@@ -11,10 +11,14 @@ import { firecrawlApp } from "../../../src/lib/firecrawl";
 export async function testPremiumAudit() {
   console.log("▶ Running Premium SEO Audit Lead Magnet Tests...");
 
-  // Save original crawlUrl method
+  // Save original crawlUrl method and env key
   const originalCrawlUrl = firecrawlApp.crawlUrl;
+  const originalApiKey = process.env.FIRECRAWL_API_KEY;
 
   try {
+    // Force route to execute crawl instead of internal mock mode
+    process.env.FIRECRAWL_API_KEY = "fc-test-api-key";
+
     // 1. Scenario A: Perfect Crawl (Verify Score, Grades, and JSON Recommendations)
     console.log("  * Scenario A: Testing Perfect Crawl and Score calculation...");
     (firecrawlApp as any).crawlUrl = async (url: string, options?: any): Promise<any> => {
@@ -25,7 +29,7 @@ export async function testPremiumAudit() {
           {
             url: `${url}/`,
             markdown: "# Optimus AI\nWe provide advanced semantic search and AI optimization.",
-            metadata: { title: "صفحه اصلی - خانه خلاق هوش مصنوعی", description: "پلتفرم پیشرفته ممیزی هوشمند سئو معنایی" }
+            metadata: { title: "صفحه اصلی - خانه خلاق هوش مصنوعی", description: "پلتفرم پیشرفته تحلیل هوشمند سئو معنایی" }
           },
           {
             url: `${url}/blog`,
@@ -106,8 +110,9 @@ export async function testPremiumAudit() {
     console.log("  * Success: Invalid URL rejected correctly.");
 
   } finally {
-    // Restore original crawl implementation
+    // Restore original crawl implementation and env key
     firecrawlApp.crawlUrl = originalCrawlUrl;
+    process.env.FIRECRAWL_API_KEY = originalApiKey;
   }
 
   console.log("✅ Premium SEO Audit Tests Passed Successfully!");

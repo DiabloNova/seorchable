@@ -82,9 +82,9 @@ export const FreeAuditPanel: React.FC<FreeAuditPanelProps> = ({ onUpgradeClick }
   }, [result]);
 
   const strings = {
-    title: isRtl ? "ممیزی رایگان ساختار سئو وب‌سایت" : "Free Website SEO & Structure Audit",
+    title: isRtl ? "تحلیل رایگان ساختار سئو وب‌سایت" : "Free Website SEO & Structure Audit",
     desc: isRtl
-      ? "ساختار اولیه، تگ‌ها و وضعیت دسترسی ربات‌های وب‌سایت خود را با ابزار پیشرفته خزش Firecrawl ممیزی نمایید."
+      ? "ساختار اولیه، تگ‌ها و وضعیت دسترسی ربات‌های وب‌سایت خود را با ابزار پیشرفته خزش Firecrawl تحلیل نمایید."
       : "Audit basic meta elements, headings, and bot crawlability with industry-grade Firecrawl technology.",
     placeholder: isRtl ? "آدرس وب‌سایت خود را وارد کنید (مثلاً: https://example.com)" : "Enter website URL (e.g. https://example.com)",
     btnAnalyze: isRtl ? "آنالیز رایگان وب‌سایت" : "Analyze Website Free",
@@ -421,7 +421,7 @@ export const FreeAuditPanel: React.FC<FreeAuditPanelProps> = ({ onUpgradeClick }
                   onClick={onUpgradeClick}
                   className="gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 border-none font-bold text-xs text-white shadow-lg shadow-orange-950/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                 >
-                  <span>{isRtl ? "ارتقا به نسخه پریمیوم و ممیزی معنایی" : "Upgrade to Premium Semantic Audit"}</span>
+                  <span>{isRtl ? "ارتقا به نسخه پریمیوم و تحلیل معنایی" : "Upgrade to Premium Semantic Audit"}</span>
                   <ArrowLeft size={14} className="rtl:-scale-x-100" />
                 </Button>
               </div>

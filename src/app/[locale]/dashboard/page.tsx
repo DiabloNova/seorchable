@@ -22,6 +22,7 @@ import { BrandIntelligenceChat } from "@/components/features/rag/BrandIntelligen
 import { AeoAuditPanel } from "@/components/features/audit/AeoAuditPanel";
 import { FreeAuditPanel } from "@/components/features/audit/FreeAuditPanel";
 import { PremiumAuditPanel } from "@/components/features/audit/PremiumAuditPanel";
+import { ContentStudio } from "@/components/features/content/ContentStudio";
 import { intelligenceService } from "@/services/intelligence";
 import { BrandHealthMetrics } from "@/schemas/intelligence";
 
@@ -257,17 +258,22 @@ export default function DashboardPage() {
     },
     {
       id: "free-audit",
-      label: isRtl ? "ممیزی رایگان" : "Free SEO Audit",
+      label: isRtl ? "تحلیل رایگان سئو" : "Free SEO Analysis",
       content: <FreeAuditPanel onUpgradeClick={handleUpgradeRedirect} />,
     },
     {
       id: "premium-audit",
-      label: isRtl ? "ممیزی پریمیوم ⭐" : "Premium Audit ⭐",
+      label: isRtl ? "تحلیل پیشرفته و پریمیوم ⭐" : "Premium Analysis ⭐",
       content: <PremiumAuditPanel />,
     },
     {
+      id: "content-studio",
+      label: isRtl ? "استودیو محتوا" : "Content Studio",
+      content: <ContentStudio />,
+    },
+    {
       id: "audit",
-      label: isRtl ? "ممیزی و بینش" : "Audit & Insights",
+      label: isRtl ? "ارزیابی و بینش" : "Audit & Insights",
       content: <AeoAuditPanel />,
     },
     {

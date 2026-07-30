@@ -107,19 +107,19 @@ export const PremiumAuditPanel: React.FC = () => {
   }, [result]);
 
   const strings = {
-    title: isRtl ? "ممیزی عمیق و تحلیل معنایی پریمیوم" : "Premium Deep Semantic SEO Audit",
+    title: isRtl ? "تحلیل عمیق و ارزیابی معنایی پریمیوم" : "Premium Deep Semantic SEO Audit",
     desc: isRtl
       ? "پایش کامل تا سقف ۵۰ صفحه وب‌سایت با موتور خزنده‌ی هوشمند Firecrawl، استخراج خلاءهای معنایی با هوش مصنوعی و بهینه‌سازی گراف دانش"
       : "Complete crawl of up to 50 pages, semantic gap identification via LLM, and structured Knowledge Graph optimization.",
     placeholder: isRtl ? "آدرس کامل وب‌سایت (مثال: https://example.com)" : "Root website URL (e.g. https://example.com)",
     depthLabel: isRtl ? "تعداد صفحات مورد پایش:" : "Crawl Depth Limit:",
-    btnAnalyze: isRtl ? "شروع ممیزی عمیق پریمیوم" : "Start Premium Audit",
+    btnAnalyze: isRtl ? "شروع تحلیل عمیق پریمیوم" : "Start Premium Audit",
     step1: isRtl ? "در حال خزش همزمان تمامی صفحات با Firecrawl..." : "Crawling and mapping site links via Firecrawl...",
     step2: isRtl ? "در حال تحلیل معنایی تگ‌ها و خلاءهای محتوایی با هوش مصنوعی..." : "Analyzing semantic content and entity gaps via LLM...",
     step3: isRtl ? "در حال استخراج گراف دانش و ساخت تابلوی پیشنهادات هوشمند..." : "Synthesizing and mapping strategic recommendations...",
     scoreGaugeTitle: isRtl ? "شاخص جامع سئو معنایی" : "Synthesized SEO Score",
     scoreGaugeDesc: isRtl ? "امتیاز کلی سلامت محتوایی، ساختار فنی و پیوندهای داخلی" : "Composite rating across semantic pillars",
-    pagesAnalyzedLabel: isRtl ? "صفحات ممیزی شده:" : "Pages Scanned:",
+    pagesAnalyzedLabel: isRtl ? "صفحات تحلیل شده:" : "Pages Scanned:",
     gradeLabel: isRtl ? "رتبه سئو:" : "Overall Grade:",
     metricsTitle: isRtl ? "امتیاز پایه‌های سئو پریمیوم" : "SEO Pillar Scores",
     contentQualityLabel: isRtl ? "کیفیت محتوا" : "Content Quality",
@@ -131,7 +131,7 @@ export const PremiumAuditPanel: React.FC = () => {
     priorityHigh: isRtl ? "حیاتی" : "High",
     priorityMedium: isRtl ? "متوسط" : "Medium",
     priorityLow: isRtl ? "عادی" : "Low",
-    downloadPdf: isRtl ? "دریافت گزارش PDF ممیزی معنایی" : "Download PDF Report",
+    downloadPdf: isRtl ? "دریافت گزارش PDF ارزیابی معنایی" : "Download PDF Report",
     downloadPdfProgress: isRtl ? "دانلود به زودی فعال خواهد شد..." : "PDF report downloader is launching soon",
     comparisonTitle: isRtl ? "مقایسه سهم صدای برند با رقبا و شاخص صنعت" : "Share of Voice & Competitor Comparison",
     competitorYourSite: isRtl ? "سایت شما" : "Your Site",
@@ -168,7 +168,7 @@ export const PremiumAuditPanel: React.FC = () => {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || (isRtl ? "خطا در پردازش ممیزی معنایی پریمیوم." : "An error occurred during Premium Audit."));
+          throw new Error(data.message || (isRtl ? "خطا در پردازش تحلیل معنایی پریمیوم." : "An error occurred during Premium Audit."));
         }
 
         setResult(data);
@@ -285,7 +285,7 @@ export const PremiumAuditPanel: React.FC = () => {
                 {isPending ? (
                   <>
                     <span className="w-4 h-4 border-2 border-white/25 border-t-white rounded-full animate-spin" />
-                    <span>{isRtl ? "در حال ممیزی..." : "Analyzing Premium..."}</span>
+                    <span>{isRtl ? "در حال ارزیابی..." : "Analyzing Premium..."}</span>
                   </>
                 ) : (
                   <>

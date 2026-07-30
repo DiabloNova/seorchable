@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
           {
             url: `${url}/`,
             markdown: "# Welcome to Optimus AI\nWe provide advanced semantic search and AI optimization. Digikala and Snapp are our competitors.",
-            metadata: { title: "صفحه اصلی - خانه خلاق هوش مصنوعی", description: "پلتفرم پیشرفته ممیزی هوشمند سئو معنایی" }
+            metadata: { title: "صفحه اصلی - خانه خلاق هوش مصنوعی", description: "پلتفرم پیشرفته تحلیل هوشمند سئو معنایی" }
           },
           {
             url: `${url}/blog`,
@@ -308,7 +308,7 @@ export async function POST(req: NextRequest) {
 
   } catch (error: unknown) {
     console.error("[Premium SEO Audit Route Error]:", error);
-    const message = error instanceof Error ? error.message : "خطای ناشناخته در ممیزی پریمیوم رخ داد.";
+    const message = error instanceof Error ? error.message : "خطای ناشناخته در ارزیابی پریمیوم رخ داد.";
     return NextResponse.json(
       { error: "Internal Server Error", message },
       { status: 500 }
