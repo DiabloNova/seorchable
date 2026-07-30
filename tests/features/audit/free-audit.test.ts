@@ -24,7 +24,7 @@ export async function testFreeAudit() {
         success: true,
         markdown: "# Welcome to Optimus AI\nThis is a beautiful page content.",
         metadata: {
-          title: "ممیزی پیشرفته سئو معنایی و هوشمندسازی کسب‌وکار آنلاین", // Exactly 53 chars (between 50 and 60)
+          title: "تحلیل پیشرفته سئو معنایی و هوشمندسازی کسب‌وکار آنلاین", // Exactly 53 chars (between 50 and 60)
           description: "تحلیل جامع ساختار سئو معنایی، پایش سلامت احساسات برند، استخراج تخصصی گراف دانش و بررسی بهینه‌سازی موتورهای پاسخ‌دهی هوشمند به زبان فارسی انجام می‌گردد.", // Exactly 152 chars (between 150 and 160)
           language: "fa",
           robots: "index, follow",

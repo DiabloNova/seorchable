@@ -73,12 +73,12 @@ export const AeoAuditPanel: React.FC = () => {
   }, []);
 
   const strings = {
-    panelTitle: isRtl ? "ممیزی عمیق و بهینه‌سازی معنایی برند (AEO)" : "Semantic AEO & SEO Brand Audit",
+    panelTitle: isRtl ? "تحلیل عمیق و بهینه‌سازی معنایی برند (AEO)" : "Semantic AEO & SEO Brand Audit",
     panelDesc: isRtl
       ? "تراکم مفاهیم، شبکه ارتباطات گراف معنایی و سلامت احساسات را ارزیابی کرده و نسخه‌های بهینه‌سازی موتورهای پاسخ‌گو را دریافت نمایید."
       : "Audit entity density, relationship clarity, and sentiment scores. Receive automated AEO recommendations.",
     inputPlaceholder: isRtl ? "نام برند یا شرکت خود را وارد کنید (مثال: دیجی کالا)..." : "Enter brand or entity name (e.g., Optimus)...",
-    btnAnalyze: isRtl ? "شروع ممیزی معنایی" : "Run Semantic Audit",
+    btnAnalyze: isRtl ? "شروع تحلیل معنایی" : "Run Semantic Audit",
     btnAnalyzing: isRtl ? "در حال پایش گراف دانش..." : "Auditing Semantic Graph...",
     scoreGaugeTitle: isRtl ? "شاخص آمادگی موتور پاسخ‌گو" : "AEO Readiness Index",
     scoreGaugeDesc: isRtl ? "امتیاز کلی حضور شما در مدل‌های زبانی بزرگ" : "Synthesized weight across semantic components",
@@ -94,7 +94,7 @@ export const AeoAuditPanel: React.FC = () => {
     categoryStructure: isRtl ? "ساختار" : "Structure",
     categoryReputation: isRtl ? "اعتبار" : "Reputation",
     validationError: isRtl ? "لطفاً نام برند مورد نظر را وارد نمایید." : "Please enter a brand or company name to audit.",
-    apiError: isRtl ? "خطا در بازیابی اطلاعات ممیزی. مطمئن شوید دیتابیس فعال است." : "Failed to retrieve semantic audit payload. Check database connectivity.",
+    apiError: isRtl ? "خطا در بازیابی اطلاعات تحلیل. مطمئن شوید دیتابیس فعال است." : "Failed to retrieve semantic audit payload. Check database connectivity.",
     emptyResultTitle: isRtl ? "درگاه آزمایش سئو معنایی" : "Semantic SEO Diagnostic Center",
     emptyResultDesc: isRtl
       ? "برای ارزیابی و استخراج اتوماتیک نقشه بهینه‌سازی، نام برند مورد نظر را جستجو کنید."
