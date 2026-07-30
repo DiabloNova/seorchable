@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     } else {
       try {
         scrapeResult = await firecrawlApp.scrapeUrl(url, {
-          formats: ["markdown", "metadata"],
+          formats: ["markdown"],
         });
       } catch (scrapeErr: unknown) {
         console.error("[Firecrawl Scrape Error]:", scrapeErr);
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (!scrapeResult || !scrapeResult.success) {
+    if (!scrapeResult || ('success' in scrapeResult && !scrapeResult.success)) {
       return NextResponse.json(
         {
           error: "Scrape Unsuccessful",
