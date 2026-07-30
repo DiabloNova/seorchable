@@ -17,7 +17,7 @@ export async function testFreeAudit() {
   try {
     // 1. Scenario A: Perfect Scrape (Score 100, Grade A)
     console.log("  * Scenario A: Testing Perfect Score (100) & Grade A...");
-    firecrawlApp.scrapeUrl = async (url: string, options?: { formats?: string[] }): Promise<unknown> => {
+    (firecrawlApp as any).scrapeUrl = async (url: string, options?: any): Promise<any> => {
       // Avoid unused variable warnings
       if (!url || !options) return null;
       return {
@@ -60,7 +60,7 @@ export async function testFreeAudit() {
 
     // 2. Scenario B: Imperfect/Poor Scrape (Missing tags, HTTP, noindex -> score 0, Grade F)
     console.log("  * Scenario B: Testing Poor Score & Grade F...");
-    firecrawlApp.scrapeUrl = async (url: string, options?: { formats?: string[] }): Promise<unknown> => {
+    (firecrawlApp as any).scrapeUrl = async (url: string, options?: any): Promise<any> => {
       // Avoid unused variable warnings
       if (!url || !options) return null;
       return {
