@@ -21,6 +21,7 @@ import { IngestionForm } from "@/components/features/ingestion/IngestionForm";
 import { BrandIntelligenceChat } from "@/components/features/rag/BrandIntelligenceChat";
 import { AeoAuditPanel } from "@/components/features/audit/AeoAuditPanel";
 import { FreeAuditPanel } from "@/components/features/audit/FreeAuditPanel";
+import { PremiumAuditPanel } from "@/components/features/audit/PremiumAuditPanel";
 import { intelligenceService } from "@/services/intelligence";
 import { BrandHealthMetrics } from "@/schemas/intelligence";
 
@@ -258,6 +259,11 @@ export default function DashboardPage() {
       id: "free-audit",
       label: isRtl ? "ممیزی رایگان" : "Free SEO Audit",
       content: <FreeAuditPanel onUpgradeClick={handleUpgradeRedirect} />,
+    },
+    {
+      id: "premium-audit",
+      label: isRtl ? "ممیزی پریمیوم ⭐" : "Premium Audit ⭐",
+      content: <PremiumAuditPanel />,
     },
     {
       id: "audit",
