@@ -17,6 +17,9 @@ import { KnowledgeGraphExplorer } from "@/components/features/graph/KnowledgeGra
 // Technical Optimization Panel
 import { TechnicalOptimizationPanel } from "@/components/features/optimization/TechnicalOptimizationPanel";
 
+// Competitive Analysis Panel
+import { CompetitiveAnalysisPanel } from "@/components/features/analysis/CompetitiveAnalysisPanel";
+
 import { intelligenceService } from "@/services/intelligence";
 import { BrandHealthMetrics } from "@/schemas/intelligence";
 
@@ -246,6 +249,11 @@ export default function DashboardPage() {
       id: "technical",
       label: isRtl ? "بهینه‌سازی فنی سئو ⭐" : "Technical Optimization ⭐",
       content: <TechnicalOptimizationPanel />,
+    },
+    {
+      id: "competitive",
+      label: isRtl ? "تحلیل رقابتی ⭐" : "Competitive Analysis ⭐",
+      content: <CompetitiveAnalysisPanel />,
     },
   ];
 
