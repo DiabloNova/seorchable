@@ -23,6 +23,7 @@ import { AeoAuditPanel } from "@/components/features/audit/AeoAuditPanel";
 import { FreeAuditPanel } from "@/components/features/audit/FreeAuditPanel";
 import { PremiumAuditPanel } from "@/components/features/audit/PremiumAuditPanel";
 import { ContentStudio } from "@/components/features/content/ContentStudio";
+import { LlmAnalyticsPanel } from "@/components/features/analytics/LlmAnalyticsPanel";
 import { intelligenceService } from "@/services/intelligence";
 import { BrandHealthMetrics } from "@/schemas/intelligence";
 
@@ -270,6 +271,11 @@ export default function DashboardPage() {
       id: "content-studio",
       label: isRtl ? "استودیو محتوا" : "Content Studio",
       content: <ContentStudio />,
+    },
+    {
+      id: "llm-analytics",
+      label: isRtl ? "تحلیل مدل‌های زبانی" : "LLM Analytics",
+      content: <LlmAnalyticsPanel />,
     },
     {
       id: "audit",
