@@ -91,7 +91,7 @@ export default function AppSidebar({
         { href: "/dashboard/optimization/technical", icon: Settings, label: "بهینه‌سازی فنی", badge: "Pro" },
         { href: "/dashboard/content", icon: FileText, label: "استودیو محتوا" },
         { href: "/dashboard/analytics/llm", icon: Bot, label: "تحلیل مدل‌های زبانی" },
-        { href: "/dashboard/competitors", icon: Compass, label: "تحلیل رقابتی" },
+        { href: "/dashboard/competitors", icon: Compass, label: "تحلیل رقابتی", badge: "Pro" },
       ],
     },
   ];

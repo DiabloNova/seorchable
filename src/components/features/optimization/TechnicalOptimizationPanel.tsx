@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/Button";
 import { Badge } from "@/components/Badge";
@@ -9,7 +10,9 @@ import { useAuth } from "@/components/AuthProvider";
 import {
   Zap, AlertTriangle, ShieldAlert, CheckCircle,
   Settings, Award, RefreshCw, Layers, Layout,
-  Cpu, FileText, Download, Smartphone, Eye
+  Cpu, FileText, Download, Smartphone, Eye,
+  Globe, Accessibility, Shield, Sparkles, Loader2,
+  ChevronDown
 } from "lucide-react";
 
 interface Category {
@@ -65,33 +68,33 @@ export const TechnicalOptimizationPanel: React.FC = () => {
   const [url, setUrl] = useState("");
   const [pagesToAnalyze, setPagesToAnalyze] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingStep, setLoadingStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<TechnicalAuditData | null>(null);
-  const [expandedIssueIdx, setExpandedIssueIdx] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState<number | null>(null);
 
   // Multi-step loading phrases
-  const loadingSteps = [
-    "در حال خزش صفحات سایت...",
-    "تحلیل عملکرد و سرعت...",
-    "بررسی دسترسی‌پذیری...",
-    "ارزیابی امنیت و سئو فنی...",
-    "تولید پیشنهادات بهینه‌سازی..."
+  const steps = [
+    { label: isRtl ? "در حال خزش صفحات سایت..." : "Crawling website pages...", icon: Globe },
+    { label: isRtl ? "تحلیل عملکرد و سرعت..." : "Analyzing performance and speed...", icon: Zap },
+    { label: isRtl ? "بررسی دسترسی‌پذیری..." : "Checking accessibility...", icon: Accessibility },
+    { label: isRtl ? "ارزیابی امنیت و سئو فنی..." : "Assessing security and technical SEO...", icon: Shield },
+    { label: isRtl ? "تولید پیشنهادات بهینه‌سازی..." : "Generating optimization suggestions...", icon: Sparkles },
   ];
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isLoading) {
       timer = setInterval(() => {
-        setLoadingStep((prev) => {
-          if (prev < loadingSteps.length - 1) {
+        setCurrentStep((prev) => {
+          if (prev < steps.length - 1) {
             return prev + 1;
           }
           return prev;
         });
-      }, 3000);
+      }, 2500);
     } else {
-      setLoadingStep(0);
+      setCurrentStep(0);
     }
     return () => clearInterval(timer);
   }, [isLoading]);
@@ -101,9 +104,10 @@ export const TechnicalOptimizationPanel: React.FC = () => {
     if (!url.trim()) return;
 
     setIsLoading(true);
-    setLoadingStep(0);
+    setCurrentStep(0);
     setError(null);
     setData(null);
+    setExpanded(null);
 
     try {
       const workspaceId = session.user?.workspaceId || "ws-tehran";
@@ -131,31 +135,8 @@ export const TechnicalOptimizationPanel: React.FC = () => {
     }
   };
 
-  const toggleIssueExpand = (idx: number) => {
-    setExpandedIssueIdx(expandedIssueIdx === idx ? null : idx);
-  };
-
   const handleExportPDF = () => {
-    // Generate simple print-mode trigger or styled download
     window.print();
-  };
-
-  const getImpactBadgeVariant = (impact: "high" | "medium" | "low") => {
-    if (impact === "high") return "error";
-    if (impact === "medium") return "warning";
-    return "info";
-  };
-
-  const getImpactLabel = (impact: "high" | "medium" | "low") => {
-    if (impact === "high") return isRtl ? "تاثیر بالا" : "High Impact";
-    if (impact === "medium") return isRtl ? "تاثیر متوسط" : "Medium Impact";
-    return isRtl ? "تاثیر کم" : "Low Impact";
-  };
-
-  const getEffortLabel = (effort: "easy" | "medium" | "hard") => {
-    if (effort === "easy") return isRtl ? "ساده" : "Easy";
-    if (effort === "medium") return isRtl ? "متوسط" : "Medium";
-    return isRtl ? "دشوار" : "Hard";
   };
 
   return (
@@ -242,18 +223,17 @@ export const TechnicalOptimizationPanel: React.FC = () => {
         </GlassCard>
       )}
 
-      {/* Loading State */}
+      {/* Enhanced Loading State with Multi-Step Animated Progress Indicators */}
       {isLoading && (
-        <GlassCard hoverable={false} className="p-8 text-center space-y-6">
-          <div className="relative flex items-center justify-center mx-auto w-16 h-16">
-            <div className="absolute w-16 h-16 border-4 border-[var(--sky-blue-500)]/20 border-t-[var(--sky-blue-500)] rounded-full animate-spin" />
-            <Cpu className="text-[var(--sky-blue-500)] animate-pulse" size={24} />
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="text-sm font-bold text-[var(--text-primary)] animate-pulse">
-              {loadingSteps[loadingStep]}
-            </h4>
+        <GlassCard hoverable={false} className="p-8 space-y-6">
+          <div className="text-center space-y-2 mb-4">
+            <div className="relative flex items-center justify-center mx-auto w-16 h-16">
+              <div className="absolute w-16 h-16 border-4 border-[var(--sky-blue-500)]/20 border-t-[var(--sky-blue-500)] rounded-full animate-spin" />
+              <Cpu className="text-[var(--sky-blue-500)] animate-pulse" size={24} />
+            </div>
+            <h3 className="text-sm font-bold text-[var(--text-primary)] mt-3">
+              {isRtl ? "پایش فنی و معنایی وب‌سایت در حال اجراست" : "Deep Site Crawl & Semantics In Progress"}
+            </h3>
             <p className="text-[11px] text-[var(--text-muted)] max-w-sm mx-auto">
               {isRtl
                 ? "فرآیند خزش عمیق و تحلیل کدهای وب‌سایت در حال انجام است. لطفاً منتظر بمانید."
@@ -261,16 +241,32 @@ export const TechnicalOptimizationPanel: React.FC = () => {
             </p>
           </div>
 
-          {/* Stepper progress nodes */}
-          <div className="flex items-center justify-center gap-2 max-w-xs mx-auto">
-            {loadingSteps.map((_, idx) => (
-              <div
-                key={idx}
-                className={`h-1.5 rounded-full transition-all duration-500 ${
-                  idx <= loadingStep ? "w-8 bg-[var(--sky-blue-500)]" : "w-2 bg-white/10"
-                }`}
-              />
-            ))}
+          <div className="space-y-3 max-w-md mx-auto">
+            {steps.map((step, idx) => {
+              const Icon = step.icon;
+              const isActive = idx === currentStep;
+              const isCompleted = idx < currentStep;
+
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: isRtl ? 20 : -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
+                    isActive ? 'bg-[var(--sky-blue-500)]/20 border border-[var(--sky-blue-500)]/40' :
+                    isCompleted ? 'bg-[var(--color-success)]/10 border border-[var(--color-success)]/20' :
+                    'bg-[var(--muted-surface)]/30 border border-transparent'
+                  }`}
+                >
+                  <Icon size={18} className={isCompleted ? 'text-[var(--color-success)]' : isActive ? 'text-[var(--sky-blue-500)]' : 'text-[var(--text-muted)]'} />
+                  <span className={`text-xs ${isCompleted ? 'text-[var(--color-success)]' : isActive ? 'text-[var(--text-primary)] font-medium' : 'text-[var(--text-muted)]'}`}>
+                    {step.label}
+                  </span>
+                  {isActive && <Loader2 size={16} className="animate-spin ml-auto" />}
+                </motion.div>
+              );
+            })}
           </div>
         </GlassCard>
       )}
@@ -353,33 +349,80 @@ export const TechnicalOptimizationPanel: React.FC = () => {
             </GlassCard>
           </div>
 
-          {/* Category score breakdowns */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <GlassCard hoverable={false} className="p-3 text-center space-y-1">
-              <span className="text-[9px] text-[var(--text-muted)] block uppercase font-bold">{isRtl ? "عملکرد" : "Performance"}</span>
-              <span className="text-base font-black text-white">{data.categories.performance.score}%</span>
-              <span className="text-[9px] text-red-400 block">{isRtl ? `${data.categories.performance.issues} خطا` : `${data.categories.performance.issues} issues`}</span>
-            </GlassCard>
-            <GlassCard hoverable={false} className="p-3 text-center space-y-1">
-              <span className="text-[9px] text-[var(--text-muted)] block uppercase font-bold">{isRtl ? "دسترسی‌پذیری" : "Accessibility"}</span>
-              <span className="text-base font-black text-white">{data.categories.accessibility.score}%</span>
-              <span className="text-[9px] text-red-400 block">{isRtl ? `${data.categories.accessibility.issues} خطا` : `${data.categories.accessibility.issues} issues`}</span>
-            </GlassCard>
-            <GlassCard hoverable={false} className="p-3 text-center space-y-1">
-              <span className="text-[9px] text-[var(--text-muted)] block uppercase font-bold">{isRtl ? "سازگاری موبایل" : "Mobile"}</span>
-              <span className="text-base font-black text-white">{data.categories.mobile.score}%</span>
-              <span className="text-[9px] text-red-400 block">{isRtl ? `${data.categories.mobile.issues} خطا` : `${data.categories.mobile.issues} issues`}</span>
-            </GlassCard>
-            <GlassCard hoverable={false} className="p-3 text-center space-y-1">
-              <span className="text-[9px] text-[var(--text-muted)] block uppercase font-bold">{isRtl ? "امنیت" : "Security"}</span>
-              <span className="text-base font-black text-white">{data.categories.security.score}%</span>
-              <span className="text-[9px] text-red-400 block">{isRtl ? `${data.categories.security.issues} خطا` : `${data.categories.security.issues} issues`}</span>
-            </GlassCard>
-            <GlassCard hoverable={false} className="p-3 text-center space-y-1">
-              <span className="text-[9px] text-[var(--text-muted)] block uppercase font-bold">{isRtl ? "سئو فنی" : "Technical SEO"}</span>
-              <span className="text-base font-black text-white">{data.categories.technicalSeo.score}%</span>
-              <span className="text-[9px] text-red-400 block">{isRtl ? `${data.categories.technicalSeo.issues} خطا` : `${data.categories.technicalSeo.issues} issues`}</span>
-            </GlassCard>
+          {/* Enhanced Category Cards */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+              {isRtl ? "تفکیک جزئیات پایش براساس دسته‌بندی‌ها" : "Category Breakdown"}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+              {[
+                {
+                  key: "performance",
+                  label: isRtl ? "عملکرد" : "Performance",
+                  icon: Zap,
+                  score: data.categories.performance.score,
+                  issuesCount: data.categories.performance.issues,
+                },
+                {
+                  key: "accessibility",
+                  label: isRtl ? "دسترسی‌پذیری" : "Accessibility",
+                  icon: Accessibility,
+                  score: data.categories.accessibility.score,
+                  issuesCount: data.categories.accessibility.issues,
+                },
+                {
+                  key: "mobile",
+                  label: isRtl ? "سازگاری موبایل" : "Mobile",
+                  icon: Smartphone,
+                  score: data.categories.mobile.score,
+                  issuesCount: data.categories.mobile.issues,
+                },
+                {
+                  key: "security",
+                  label: isRtl ? "امنیت" : "Security",
+                  icon: Shield,
+                  score: data.categories.security.score,
+                  issuesCount: data.categories.security.issues,
+                },
+                {
+                  key: "technicalSeo",
+                  label: isRtl ? "سئو فنی" : "Technical SEO",
+                  icon: FileText,
+                  score: data.categories.technicalSeo.score,
+                  issuesCount: data.categories.technicalSeo.issues,
+                }
+              ].map((cat) => {
+                const Icon = cat.icon;
+                const score = cat.score;
+                const issuesCount = cat.issuesCount;
+
+                return (
+                  <div
+                    key={cat.key}
+                    className="glass-card p-6 rounded-2xl hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(56,189,248,0.15)] transition-all duration-300"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`p-3 rounded-xl ${score >= 80 ? 'bg-green-500/20' : score >= 60 ? 'bg-yellow-500/20' : 'bg-red-500/20'}`}>
+                        <Icon size={24} className={score >= 80 ? 'text-green-500' : score >= 60 ? 'text-yellow-500' : 'text-red-500'} />
+                      </div>
+                      <span className="text-3xl font-bold">{score}</span>
+                    </div>
+                    <h3 className="text-sm font-medium text-[var(--text-muted)] mb-2">{cat.label}</h3>
+                    <div className="h-2 bg-[var(--border)] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-[var(--sky-blue-500)] to-[var(--orange-500)] rounded-full transition-all duration-500"
+                        style={{ width: `${score}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-[var(--text-muted)] mt-2">
+                      {isRtl
+                        ? `${issuesCount} مورد نیاز به بهبود`
+                        : `${issuesCount} issues found`}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Quick Wins Section */}
@@ -403,7 +446,7 @@ export const TechnicalOptimizationPanel: React.FC = () => {
             </div>
           </GlassCard>
 
-          {/* Critical Issues List */}
+          {/* Expandable Critical Issues Section */}
           <div className="space-y-4">
             <h3 className="text-xs font-bold uppercase tracking-wider text-red-400 flex items-center gap-1.5">
               <AlertTriangle size={14} />
@@ -411,66 +454,60 @@ export const TechnicalOptimizationPanel: React.FC = () => {
             </h3>
 
             <div className="space-y-3">
-              {data.criticalIssues.map((issue, idx) => {
-                const isExpanded = expandedIssueIdx === idx;
-                return (
-                  <GlassCard key={idx} hoverable={false} className="p-4 border-red-500/10 bg-red-500/[0.005]">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div className="flex gap-2.5 items-start">
-                        <div className="p-1.5 rounded-lg bg-red-500/10 text-red-400 flex-shrink-0 mt-0.5">
-                          <AlertTriangle size={14} />
-                        </div>
-                        <div>
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{issue.category}</span>
-                          <h4 className="text-xs font-bold text-white mt-0.5 leading-snug">{issue.issue}</h4>
-                          <p className="text-[10px] text-[var(--text-muted)] mt-1">
-                            {isRtl
-                              ? `تعداد صفحات تحت تاثیر: ${issue.affectedPages} صفحه`
-                              : `Affected pages: ${issue.affectedPages}`}
-                          </p>
-                        </div>
+              {data.criticalIssues.map((issue, idx) => (
+                <div key={idx} className="glass-card rounded-xl border border-[var(--glass-border)] overflow-hidden transition-all duration-300">
+                  <div
+                    onClick={() => setExpanded(expanded === idx ? null : idx)}
+                    className="p-4 cursor-pointer hover:bg-[var(--muted-surface)] transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <AlertTriangle size={20} className="text-red-500" />
+                        <h4 className="font-medium text-[var(--text-primary)] text-sm">{issue.issue}</h4>
                       </div>
-
-                      <div className="flex items-center gap-2 self-end sm:self-auto">
-                        <Badge variant={getImpactBadgeVariant(issue.impact)} className="text-[9px]">
-                          {getImpactLabel(issue.impact)}
-                        </Badge>
-                        <Badge variant="neutral" className="text-[9px]">
-                          {isRtl ? `سختی: ${getEffortLabel(issue.effort)}` : `Effort: ${getEffortLabel(issue.effort)}`}
-                        </Badge>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleIssueExpand(idx)}
-                          className="p-1 px-2.5 text-[10px] hover:bg-white/5 text-slate-300 hover:text-white rounded-lg flex items-center gap-1 cursor-pointer"
-                        >
-                          <Eye size={10} />
-                          <span>{isRtl ? "نمایش راهکار" : "View Fix"}</span>
-                        </Button>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-0.5 text-[10px] rounded-full font-semibold ${issue.impact === 'high' ? 'bg-red-500/20 text-red-500' : 'bg-yellow-500/20 text-yellow-500'}`}>
+                          {issue.impact === 'high' ? (isRtl ? 'بحرانی' : 'Critical') : (isRtl ? 'هشدار' : 'Warning')}
+                        </span>
+                        <ChevronDown size={16} className={`transition-transform ${expanded === idx ? 'rotate-180' : ''} text-[var(--text-muted)]`} />
                       </div>
                     </div>
+                    <p className="text-xs text-[var(--text-muted)] mt-2">
+                      {isRtl
+                        ? `${issue.affectedPages} صفحه تحت تأثیر`
+                        : `${issue.affectedPages} pages affected`}
+                    </p>
+                  </div>
 
-                    {/* Expandable Fix Section */}
-                    {isExpanded && (
-                      <div className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-slide-down">
-                        <div className="bg-white/[0.01] p-3 rounded-lg border border-white/5">
-                          <h5 className="text-[10px] font-bold text-slate-300 mb-1">{isRtl ? "توصیه فنی بهینه‌سازی:" : "Optimization Recommendation:"}</h5>
-                          <p className="text-xs text-slate-200 leading-relaxed">{issue.recommendation}</p>
-                        </div>
-
-                        {issue.codeExample && (
-                          <div className="space-y-1.5">
-                            <h5 className="text-[10px] font-bold text-slate-300">{isRtl ? "نمونه کد پیاده‌سازی:" : "Implementation Code Example:"}</h5>
-                            <pre className="p-3 bg-slate-950/80 border border-white/5 rounded-lg text-[10px] text-slate-300 font-mono overflow-x-auto leading-normal whitespace-pre">
+                  <AnimatePresence>
+                    {expanded === idx && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="border-t border-[var(--glass-border)] bg-[var(--muted-surface)]/30"
+                      >
+                        <div className="p-4 space-y-3">
+                          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{issue.recommendation}</p>
+                          {issue.codeExample && (
+                            <pre className="bg-[var(--bg-secondary)] p-3 rounded-lg overflow-x-auto text-[10px] text-[var(--text-primary)] font-mono leading-normal whitespace-pre">
                               <code>{issue.codeExample}</code>
                             </pre>
+                          )}
+                          <div className="flex items-center gap-4 text-[10px] text-[var(--text-muted)] font-bold">
+                            <span>
+                              {isRtl ? `تأثیر: ${issue.impact === 'high' ? 'زیاد' : issue.impact === 'medium' ? 'متوسط' : 'کم'}` : `Impact: ${issue.impact}`}
+                            </span>
+                            <span>
+                              {isRtl ? `تلاش: ${issue.effort === 'easy' ? 'آسان' : issue.effort === 'medium' ? 'متوسط' : 'سخت'}` : `Effort: ${issue.effort}`}
+                            </span>
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      </motion.div>
                     )}
-                  </GlassCard>
-                );
-              })}
+                  </AnimatePresence>
+                </div>
+              ))}
             </div>
           </div>
         </div>
