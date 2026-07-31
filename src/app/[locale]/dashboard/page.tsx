@@ -6,12 +6,16 @@ import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Dialog } from "@/components/Dialog";
+import { Tabs } from "@/components/Tabs";
 
 // Brand Intelligence Analytics Components
 import { KPICard } from "@/components/features/analytics/KPICard";
 import { SentimentTrendChart } from "@/components/features/analytics/SentimentTrendChart";
 import { TopEntitiesList } from "@/components/features/analytics/TopEntitiesList";
 import { KnowledgeGraphExplorer } from "@/components/features/graph/KnowledgeGraphExplorer";
+
+// Technical Optimization Panel
+import { TechnicalOptimizationPanel } from "@/components/features/optimization/TechnicalOptimizationPanel";
 
 import { intelligenceService } from "@/services/intelligence";
 import { BrandHealthMetrics } from "@/schemas/intelligence";
@@ -61,8 +65,7 @@ const Skeleton = () => (
 );
 
 /**
- * Premium dashboard redesigned with vertical route-based sidebar navigation.
- * Renders the primary Overview & Analytics content directly.
+ * Premium dashboard redesigned with vertical route-based sidebar navigation and core tabs.
  */
 export default function DashboardPage() {
   const { session } = useAuth();
@@ -79,6 +82,8 @@ export default function DashboardPage() {
   const [isAddBrandOpen, setIsAddBrandOpen] = useState(false);
   const [newBrandName, setNewBrandName] = useState("");
   const [newBrandDomain, setNewBrandDomain] = useState("");
+
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     if (session.status !== "authenticated") return;
@@ -178,6 +183,72 @@ export default function DashboardPage() {
     return <Skeleton />;
   }
 
+  const dashboardTabs = [
+    {
+      id: "overview",
+      label: isRtl ? "نمای کلی و تحلیلی" : "Overview & Analytics",
+      content: (
+        <div className="space-y-6">
+          {/* Row 1: KPI Metrics */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <KPICard
+              title={isRtl ? "مجموع سیگنال‌های پایش شده" : "Total Mentions Tracked"}
+              value={analyticsSummary.totalMentions}
+              change="+12.4%"
+              changeType="success"
+              description={isRtl ? "پایش فعال در موتورهای پاسخ‌دهی" : "Active crawling from leading search models"}
+              icon={Activity}
+            />
+            <KPICard
+              title={isRtl ? "میانگین شاخص احساسات" : "Avg Sentiment Index"}
+              value={`${(analyticsSummary.averageSentimentScore * 100).toFixed(1)} / 100`}
+              change="+4.2%"
+              changeType="success"
+              description={isRtl ? "کیفیت معنایی پاسخ‌های هوش مصنوعی" : "Qualitative semantic score"}
+              icon={MessageSquare}
+            />
+            <KPICard
+              title={isRtl ? "شاخص سلامت و امنیت برند" : "Brand Safety Index"}
+              value="۹۲.۴٪"
+              change="+1.5%"
+              changeType="success"
+              description={isRtl ? "عدم وجود پاسخ مغایر با حقیقت" : "Risk of incorrect model claims"}
+              icon={Award}
+            />
+            <KPICard
+              title={isRtl ? "کل مراجع استناد شده" : "Verified Outbound Citations"}
+              value={brandMetrics.totalCitations}
+              change="+8.3%"
+              changeType="success"
+              description={isRtl ? "پیوندهای ارجاع ثبت‌شده به دامنه" : "Verified active citation links"}
+              icon={FileText}
+            />
+          </div>
+
+          {/* Row 2: Charts Grid */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <SentimentTrendChart data={analyticsSummary.recentTrend} />
+            </div>
+            <div>
+              <TopEntitiesList data={analyticsSummary.topEntities} />
+            </div>
+          </div>
+
+          {/* Row 3: Interactive Knowledge Graph Explorer */}
+          <div className="w-full">
+            <KnowledgeGraphExplorer />
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "technical",
+      label: isRtl ? "بهینه‌سازی فنی سئو ⭐" : "Technical Optimization ⭐",
+      content: <TechnicalOptimizationPanel />,
+    },
+  ];
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Welcome Header */}
@@ -201,59 +272,8 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      {/* Overview Analytics Content (no tabs) */}
-      <div className="space-y-6">
-        {/* Row 1: KPI Metrics */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <KPICard
-            title={isRtl ? "مجموع سیگنال‌های پایش شده" : "Total Mentions Tracked"}
-            value={analyticsSummary.totalMentions}
-            change="+12.4%"
-            changeType="success"
-            description={isRtl ? "پایش فعال در موتورهای پاسخ‌دهی" : "Active crawling from leading search models"}
-            icon={Activity}
-          />
-          <KPICard
-            title={isRtl ? "میانگین شاخص احساسات" : "Avg Sentiment Index"}
-            value={`${(analyticsSummary.averageSentimentScore * 100).toFixed(1)} / 100`}
-            change="+4.2%"
-            changeType="success"
-            description={isRtl ? "کیفیت معنایی پاسخ‌های هوش مصنوعی" : "Qualitative semantic score"}
-            icon={MessageSquare}
-          />
-          <KPICard
-            title={isRtl ? "شاخص سلامت و امنیت برند" : "Brand Safety Index"}
-            value="۹۲.۴٪"
-            change="+1.5%"
-            changeType="success"
-            description={isRtl ? "عدم وجود پاسخ مغایر با حقیقت" : "Risk of incorrect model claims"}
-            icon={Award}
-          />
-          <KPICard
-            title={isRtl ? "کل مراجع استناد شده" : "Verified Outbound Citations"}
-            value={brandMetrics.totalCitations}
-            change="+8.3%"
-            changeType="success"
-            description={isRtl ? "پیوندهای ارجاع ثبت‌شده به دامنه" : "Verified active citation links"}
-            icon={FileText}
-          />
-        </div>
-
-        {/* Row 2: Charts Grid */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <SentimentTrendChart data={analyticsSummary.recentTrend} />
-          </div>
-          <div>
-            <TopEntitiesList data={analyticsSummary.topEntities} />
-          </div>
-        </div>
-
-        {/* Row 3: Interactive Knowledge Graph Explorer */}
-        <div className="w-full">
-          <KnowledgeGraphExplorer />
-        </div>
-      </div>
+      {/* Tabs Container */}
+      <Tabs tabs={dashboardTabs} activeTabId={activeTab} onTabChange={setActiveTab} />
 
       {/* REGISTER BRAND DIALOG */}
       <Dialog
