@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
           success: true,
           markdown: "# Welcome to Optimus AI\nThis is a beautiful page content and we optimize technical SEO structure.",
           metadata: {
-            title: "ممیزی پیشرفته سئو معنایی و هوشمندسازی کسب‌وکار آنلاین", // 53 chars
+            title: "تحلیل پیشرفته سئو معنایی و هوشمندسازی کسب‌وکار آنلاین", // 53 chars
             description: "تحلیل جامع ساختار سئو معنایی، پایش سلامت احساسات برند، استخراج تخصصی گراف دانش و بررسی بهینه‌سازی موتورهای پاسخ‌دهی هوشمند به زبان فارسی انجام می‌گردد.", // 152 chars
             language: "fa",
             robots: "index, follow",
@@ -257,7 +257,7 @@ export async function POST(req: NextRequest) {
     if (quickTips.length === 0) {
       quickTips.push({
         issue: "شاخص‌های اولیه سئو فنی سایت شما عالی است!",
-        recommendation: "برای گام بعدی، ساختار معنایی پیشرفته و ارتباط میان موجودیت‌ها (Entity Graph) را به کمک نسخه ویژه ممیزی کنید.",
+        recommendation: "برای گام بعدی، ساختار معنایی پیشرفته و ارتباط میان موجودیت‌ها (Entity Graph) را به کمک نسخه ویژه تحلیل کنید.",
       });
       quickTips.push({
         issue: "آمادگی ساختاری برای بهینه‌سازی موتورهای پاسخ‌گو (AEO)",
