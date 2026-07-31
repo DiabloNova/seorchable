@@ -88,6 +88,7 @@ export default function AppSidebar({
       items: [
         { href: "/dashboard/audit/free", icon: BarChart3, label: "تحلیل رایگان" },
         { href: "/dashboard/audit/premium", icon: Star, label: "تحلیل پیشرفته", badge: "Pro" },
+        { href: "/dashboard/optimization/technical", icon: Settings, label: "بهینه‌سازی فنی", badge: "Pro" },
         { href: "/dashboard/content", icon: FileText, label: "استودیو محتوا" },
         { href: "/dashboard/analytics/llm", icon: Bot, label: "تحلیل مدل‌های زبانی" },
         { href: "/dashboard/competitors", icon: Compass, label: "تحلیل رقابتی" },
