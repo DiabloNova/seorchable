@@ -3,12 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { useTheme } from "@/components/ThemeProvider";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
 import { Button } from "@/components/Button";
-import { Badge } from "@/components/Badge";
 import { Input } from "@/components/Input";
 import { Dialog } from "@/components/Dialog";
-import { Tabs } from "@/components/Tabs";
 
 // Brand Intelligence Analytics Components
 import { KPICard } from "@/components/features/analytics/KPICard";
@@ -16,14 +13,6 @@ import { SentimentTrendChart } from "@/components/features/analytics/SentimentTr
 import { TopEntitiesList } from "@/components/features/analytics/TopEntitiesList";
 import { KnowledgeGraphExplorer } from "@/components/features/graph/KnowledgeGraphExplorer";
 
-// Existing Components
-import { IngestionForm } from "@/components/features/ingestion/IngestionForm";
-import { BrandIntelligenceChat } from "@/components/features/rag/BrandIntelligenceChat";
-import { AeoAuditPanel } from "@/components/features/audit/AeoAuditPanel";
-import { FreeAuditPanel } from "@/components/features/audit/FreeAuditPanel";
-import { PremiumAuditPanel } from "@/components/features/audit/PremiumAuditPanel";
-import { ContentStudio } from "@/components/features/content/ContentStudio";
-import { LlmAnalyticsPanel } from "@/components/features/analytics/LlmAnalyticsPanel";
 import { intelligenceService } from "@/services/intelligence";
 import { BrandHealthMetrics } from "@/schemas/intelligence";
 
@@ -32,12 +21,10 @@ import {
   FileText,
   AlertCircle,
   Plus,
-  ExternalLink,
   RefreshCw,
   Activity,
   Award
 } from "lucide-react";
-import Link from "next/link";
 
 interface AnalyticsSummary {
   totalMentions: number;
@@ -74,7 +61,8 @@ const Skeleton = () => (
 );
 
 /**
- * Premium dashboard with integrated "Analytics & Overview" and "Ingestion & Chat Tools" via a tabbed layout.
+ * Premium dashboard redesigned with vertical route-based sidebar navigation.
+ * Renders the primary Overview & Analytics content directly.
  */
 export default function DashboardPage() {
   const { session } = useAuth();
@@ -91,9 +79,6 @@ export default function DashboardPage() {
   const [isAddBrandOpen, setIsAddBrandOpen] = useState(false);
   const [newBrandName, setNewBrandName] = useState("");
   const [newBrandDomain, setNewBrandDomain] = useState("");
-
-  // Control active tab dynamically to support redirection from Free Audit Panel Upsell
-  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     if (session.status !== "authenticated") return;
@@ -164,10 +149,6 @@ export default function DashboardPage() {
     setRefreshKey((prev) => prev + 1);
   };
 
-  const handleUpgradeRedirect = () => {
-    setActiveTab("audit");
-  };
-
   if (error) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center space-y-6 animate-fade-in">
@@ -197,224 +178,6 @@ export default function DashboardPage() {
     return <Skeleton />;
   }
 
-  // Define tab structures
-  const dashboardTabs = [
-    {
-      id: "overview",
-      label: isRtl ? "نمای کلی و تحلیلی" : "Overview & Analytics",
-      content: (
-        <div className="space-y-6">
-          {/* Row 1: KPI Metrics */}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <KPICard
-              title={isRtl ? "مجموع سیگنال‌های پایش شده" : "Total Mentions Tracked"}
-              value={analyticsSummary.totalMentions}
-              change="+12.4%"
-              changeType="success"
-              description={isRtl ? "پایش فعال در موتورهای پاسخ‌دهی" : "Active crawling from leading search models"}
-              icon={Activity}
-            />
-            <KPICard
-              title={isRtl ? "میانگین شاخص احساسات" : "Avg Sentiment Index"}
-              value={`${(analyticsSummary.averageSentimentScore * 100).toFixed(1)} / 100`}
-              change="+4.2%"
-              changeType="success"
-              description={isRtl ? "کیفیت معنایی پاسخ‌های هوش مصنوعی" : "Qualitative semantic score"}
-              icon={MessageSquare}
-            />
-            <KPICard
-              title={isRtl ? "شاخص سلامت و امنیت برند" : "Brand Safety Index"}
-              value="۹۲.۴٪"
-              change="+1.5%"
-              changeType="success"
-              description={isRtl ? "عدم وجود پاسخ مغایر با حقیقت" : "Risk of incorrect model claims"}
-              icon={Award}
-            />
-            <KPICard
-              title={isRtl ? "کل مراجع استناد شده" : "Verified Outbound Citations"}
-              value={brandMetrics.totalCitations}
-              change="+8.3%"
-              changeType="success"
-              description={isRtl ? "پیوندهای ارجاع ثبت‌شده به دامنه" : "Verified active citation links"}
-              icon={FileText}
-            />
-          </div>
-
-          {/* Row 2: Charts Grid */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-2">
-              <SentimentTrendChart data={analyticsSummary.recentTrend} />
-            </div>
-            <div>
-              <TopEntitiesList data={analyticsSummary.topEntities} />
-            </div>
-          </div>
-
-          {/* Row 3: Interactive Knowledge Graph Explorer */}
-          <div className="w-full">
-            <KnowledgeGraphExplorer />
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: "free-audit",
-      label: isRtl ? "تحلیل رایگان سئو" : "Free SEO Analysis",
-      content: <FreeAuditPanel onUpgradeClick={handleUpgradeRedirect} />,
-    },
-    {
-      id: "premium-audit",
-      label: isRtl ? "تحلیل پیشرفته و پریمیوم ⭐" : "Premium Analysis ⭐",
-      content: <PremiumAuditPanel />,
-    },
-    {
-      id: "content-studio",
-      label: isRtl ? "استودیو محتوا" : "Content Studio",
-      content: <ContentStudio />,
-    },
-    {
-      id: "llm-analytics",
-      label: isRtl ? "تحلیل مدل‌های زبانی" : "LLM Analytics",
-      content: <LlmAnalyticsPanel />,
-    },
-    {
-      id: "audit",
-      label: isRtl ? "ارزیابی و بینش" : "Audit & Insights",
-      content: <AeoAuditPanel />,
-    },
-    {
-      id: "tools",
-      label: isRtl ? "کنسول ابزارها و گفتگو" : "Ingestion & Chat Tools",
-      content: (
-        <div className="space-y-6">
-          {/* Live Ingestion & Chat Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <IngestionForm />
-            <BrandIntelligenceChat />
-          </div>
-
-          {/* Table & Optimizations Row */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {/* Live Citation Stream table */}
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>{isRtl ? "پایش زنده استنادات و مراجع" : "Live Citation Stream"}</CardTitle>
-                    <CardDescription>
-                      {isRtl
-                        ? "نمای لحظه‌ای از نحوه ارجاع مدل‌ها به دارایی‌های وب شما."
-                        : "Real-time logs of queries yielding direct links to your web domains."}
-                    </CardDescription>
-                  </div>
-                  <Link href={`/${language}/dashboard/intelligence`}>
-                    <Button variant="outline" size="sm" className="text-xs">
-                      {isRtl ? "مشاهده همه" : "View All"}
-                    </Button>
-                  </Link>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto -mx-5">
-                  <table className="w-full text-start border-collapse">
-                    <thead>
-                      <tr className="border-y border-[var(--border)] text-[10px] text-[var(--text-muted)] font-semibold uppercase bg-[var(--muted-surface)]">
-                        <th className="py-2.5 px-4 text-start">{isRtl ? "مدل" : "Engine"}</th>
-                        <th className="py-2.5 px-4 text-start">{isRtl ? "کوئری فرضی" : "Prompt Query"}</th>
-                        <th className="py-2.5 px-4 text-start">{isRtl ? "نوع ارجاع" : "Type"}</th>
-                        <th className="py-2.5 px-4 text-start">{isRtl ? "زمان" : "Occurred"}</th>
-                        <th className="py-2.5 px-4"></th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[var(--border)] text-xs">
-                      {brandMetrics.recentCitations.map((cit) => (
-                        <tr key={cit.id} className="hover:bg-[var(--muted-surface)] transition-colors">
-                          <td className="py-3 px-4 font-semibold text-[var(--text-primary)]">
-                            {cit.engine}
-                          </td>
-                          <td className="py-3 px-4 text-[var(--text-secondary)] italic max-w-[200px] truncate">
-                            &ldquo;{cit.query}&rdquo;
-                          </td>
-                          <td className="py-3 px-4">
-                            <Badge variant={cit.status === "Verified Citation" ? "success" : "info"}>
-                              {cit.status}
-                            </Badge>
-                          </td>
-                          <td className="py-3 px-4 text-[10px] text-[var(--text-muted)]">
-                            {cit.time}
-                          </td>
-                          <td className="py-3 px-4 text-end">
-                            <a
-                              href={cit.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex p-1 text-[var(--text-muted)] hover:text-[var(--color-primary-600)] transition-colors"
-                            >
-                              <ExternalLink size={14} className="rtl:-scale-x-100" />
-                            </a>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* AI Action Optimizations */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{isRtl ? "اقدامات فوری بهینه‌سازی" : "Optimization Center"}</CardTitle>
-                <CardDescription>
-                  {isRtl
-                    ? "وظایف پیشنهادی هوش مصنوعی برای ارتقای رتبه و سهم صدای برند."
-                    : "AI-generated steps to secure brand citation anchors."}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-start gap-3 p-3.5 rounded-[var(--radius-md)] bg-[var(--muted-surface)] border border-[var(--border)]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] mt-1.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs font-bold text-[var(--text-primary)]">
-                      {isRtl ? "افزودن اسکیما به صفحات فرود" : "Inject Schema on Product Pages"}
-                    </p>
-                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 leading-relaxed">
-                      {isRtl ? "فرمت JSON-LD به مدل‌ها در درک موجودیت‌ها کمک می‌کند." : "Provides structured context for ChatGPT models."}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3.5 rounded-[var(--radius-md)] bg-[var(--muted-surface)] border border-[var(--border)]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-warning)] mt-1.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs font-bold text-[var(--text-primary)]">
-                      {isRtl ? "رفع خطای توکنایزر زبان فارسی" : "Address Hallucinated Claims"}
-                    </p>
-                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 leading-relaxed">
-                      {isRtl ? "درخواست اسکن هدفمند جدید برای رفع تناقض‌های متنی." : "Create target benchmarks for incorrect statements."}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3.5 rounded-[var(--radius-md)] bg-[var(--muted-surface)] border border-[var(--border)]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary-600)] mt-1.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs font-bold text-[var(--text-primary)]">
-                      {isRtl ? "به‌روزرسانی ساختار llms.txt" : "Publish structured llms.txt"}
-                    </p>
-                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 leading-relaxed">
-                      {isRtl ? "به‌روزرسانی دسترسی ربات‌های جمع‌آوری داده هوش مصنوعی." : "Allows seamless crawling by Perplexity crawler engines."}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      ),
-    },
-  ];
-
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Welcome Header */}
@@ -438,8 +201,59 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      {/* Main Tabbed Layout Container */}
-      <Tabs tabs={dashboardTabs} activeTabId={activeTab} onTabChange={setActiveTab} />
+      {/* Overview Analytics Content (no tabs) */}
+      <div className="space-y-6">
+        {/* Row 1: KPI Metrics */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <KPICard
+            title={isRtl ? "مجموع سیگنال‌های پایش شده" : "Total Mentions Tracked"}
+            value={analyticsSummary.totalMentions}
+            change="+12.4%"
+            changeType="success"
+            description={isRtl ? "پایش فعال در موتورهای پاسخ‌دهی" : "Active crawling from leading search models"}
+            icon={Activity}
+          />
+          <KPICard
+            title={isRtl ? "میانگین شاخص احساسات" : "Avg Sentiment Index"}
+            value={`${(analyticsSummary.averageSentimentScore * 100).toFixed(1)} / 100`}
+            change="+4.2%"
+            changeType="success"
+            description={isRtl ? "کیفیت معنایی پاسخ‌های هوش مصنوعی" : "Qualitative semantic score"}
+            icon={MessageSquare}
+          />
+          <KPICard
+            title={isRtl ? "شاخص سلامت و امنیت برند" : "Brand Safety Index"}
+            value="۹۲.۴٪"
+            change="+1.5%"
+            changeType="success"
+            description={isRtl ? "عدم وجود پاسخ مغایر با حقیقت" : "Risk of incorrect model claims"}
+            icon={Award}
+          />
+          <KPICard
+            title={isRtl ? "کل مراجع استناد شده" : "Verified Outbound Citations"}
+            value={brandMetrics.totalCitations}
+            change="+8.3%"
+            changeType="success"
+            description={isRtl ? "پیوندهای ارجاع ثبت‌شده به دامنه" : "Verified active citation links"}
+            icon={FileText}
+          />
+        </div>
+
+        {/* Row 2: Charts Grid */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <SentimentTrendChart data={analyticsSummary.recentTrend} />
+          </div>
+          <div>
+            <TopEntitiesList data={analyticsSummary.topEntities} />
+          </div>
+        </div>
+
+        {/* Row 3: Interactive Knowledge Graph Explorer */}
+        <div className="w-full">
+          <KnowledgeGraphExplorer />
+        </div>
+      </div>
 
       {/* REGISTER BRAND DIALOG */}
       <Dialog
