@@ -209,7 +209,7 @@ export const ContentStudio: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in" dir={direction}>
       {/* Input settings Panel */}
-      <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-md">
+      <Card className="backdrop-blur-md shadow-md">
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-gradient-to-tr from-sky-500 to-blue-500 border border-sky-500/20 rounded-xl text-white">
@@ -226,7 +226,7 @@ export const ContentStudio: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* URL/Text target */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-white/50">{strings.urlLabel}</label>
+                <label className="text-[11px] font-bold text-[var(--text-muted)]">{strings.urlLabel}</label>
                 <div className="relative">
                   <Search size={14} className={`absolute top-1/2 -translate-y-1/2 text-[var(--text-muted)] ${isRtl ? "right-3.5" : "left-4"}`} />
                   <input
@@ -237,7 +237,7 @@ export const ContentStudio: React.FC = () => {
                     className={`
                       w-full py-2.5 text-xs rounded-xl outline-none transition-all duration-300
                       bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)]
-                      focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 focus:bg-[var(--card-bg)]
+                      focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 focus:bg-[var(--card)]
                       placeholder:text-[var(--text-muted)]
                       ${isRtl ? "pr-10 pl-4" : "pl-10 pr-4"}
                     `}
@@ -248,22 +248,22 @@ export const ContentStudio: React.FC = () => {
 
               {/* Brand Voice Dropdown */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-white/50">{strings.voiceLabel}</label>
+                <label className="text-[11px] font-bold text-[var(--text-muted)]">{strings.voiceLabel}</label>
                 <select
                   value={brandVoice}
                   onChange={(e) => setBrandVoice(e.target.value)}
                   className="w-full py-2.5 px-4 text-xs font-bold text-[var(--text-primary)] bg-[var(--muted-surface)] border border-[var(--border)] rounded-xl outline-none cursor-pointer focus:border-sky-400"
                   disabled={isPending}
                 >
-                  <option value="رسمی" className="bg-slate-900 text-white">{strings.voice1}</option>
-                  <option value="دوستانه" className="bg-slate-900 text-white">{strings.voice2}</option>
-                  <option value="تخصصی" className="bg-slate-900 text-white">{strings.voice3}</option>
+                  <option value="رسمی" className="bg-[var(--card)] text-[var(--text-primary)]">{strings.voice1}</option>
+                  <option value="دوستانه" className="bg-[var(--card)] text-[var(--text-primary)]">{strings.voice2}</option>
+                  <option value="تخصصی" className="bg-[var(--card)] text-[var(--text-primary)]">{strings.voice3}</option>
                 </select>
               </div>
 
               {/* Tag Keywords list */}
               <div className="md:col-span-2 space-y-1.5">
-                <label className="text-[11px] font-bold text-white/50">{strings.keywordsLabel}</label>
+                <label className="text-[11px] font-bold text-[var(--text-muted)]">{strings.keywordsLabel}</label>
                 <div className="flex flex-wrap gap-2 p-2 bg-[var(--muted-surface)] border border-[var(--border)] rounded-xl min-h-[42px] items-center">
                   {keywords.map((kw, i) => (
                     <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-lg bg-sky-500/10 border border-sky-500/25 text-sky-400 animate-fade-in">
@@ -312,21 +312,21 @@ export const ContentStudio: React.FC = () => {
           {isPending && (
             <div className="mt-6 space-y-4 p-5 rounded-2xl border border-sky-500/15 bg-sky-500/5 animate-pulse">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 0 ? "text-sky-400" : "text-white/40"}`}>
+                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 0 ? "text-sky-400" : "text-[var(--text-muted)]"}`}>
                   <Activity size={14} className={loadingStep === 0 ? "animate-spin text-sky-400" : ""} />
                   <span>{strings.step1}</span>
                 </div>
-                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 1 ? "text-sky-400" : "text-white/40"}`}>
+                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 1 ? "text-sky-400" : "text-[var(--text-muted)]"}`}>
                   <Activity size={14} className={loadingStep === 1 ? "animate-spin text-sky-400" : ""} />
                   <span>{strings.step2}</span>
                 </div>
-                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 2 ? "text-sky-400" : "text-white/40"}`}>
+                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 2 ? "text-sky-400" : "text-[var(--text-muted)]"}`}>
                   <Activity size={14} className={loadingStep === 2 ? "animate-spin text-sky-400" : ""} />
                   <span>{strings.step3}</span>
                 </div>
               </div>
 
-              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-sky-500 to-blue-500 transition-all duration-1000 ease-out"
                   style={{ width: `${(loadingStep + 1) * 33.3}%` }}
@@ -348,7 +348,7 @@ export const ContentStudio: React.FC = () => {
       {result && !isPending && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in-up">
           {/* Circular Score Ring */}
-          <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg flex flex-col justify-between">
+          <Card className="shadow-lg flex flex-col justify-between">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
                 <Smile size={12} />
@@ -365,7 +365,7 @@ export const ContentStudio: React.FC = () => {
                     cx="72"
                     cy="72"
                     r="58"
-                    className="stroke-white/[0.04]"
+                    className="stroke-[var(--border)]"
                     strokeWidth="8"
                     fill="transparent"
                   />
@@ -385,7 +385,7 @@ export const ContentStudio: React.FC = () => {
                   <span className={`text-5xl font-black font-display leading-none tracking-tight ${getScoreColor(result.semanticHealthScore)}`}>
                     {animatedScore}
                   </span>
-                  <span className="text-[10px] font-bold text-white/40 mt-1 tracking-widest uppercase">
+                  <span className="text-[10px] font-bold text-[var(--text-muted)] mt-1 tracking-widest uppercase">
                     / 100
                   </span>
                 </div>
@@ -394,8 +394,8 @@ export const ContentStudio: React.FC = () => {
           </Card>
 
           {/* Terminology Suggestion improvements */}
-          <Card className="lg:col-span-2 border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg">
-            <CardHeader className="pb-3 border-b border-white/5">
+          <Card className="lg:col-span-2 shadow-lg">
+            <CardHeader className="pb-3 border-b border-[var(--border)]">
               <CardTitle className="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
                 <Languages size={12} />
                 <span>{strings.suggestionsTitle}</span>
@@ -405,14 +405,14 @@ export const ContentStudio: React.FC = () => {
               {result.terminologySuggestions.map((sug, idx) => {
                 const isApplied = appliedSuggestions.has(idx);
                 return (
-                  <div key={idx} className="p-3.5 rounded-xl border border-white/5 bg-white/[0.01] flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
+                  <div key={idx} className="p-3.5 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
                     <div className="space-y-1.5">
                       <div className="flex items-center flex-wrap gap-2.5 text-xs font-bold">
-                        <span className="line-through text-red-400 bg-red-500/10 border border-red-500/25 px-2 py-0.5 rounded">{sug.originalWord}</span>
-                        <ChevronLeft size={12} className="text-white/40 rtl:rotate-180" />
-                        <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded">{sug.suggestedWord}</span>
+                        <span className="line-through text-red-500 bg-red-500/10 border border-red-500/25 px-2 py-0.5 rounded">{sug.originalWord}</span>
+                        <ChevronLeft size={12} className="text-[var(--text-muted)] rtl:rotate-180" />
+                        <span className="text-emerald-500 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded">{sug.suggestedWord}</span>
                       </div>
-                      <p className="text-[10px] text-white/50 leading-relaxed font-medium">💡 {sug.reason}</p>
+                      <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed font-medium">💡 {sug.reason}</p>
                       <p className="text-[9px] text-[var(--text-muted)] italic font-mono">&ldquo;{sug.context}&rdquo;</p>
                     </div>
 
@@ -430,8 +430,8 @@ export const ContentStudio: React.FC = () => {
                       size="sm"
                       className={`gap-1.5 text-[10px] font-bold px-3 py-1.5 rounded-lg border transition-all ${
                         isApplied
-                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                          : "border-white/10 hover:bg-white/5"
+                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
+                          : "border-[var(--border)] hover:bg-[var(--muted-surface)]"
                       }`}
                     >
                       {isApplied ? (
@@ -453,8 +453,8 @@ export const ContentStudio: React.FC = () => {
           </Card>
 
           {/* AI Content drafts list */}
-          <Card className="lg:col-span-3 border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg">
-            <CardHeader className="pb-3 border-b border-white/5">
+          <Card className="lg:col-span-3 shadow-lg">
+            <CardHeader className="pb-3 border-b border-[var(--border)]">
               <CardTitle className="text-sm font-bold flex items-center gap-2 text-sky-400">
                 <Bookmark size={15} />
                 <span>{strings.outlineTitle}</span>
@@ -465,17 +465,17 @@ export const ContentStudio: React.FC = () => {
                 const isCopied = copiedIdx === idx;
                 const draftText = `Title: ${item.title}\n\nOutline:\n${item.outline.map(o => `- ${o}`).join("\n")}`;
                 return (
-                  <div key={idx} className="p-4 rounded-xl border border-white/5 bg-white/[0.01] space-y-4 flex flex-col justify-between hover:border-white/10 transition-all duration-200">
+                  <div key={idx} className="p-4 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)]/10 space-y-4 flex flex-col justify-between hover:border-[var(--sky-blue-500)]/40 transition-all duration-200">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 font-mono">SEO: {item.seoScore}%</span>
-                        <span className="text-[10px] text-white/35 font-bold">پیش‌نویس {idx + 1}</span>
+                        <span className="px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-500/10 border border-emerald-500/25 text-emerald-500 font-mono">SEO: {item.seoScore}%</span>
+                        <span className="text-[10px] text-[var(--text-muted)] font-bold">پیش‌نویس {idx + 1}</span>
                       </div>
-                      <h4 className="text-xs font-black text-white leading-relaxed">{item.title}</h4>
-                      <ul className="space-y-1.5 pr-2 border-r border-white/5">
+                      <h4 className="text-xs font-black text-[var(--text-primary)] leading-relaxed">{item.title}</h4>
+                      <ul className="space-y-1.5 pr-2 border-r border-[var(--border)]">
                         {item.outline.map((o, oIdx) => (
-                          <li key={oIdx} className="text-[10px] text-white/60 leading-relaxed list-none flex items-start gap-1.5 font-medium">
-                            <span className="w-1 h-1 rounded-full bg-sky-400 mt-1.5 flex-shrink-0" />
+                          <li key={oIdx} className="text-[10px] text-[var(--text-secondary)] leading-relaxed list-none flex items-start gap-1.5 font-medium">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-1.5 flex-shrink-0" />
                             <span>{o}</span>
                           </li>
                         ))}
@@ -486,8 +486,8 @@ export const ContentStudio: React.FC = () => {
                       onClick={() => handleCopy(draftText, idx)}
                       className={`w-full mt-3 gap-1.5 text-[10px] font-bold py-2 rounded-lg border transition-all ${
                         isCopied
-                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                          : "border-white/10 bg-white/5 hover:bg-white/10"
+                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
+                          : "border-[var(--border)] bg-[var(--muted-surface)] hover:bg-[var(--background-subtle)] text-[var(--text-primary)]"
                       }`}
                     >
                       {isCopied ? (

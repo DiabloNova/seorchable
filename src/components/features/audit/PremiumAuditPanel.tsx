@@ -225,7 +225,7 @@ export const PremiumAuditPanel: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in" dir={direction}>
       {/* Search & URL Input Card */}
-      <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-md">
+      <Card className="backdrop-blur-md shadow-md">
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-gradient-to-tr from-amber-500 to-orange-500 border border-orange-500/30 rounded-xl text-white shadow-lg shadow-orange-950/20">
@@ -253,7 +253,7 @@ export const PremiumAuditPanel: React.FC = () => {
                   className={`
                     w-full py-3 text-xs rounded-xl outline-none transition-all duration-300
                     bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)]
-                    focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30 focus:bg-[var(--card-bg)]
+                    focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30 focus:bg-[var(--card)]
                     placeholder:text-[var(--text-muted)]
                     ${isRtl ? "pr-11 pl-4" : "pl-11 pr-4"}
                   `}
@@ -270,9 +270,9 @@ export const PremiumAuditPanel: React.FC = () => {
                   className="bg-transparent text-xs font-bold text-[var(--text-primary)] outline-none border-none cursor-pointer pr-1"
                   disabled={isPending}
                 >
-                  <option value={10} className="bg-[var(--card-bg)] text-[var(--text-primary)]">۱۰ {isRtl ? "صفحه" : "Pages"}</option>
-                  <option value={25} className="bg-[var(--card-bg)] text-[var(--text-primary)]">۲۵ {isRtl ? "صفحه" : "Pages"}</option>
-                  <option value={50} className="bg-[var(--card-bg)] text-[var(--text-primary)]">۵۰ {isRtl ? "صفحه" : "Pages"}</option>
+                  <option value={10} className="bg-[var(--card)] text-[var(--text-primary)]">۱۰ {isRtl ? "صفحه" : "Pages"}</option>
+                  <option value={25} className="bg-[var(--card)] text-[var(--text-primary)]">۲۵ {isRtl ? "صفحه" : "Pages"}</option>
+                  <option value={50} className="bg-[var(--card)] text-[var(--text-primary)]">۵۰ {isRtl ? "صفحه" : "Pages"}</option>
                 </select>
               </div>
 
@@ -301,22 +301,22 @@ export const PremiumAuditPanel: React.FC = () => {
           {isPending && (
             <div className="mt-6 space-y-4 p-5 rounded-2xl border border-orange-500/15 bg-orange-500/5 animate-pulse">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 0 ? "text-amber-400" : "text-white/40"}`}>
+                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 0 ? "text-amber-400" : "text-[var(--text-muted)]"}`}>
                   <CircleDot size={14} className={loadingStep === 0 ? "animate-spin text-amber-400" : ""} />
                   <span>{strings.step1}</span>
                 </div>
-                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 1 ? "text-amber-400" : "text-white/40"}`}>
+                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 1 ? "text-amber-400" : "text-[var(--text-muted)]"}`}>
                   <CircleDot size={14} className={loadingStep === 1 ? "animate-spin text-amber-400" : ""} />
                   <span>{strings.step2}</span>
                 </div>
-                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 2 ? "text-amber-400" : "text-white/40"}`}>
+                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 2 ? "text-amber-400" : "text-[var(--text-muted)]"}`}>
                   <CircleDot size={14} className={loadingStep === 2 ? "animate-spin text-amber-400" : ""} />
                   <span>{strings.step3}</span>
                 </div>
               </div>
 
               {/* Progress Bar Line */}
-              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-1000 ease-out"
                   style={{ width: `${(loadingStep + 1) * 33.3}%` }}
@@ -340,7 +340,7 @@ export const PremiumAuditPanel: React.FC = () => {
           {/* Main Gauges row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Score Ring Gauge */}
-            <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg flex flex-col justify-between">
+            <Card className="shadow-lg flex flex-col justify-between">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
                   <Gauge size={12} />
@@ -357,7 +357,7 @@ export const PremiumAuditPanel: React.FC = () => {
                       cx="72"
                       cy="72"
                       r="58"
-                      className="stroke-white/[0.04]"
+                      className="stroke-[var(--border)]"
                       strokeWidth="8"
                       fill="transparent"
                     />
@@ -377,7 +377,7 @@ export const PremiumAuditPanel: React.FC = () => {
                     <span className={`text-5xl font-black font-display leading-none tracking-tight ${getScoreColor(result.score)}`}>
                       {animatedScore}
                     </span>
-                    <span className="text-[10px] font-bold text-white/40 mt-1 tracking-widest uppercase">
+                    <span className="text-[10px] font-bold text-[var(--text-muted)] mt-1 tracking-widest uppercase">
                       / 100
                     </span>
                   </div>
@@ -388,17 +388,17 @@ export const PremiumAuditPanel: React.FC = () => {
                     <span>{strings.gradeLabel}</span>
                     <span className="text-sm font-black">{result.grade}</span>
                   </div>
-                  <div className="px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.02] text-xs font-bold text-white/70">
+                  <div className="px-3.5 py-1.5 rounded-full border border-[var(--border)] bg-[var(--muted-surface)]/20 text-xs font-bold text-[var(--text-secondary)]">
                     <span>{strings.pagesAnalyzedLabel}</span>
-                    <span className="text-xs font-black text-white pr-1.5">{result.pagesAnalyzed}</span>
+                    <span className="text-xs font-black text-[var(--text-primary)] pr-1.5">{result.pagesAnalyzed}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Metrics cards grid */}
-            <Card className="md:col-span-2 border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg">
-              <CardHeader className="pb-3 border-b border-white/5">
+            <Card className="md:col-span-2 shadow-lg">
+              <CardHeader className="pb-3 border-b border-[var(--border)]">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
                   <Layers size={12} />
                   <span>{strings.metricsTitle}</span>
@@ -406,45 +406,45 @@ export const PremiumAuditPanel: React.FC = () => {
               </CardHeader>
               <CardContent className="pt-4 grid grid-cols-2 gap-4">
                 {/* Metric 1 */}
-                <div className="p-3.5 rounded-xl border border-white/5 bg-white/[0.01]">
+                <div className="p-3.5 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)]/20">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs text-white/60 font-semibold">{strings.contentQualityLabel}</span>
-                    <span className="text-xs font-black text-emerald-400">{result.metrics.contentQuality}</span>
+                    <span className="text-xs text-[var(--text-secondary)] font-semibold">{strings.contentQualityLabel}</span>
+                    <span className="text-xs font-black text-emerald-500">{result.metrics.contentQuality}</span>
                   </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
                     <div className="h-full bg-emerald-500" style={{ width: `${result.metrics.contentQuality}%` }} />
                   </div>
                 </div>
 
                 {/* Metric 2 */}
-                <div className="p-3.5 rounded-xl border border-white/5 bg-white/[0.01]">
+                <div className="p-3.5 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)]/20">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs text-white/60 font-semibold">{strings.technicalHealthLabel}</span>
-                    <span className="text-xs font-black text-amber-400">{result.metrics.technicalHealth}</span>
+                    <span className="text-xs text-[var(--text-secondary)] font-semibold">{strings.technicalHealthLabel}</span>
+                    <span className="text-xs font-black text-amber-500">{result.metrics.technicalHealth}</span>
                   </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
                     <div className="h-full bg-amber-500" style={{ width: `${result.metrics.technicalHealth}%` }} />
                   </div>
                 </div>
 
                 {/* Metric 3 */}
-                <div className="p-3.5 rounded-xl border border-white/5 bg-white/[0.01]">
+                <div className="p-3.5 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)]/20">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs text-white/60 font-semibold">{strings.internalLinkingLabel}</span>
-                    <span className="text-xs font-black text-emerald-400">{result.metrics.internalLinking}</span>
+                    <span className="text-xs text-[var(--text-secondary)] font-semibold">{strings.internalLinkingLabel}</span>
+                    <span className="text-xs font-black text-emerald-500">{result.metrics.internalLinking}</span>
                   </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
                     <div className="h-full bg-emerald-500" style={{ width: `${result.metrics.internalLinking}%` }} />
                   </div>
                 </div>
 
                 {/* Metric 4 */}
-                <div className="p-3.5 rounded-xl border border-white/5 bg-white/[0.01]">
+                <div className="p-3.5 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)]/20">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs text-white/60 font-semibold">{strings.semanticCoverageLabel}</span>
+                    <span className="text-xs text-[var(--text-secondary)] font-semibold">{strings.semanticCoverageLabel}</span>
                     <span className="text-xs font-black text-teal-400">{result.metrics.semanticCoverage}</span>
                   </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
                     <div className="h-full bg-teal-500" style={{ width: `${result.metrics.semanticCoverage}%` }} />
                   </div>
                 </div>
@@ -455,8 +455,8 @@ export const PremiumAuditPanel: React.FC = () => {
           {/* Issues & Recommendations grid row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left: Issues List */}
-            <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg">
-              <CardHeader className="pb-3 border-b border-white/5">
+            <Card className="shadow-lg">
+              <CardHeader className="pb-3 border-b border-[var(--border)]">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
                   <Workflow size={12} />
                   <span>{strings.issuesTitle}</span>
@@ -464,18 +464,18 @@ export const PremiumAuditPanel: React.FC = () => {
               </CardHeader>
               <CardContent className="pt-4 space-y-3.5 max-h-[350px] overflow-y-auto pr-1">
                 {result.issues.length === 0 ? (
-                  <div className="p-4 text-center text-white/40 text-xs font-medium">هیچ خطا یا نقص جدی شناسایی نشد.</div>
+                  <div className="p-4 text-center text-[var(--text-muted)] text-xs font-medium">هیچ خطا یا نقص جدی شناسایی نشد.</div>
                 ) : (
                   result.issues.map((issue, i) => (
-                    <div key={i} className="p-3.5 rounded-xl border border-white/5 bg-white/[0.01] space-y-2">
+                    <div key={i} className="p-3.5 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)]/15 space-y-2">
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
                           <span>{getSeverityIcon(issue.severity)}</span>
-                          <span className="font-bold text-white/90">{issue.description}</span>
+                          <span className="font-bold text-[var(--text-primary)]">{issue.description}</span>
                         </div>
-                        <span className="px-2 py-0.5 text-[9px] font-bold rounded bg-white/5 border border-white/10 uppercase tracking-widest text-white/60">{issue.category}</span>
+                        <span className="px-2 py-0.5 text-[9px] font-bold rounded bg-[var(--muted-surface)] border border-[var(--border)] uppercase tracking-widest text-[var(--text-muted)]">{issue.category}</span>
                       </div>
-                      <p className="text-[10px] text-white/55 leading-relaxed font-medium">
+                      <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed font-medium">
                         🔧 {issue.recommendation}
                       </p>
                     </div>
@@ -485,8 +485,8 @@ export const PremiumAuditPanel: React.FC = () => {
             </Card>
 
             {/* Right: AI Content recommendations list */}
-            <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg">
-              <CardHeader className="pb-3 border-b border-white/5">
+            <Card className="shadow-lg">
+              <CardHeader className="pb-3 border-b border-[var(--border)]">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
                   <Sparkle size={12} />
                   <span>{strings.recsTitle}</span>
@@ -494,11 +494,11 @@ export const PremiumAuditPanel: React.FC = () => {
               </CardHeader>
               <CardContent className="pt-4 space-y-3.5 max-h-[350px] overflow-y-auto pr-1">
                 {result.recommendations.map((rec, i) => (
-                  <div key={i} className="p-3.5 rounded-xl border border-white/5 bg-white/[0.01] flex items-start gap-3">
+                  <div key={i} className="p-3.5 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)]/15 flex items-start gap-3">
                     <div className="flex-shrink-0 mt-0.5">{getPriorityBadge(rec.priority)}</div>
                     <div className="flex-1 space-y-1">
-                      <p className="text-xs text-white/80 leading-relaxed font-bold">{rec.insight}</p>
-                      <div className="text-[9px] font-bold text-emerald-400">📈 {rec.estimatedImpact}</div>
+                      <p className="text-xs text-[var(--text-primary)] leading-relaxed font-bold">{rec.insight}</p>
+                      <div className="text-[9px] font-bold text-emerald-500">📈 {rec.estimatedImpact}</div>
                     </div>
                   </div>
                 ))}
@@ -507,8 +507,8 @@ export const PremiumAuditPanel: React.FC = () => {
           </div>
 
           {/* Competitor Comparison & Actions */}
-          <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg">
-            <CardHeader className="pb-3 border-b border-white/5">
+          <Card className="shadow-lg">
+            <CardHeader className="pb-3 border-b border-[var(--border)]">
               <CardTitle className="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
                 <Globe size={12} />
                 <span>{strings.comparisonTitle}</span>
@@ -519,10 +519,10 @@ export const PremiumAuditPanel: React.FC = () => {
                 {/* Your site bar */}
                 <div>
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-bold text-white">{strings.competitorYourSite}</span>
-                    <span className="font-black text-orange-400">{result.competitorComparison.yourSite}</span>
+                    <span className="font-bold text-[var(--text-primary)]">{strings.competitorYourSite}</span>
+                    <span className="font-black text-orange-500">{result.competitorComparison.yourSite}</span>
                   </div>
-                  <div className="w-full h-2.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-full h-2.5 bg-[var(--border)] rounded-full overflow-hidden">
                     <div className="h-full bg-gradient-to-r from-amber-500 to-orange-500" style={{ width: `${result.competitorComparison.yourSite}%` }} />
                   </div>
                 </div>
@@ -530,31 +530,31 @@ export const PremiumAuditPanel: React.FC = () => {
                 {/* Industry average bar */}
                 <div>
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-bold text-white/60">{strings.competitorAverage}</span>
-                    <span className="font-black text-white/60">{result.competitorComparison.industryAverage}</span>
+                    <span className="font-bold text-[var(--text-secondary)]">{strings.competitorAverage}</span>
+                    <span className="font-black text-[var(--text-secondary)]">{result.competitorComparison.industryAverage}</span>
                   </div>
-                  <div className="w-full h-2.5 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-white/20" style={{ width: `${result.competitorComparison.industryAverage}%` }} />
+                  <div className="w-full h-2.5 bg-[var(--border)] rounded-full overflow-hidden">
+                    <div className="h-full bg-[var(--border-strong)]" style={{ width: `${result.competitorComparison.industryAverage}%` }} />
                   </div>
                 </div>
 
                 {/* Top competitor bar */}
                 <div>
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-bold text-white/75">{strings.competitorTop}</span>
-                    <span className="font-black text-white/75">{result.competitorComparison.topCompetitor}</span>
+                    <span className="font-bold text-[var(--text-secondary)]">{strings.competitorTop}</span>
+                    <span className="font-black text-[var(--text-secondary)]">{result.competitorComparison.topCompetitor}</span>
                   </div>
-                  <div className="w-full h-2.5 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-white/35" style={{ width: `${result.competitorComparison.topCompetitor}%` }} />
+                  <div className="w-full h-2.5 bg-[var(--border)] rounded-full overflow-hidden">
+                    <div className="h-full bg-[var(--text-muted)]" style={{ width: `${result.competitorComparison.topCompetitor}%` }} />
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons footer */}
-              <div className="flex justify-end pt-4 border-t border-white/5">
+              <div className="flex justify-end pt-4 border-t border-[var(--border)]">
                 <Button
                   onClick={() => alert(strings.downloadPdfProgress)}
-                  className="gap-2 px-6 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold text-xs hover:scale-[1.01] active:scale-[0.99] transition-all duration-300"
+                  className="gap-2 px-6 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)] hover:bg-[var(--background-subtle)] text-[var(--text-primary)] font-bold text-xs hover:scale-[1.01] active:scale-[0.99] transition-all duration-300"
                 >
                   <FileDown size={14} />
                   <span>{strings.downloadPdf}</span>

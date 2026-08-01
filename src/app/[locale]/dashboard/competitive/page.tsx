@@ -2,18 +2,19 @@
 
 import React from "react";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
 import { useTheme } from "@/components/ThemeProvider";
+import { CompetitiveAnalysisPanel } from "@/components/features/analysis/CompetitiveAnalysisPanel";
 
 /**
- * Renders the localized Competitive Intel dashboard page with a placeholder for competitive monitoring.
+ * Beautiful dedicated page rendering our brand-new Competitive Analysis panel.
  */
 export default function CompetitivePage() {
   const { language } = useTheme();
+  const isRtl = language === "fa";
 
   const breadcrumbItems = [
-    { label: language === "fa" ? "داشبورد" : "Dashboard", href: "/dashboard" },
-    { label: language === "fa" ? "تحلیل رقابتی" : "Competitive Intel" },
+    { label: isRtl ? "داشبورد" : "Dashboard", href: "/dashboard" },
+    { label: isRtl ? "تحلیل رقابتی" : "Competitive Intelligence" },
   ];
 
   return (
@@ -21,31 +22,17 @@ export default function CompetitivePage() {
       <Breadcrumb items={breadcrumbItems} />
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-            {language === "fa" ? "تحلیل رقابتی" : "Competitive Intel"}
+          <h1 className="text-2xl font-black tracking-tight text-[var(--text-primary)] font-display">
+            {isRtl ? "تحلیل رقابتی هوشمند (Competitive Intel)" : "Competitive Intelligence"}
           </h1>
-          <p className="text-sm text-[var(--text-secondary)] mt-1">
-            {language === "fa"
-              ? "پایش سهم صدای مدل‌های زبانی بزرگ (SoMV) به صورت بلادرنگ در مقایسه با رقبای اصلی بازار."
-              : "Real-time tracking of Share of Model Voice (SoMV) compared with primary market competitors."}
+          <p className="text-xs text-[var(--text-secondary)] mt-1">
+            {isRtl
+              ? "پایش سهم صدای مدل‌های زبانی بزرگ، مقایسه شاخص‌های کلیدی محتوا و بهینه‌سازی فنی شما با ۵ رقیب اصلی."
+              : "Compare brand metrics, content strategies, and SEO indicators directly with up to 5 competitors."}
           </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{language === "fa" ? "تحلیل همزمان سهم صدای مدل‌ها" : "Share of Model Voice Benchmarking"}</CardTitle>
-            <CardDescription>
-              {language === "fa"
-                ? "مقایسه میزان دفعات پیشنهاد شدن برند شما در مقابل رقبا در موتورهای هوش مصنوعی."
-                : "Comparative brand recommendation volume counts against competitors across top AI engines."}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="h-64 flex items-center justify-center border border-dashed border-[var(--border)] rounded-[var(--radius-md)] bg-[var(--background)]">
-            <span className="text-sm text-[var(--text-muted)]">
-              {language === "fa" ? "ماژول پایش رقابتی (به زودی در فازهای بعدی)" : "Competitive Monitoring Workspace (Coming in future phases)"}
-            </span>
-          </CardContent>
-        </Card>
+        <CompetitiveAnalysisPanel />
       </div>
     </div>
   );
