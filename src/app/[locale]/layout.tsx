@@ -4,6 +4,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { persianPrimary, persianDisplay } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
+import { FloatingSidebar } from "@/components/marketing/FloatingSidebar";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -59,6 +60,7 @@ export default async function RootLayout({ children, params }: LayoutProps) {
       <body>
         <ThemeProvider initialLanguage={locale as "en" | "fa"}>
           <AuthProvider>
+            <FloatingSidebar />
             {children}
           </AuthProvider>
         </ThemeProvider>

@@ -3,13 +3,27 @@
 import React, { useState, use } from "react";
 import { LandingHeader } from "@/components/marketing/LandingHeader";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
-import { Code2, Terminal, BookOpen, Layers, Play } from "lucide-react";
+import {
+  Code2,
+  Terminal,
+  BookOpen,
+  Layers,
+  Play,
+  Cpu,
+  Network,
+  ShieldAlert,
+  Database,
+  ArrowRight,
+  GitMerge,
+  CpuIcon
+} from "lucide-react";
 
 export default function DocumentationPage({ params }: { params: Promise<{ locale: string }> }) {
   const resolvedParams = use(params);
   const locale = resolvedParams.locale;
   const isFa = locale === "fa";
 
+  const [activeTab, setActiveTab] = useState<"quickstart" | "pipeline" | "graph" | "security">("quickstart");
   const [activeCodeTab, setActiveCodeTab] = useState<"curl" | "node">("curl");
 
   const curlCode = `curl -X POST "https://api.brandgraph.ai/v1/analysis/sentiment" \\
@@ -41,113 +55,256 @@ console.log('Semantic score:', analysis.sentimentScore);`;
         <div className="mx-auto max-w-6xl px-4 sm:px-6 relative z-10 space-y-4">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#38bdf8]/10 border border-[#38bdf8]/30 text-xs font-bold text-[#38bdf8]">
             <BookOpen size={12} />
-            <span>{isFa ? "مرکز توسعه‌دهندگان" : "Developer Portal"}</span>
+            <span>{isFa ? "مرکز اسناد فنی و توسعه‌دهندگان" : "Developer Portal & Technical Specs"}</span>
           </span>
           <h1 className="font-display font-black text-3xl sm:text-4xl text-[var(--text-primary)] leading-tight">
-            {isFa ? "مستندات فنی و راهنمای پیاده‌سازی API" : "Technical Integration & API Reference"}
+            {isFa ? "مستندات و مرجع معماری هوشمندی برند" : "Documentation & Architecture Reference"}
           </h1>
-          <p className="text-[var(--text-secondary)] text-sm sm:text-base font-medium max-w-2xl">
+          <p className="text-[var(--text-secondary)] text-sm sm:text-base font-medium max-w-3xl">
             {isFa
-              ? "نحوه کارکرد مدل‌های تحلیل معنایی، اسناد مربوط به توابع خزش Firecrawl و مستندات گام‌به‌گام اتصال به سرویس."
-              : "Learn how to query semantic sentiment metrics, integrate crawler hooks, and retrieve brand entity graphs."}
+              ? "مستندات مهندسی در خصوص خط لوله پردازش مدل‌های هوش مصنوعی، ساختار گراف دانش برند، و الزامات امنیت و جداسازی مستاجرها."
+              : "Complete system blueprints on multi-model pipelines, semantic graph traversal, and zero-trust database structures."}
           </p>
         </div>
       </section>
 
       {/* Docs Body Content */}
       <section className="py-12 bg-[var(--background)] flex-1">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 grid lg:grid-cols-[250px_1fr] gap-12">
-          {/* Sidebar Navigation */}
-          <aside className="space-y-6 hidden lg:block">
-            <div className="space-y-2">
-              <h3 className="text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">{isFa ? "شروع به کار" : "Getting Started"}</h3>
-              <ul className="space-y-1.5 text-xs font-bold text-[var(--text-secondary)]">
-                <li><span className="block px-3 py-2 rounded-lg bg-[var(--muted-surface)] text-[#38bdf8] cursor-pointer">{isFa ? "راهنمای شروع سریع" : "Quick Start Guide"}</span></li>
-                <li><span className="block px-3 py-2 rounded-lg hover:bg-[var(--muted-surface)] cursor-pointer">{isFa ? "مفاهیم کلیدی" : "Key Concepts"}</span></li>
-                <li><span className="block px-3 py-2 rounded-lg hover:bg-[var(--muted-surface)] cursor-pointer">{isFa ? "احراز هویت" : "Authentication"}</span></li>
-              </ul>
-            </div>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 grid lg:grid-cols-[260px_1fr] gap-12">
 
+          {/* Interactive Navigation Sidebar */}
+          <aside className="space-y-6">
             <div className="space-y-2">
-              <h3 className="text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">{isFa ? "مرجع وب‌سرویس‌ها" : "API Endpoints"}</h3>
+              <h3 className="text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">{isFa ? "بخش‌های مستندات" : "DOCUMENT SECTIONS"}</h3>
               <ul className="space-y-1.5 text-xs font-bold text-[var(--text-secondary)]">
-                <li><span className="block px-3 py-2 rounded-lg hover:bg-[var(--muted-surface)] cursor-pointer">{isFa ? "ارسال دامنه خزش" : "POST Crawl Target"}</span></li>
-                <li><span className="block px-3 py-2 rounded-lg hover:bg-[var(--muted-surface)] cursor-pointer">{isFa ? "تحلیل معنایی" : "GET Semantic Sentiment"}</span></li>
-                <li><span className="block px-3 py-2 rounded-lg hover:bg-[var(--muted-surface)] cursor-pointer">{isFa ? "شبیه‌ساز روابط گراف" : "GET Entity Graph"}</span></li>
+
+                <li>
+                  <button
+                    onClick={() => setActiveTab("quickstart")}
+                    className={`w-full text-start block px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
+                      activeTab === "quickstart"
+                        ? "bg-slate-900 text-[#38bdf8] border border-white/5"
+                        : "hover:bg-[var(--muted-surface)]"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Play size={14} />
+                      <span>{isFa ? "راهنمای شروع سریع" : "Quick Start Guide"}</span>
+                    </span>
+                  </button>
+                </li>
+
+                <li>
+                  <button
+                    onClick={() => setActiveTab("pipeline")}
+                    className={`w-full text-start block px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
+                      activeTab === "pipeline"
+                        ? "bg-slate-900 text-[#38bdf8] border border-white/5"
+                        : "hover:bg-[var(--muted-surface)]"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Cpu size={14} />
+                      <span>{isFa ? "خط لوله پردازش مدل‌ها" : "AI Ingestion Pipeline"}</span>
+                    </span>
+                  </button>
+                </li>
+
+                <li>
+                  <button
+                    onClick={() => setActiveTab("graph")}
+                    className={`w-full text-start block px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
+                      activeTab === "graph"
+                        ? "bg-slate-900 text-[#38bdf8] border border-white/5"
+                        : "hover:bg-[var(--muted-surface)]"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Network size={14} />
+                      <span>{isFa ? "معماری گراف دانش" : "Knowledge Graph Design"}</span>
+                    </span>
+                  </button>
+                </li>
+
+                <li>
+                  <button
+                    onClick={() => setActiveTab("security")}
+                    className={`w-full text-start block px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
+                      activeTab === "security"
+                        ? "bg-slate-900 text-[#38bdf8] border border-white/5"
+                        : "hover:bg-[var(--muted-surface)]"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Database size={14} />
+                      <span>{isFa ? "امنیت و جداسازی مستاجر" : "Tenant Security Spec"}</span>
+                    </span>
+                  </button>
+                </li>
+
               </ul>
             </div>
           </aside>
 
-          {/* Core Technical Content */}
+          {/* Dynamic Content Panel */}
           <div className="space-y-10 min-w-0">
-            {/* Quickstart segment */}
-            <div className="space-y-4">
-              <h2 className="text-xl sm:text-2xl font-black font-display text-[var(--text-primary)] flex items-center gap-2">
-                <Play size={20} className="text-[#38bdf8]" />
-                <span>{isFa ? "راهنمای شروع سریع (Quick Start)" : "Quick Start Guide"}</span>
-              </h2>
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed font-semibold">
-                {isFa
-                  ? "جهت شروع کار با سرویس و دریافت گزارش دیده‌شدن برند، ابتدا به سادگی کلید دسترسی API خود را از پیشخوان کاربری کپی کرده و اولین وب‌سرویس را به صورت آزمایشی فراخوانی نمایید."
-                  : "To query your brand visibility programmatically, grab your security token inside the administrative panel, and issue a HTTP request to our REST middleware."}
-              </p>
 
-              {/* Code Container */}
-              <div className="rounded-2xl border border-[var(--glass-border)] bg-[#090d16] overflow-hidden shadow-2xl">
-                <div className="flex items-center justify-between px-4 py-3 bg-[#0c121e] border-b border-[var(--border)]">
-                  <div className="flex gap-2 text-xs font-bold font-mono">
-                    <button
-                      onClick={() => setActiveCodeTab("curl")}
-                      className={`px-3 py-1 rounded-md transition-all cursor-pointer ${activeCodeTab === "curl" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}
-                    >
-                      cURL
-                    </button>
-                    <button
-                      onClick={() => setActiveCodeTab("node")}
-                      className={`px-3 py-1 rounded-md transition-all cursor-pointer ${activeCodeTab === "node" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}
-                    >
-                      Node.js SDK
-                    </button>
+            {/* 1. QUICKSTART TAB */}
+            {activeTab === "quickstart" && (
+              <div className="space-y-6 animate-fade-in text-start">
+                <div className="space-y-2">
+                  <h2 className="text-xl sm:text-2xl font-black font-display text-[var(--text-primary)] flex items-center gap-2">
+                    <Play size={20} className="text-[#38bdf8]" />
+                    <span>{isFa ? "راهنمای شروع سریع (API)" : "Quick Start API Reference"}</span>
+                  </h2>
+                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed font-semibold">
+                    {isFa
+                      ? "با فراخوانی وب‌سرویس‌های ما، شما می‌توانید سهم صدا و توصیه‌های هوش مصنوعی درباره‌ی برند خود را واکشی نمایید."
+                      : "Access key semantic metrics of your company inside the model database via lightweight JSON REST interfaces."}
+                  </p>
+                </div>
+
+                {/* Code Tabs */}
+                <div className="rounded-2xl border border-[var(--glass-border)] bg-[#090d16] overflow-hidden shadow-2xl">
+                  <div className="flex items-center justify-between px-4 py-3 bg-[#0c121e] border-b border-[var(--border)]">
+                    <div className="flex gap-2 text-xs font-bold font-mono">
+                      <button
+                        onClick={() => setActiveCodeTab("curl")}
+                        className={`px-3 py-1 rounded-md transition-all cursor-pointer ${activeCodeTab === "curl" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}
+                      >
+                        cURL
+                      </button>
+                      <button
+                        onClick={() => setActiveCodeTab("node")}
+                        className={`px-3 py-1 rounded-md transition-all cursor-pointer ${activeCodeTab === "node" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}
+                      >
+                        Node.js SDK
+                      </button>
+                    </div>
+                    <Terminal size={14} className="text-slate-500" />
                   </div>
-                  <Terminal size={14} className="text-slate-500" />
-                </div>
-                <div className="p-4 overflow-x-auto text-xs font-mono text-slate-300 leading-relaxed text-start" dir="ltr">
-                  <pre>{activeCodeTab === "curl" ? curlCode : nodeCode}</pre>
+                  <div className="p-4 overflow-x-auto text-xs font-mono text-slate-300 leading-relaxed text-start" dir="ltr">
+                    <pre>{activeCodeTab === "curl" ? curlCode : nodeCode}</pre>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            <div className="h-px bg-[var(--border)]" />
-
-            {/* Ingestion & Crawling segment */}
-            <div className="space-y-4">
-              <h2 className="text-xl sm:text-2xl font-black font-display text-[var(--text-primary)] flex items-center gap-2">
-                <Layers size={20} className="text-[#f97316]" />
-                <span>{isFa ? "مکانیسم خزش و پردازش ساختاریافته" : "Ingestion & Crawler Architecture"}</span>
-              </h2>
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed font-semibold">
-                {isFa
-                  ? "موتور خزش ما با رعایت تمام قوانین فایل robots.txt، ساختار وب‌سایت، متاداده‌های هدر و تگ‌های معنایی را با Firecrawl واکشی کرده و به عنوان گره‌های جدید به گراف روابط برند اضافه می‌کند."
-                  : "Our pipeline integrates Firecrawl infrastructure to capture dynamic HTML components, processing metadata structure according to row-level security parameters."}
-              </p>
-
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="p-5 rounded-xl border border-[var(--border)] bg-[var(--glass-bg)] space-y-2">
-                  <h4 className="text-sm font-bold font-display text-[var(--text-primary)]">{isFa ? "نرخ مجاز خزش (Rate Limiting)" : "Adaptive Crawling Rate"}</h4>
-                  <p className="text-xs text-[var(--text-muted)] leading-relaxed font-semibold">
-                    {isFa ? "سیستم به صورت پویا با توجه به پاسخ‌دهی سرور شما سرعت خزش را جهت جلوگیری از ممانعت یا فشار روی سرور تنظیم می‌کند." : "Crawl engines dynamically rate-limit targets to preserve active server resource safety."}
+            {/* 2. PIPELINE ARCHITECTURE TAB */}
+            {activeTab === "pipeline" && (
+              <div className="space-y-6 animate-fade-in text-start">
+                <div className="space-y-2">
+                  <h2 className="text-xl sm:text-2xl font-black font-display text-[var(--text-primary)] flex items-center gap-2">
+                    <Cpu size={20} className="text-[#38bdf8]" />
+                    <span>{isFa ? "ساختار خط لوله پردازش چند مدل هوش مصنوعی" : "AI Processing Pipeline Architecture"}</span>
+                  </h2>
+                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed font-semibold">
+                    {isFa
+                      ? "این لایه برای پردازش، سناریوسازی و سنجش داده‌های ورودی و خروجی در ۶ مرحله مجزا طراحی گردیده است."
+                      : "Abstract core pipeline coordinating multi-model query dispatching, factuality checking, and semantic calculations."}
                   </p>
                 </div>
 
-                <div className="p-5 rounded-xl border border-[var(--border)] bg-[var(--glass-bg)] space-y-2">
-                  <h4 className="text-sm font-bold font-display text-[var(--text-primary)]">{isFa ? "استانداردهای امنیتی خزش" : "Security & Agent Isolation"}</h4>
-                  <p className="text-xs text-[var(--text-muted)] leading-relaxed font-semibold">
-                    {isFa ? "تمامی فرآیندهای استخراج و خزش با تایید مالکیت و جداسازی کامل داده‌ها در سطح مستاجر انجام می‌شوند." : "All crawl sessions verify organizational ownership, maintaining strict row-level isolation."}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="p-5 rounded-2xl border border-[var(--glass-border)] bg-slate-900/40 space-y-2.5">
+                    <span className="text-[10px] uppercase font-black tracking-widest text-[#38bdf8]">{isFa ? "مرحله ۱: آداپتورهای مدل" : "Stage 1: IAIEngineAdapter"}</span>
+                    <p className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">
+                      {isFa ? "ارسال و توزیع پرسش‌ها به OpenAI ChatGPT، Claude، Perplexity، و Google Gemini به‌طور کاملاً برخط." : "Handles dynamic query translation and multi-endpoint polling routines safely."}
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl border border-[var(--glass-border)] bg-slate-900/40 space-y-2.5">
+                    <span className="text-[10px] uppercase font-black tracking-widest text-[#f97316]">{isFa ? "مرحله ۲: پایش توهم و صحت" : "Stage 2: Factual Validation"}</span>
+                    <p className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">
+                      {isFa ? "کالبدشکافی داده‌های برگشتی و تخمین میزان صحت و گرامر پاسخ‌ها با لایه امتیازدهی اختصاصی." : "Sanitizes raw model outputs, masking user credentials and mapping hallucination indicators."}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl border border-[var(--glass-border)] bg-slate-900/60 font-semibold text-xs leading-relaxed text-[var(--text-secondary)] space-y-2">
+                  <h4 className="text-sm font-bold text-white font-display">{isFa ? "راهبرد افزونه‌های مدل (Pluggable Adapters)" : "Pluggable Model Strategy"}</h4>
+                  <p>
+                    {isFa
+                      ? "با واسط‌های سخت‌گیرانه تعبیه شده در پلتفرم، ما می‌توانیم در هر زمان هر مدل زبانی بزرگ بومی یا تجاری دیگر را به‌سادگی بدون تغییر منطق تجاری برنامه اضافه کنیم."
+                      : "By defining solid interfaces, our platform supports seamless updates to modern LLMs (like GPT-4.5) simply by creating concrete adapter instances."}
                   </p>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* 3. KNOWLEDGE GRAPH DESIGN TAB */}
+            {activeTab === "graph" && (
+              <div className="space-y-6 animate-fade-in text-start">
+                <div className="space-y-2">
+                  <h2 className="text-xl sm:text-2xl font-black font-display text-[var(--text-primary)] flex items-center gap-2">
+                    <Network size={20} className="text-[#38bdf8]" />
+                    <span>{isFa ? "طراحی و ساختار گراف روابط معنایی برند" : "Semantic Knowledge Graph Architecture"}</span>
+                  </h2>
+                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed font-semibold">
+                    {isFa
+                      ? "نگاشت شبکه‌ای موجودیت‌های برند، محصولات مرتبط، رقبای مستقیم و نوع ارجاعات موتورهای هوشمند."
+                      : "How the platform maps and structures complex semantic association networks."}
+                  </p>
+                </div>
+
+                <div className="p-6 rounded-3xl border border-[var(--glass-border)] bg-slate-950/60 space-y-4">
+                  <h3 className="text-sm font-bold font-display text-[#38bdf8]">{isFa ? "رویکرد دیتابیس دوگانه (Relational + Graph DB)" : "Dual Database Strategy"}</h3>
+                  <p className="text-xs text-[var(--text-muted)] leading-relaxed font-semibold">
+                    {isFa
+                      ? "۱. اطلاعات تراکنشی و لاگ‌ها درون پایگاه داده PostgreSQL نگهداری شده تا ویژگی‌های تراکنشی (ACID) و امنیت RLS در سطح فیلدها تضمین گردد."
+                      : "1. Transactional Metadata: Stored securely in PostgreSQL tables supporting strict tenant boundaries and ACID transactions."}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)] leading-relaxed font-semibold">
+                    {isFa
+                      ? "۲. پیمایش‌های چندگانه و سنگین روابط به پایگاه داده Neo4j / Neptune سپرده می‌شود تا گراف همبستگی رقبا به‌سرعت محاسبه گردد."
+                      : "2. Analytical Traversals: Synergizes with Neo4j using cypher queries to trace competitive circles and index overlap frequencies."}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* 4. TENANT SECURITY TAB */}
+            {activeTab === "security" && (
+              <div className="space-y-6 animate-fade-in text-start">
+                <div className="space-y-2">
+                  <h2 className="text-xl sm:text-2xl font-black font-display text-[var(--text-primary)] flex items-center gap-2">
+                    <Database size={20} className="text-[#38bdf8]" />
+                    <span>{isFa ? "الزامات امنیتی و ایزوله‌سازی چندمستاجری (RLS)" : "Tenant Context & PostgreSQL RLS Spec"}</span>
+                  </h2>
+                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed font-semibold">
+                    {isFa
+                      ? "تفکیک داده‌ها به صورت کاملاً سخت‌گیرانه در سطح پایگاه داده اصلی برنامه به منظور پیشگیری از نشت اطلاعات."
+                      : "Enterprise security architecture guaranteeing zero cross-contamination of competitor or corporate analysis datasets."}
+                  </p>
+                </div>
+
+                <div className="p-5 rounded-2xl border border-[var(--glass-border)] bg-slate-900/60 font-mono text-xs text-slate-300 space-y-3" dir="ltr">
+                  <span className="text-[10px] font-sans font-bold text-sky-400">SET LOCAL Current Tenant Context Pattern</span>
+                  <pre className="overflow-x-auto bg-[#0a0d16] p-4 rounded-xl text-slate-400">
+{`-- Transaction-Scoped Settings binding:
+SET LOCAL app.current_tenant_id = 'your-tenant-uuid';
+
+-- Enforces Row Level Security (RLS) policies dynamically:
+SELECT * FROM entity_relationships
+WHERE organization_id = current_setting('app.current_tenant_id');`}
+                  </pre>
+                </div>
+
+                <div className="space-y-3 text-xs font-semibold text-[var(--text-secondary)]">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span>{isFa ? "مسدودسازی نشت داده‌های مستاجر با سیاست‌های پیشرفته PostgreSQL." : "Strictly maps app session context to dynamic DB isolation policies."}</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span>{isFa ? "تضمین ایمنی و جداسازی کامل ۱۲ جدول اطلاعاتی اصلی." : "RLS enforcement active on 12 security-critical relational tables."}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
+
         </div>
       </section>
 
