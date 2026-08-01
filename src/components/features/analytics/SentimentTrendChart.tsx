@@ -35,7 +35,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, i
     const formattedValue = typeof value === "number" ? value.toFixed(2) : value;
 
     return (
-      <div className="bg-slate-950/80 backdrop-blur-md border border-white/10 p-3 rounded-xl shadow-lg text-xs space-y-1">
+      <div className="bg-[var(--card)] backdrop-blur-md border border-[var(--glass-border)] p-3 rounded-xl shadow-lg text-xs space-y-1">
         <p className="font-bold text-[var(--text-primary)]">{label}</p>
         <p className="text-[#1F76F9] font-semibold">
           {isRtl ? "شاخص رضایت: " : "Sentiment Score: "}
@@ -111,19 +111,19 @@ export const SentimentTrendChart: React.FC<SentimentTrendChartProps> = ({
               </defs>
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="rgba(255, 255, 255, 0.03)"
+                stroke="var(--border)"
                 vertical={false}
               />
               <XAxis
                 dataKey="date"
-                stroke="rgba(255, 255, 255, 0.4)"
+                stroke="var(--text-muted)"
                 fontSize={10}
                 tickLine={false}
                 axisLine={false}
                 reversed={isRtl}
               />
               <YAxis
-                stroke="rgba(255, 255, 255, 0.4)"
+                stroke="var(--text-muted)"
                 fontSize={10}
                 tickLine={false}
                 axisLine={false}
@@ -131,7 +131,7 @@ export const SentimentTrendChart: React.FC<SentimentTrendChartProps> = ({
                 tickFormatter={(val) => val.toFixed(1)}
                 orientation={isRtl ? "right" : "left"}
               />
-              <Tooltip content={<CustomTooltip isRtl={isRtl} />} cursor={{ stroke: "rgba(255, 255, 255, 0.08)" }} />
+              <Tooltip content={<CustomTooltip isRtl={isRtl} />} cursor={{ stroke: "var(--border-strong)" }} />
               <Area
                 type="monotone"
                 dataKey="score"

@@ -147,10 +147,10 @@ export const AeoAuditPanel: React.FC = () => {
     return (
       <Card className="animate-pulse">
         <CardHeader>
-          <div className="h-4 w-48 bg-white/5 rounded mb-2" />
-          <div className="h-3 w-80 bg-white/5 rounded" />
+          <div className="h-4 w-48 bg-[var(--muted-surface)] rounded mb-2" />
+          <div className="h-3 w-80 bg-[var(--muted-surface)] rounded" />
         </CardHeader>
-        <CardContent className="h-64 bg-white/5 rounded-xl" />
+        <CardContent className="h-64 bg-[var(--muted-surface)] rounded-xl" />
       </Card>
     );
   }
@@ -210,7 +210,7 @@ export const AeoAuditPanel: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in" dir={direction}>
       {/* Title Card */}
-      <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-md">
+      <Card className="backdrop-blur-md shadow-md">
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-blue-500/10 border border-blue-500/20 rounded-xl text-[#1F76F9]">
@@ -226,7 +226,7 @@ export const AeoAuditPanel: React.FC = () => {
           {/* Search input Form */}
           <form onSubmit={handleAudit} className="flex gap-2">
             <div className="relative flex-1">
-              <Search size={16} className={`absolute top-1/2 -translate-y-1/2 text-white/35 ${isRtl ? "right-4" : "left-4"}`} />
+              <Search size={16} className={`absolute top-1/2 -translate-y-1/2 text-[var(--text-muted)] ${isRtl ? "right-4" : "left-4"}`} />
               <input
                 type="text"
                 value={targetBrand}
@@ -234,9 +234,9 @@ export const AeoAuditPanel: React.FC = () => {
                 placeholder={strings.inputPlaceholder}
                 className={`
                   w-full py-2.5 text-xs rounded-xl outline-none transition-all duration-300
-                  bg-white/[0.02] text-white border border-white/10
-                  focus:border-[#1F76F9] focus:ring-1 focus:ring-[#1F76F9]/30 focus:bg-white/[0.04]
-                  placeholder:text-white/20
+                  bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)]
+                  focus:border-[#1F76F9] focus:ring-1 focus:ring-[#1F76F9]/30 focus:bg-[var(--card)]
+                  placeholder:text-[var(--text-muted)]
                   ${isRtl ? "pr-11 pl-4" : "pl-11 pr-4"}
                 `}
                 disabled={isPending}
@@ -274,8 +274,8 @@ export const AeoAuditPanel: React.FC = () => {
 
       {!result ? (
         /* Empty Sandbox Diagnostic State */
-        <Card className="border border-white/5 bg-white/[0.01] backdrop-blur-md p-10 text-center flex flex-col items-center justify-center min-h-[300px]">
-          <div className="p-4 rounded-full bg-white/[0.02] border border-white/10 text-white/20 mb-4 animate-pulse-glow">
+        <Card className="backdrop-blur-md p-10 text-center flex flex-col items-center justify-center min-h-[300px]">
+          <div className="p-4 rounded-full bg-[var(--muted-surface)]/40 border border-[var(--border)] text-[var(--text-muted)]/25 mb-4 animate-pulse-glow">
             <Cpu size={32} className="text-[#1F76F9]" />
           </div>
           <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1.5">{strings.emptyResultTitle}</h3>
@@ -285,7 +285,7 @@ export const AeoAuditPanel: React.FC = () => {
         /* Dynamic Audit Results */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Circular Gauge Score Column */}
-          <Card className="flex flex-col justify-between border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg">
+          <Card className="flex flex-col justify-between shadow-lg">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-bold uppercase tracking-wider text-[var(--color-accent-600)] flex items-center gap-1.5">
                 <TrendingUp size={12} />
@@ -303,7 +303,7 @@ export const AeoAuditPanel: React.FC = () => {
                     cx="64"
                     cy="64"
                     r="52"
-                    className="stroke-white/[0.04]"
+                    className="stroke-[var(--border)]"
                     strokeWidth="8"
                     fill="transparent"
                   />
@@ -333,7 +333,7 @@ export const AeoAuditPanel: React.FC = () => {
           </Card>
 
           {/* Recharts RadarChart Pillar Column */}
-          <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg">
+          <Card className="shadow-lg">
             <CardHeader className="pb-1">
               <CardTitle className="text-xs font-bold uppercase tracking-wider text-[var(--color-accent-600)] flex items-center gap-1.5">
                 <Cpu size={12} />
@@ -343,17 +343,17 @@ export const AeoAuditPanel: React.FC = () => {
             <CardContent className="h-[210px] w-full flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}>
-                  <PolarGrid stroke="rgba(255, 255, 255, 0.05)" />
+                  <PolarGrid stroke="var(--border)" />
                   <PolarAngleAxis
                     dataKey="subject"
-                    stroke="rgba(255, 255, 255, 0.5)"
+                    stroke="var(--text-muted)"
                     fontSize={10}
                     tickLine={false}
                   />
                   <PolarRadiusAxis
                     angle={30}
                     domain={[0, 100]}
-                    stroke="rgba(255, 255, 255, 0.2)"
+                    stroke="var(--border-strong)"
                     fontSize={8}
                     tickLine={false}
                   />
@@ -366,11 +366,11 @@ export const AeoAuditPanel: React.FC = () => {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(15, 23, 42, 0.9)",
-                      borderColor: "rgba(255, 255, 255, 0.1)",
+                      backgroundColor: "var(--card)",
+                      borderColor: "var(--border)",
                       borderRadius: "8px",
                       fontSize: "11px",
-                      color: "#fff"
+                      color: "var(--text-primary)"
                     }}
                   />
                 </RadarChart>
@@ -379,8 +379,8 @@ export const AeoAuditPanel: React.FC = () => {
           </Card>
 
           {/* Recommendations List Column */}
-          <Card className="lg:col-span-3 border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg">
-            <CardHeader className="border-b border-white/5 pb-3">
+          <Card className="lg:col-span-3 shadow-lg">
+            <CardHeader className="border-b border-[var(--border)] pb-3">
               <CardTitle className="text-sm font-bold flex items-center gap-2">
                 <Sparkles size={16} className="text-[#1F76F9]" />
                 <span>{strings.recommendationsTitle}</span>
@@ -394,8 +394,8 @@ export const AeoAuditPanel: React.FC = () => {
                 <div
                   key={index}
                   className="
-                    p-4 rounded-xl border border-white/5 bg-white/[0.01] backdrop-blur-sm
-                    hover:border-white/10 transition-all duration-200 flex flex-col sm:flex-row sm:items-start gap-3.5
+                    p-4 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)]/20 backdrop-blur-sm
+                    hover:border-[var(--sky-blue-500)]/45 transition-all duration-200 flex flex-col sm:flex-row sm:items-start gap-3.5
                   "
                 >
                   {/* Priority icon badge left */}
@@ -406,11 +406,11 @@ export const AeoAuditPanel: React.FC = () => {
                   {/* Recommendation core content */}
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold text-white/45">
+                      <span className="text-[10px] font-bold text-[var(--text-muted)]">
                         {strings.radarScore} {index + 1} • {getCategoryLabel(rec.category)}
                       </span>
                     </div>
-                    <p className="text-xs text-white/80 leading-relaxed font-medium">
+                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
                       {rec.insight}
                     </p>
                   </div>

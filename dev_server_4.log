@@ -10,3 +10,5 @@
  GET /fa 200 in 1512ms (next.js: 888ms, application-code: 624ms)
  POST /fa 200 in 100ms (next.js: 20ms, application-code: 81ms)
   └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 5ms src/actions/auth.ts
+[?25h
+ ELIFECYCLE  Command failed with exit code 143.

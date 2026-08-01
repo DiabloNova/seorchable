@@ -93,7 +93,7 @@ export const IngestionForm: React.FC = () => {
 
       <CardContent className="space-y-5">
         {/* Toggle between Text and URL mode */}
-        <div className="flex gap-2 p-1.5 bg-white/[0.02] border border-white/5 rounded-xl">
+        <div className="flex gap-2 p-1.5 bg-[var(--muted-surface)] border border-[var(--border)] rounded-xl">
           <Button
             type="button"
             variant={mode === "text" ? "primary" : "ghost"}
@@ -133,9 +133,9 @@ export const IngestionForm: React.FC = () => {
                 rows={4}
                 className="
                   w-full px-4 py-3 text-sm rounded-xl outline-none transition-all duration-300
-                  bg-white/[0.02] text-white border border-white/10
-                  focus:border-[#1F76F9] focus:ring-1 focus:ring-[#1F76F9]/30 focus:bg-white/[0.04]
-                  placeholder:text-white/30 resize-none
+                  bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)]
+                  focus:border-[#1F76F9] focus:ring-1 focus:ring-[#1F76F9]/30 focus:bg-[var(--card)]
+                  placeholder:text-[var(--text-muted)] resize-none
                 "
               />
             </div>
@@ -174,7 +174,7 @@ export const IngestionForm: React.FC = () => {
             <div
               className={`
                 p-4 rounded-xl border flex items-start gap-3 transition-all duration-300
-                backdrop-blur-md bg-white/[0.02]
+                backdrop-blur-md bg-[var(--muted-surface)]/20
                 ${result.status === "success" ? "border-emerald-500/20 text-emerald-400" : "border-red-500/20 text-red-400"}
               `}
             >

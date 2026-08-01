@@ -154,12 +154,12 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
 
   const getMarketPositionLabel = (pos: CompetitiveAnalysisResponse["marketPosition"]) => {
     const mapping = {
-      leader: { fa: "رهبر بازار (Leader)", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" },
+      leader: { fa: "رهبر بازار (Leader)", color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/30" },
       challenger: { fa: "چالش‌گر بازار (Challenger)", color: "text-[var(--sky-blue-500)] bg-[var(--sky-blue-500)]/10 border-[var(--sky-blue-500)]/30" },
       follower: { fa: "دنبال‌کننده (Follower)", color: "text-[var(--orange-500)] bg-[var(--orange-500)]/10 border-[var(--orange-500)]/30" },
-      niche: { fa: "بازیگر تخصصی (Niche Player)", color: "text-purple-400 bg-purple-500/10 border-purple-500/30" }
+      niche: { fa: "بازیگر تخصصی (Niche Player)", color: "text-purple-500 bg-purple-500/10 border-purple-500/30" }
     };
-    return mapping[pos] || { fa: pos, color: "text-white bg-white/10" };
+    return mapping[pos] || { fa: pos, color: "text-[var(--text-primary)] bg-[var(--muted-surface)]" };
   };
 
   return (
@@ -182,7 +182,7 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                 onChange={(e) => setUserUrl(e.target.value)}
                 disabled={isLoading}
                 className="w-full px-4 py-3 text-xs rounded-xl outline-none transition-all duration-300
-                         bg-white/[0.02] text-white border border-white/10
+                         bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)]
                          focus:border-[var(--sky-blue-500)] focus:ring-1 focus:ring-[var(--sky-blue-500)]/30"
               />
             </div>
@@ -203,7 +203,7 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                     className={`px-3 py-3 text-xs rounded-xl border font-bold transition-all ${
                       analysisDepth === depth
                         ? "bg-gradient-to-r from-[var(--sky-blue-500)] to-[var(--orange-500)] text-white border-transparent"
-                        : "bg-white/[0.01] text-[var(--text-muted)] border-white/10 hover:bg-white/5"
+                        : "bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)] hover:bg-[var(--background-subtle)]"
                     }`}
                   >
                     {depth === "quick" && (isRtl ? "سریع (۵ صفحه)" : "Quick (5 pages)")}
@@ -227,7 +227,7 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                   type="button"
                   onClick={handleAddCompetitor}
                   disabled={isLoading}
-                  className="text-[10px] text-[var(--sky-blue-500)] hover:text-white flex items-center gap-1 font-bold"
+                  className="text-[10px] text-[var(--sky-blue-500)] hover:text-[var(--text-primary)] flex items-center gap-1 font-bold"
                 >
                   <Plus size={12} />
                   <span>{isRtl ? "افزودن رقیب جدید" : "Add Competitor"}</span>
@@ -247,7 +247,7 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                     onChange={(e) => handleCompetitorUrlChange(idx, e.target.value)}
                     disabled={isLoading}
                     className="flex-1 px-4 py-2.5 text-xs rounded-xl outline-none transition-all duration-300
-                             bg-white/[0.01] text-white border border-white/10
+                             bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)]
                              focus:border-purple-400 focus:ring-1 focus:ring-purple-400/30"
                   />
                   <button
@@ -382,10 +382,10 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-2 w-full border-t border-white/5 pt-4 text-xs text-[var(--text-secondary)]">
+              <div className="space-y-2 w-full border-t border-[var(--border)] pt-4 text-xs text-[var(--text-secondary)]">
                 <div className="flex justify-between">
                   <span>{isRtl ? "تعداد رقبای تحلیل شده:" : "Competitors Analyzed:"}</span>
-                  <span className="font-bold text-white">{data.marketInsights.totalCompetitorsAnalyzed}</span>
+                  <span className="font-bold text-[var(--text-primary)]">{data.marketInsights.totalCompetitorsAnalyzed}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>{isRtl ? "رتبه تقریبی شما در صنف:" : "Estimated Rank:"}</span>
@@ -411,9 +411,9 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
               <div className="w-full h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <RadarChart cx="50%" cy="50%" outerRadius="75%" data={getRadarData()}>
-                    <PolarGrid stroke="rgba(255, 255, 255, 0.1)" />
-                    <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 10 }} />
-                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: "#cbd5e1", fontSize: 8 }} />
+                    <PolarGrid stroke="var(--border)" />
+                    <PolarAngleAxis dataKey="subject" tick={{ fill: "var(--text-muted)", fontSize: 10 }} />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: "var(--text-secondary)", fontSize: 8 }} />
                     <Radar
                       name={isRtl ? "برند شما" : "Your Brand"}
                       dataKey={isRtl ? "شما" : "User"}
@@ -435,7 +435,7 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                         />
                       );
                     })}
-                    <Tooltip contentStyle={{ backgroundColor: "rgba(15, 23, 42, 0.95)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "8px", fontSize: "11px" }} />
+                    <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", color: "var(--text-primary)", borderRadius: "8px", fontSize: "11px" }} />
                     <Legend wrapperStyle={{ fontSize: "9px" }} />
                   </RadarChart>
                 </ResponsiveContainer>
@@ -452,9 +452,9 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
             </h3>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-xs text-right text-slate-300 border-collapse">
+              <table className="w-full text-xs text-right text-[var(--text-secondary)] border-collapse">
                 <thead>
-                  <tr className="border-b border-white/10 text-[var(--text-muted)]">
+                  <tr className="border-b border-[var(--border)] text-[var(--text-muted)]">
                     <th className="pb-3 pt-1 text-right font-bold">{isRtl ? "رقیب / برند" : "Competitor / Brand"}</th>
                     <th className="pb-3 pt-1 text-center font-bold">{isRtl ? "شاخص کلی" : "Overall score"}</th>
                     <th className="pb-3 pt-1 text-center font-bold">{isRtl ? "محتوا" : "Content"}</th>
@@ -464,10 +464,10 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                     <th className="pb-3 pt-1 text-center font-bold">{isRtl ? "احتمال پیشی گرفتن" : "Win probability"}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-[var(--border)]">
                   {/* Row for user */}
-                  <tr className="bg-white/[0.02]">
-                    <td className="py-3 font-bold text-white flex items-center gap-2">
+                  <tr className="bg-[var(--muted-surface)]/40">
+                    <td className="py-3 font-bold text-[var(--text-primary)] flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-[var(--sky-blue-500)]" />
                       <span>{isRtl ? "برند شما (شما)" : "Your Brand"}</span>
                     </td>
@@ -484,12 +484,12 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                     const colors = ["bg-orange-500", "bg-emerald-500", "bg-purple-500", "bg-pink-500"];
                     const color = colors[idx % colors.length];
                     return (
-                      <tr key={comp.competitorUrl} className="hover:bg-white/[0.01]">
-                        <td className="py-3 font-bold text-slate-300 flex items-center gap-2">
+                      <tr key={comp.competitorUrl} className="hover:bg-[var(--muted-surface)]/20">
+                        <td className="py-3 font-bold text-[var(--text-secondary)] flex items-center gap-2">
                           <div className={`w-2 h-2 rounded-full ${color}`} />
                           <span className="truncate max-w-[150px]">{comp.competitorName}</span>
                         </td>
-                        <td className="py-3 text-center font-bold text-white">{comp.overallScore}</td>
+                        <td className="py-3 text-center font-bold text-[var(--text-primary)]">{comp.overallScore}</td>
                         <td className="py-3 text-center">{comp.headToHead.content.competitor}</td>
                         <td className="py-3 text-center">{comp.headToHead.technical.competitor}</td>
                         <td className="py-3 text-center">{comp.headToHead.seo.competitor}</td>
@@ -507,8 +507,8 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {data.competitorComparison.map((comp) => (
               <GlassCard key={comp.competitorUrl} hoverable={false} className="p-5 space-y-4">
-                <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <h4 className="text-xs font-black text-white">{isRtl ? `جزئیات تقابل با: ${comp.competitorName}` : `H2H: ${comp.competitorName}`}</h4>
+                <div className="flex items-center justify-between border-b border-[var(--border)] pb-2">
+                  <h4 className="text-xs font-black text-[var(--text-primary)]">{isRtl ? `جزئیات تقابل با: ${comp.competitorName}` : `H2H: ${comp.competitorName}`}</h4>
                   <Badge variant="success" className="text-[9px]">
                     {isRtl ? `شانس غلبه: ${comp.winProbability}%` : `Win Prob: ${comp.winProbability}%`}
                   </Badge>
@@ -519,7 +519,7 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                     <span className="text-[10px] font-bold text-emerald-400 block">{isRtl ? "نقاط قوت رقیب (ضعف شما):" : "Competitor Strengths:"}</span>
                     <ul className="space-y-1.5">
                       {comp.strengths.map((str, sIdx) => (
-                        <li key={sIdx} className="text-[11px] text-slate-400 leading-relaxed list-disc list-inside">
+                        <li key={sIdx} className="text-[11px] text-[var(--text-secondary)] leading-relaxed list-disc list-inside">
                           {str}
                         </li>
                       ))}
@@ -529,7 +529,7 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                     <span className="text-[10px] font-bold text-red-400 block">{isRtl ? "نقاط ضعف رقیب (برتری شما):" : "Competitor Weaknesses:"}</span>
                     <ul className="space-y-1.5">
                       {comp.weaknesses.map((weak, wIdx) => (
-                        <li key={wIdx} className="text-[11px] text-slate-400 leading-relaxed list-disc list-inside">
+                        <li key={wIdx} className="text-[11px] text-[var(--text-secondary)] leading-relaxed list-disc list-inside">
                           {weak}
                         </li>
                       ))}
@@ -559,8 +559,8 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                         {isRtl ? `تأثیر: ${adv.impact === "high" ? "زیاد" : "متوسط"}` : `Impact: ${adv.impact}`}
                       </Badge>
                     </div>
-                    <h4 className="text-xs font-bold text-white leading-normal">{adv.advantage}</h4>
-                    <p className="text-[10px] text-slate-400 leading-relaxed">
+                    <h4 className="text-xs font-bold text-[var(--text-primary)] leading-normal">{adv.advantage}</h4>
+                    <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed">
                       <strong>{isRtl ? "چگونگی بکارگیری:" : "How to Leverage:"} </strong>{adv.howToLeverage}
                     </p>
                   </div>
@@ -579,12 +579,12 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                 {data.strategicOpportunities.map((opp, idx) => (
                   <div key={idx} className="p-3 rounded-xl border border-[var(--sky-blue-500)]/15 bg-[var(--sky-blue-500)]/[0.02] space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold text-white leading-normal">{opp.opportunity}</h4>
+                      <h4 className="text-xs font-bold text-[var(--text-primary)] leading-normal">{opp.opportunity}</h4>
                       <Badge variant="warning" className="text-[9px]">
                         {isRtl ? `پتانسیل: ${opp.potential === "high" ? "بالا" : "متوسط"}` : `Potential: ${opp.potential}`}
                       </Badge>
                     </div>
-                    <p className="text-[10px] text-slate-400 leading-relaxed">
+                    <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed">
                       <strong>{isRtl ? "طرح اجرایی:" : "Action Plan:"} </strong>{opp.actionPlan}
                     </p>
                     <span className="text-[9px] text-[var(--sky-blue-500)]/80 block font-bold">
@@ -666,20 +666,20 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-3 bg-white/[0.01] border border-white/5 rounded-xl">
+              <div className="p-3 bg-[var(--muted-surface)] border border-[var(--border)] rounded-xl">
                 <span className="text-[10px] text-[var(--text-muted)] block mb-1.5 font-bold">{isRtl ? "روند کلی صنعت:" : "Industry Averages:"}</span>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                   {isRtl
                     ? `میانگین امتیاز رقابتی صنف شما ${data.marketInsights.avgIndustryScore} از ۱۰۰ است. برند شما با شاخص ${data.overallScore} در رتبه برتر صنف قرار می‌گیرد.`
                     : `Average industry index is ${data.marketInsights.avgIndustryScore} / 100.`}
                 </p>
               </div>
 
-              <div className="p-3 bg-white/[0.01] border border-white/5 rounded-xl space-y-2">
+              <div className="p-3 bg-[var(--muted-surface)] border border-[var(--border)] rounded-xl space-y-2">
                 <span className="text-[10px] text-[var(--text-muted)] block font-bold">{isRtl ? "سه ترند برتر صنف:" : "Top Industry Trends:"}</span>
                 <ul className="space-y-1">
                   {data.marketInsights.topIndustryTrends.map((trend, tIdx) => (
-                    <li key={tIdx} className="text-xs text-slate-300 leading-relaxed flex items-center gap-2">
+                    <li key={tIdx} className="text-xs text-[var(--text-secondary)] leading-relaxed flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
                       <span>{trend}</span>
                     </li>

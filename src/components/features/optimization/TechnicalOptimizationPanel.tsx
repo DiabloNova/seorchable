@@ -159,8 +159,8 @@ export const TechnicalOptimizationPanel: React.FC = () => {
                 onChange={(e) => setUrl(e.target.value)}
                 disabled={isLoading}
                 className="w-full px-4 py-3 text-xs rounded-xl outline-none transition-all duration-300
-                         bg-white/[0.02] text-white border border-white/10
-                         focus:border-[var(--sky-blue-500)] focus:ring-1 focus:ring-[var(--sky-blue-500)]/30 focus:bg-white/[0.04]"
+                         bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)]
+                         focus:border-[var(--sky-blue-500)] focus:ring-1 focus:ring-[var(--sky-blue-500)]/30 focus:bg-[var(--card)]"
               />
             </div>
 
@@ -175,7 +175,7 @@ export const TechnicalOptimizationPanel: React.FC = () => {
                 onChange={(e) => setPagesToAnalyze(Number(e.target.value))}
                 disabled={isLoading}
                 className="w-full px-4 py-3 text-xs rounded-xl outline-none transition-all duration-300
-                         bg-slate-900/90 text-white border border-white/10 cursor-pointer
+                         bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)] cursor-pointer
                          focus:border-[var(--sky-blue-500)]"
               >
                 <option value={5}>{isRtl ? "۵ صفحه" : "5 pages"}</option>
@@ -285,8 +285,8 @@ export const TechnicalOptimizationPanel: React.FC = () => {
               </div>
 
               <div className="relative flex items-center justify-center my-6">
-                <div className="w-36 h-36 rounded-full border-4 border-dashed border-white/10 flex flex-col items-center justify-center">
-                  <span className="text-5xl font-black bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent">
+                <div className="w-36 h-36 rounded-full border-4 border-dashed border-[var(--border-strong)] flex flex-col items-center justify-center">
+                  <span className="text-5xl font-black text-[var(--text-primary)]">
                     {data.technicalScore}
                   </span>
                   <span className="text-[10px] text-[var(--text-muted)] font-bold mt-1 uppercase tracking-widest">
@@ -295,7 +295,7 @@ export const TechnicalOptimizationPanel: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-1 w-full border-t border-white/5 pt-4">
+              <div className="space-y-1 w-full border-t border-[var(--border)] pt-4">
                 <p className="text-xs text-[var(--text-secondary)]">
                   {isRtl
                     ? `تعداد کل صفحات پایش شده: ${data.pagesAnalyzed} صفحه`
@@ -318,21 +318,21 @@ export const TechnicalOptimizationPanel: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-3 bg-white/[0.01] border border-white/5 rounded-xl text-center">
+                <div className="p-3 bg-[var(--muted-surface)]/40 border border-[var(--border)] rounded-xl text-center">
                   <span className="text-[10px] text-[var(--text-muted)] block mb-1">{isRtl ? "میانگین لود" : "Avg Load Time"}</span>
-                  <span className="text-sm font-black text-white">{data.performanceMetrics.avgLoadTime}</span>
+                  <span className="text-sm font-black text-[var(--text-primary)]">{data.performanceMetrics.avgLoadTime}</span>
                 </div>
-                <div className="p-3 bg-white/[0.01] border border-white/5 rounded-xl text-center">
+                <div className="p-3 bg-[var(--muted-surface)]/40 border border-[var(--border)] rounded-xl text-center">
                   <span className="text-[10px] text-[var(--text-muted)] block mb-1">Largest Contentful Paint (LCP)</span>
                   <span className="text-sm font-black text-[var(--orange-500)]">{data.performanceMetrics.largestContentfulPaint}</span>
                 </div>
-                <div className="p-3 bg-white/[0.01] border border-white/5 rounded-xl text-center">
+                <div className="p-3 bg-[var(--muted-surface)]/40 border border-[var(--border)] rounded-xl text-center">
                   <span className="text-[10px] text-[var(--text-muted)] block mb-1">Cumulative Layout Shift (CLS)</span>
                   <span className="text-sm font-black text-emerald-400">{data.performanceMetrics.cumulativeLayoutShift}</span>
                 </div>
-                <div className="p-3 bg-white/[0.01] border border-white/5 rounded-xl text-center">
+                <div className="p-3 bg-[var(--muted-surface)]/40 border border-[var(--border)] rounded-xl text-center">
                   <span className="text-[10px] text-[var(--text-muted)] block mb-1">{isRtl ? "مجموع حجم صفحه" : "Total Page Size"}</span>
-                  <span className="text-sm font-black text-white">{data.performanceMetrics.totalPageSize}</span>
+                  <span className="text-sm font-black text-[var(--text-primary)]">{data.performanceMetrics.totalPageSize}</span>
                 </div>
               </div>
 
@@ -342,7 +342,7 @@ export const TechnicalOptimizationPanel: React.FC = () => {
                   <span className="text-[10px] text-[var(--text-muted)]">{isRtl ? "امتیاز فشرده‌سازی و بهینه‌سازی تصاویر" : "Image Compression Score"}</span>
                   <span className="font-black text-emerald-400">{data.performanceMetrics.imageOptimizationScore} / 100</span>
                 </div>
-                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-[var(--border)] rounded-full overflow-hidden">
                   <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${data.performanceMetrics.imageOptimizationScore}%` }} />
                 </div>
               </div>
@@ -437,7 +437,7 @@ export const TechnicalOptimizationPanel: React.FC = () => {
                 <div key={idx} className="p-3 rounded-xl border border-emerald-500/15 bg-emerald-500/[0.02] flex items-start gap-3">
                   <Zap className="text-emerald-400 flex-shrink-0 mt-0.5 animate-pulse" size={16} />
                   <div>
-                    <h4 className="text-xs font-bold text-white leading-normal">{win.issue}</h4>
+                    <h4 className="text-xs font-bold text-[var(--text-primary)] leading-normal">{win.issue}</h4>
                     <p className="text-[10px] text-emerald-300/80 mt-1 leading-relaxed">{win.fix}</p>
                     <span className="text-[9px] text-emerald-400/60 block mt-1.5 font-bold">{isRtl ? `زمان تخمینی: ${win.estimatedTime}` : `Estimated Time: ${win.estimatedTime}`}</span>
                   </div>
