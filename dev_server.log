@@ -1,15 +1,19 @@
 
-> ai-branding-platform@0.1.0 start /app
-> next start
+> ai-branding-platform@0.1.0 dev /app
+> next dev
 
-▲ Next.js 16.2.11
+▲ Next.js 16.2.11 (Turbopack)
 - Local:         http://localhost:3000
 - Network:       http://192.168.0.2:3000
-✓ Ready in 197ms
-[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
-[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
-[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [ws-tehran]
-[Postgres Transacted SQL] Executing Parameterised Query: "INSERT INTO competitive_analyses (
-              organization_id, user_url, competitor_urls, overall_score, market_position, comparison_data, advantages, gaps, opportunities
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)" with values: [ws-tehran, https://myshop.ir, https://competitor-one.ir, 85, leader, [{"competitorUrl":"https://competitor-one.ir","competitorName":"Competitor-one","overallScore":73,"winProbability":51,"strengths":["رتبه سئو عالی در کلمات کلیدی پرسرچ","اعتبار دامنه و بکلینک‌های قوی"],"weaknesses":["تولید محتوای متنی تکراری بدون ارزش افزوده","امنیت ضعیف هدرها و تگ‌های منسوخ شده"],"headToHead":{"content":{"user":87,"competitor":72},"technical":{"user":73,"competitor":84},"seo":{"user":80,"competitor":89},"brand":{"user":68,"competitor":82}}}], [{"category":"سئو فنی و بهینه‌سازی","advantage":"ساختار سلسله‌مراتبی قالب و بکارگیری تگ‌های معنایی کامل در وب‌سایت Myshop","impact":"high","howToLeverage":"تمرکز روی افزایش تعداد صفحات فرود (Landing Pages) برای رتبه‌گیری در کلمات لانگ‌تیل."},{"category":"تولید محتوا","advantage":"تراکم کلمات کلیدی هدفمند و پوشش موضوعی عمیق‌تر در مقالات تخصصی نسبت به رقبا","impact":"medium","howToLeverage":"اشتراک‌گذاری خودکار بخش‌های کلیدی مقالات در شبکه‌های اجتماعی برای گرفتن سیگنال‌های اجتماعی قوی‌تر."}], [{"category":"سرعت و عملکرد","gap":"سرعت لود نسخه موبایل رقبا به طور میانگین ۱.۲ ثانیه سریع‌تر از وب‌سایت شماست.","severity":"critical","recommendedAction":"بهینه‌سازی کدهای CSS و JS بلاک‌کننده رندر، استفاده از قابلیت‌های فشرده‌سازی نوین و راه‌اندازی CDN.","estimatedEffort":"medium"},{"category":"اعتبار دامنه و بک‌لینک","gap":"رقبا دارای بک‌لینک‌های باکیفیت و دائمی از خبرگزاری‌های رسمی و فروم‌های تخصصی هستند.","severity":"warning","recommendedAction":"تدوین کمپین‌های هدفمند رپورتاژ آگهی و تبادل لینک با مراجع دارای اتوریتی بالا.","estimatedEffort":"hard"}], [{"opportunity":"تولید پادکست و محتوای صوتی چندرسانه‌ای در حوزه تخصصی","potential":"high","timeToImpact":"۳ الی ۶ ماه","actionPlan":"ضبط خلاصه صوتی مقالات پربازدید و انتشار در پلتفرم‌های پخش پادکست به عنوان کانال ترافیک جدید."},{"opportunity":"بهبود شاخص‌های دسترسی‌پذیری برای افزایش نرخ تبدیل نهایی","potential":"medium","timeToImpact":"۱ ماه","actionPlan":"اصلاح کنتراست رنگی متون و افزودن راهنمای کیبورد در تمامی فرم‌های خرید وب‌سایت."}]]
-[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
+✓ Ready in 637ms
+
+○ Compiling /[locale] ...
+ GET /fa 200 in 7.6s (next.js: 6.7s, application-code: 848ms)
+ POST /fa 200 in 169ms (next.js: 39ms, application-code: 130ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 21ms src/actions/auth.ts
+ GET /fa 200 in 159ms (next.js: 35ms, application-code: 124ms)
+ POST /fa 200 in 127ms (next.js: 30ms, application-code: 98ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 11ms src/actions/auth.ts
+ GET /fa 200 in 155ms (next.js: 34ms, application-code: 121ms)
+ POST /fa 200 in 148ms (next.js: 32ms, application-code: 116ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 7ms src/actions/auth.ts
