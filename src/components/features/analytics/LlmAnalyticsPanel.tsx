@@ -247,7 +247,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in" dir={isRtl ? "rtl" : "ltr"}>
       {/* Configuration GlassCard */}
-      <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-md">
+      <Card className="backdrop-blur-md shadow-md">
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-gradient-to-tr from-sky-500 to-indigo-500 border border-sky-500/30 rounded-xl text-white shadow-lg shadow-sky-950/20">
@@ -277,7 +277,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value)}
                   placeholder={isRtl ? "مثال: خانه خلاق هوش مصنوعی" : "e.g., Optimus AI"}
-                  className="w-full px-4 py-2.5 text-xs rounded-xl outline-none transition-all duration-300 bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)] focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 focus:bg-[var(--card-bg)]"
+                  className="w-full px-4 py-2.5 text-xs rounded-xl outline-none transition-all duration-300 bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)] focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 focus:bg-[var(--card)]"
                   disabled={isPending}
                 />
               </div>
@@ -293,14 +293,14 @@ export const LlmAnalyticsPanel: React.FC = () => {
                     value={competitorInput}
                     onChange={(e) => setCompetitorInput(e.target.value)}
                     placeholder={isRtl ? "نام رقیب جدید..." : "Add competitor brand name..."}
-                    className="flex-1 px-4 py-2.5 text-xs rounded-xl outline-none transition-all duration-300 bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)] focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 focus:bg-[var(--card-bg)]"
+                    className="flex-1 px-4 py-2.5 text-xs rounded-xl outline-none transition-all duration-300 bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[var(--border)] focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 focus:bg-[var(--card)]"
                     disabled={isPending}
                   />
                   <Button
                     type="submit"
                     variant="outline"
                     disabled={isPending || !competitorInput.trim()}
-                    className="p-2.5 rounded-xl border border-white/10 hover:bg-white/5"
+                    className="p-2.5 rounded-xl border border-[var(--border)] hover:bg-[var(--muted-surface)] text-[var(--text-primary)]"
                   >
                     <Plus size={16} />
                   </Button>
@@ -311,14 +311,14 @@ export const LlmAnalyticsPanel: React.FC = () => {
                   {competitors.map((comp) => (
                     <div
                       key={comp}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold rounded-lg border border-orange-500/25 bg-orange-500/10 text-orange-400"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold rounded-lg border border-orange-500/25 bg-orange-500/10 text-orange-500 dark:text-orange-400"
                     >
                       <span>{comp}</span>
                       {!isPending && (
                         <button
                           type="button"
                           onClick={() => removeCompetitor(comp)}
-                          className="hover:text-white transition-colors"
+                          className="hover:text-[var(--text-primary)] transition-colors"
                         >
                           <X size={12} />
                         </button>
@@ -326,7 +326,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
                     </div>
                   ))}
                   {competitors.length === 0 && (
-                    <span className="text-[10px] text-white/40 italic">
+                    <span className="text-[10px] text-[var(--text-muted)] italic">
                       {isRtl ? "هیچ رقیبی ثبت نشده است" : "No competitors registered"}
                     </span>
                   )}
@@ -355,11 +355,11 @@ export const LlmAnalyticsPanel: React.FC = () => {
                         className={`w-full text-start p-2.5 text-[10px] rounded-xl border transition-all duration-300 flex items-start gap-2 ${
                           isSelected
                             ? "border-sky-500/30 bg-sky-500/10 text-sky-400 font-bold"
-                            : "border-white/5 bg-white/[0.01] text-[var(--text-secondary)] hover:bg-white/5"
+                            : "border-[var(--border)] bg-[var(--muted-surface)]/20 text-[var(--text-secondary)] hover:bg-[var(--muted-surface)]"
                         }`}
                         disabled={isPending}
                       >
-                        <span className={`w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0 ${isSelected ? "bg-sky-400" : "bg-white/20"}`} />
+                        <span className={`w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0 ${isSelected ? "bg-sky-400" : "bg-[var(--border-strong)]"}`} />
                         <span className="leading-relaxed">{resolvedText}</span>
                       </button>
                     );
@@ -369,7 +369,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
 
               {/* Custom template writer */}
               <form onSubmit={addCustomQuery} className="space-y-1.5">
-                <label className="text-[10px] font-bold text-white/40">
+                <label className="text-[10px] font-bold text-[var(--text-muted)]">
                   {isRtl ? "افزودن کوئری دست‌نویس با الگوی [برند]:" : "Add custom template (use [brand] placeholder):"}
                 </label>
                 <div className="flex gap-2">
@@ -385,7 +385,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
                     type="submit"
                     variant="outline"
                     disabled={isPending || !customQuery.trim()}
-                    className="px-3 text-xs font-bold border border-white/10"
+                    className="px-3 text-xs font-bold border border-[var(--border)] hover:bg-[var(--muted-surface)] text-[var(--text-primary)]"
                   >
                     {isRtl ? "ثبت" : "Add"}
                   </Button>
@@ -398,21 +398,21 @@ export const LlmAnalyticsPanel: React.FC = () => {
           {isPending && (
             <div className="mt-6 space-y-4 p-5 rounded-2xl border border-sky-500/15 bg-sky-500/5 animate-pulse">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 0 ? "text-sky-400" : "text-white/40"}`}>
+                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 0 ? "text-sky-400" : "text-[var(--text-muted)]"}`}>
                   <CircleDot size={14} className={loadingStep === 0 ? "animate-spin text-sky-400" : ""} />
                   <span>{isRtl ? "شبیه‌سازی پرس‌وجو از مدل‌های زبانی..." : "Simulating queries from LLM models..."}</span>
                 </div>
-                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 1 ? "text-sky-400" : "text-white/40"}`}>
+                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 1 ? "text-sky-400" : "text-[var(--text-muted)]"}`}>
                   <CircleDot size={14} className={loadingStep === 1 ? "animate-spin text-sky-400" : ""} />
                   <span>{isRtl ? "تحلیل احساسات و ذکر برند..." : "Analyzing sentiment and brand mention rate..."}</span>
                 </div>
-                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 2 ? "text-sky-400" : "text-white/40"}`}>
+                <div className={`flex items-center gap-2.5 font-bold ${loadingStep === 2 ? "text-sky-400" : "text-[var(--text-muted)]"}`}>
                   <CircleDot size={14} className={loadingStep === 2 ? "animate-spin text-sky-400" : ""} />
                   <span>{isRtl ? "محاسبه سهم صدا..." : "Compiling brand Share of Voice..."}</span>
                 </div>
               </div>
 
-              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-sky-500 to-indigo-500 transition-all duration-1000 ease-out"
                   style={{ width: `${(loadingStep + 1) * 33.3}%` }}
@@ -448,7 +448,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
             {/* 1. Share of Voice Chart Card */}
-            <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg flex flex-col justify-between">
+            <Card className="shadow-lg flex flex-col justify-between">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
                   <PieChartIcon size={12} />
@@ -477,8 +477,9 @@ export const LlmAnalyticsPanel: React.FC = () => {
                       </Pie>
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: "#090d16e1",
-                          border: "1px solid rgba(255, 255, 255, 0.1)",
+                          backgroundColor: "var(--card)",
+                          border: "1px solid var(--border)",
+                          color: "var(--text-primary)",
                           borderRadius: "10px",
                           fontSize: "10px"
                         }}
@@ -491,7 +492,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
                     <span className="text-2xl font-black text-sky-400 font-display">
                       {result.shareOfVoice.yourBrand}%
                     </span>
-                    <span className="text-[8px] text-white/40 tracking-wider">
+                    <span className="text-[8px] text-[var(--text-muted)] tracking-wider">
                       {isRtl ? "برند شما" : "YOUR BRAND"}
                     </span>
                   </div>
@@ -500,7 +501,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
                 {/* Legend list */}
                 <div className="w-full grid grid-cols-2 gap-2 mt-2">
                   {chartData.map((item, index) => (
-                    <div key={item.name} className="flex items-center gap-2 p-1.5 rounded bg-white/[0.01] border border-white/5">
+                    <div key={item.name} className="flex items-center gap-2 p-1.5 rounded bg-[var(--muted-surface)]/20 border border-[var(--border)]">
                       <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
                       <span className="text-[10px] font-bold text-[var(--text-secondary)] truncate flex-1">{item.name}</span>
                       <span className="text-[10px] font-black text-[var(--text-primary)]">{item.value}%</span>
@@ -511,7 +512,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
             </Card>
 
             {/* 2. Sentiment Gauge Card */}
-            <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg flex flex-col justify-between">
+            <Card className="shadow-lg flex flex-col justify-between">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
                   <TrendingUp size={12} />
@@ -528,7 +529,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
                       cx="72"
                       cy="72"
                       r="58"
-                      className="stroke-white/[0.04]"
+                      className="stroke-[var(--border)]"
                       strokeWidth="8"
                       fill="transparent"
                     />
@@ -548,7 +549,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
                     <span className="text-4xl font-black text-sky-400 font-display">
                       {animatedScore}
                     </span>
-                    <span className="text-[9px] font-bold text-white/40 mt-0.5 uppercase tracking-widest">
+                    <span className="text-[9px] font-bold text-[var(--text-muted)] mt-0.5 uppercase tracking-widest">
                       / 100
                     </span>
                   </div>
@@ -570,8 +571,8 @@ export const LlmAnalyticsPanel: React.FC = () => {
             </Card>
 
             {/* 3. Actionable Insights */}
-            <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg flex flex-col justify-between">
-              <CardHeader className="pb-3 border-b border-white/5">
+            <Card className="shadow-lg flex flex-col justify-between">
+              <CardHeader className="pb-3 border-b border-[var(--border)]">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
                   <ShieldCheck size={12} />
                   <span>{isRtl ? "بینش‌ها و اقدامات استراتژیک" : "Brand Defense Insights"}</span>
@@ -585,7 +586,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
                   >
                     <Flame size={14} className="text-orange-400 flex-shrink-0 mt-0.5 animate-pulse" />
                     <div className="space-y-1.5">
-                      <p className="leading-relaxed font-bold text-white/90">{insight}</p>
+                      <p className="leading-relaxed font-bold text-[var(--text-primary)]">{insight}</p>
                     </div>
                   </div>
                 ))}
@@ -594,8 +595,8 @@ export const LlmAnalyticsPanel: React.FC = () => {
           </div>
 
           {/* Detailed query result response cards */}
-          <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg">
-            <CardHeader className="pb-3 border-b border-white/5">
+          <Card className="shadow-lg">
+            <CardHeader className="pb-3 border-b border-[var(--border)]">
               <CardTitle className="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
                 <MessageSquare size={12} />
                 <span>{isRtl ? "جزئیات شبیه‌سازی مدل زبانی و تحلیل پاسخ‌ها" : "Simulated AI Query Outputs & Semantic Analysis"}</span>
@@ -605,13 +606,13 @@ export const LlmAnalyticsPanel: React.FC = () => {
               {result.queryResults.map((qr, idx) => (
                 <div
                   key={idx}
-                  className="p-4 rounded-2xl border border-white/5 bg-white/[0.01] space-y-3.5"
+                  className="p-4 rounded-2xl border border-[var(--border)] bg-[var(--muted-surface)]/10 space-y-3.5"
                 >
                   {/* Query Header info */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs pb-3 border-b border-white/5">
+                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs pb-3 border-b border-[var(--border)]">
                     <div className="flex items-center gap-2">
                       <HelpCircle size={14} className="text-sky-400" />
-                      <span className="font-bold text-white">« {qr.query} »</span>
+                      <span className="font-bold text-[var(--text-primary)]">« {qr.query} »</span>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -637,8 +638,8 @@ export const LlmAnalyticsPanel: React.FC = () => {
                   </div>
 
                   {/* Simulated Response text with highlight */}
-                  <div className="text-xs space-y-1.5 leading-relaxed bg-[var(--muted-surface)] p-3.5 rounded-xl border border-[var(--border)] text-white/80">
-                    <div className="text-[10px] text-white/40 font-black mb-1 uppercase tracking-wider flex items-center gap-1">
+                  <div className="text-xs space-y-1.5 leading-relaxed bg-[var(--muted-surface)] p-3.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)]">
+                    <div className="text-[10px] text-[var(--text-muted)] font-black mb-1 uppercase tracking-wider flex items-center gap-1">
                       <BrainCircuit size={10} />
                       <span>{isRtl ? "پاسخ مدل زبانی فرضی" : "Simulated AI Model Answer"}</span>
                     </div>
