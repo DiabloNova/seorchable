@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { firecrawlApp } from "@/lib/firecrawl";
+import { getLLMClient } from "@/services/ai/llm-client";
 import { TenantContextManager } from "@/core/database/tenant-context";
 import { PostgresClient } from "@/features/admin/infrastructure/persistence/postgres";
 
@@ -184,52 +185,118 @@ export async function POST(req: NextRequest) {
         const userRanking = overallScore >= avgIndustryScore ? 2 : 3;
 
         // Structured Recommendations & Advantages (in Persian)
-        const competitiveAdvantages: CompetitiveAnalysisResponse["competitiveAdvantages"] = [
-          {
-            category: "سئو فنی و بهینه‌سازی",
-            advantage: `ساختار سلسله‌مراتبی قالب و بکارگیری تگ‌های معنایی کامل در وب‌سایت ${userBrand}`,
-            impact: "high",
-            howToLeverage: "تمرکز روی افزایش تعداد صفحات فرود (Landing Pages) برای رتبه‌گیری در کلمات لانگ‌تیل."
-          },
-          {
-            category: "تولید محتوا",
-            advantage: "تراکم کلمات کلیدی هدفمند و پوشش موضوعی عمیق‌تر در مقالات تخصصی نسبت به رقبا",
-            impact: "medium",
-            howToLeverage: "اشتراک‌گذاری خودکار بخش‌های کلیدی مقالات در شبکه‌های اجتماعی برای گرفتن سیگنال‌های اجتماعی قوی‌تر."
-          }
-        ];
+        let competitiveAdvantages: CompetitiveAnalysisResponse["competitiveAdvantages"] = [];
+        let gapAnalysis: CompetitiveAnalysisResponse["gapAnalysis"] = [];
+        let strategicOpportunities: CompetitiveAnalysisResponse["strategicOpportunities"] = [];
 
-        const gapAnalysis: CompetitiveAnalysisResponse["gapAnalysis"] = [
-          {
-            category: "سرعت و عملکرد",
-            gap: "سرعت لود نسخه موبایل رقبا به طور میانگین ۱.۲ ثانیه سریع‌تر از وب‌سایت شماست.",
-            severity: "critical",
-            recommendedAction: "بهینه‌سازی کدهای CSS و JS بلاک‌کننده رندر، استفاده از قابلیت‌های فشرده‌سازی نوین و راه‌اندازی CDN.",
-            estimatedEffort: "medium"
-          },
-          {
-            category: "اعتبار دامنه و بک‌لینک",
-            gap: "رقبا دارای بک‌لینک‌های باکیفیت و دائمی از خبرگزاری‌های رسمی و فروم‌های تخصصی هستند.",
-            severity: "warning",
-            recommendedAction: "تدوین کمپین‌های هدفمند رپورتاژ آگهی و تبادل لینک با مراجع دارای اتوریتی بالا.",
-            estimatedEffort: "hard"
-          }
-        ];
+        // Use the LLM client to generate strategic insights if possible
+        const llmClient = getLLMClient();
+        const llmPrompt = `
+          You are a Senior AI Product Engineer and Competitive Intelligence Specialist.
+          We are analyzing the competitive posture of our brand/website against competitors.
 
-        const strategicOpportunities: CompetitiveAnalysisResponse["strategicOpportunities"] = [
+          User Site URL: ${userUrl} (Brand Name: ${userBrand})
+          Competitor Site URLs: ${competitorUrls.join(", ")}
+          Analysis Depth: ${analysisDepth}
+
+          Provide a competitive analysis that:
+          1. Highlights competitive advantages of the user site over competitors in Persian.
+          2. Identifies critical/warning gaps where competitors might perform better, with action plans and estimated efforts.
+          3. Reveals strategic opportunities with potential and time to impact.
+
+          Return strictly a valid JSON object in Persian with this structure (no conversational text outside JSON):
           {
-            opportunity: "تولید پادکست و محتوای صوتی چندرسانه‌ای در حوزه تخصصی",
-            potential: "high",
-            timeToImpact: "۳ الی ۶ ماه",
-            actionPlan: "ضبط خلاصه صوتی مقالات پربازدید و انتشار در پلتفرم‌های پخش پادکست به عنوان کانال ترافیک جدید."
-          },
-          {
-            opportunity: "بهبود شاخص‌های دسترسی‌پذیری برای افزایش نرخ تبدیل نهایی",
-            potential: "medium",
-            timeToImpact: "۱ ماه",
-            actionPlan: "اصلاح کنتراست رنگی متون و افزودن راهنمای کیبورد در تمامی فرم‌های خرید وب‌سایت."
+            "competitiveAdvantages": [
+              { "category": "سئو فنی و بهینه‌سازی", "advantage": "string", "impact": "high", "howToLeverage": "string" }
+            ],
+            "gapAnalysis": [
+              { "category": "سرعت و عملکرد", "gap": "string", "severity": "critical", "recommendedAction": "string", "estimatedEffort": "medium" }
+            ],
+            "strategicOpportunities": [
+              { "opportunity": "string", "potential": "high", "timeToImpact": "string", "actionPlan": "string" }
+            ]
           }
-        ];
+        `;
+
+        let parsedLlmData: {
+          competitiveAdvantages?: CompetitiveAnalysisResponse["competitiveAdvantages"];
+          gapAnalysis?: CompetitiveAnalysisResponse["gapAnalysis"];
+          strategicOpportunities?: CompetitiveAnalysisResponse["strategicOpportunities"];
+        } | null = null;
+
+        try {
+          const llmResponseRaw = await llmClient.generateText(llmPrompt, {
+            temperature: 0.3,
+            systemPrompt: "You are an expert competitive intelligence AI who outputs strictly valid JSON in Persian."
+          });
+
+          let cleanJson = llmResponseRaw.trim();
+          if (cleanJson.startsWith("```json")) {
+            cleanJson = cleanJson.substring(7, cleanJson.length - 3).trim();
+          } else if (cleanJson.startsWith("```")) {
+            cleanJson = cleanJson.substring(3, cleanJson.length - 3).trim();
+          }
+
+          if (cleanJson && !cleanJson.includes("[Mock Persian Response")) {
+            parsedLlmData = JSON.parse(cleanJson);
+          }
+        } catch (llmErr) {
+          console.warn("[Competitive API] LLM execution or JSON parsing failed. Falling back to deterministic simulation.", llmErr);
+        }
+
+        if (parsedLlmData && Array.isArray(parsedLlmData.competitiveAdvantages) && Array.isArray(parsedLlmData.gapAnalysis) && Array.isArray(parsedLlmData.strategicOpportunities)) {
+          competitiveAdvantages = parsedLlmData.competitiveAdvantages;
+          gapAnalysis = parsedLlmData.gapAnalysis;
+          strategicOpportunities = parsedLlmData.strategicOpportunities;
+        } else {
+          // Robust, deterministic high-quality Persian mock data fallback
+          competitiveAdvantages = [
+            {
+              category: "سئو فنی و بهینه‌سازی",
+              advantage: `ساختار سلسله‌مراتبی قالب و بکارگیری تگ‌های معنایی کامل در وب‌سایت ${userBrand}`,
+              impact: "high",
+              howToLeverage: "تمرکز روی افزایش تعداد صفحات فرود (Landing Pages) برای رتبه‌گیری در کلمات لانگ‌تیل."
+            },
+            {
+              category: "تولید محتوا",
+              advantage: "تراکم کلمات کلیدی هدفمند و پوشش موضوعی عمیق‌تر در مقالات تخصصی نسبت به رقبا",
+              impact: "medium",
+              howToLeverage: "اشتراک‌گذاری خودکار بخش‌های کلیدی مقالات در شبکه‌های اجتماعی برای گرفتن سیگنال‌های اجتماعی قوی‌تر."
+            }
+          ];
+
+          gapAnalysis = [
+            {
+              category: "سرعت و عملکرد",
+              gap: "سرعت لود نسخه موبایل رقبا به طور میانگین ۱.۲ ثانیه سریع‌تر از وب‌سایت شماست.",
+              severity: "critical",
+              recommendedAction: "بهینه‌سازی کدهای CSS و JS بلاک‌کننده رندر، استفاده از قابلیت‌های فشرده‌سازی نوین و راه‌اندازی CDN.",
+              estimatedEffort: "medium"
+            },
+            {
+              category: "اعتبار دامنه و بک‌لینک",
+              gap: "رقبا دارای بک‌لینک‌های باکیفیت و دائمی از خبرگزاری‌های رسمی و فروم‌های تخصصی هستند.",
+              severity: "warning",
+              recommendedAction: "تدوین کمپین‌های هدفمند رپورتاژ آگهی و تبادل لینک با مراجع دارای اتوریتی بالا.",
+              estimatedEffort: "hard"
+            }
+          ];
+
+          strategicOpportunities = [
+            {
+              opportunity: "تولید پادکست و محتوای صوتی چندرسانه‌ای در حوزه تخصصی",
+              potential: "high",
+              timeToImpact: "۳ الی ۶ ماه",
+              actionPlan: "ضبط خلاصه صوتی مقالات پربازدید و انتشار در پلتفرم‌های پخش پادکست به عنوان کانال ترافیک جدید."
+            },
+            {
+              opportunity: "بهبود شاخص‌های دسترسی‌پذیری برای افزایش نرخ تبدیل نهایی",
+              potential: "medium",
+              timeToImpact: "۱ ماه",
+              actionPlan: "اصلاح کنتراست رنگی متون و افزودن راهنمای کیبورد در تمامی فرم‌های خرید وب‌سایت."
+            }
+          ];
+        }
 
         const responsePayload: CompetitiveAnalysisResponse = {
           overallScore,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 /**
  * Automated Test Suite for Competitive Analysis Module
  * Verifies score heuristics, pair-wise comparisons, market position labels,
