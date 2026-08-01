@@ -33,7 +33,8 @@ export const TENANT_SCOPED_TABLES = Object.freeze([
   "document_embeddings",
   "kg_entities",
   "kg_relationships",
-  "premium_audits"
+  "premium_audits",
+  "competitive_analyses"
 ]);
 
 /**
