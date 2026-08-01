@@ -21,4 +21,13 @@ export const marketingContent = {
     console: { fa: "ورود به پیشخوان کاربری", en: "Enter Console" },
     demo: { fa: "درخواست دمو", en: "Request a demo" },
   },
+  menu: {
+    open: { fa: "باز کردن منو", en: "Open menu" },
+    close: { fa: "بستن منو", en: "Close menu" },
+    label: { fa: "منو", en: "Menu" },
+    tagline: {
+      fa: "هوشمندی برند در عصر موتورهای پاسخ‌گو",
+      en: "Brand intelligence for the answer-engine era",
+    },
+  },
 } as const;

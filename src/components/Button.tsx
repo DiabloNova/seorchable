@@ -14,19 +14,20 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   const baseStyle = `
     inline-flex items-center justify-center font-bold whitespace-nowrap
-    transition-all duration-200 cubic-bezier(0.4, 0, 0.2, 1)
+    transition-[transform,box-shadow,background-color,color,border-color] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sky-blue-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]
-    disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97] hover:scale-[1.02]
+    disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97] hover:-translate-y-0.5
     relative overflow-hidden cursor-pointer
   `;
 
   // We add a subtle shimmer effect on hover for the primary variant
   const variants = {
     primary: `
-      bg-[image:var(--gradient-primary)] text-white shadow-[0_4px_14px_rgba(14,165,233,0.3)]
+      bg-[image:var(--gradient-primary)] text-white
+      shadow-[0_6px_20px_-4px_rgba(14,165,233,0.45)] hover:shadow-[0_12px_30px_-6px_rgba(14,165,233,0.55)]
       border border-transparent
       before:absolute before:top-0 before:-left-full before:w-full before:h-full
-      before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent
+      before:bg-gradient-to-r before:from-transparent before:via-white/25 before:to-transparent
       before:transition-all before:duration-700 hover:before:left-full
     `,
     secondary: `
