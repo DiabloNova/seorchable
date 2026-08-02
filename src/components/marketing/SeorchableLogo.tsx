@@ -9,18 +9,21 @@ interface SeorchableLogoProps {
 /**
  * High-fidelity, custom SVG rendering of the seorchable.ir signature logo.
  * Modeled after the hand-drawn, asymmetrical, sharp-pointed tapered star in the reference image.
- * Fully supports dark/light themes, responsive sizing, and interactive hover glow effects.
+ * Updated to be professional dark gray (grayish-black) with a completely transparent background.
  */
 export function SeorchableLogo({
   className = "w-9 h-9",
-  glow = true,
-  monochrome = false,
+  glow = false, // Background is completely transparent by default
+  monochrome = true, // Force monochrome to dark-grayish-black
 }: SeorchableLogoProps) {
+  // We use a professional grayish-black/dark gray color: #2d3139
+  const darkGrayColor = "#2d3139";
+
   return (
     <div className={`relative inline-block shrink-0 ${className}`}>
-      {/* Background Glow Effect */}
-      {glow && !monochrome && (
-        <div className="absolute inset-0 bg-gradient-to-br from-[#38bdf8] to-[#f97316] rounded-full blur-md opacity-40 animate-pulse pointer-events-none scale-110" />
+      {/* Background Glow is completely disabled or transparent */}
+      {glow && (
+        <div className="absolute inset-0 bg-transparent rounded-full pointer-events-none scale-110" />
       )}
 
       <svg
@@ -29,14 +32,7 @@ export function SeorchableLogo({
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full relative z-10 transition-transform duration-500 hover:rotate-12 cursor-pointer"
       >
-        <defs>
-          <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#38bdf8" />
-            <stop offset="100%" stopColor="#f97316" />
-          </linearGradient>
-        </defs>
-
-        {/* Hand-drawn Asymmetrical 6-Point Tapered Star Path */}
+        {/* Hand-drawn Asymmetrical 6-Point Tapered Star Path with professional grayish-black fill */}
         <path
           d="M 48 39
              L 18 14
@@ -49,14 +45,14 @@ export function SeorchableLogo({
              L 44 45
              L 9 52
              Z"
-          fill={monochrome ? "currentColor" : "url(#logo-gradient)"}
-          stroke={monochrome ? "currentColor" : "url(#logo-gradient)"}
+          fill={darkGrayColor}
+          stroke={darkGrayColor}
           strokeWidth="1.5"
           strokeLinejoin="round"
         />
 
-        {/* Optional decorative small dot or trademark */}
-        <circle cx="91" cy="23" r="1.5" fill={monochrome ? "currentColor" : "#f97316"} />
+        {/* Decorative small dot in matching grayish-black */}
+        <circle cx="91" cy="23" r="1.5" fill={darkGrayColor} />
       </svg>
     </div>
   );

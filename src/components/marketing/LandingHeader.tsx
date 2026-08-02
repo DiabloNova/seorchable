@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Moon, Sun, Languages } from "lucide-react";
+import { Moon, Sun, Languages, Receipt } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/Button";
@@ -65,6 +65,7 @@ export function LandingHeader() {
 
         {/* Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Language Toggle */}
           <button
             type="button"
             onClick={() => setLanguage(isFa ? "en" : "fa")}
@@ -75,6 +76,7 @@ export function LandingHeader() {
             <span>{isFa ? "EN" : "فا"}</span>
           </button>
 
+          {/* Theme Toggle */}
           <button
             type="button"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -83,6 +85,15 @@ export function LandingHeader() {
           >
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>
+
+          {/* Invoice Icon placed right next to Language and Theme Toggles */}
+          <Link
+            href={`/${language}/invoice`}
+            aria-label={isFa ? "پرداخت صورتحساب" : "Invoice Payment"}
+            className="grid place-items-center w-9 h-9 rounded-[var(--radius-md)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--muted-surface)] transition-colors"
+          >
+            <Receipt size={16} />
+          </Link>
 
           <Link href={`/${language}/dashboard`} className="hidden sm:inline-block">
             <Button size="sm" variant="primary" className="font-bold">

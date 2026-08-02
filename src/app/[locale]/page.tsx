@@ -190,25 +190,28 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </p>
 
             {/* Shimmer CTA Buttons */}
-            <div className="flex flex-wrap gap-4 justify-center lg:justify-start pt-2">
+            <div className="flex flex-col sm:flex-row gap-3.5 justify-center lg:justify-start pt-2 w-full sm:w-auto">
+              {/* Primary Button: Shimmer Gradient */}
               <button
                 onClick={() => scrollToRef(freeAuditRef)}
-                className="relative overflow-hidden group px-8 py-4 rounded-xl text-white font-bold bg-gradient-to-r from-[#38bdf8] to-[#f97316] shadow-lg shadow-[#38bdf8]/20 transition-all duration-300 hover:scale-[1.03] hover:shadow-orange-500/20 active:scale-[0.98] cursor-pointer"
+                className="relative overflow-hidden group px-6 py-3 sm:px-7 sm:py-3.5 rounded-xl text-white text-sm sm:text-base font-bold bg-gradient-to-r from-[#38bdf8] to-[#f97316] shadow-lg shadow-[#38bdf8]/25 transition-all duration-300 hover:scale-[1.02] hover:shadow-[#f97316]/30 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                style={{
+                  boxShadow: "0 10px 20px -5px rgba(56, 189, 248, 0.3), 0 4px 6px -2px rgba(249, 115, 22, 0.2)",
+                }}
               >
                 {/* Gradient shimmer sheen overlay */}
                 <span className="absolute inset-0 w-full h-full bg-white/20 transform -translate-x-full group-hover:animate-shimmer" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)" }} />
-                <span className="relative flex items-center gap-2">
-                  <span>{isFa ? "شروع تحلیل رایگان" : "Start Free Audit"}</span>
-                  <ArrowRight size={18} className="rtl:-scale-x-100" />
-                </span>
+                <span>{isFa ? "شروع تحلیل رایگان" : "Start Free Audit"}</span>
+                <ArrowRight size={16} className="rtl:-scale-x-100 transition-transform duration-300 group-hover:translate-x-1" />
               </button>
 
+              {/* Secondary Button: Premium Glassmorphic */}
               <button
                 onClick={() => scrollToRef(dashboardPreviewRef)}
-                className="px-8 py-4 rounded-xl font-bold bg-[var(--muted-surface)] text-[var(--text-primary)] border border-[#38bdf8]/30 hover:border-[#38bdf8]/80 backdrop-blur-md transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2 cursor-pointer shadow-md"
+                className="px-6 py-3 sm:px-7 sm:py-3.5 rounded-xl text-sm sm:text-base font-bold bg-slate-950/40 hover:bg-[#38bdf8]/10 text-[var(--text-primary)] border border-[#38bdf8]/30 hover:border-[#38bdf8]/80 backdrop-blur-md transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow-md"
               >
                 <span>{isFa ? "مشاهده دمو" : "View Live Demo"}</span>
-                <ArrowDown size={18} className="animate-bounce" />
+                <ArrowDown size={16} className="animate-bounce" />
               </button>
             </div>
 
@@ -228,26 +231,122 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </div>
           </div>
 
-          {/* Interactive Polar Radar Graph Container */}
-          <div className="relative w-full h-[380px] sm:h-[450px] rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-md shadow-2xl overflow-hidden group">
-            <div className="absolute top-4 left-4 z-10 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/50 border border-[#38bdf8]/20 text-xs text-[#38bdf8] backdrop-blur-lg">
-              <Network size={14} className="animate-pulse" />
-              <span className="font-mono text-[10px] uppercase tracking-wider">{isFa ? "گراف روابط زنده" : "Interactive KG Core"}</span>
+          {/* Interactive Polar Radar Graph Container with Guide/Legend */}
+          <div className="flex flex-col gap-4 w-full">
+            <div className="relative w-full h-[350px] sm:h-[390px] rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-md shadow-2xl overflow-hidden group">
+              <div className="absolute top-4 left-4 z-10 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/50 border border-[#38bdf8]/20 text-xs text-[#38bdf8] backdrop-blur-lg">
+                <Network size={14} className="animate-pulse" />
+                <span className="font-mono text-[10px] uppercase tracking-wider">{isFa ? "گراف روابط زنده" : "Interactive KG Core"}</span>
+              </div>
+
+              <RadialPolarGraph className="w-full h-full" />
+
+              <div className="absolute bottom-4 inset-x-4 text-center pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity duration-300">
+                <p className="text-[10px] text-slate-400">
+                  {isFa ? "موس خود را روی بخش‌های مختلف حرکت دهید تا ارتباطات و بردارهای استنادی را پایش کنید" : "Hover over segments to inspect semantic vectors and citation patterns"}
+                </p>
+              </div>
             </div>
 
-            <RadialPolarGraph className="w-full h-full" />
+            {/* Guide & Legend for the Live Relationships Graph */}
+            <div className="glass-panel border border-white/10 rounded-2xl p-4 sm:p-5 bg-slate-950/75 text-white shadow-xl space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-white/5">
+                <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-[#38bdf8] to-[#f97316] animate-pulse" />
+                <h4 className="text-xs sm:text-sm font-black font-display text-white">
+                  {isFa ? "راهنمای علائم و شاخص‌های گراف روابط زنده" : "Live Relationships Graph Guide & Legend"}
+                </h4>
+              </div>
 
-            <div className="absolute bottom-4 inset-x-4 text-center pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity duration-300">
-              <p className="text-[10px] text-slate-400">
-                {isFa ? "موس خود را روی بخش‌های مختلف حرکت دهید تا ارتباطات و بردارهای استنادی را پایش کنید" : "Hover over segments to inspect semantic vectors and citation patterns"}
-              </p>
+              <div className="grid sm:grid-cols-2 gap-4 text-[11px] leading-relaxed">
+                {/* Column 1: Colors & Signals */}
+                <div className="space-y-3">
+                  <h5 className="font-bold text-[var(--sky-blue-500)] text-[10px] uppercase tracking-wider border-b border-white/5 pb-1">
+                    {isFa ? "۱. تحلیل رنگ‌ها و سیگنال‌ها" : "1. Color & Signal Analysis"}
+                  </h5>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <span className="w-3.5 h-3.5 rounded bg-[#38bdf8]/20 border border-[#38bdf8] shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-slate-200">{isFa ? "سیگنال آبی آسمانی (موج ارگانیک):" : "Sky Blue Wave (Organic Signal)"}</p>
+                        <p className="text-slate-400 text-[10px]">
+                          {isFa
+                            ? "نشان‌دهنده قدرت حضور ارگانیک و انطباق معنایی برند شما در مدل‌های هوش مصنوعی زبانی است."
+                            : "Represents organic semantic strength and natural alignment of your brand across model training data."}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="w-3.5 h-3.5 rounded bg-[#c53f47]/20 border border-[#c53f47] shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-slate-200">{isFa ? "سیگنال قرمز گرم (سیگنال رقبا):" : "Warm Red Wave (Competitor Signal)"}</p>
+                        <p className="text-slate-400 text-[10px]">
+                          {isFa
+                            ? "پایش چگالی حضور رقبا و سهم ارجاعات چت‌بات‌ها به سایر کسب‌وکارهای موازی بازار را نمایش می‌دهد."
+                            : "Monitors competitive references and how often model citations are diverted to other market competitors."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 2: Lines & Values */}
+                <div className="space-y-3">
+                  <h5 className="font-bold text-[var(--orange-500)] text-[10px] uppercase tracking-wider border-b border-white/5 pb-1">
+                    {isFa ? "۲. تحلیل حلقه‌ها و مدارهای رادار" : "2. Lines & Radial Thresholds"}
+                  </h5>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <div className="flex flex-col gap-1 items-center shrink-0 mt-1 font-mono text-[9px] text-slate-400 font-bold">
+                        <span>100%</span>
+                        <div className="w-5 h-px border-t border-slate-500 border-dashed" />
+                        <span>20%</span>
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-200">{isFa ? "مدارهای دایره‌ای هم‌مرکز (فاصله معنایی):" : "Concentric Gray Tracks (Semantic Distance)"}</p>
+                        <p className="text-slate-400 text-[10px]">
+                          {isFa
+                            ? "نشان‌دهنده ضریب اطمینان استناد است (۲۰٪ در مرکز تا ۱۰۰٪ در پوسته بیرونی). نزدیکی به مرز ۱۰۰٪ به معنای پایداری ارجاع است."
+                            : "Measures semantic proximity and citation confidence (from 20% core to 100% outer rim). Sits highest near the edge."}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-px border-t-2 border-slate-400 border-dashed shrink-0 mt-2.5" />
+                      <div>
+                        <p className="font-bold text-slate-200">{isFa ? "مرز دایره‌ای نقطه‌چین (آستانه مطلوب):" : "Middle Dashed Track (Optimal Threshold)"}</p>
+                        <p className="text-slate-400 text-[10px]">
+                          {isFa
+                            ? "خط آستانه ۵۰٪ بقا و دیده‌شدن را نشان می‌دهد؛ انحناهای موجی باید بالاتر از این خط حرکت کنند تا ارجاع پایدار باشد."
+                            : "The vital 50% baseline threshold. Wave contours must expand beyond this circle to ensure predictable citation delivery."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Diamond Pointer Explanations */}
+              <div className="pt-2 border-t border-white/5 flex flex-wrap gap-4 justify-around text-[10px] text-slate-300">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rotate-45 bg-[#38bdf8] shrink-0" />
+                  <span>{isFa ? "لوزی آبی (p1): سهم صدای برند" : "Blue Diamond (p1): Brand Share of Voice"}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rotate-45 bg-[#c53f47] shrink-0" />
+                  <span>{isFa ? "لوزی قرمز (p2): ریسک توهم" : "Red Diamond (p2): Hallucination Risk"}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rotate-45 bg-[#c53f47] opacity-75 shrink-0" />
+                  <span>{isFa ? "لوزی قرمز کمرنگ (p3): خروج استناد" : "Red/Teal Diamond (p3): Citation Leakage"}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* 2. How It Works Section (Technical Depth with 4-Step Flow) */}
-      <section className="py-24 bg-[var(--background-subtle)]/30 dark:bg-[#0a0d16]/30 relative border-t border-[var(--border)]">
+      <section id="process" className="py-24 bg-[var(--background-subtle)]/30 dark:bg-[#0a0d16]/30 relative border-t border-[var(--border)]">
         <div className="absolute inset-0 grid-backdrop opacity-[0.2] pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
@@ -262,7 +361,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
           </div>
 
           {/* 4-Step Visual Flow Cards */}
-          <div className="grid md:grid-cols-4 gap-6 relative">
+          <div id="features" className="grid md:grid-cols-4 gap-6 relative">
             {/* Step 1: Crawl */}
             <div className="glass-panel hover-lift p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] relative">
               <div className="absolute -top-4 -right-4 w-8 h-8 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#f97316] flex items-center justify-center text-xs font-black text-white">
@@ -279,10 +378,15 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                   ? "خزش تمام‌عیار محتوای وب‌سایت با موتور Firecrawl جهت یافتن محتواهای ساختاریافته و داده‌های مخفی."
                   : "We crawl corporate websites using specialized Firecrawl infrastructure, gathering deep text elements."}
               </p>
-              <span className="text-[11px] font-bold text-[#38bdf8] hover:underline flex items-center gap-1 cursor-pointer">
+              <Link
+                href={`/${locale}/docs/infrastructure-architecture`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] font-bold text-[#38bdf8] hover:underline flex items-center gap-1 cursor-pointer"
+              >
                 <span>{isFa ? "مستندات خزش هوشمند" : "Read Crawl Docs"}</span>
                 <ExternalLink size={10} />
-              </span>
+              </Link>
             </div>
 
             {/* Step 2: Parse */}
@@ -301,10 +405,15 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                   ? "استخراج روابط و موجودیت‌های برند، رقبای کلیدی، مفاهیم و الگوها با دقت دستوری و گرامری بسیار بالا."
                   : "Processing textual structures to map complex brand schemas, proprietary assets, and synonyms."}
               </p>
-              <span className="text-[11px] font-bold text-[#f97316] hover:underline flex items-center gap-1 cursor-pointer">
+              <Link
+                href={`/${locale}/docs/knowledge-graph-design`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] font-bold text-[#f97316] hover:underline flex items-center gap-1 cursor-pointer"
+              >
                 <span>{isFa ? "مستندات نگاشت موجودیت" : "Read Schema Docs"}</span>
                 <ExternalLink size={10} />
-              </span>
+              </Link>
             </div>
 
             {/* Step 3: Analyze */}
@@ -323,10 +432,15 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                   ? "تحلیل معنایی با LLM برای شناسایی میزان تفاهم و سهم حضور برند در پاسخ‌های هوش مصنوعی."
                   : "Assessing LLM sentiment vectors, keyword associations, and competitor citation frequencies."}
               </p>
-              <span className="text-[11px] font-bold text-purple-400 hover:underline flex items-center gap-1 cursor-pointer">
+              <Link
+                href={`/${locale}/docs/ai-pipeline-architecture`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] font-bold text-purple-400 hover:underline flex items-center gap-1 cursor-pointer"
+              >
                 <span>{isFa ? "مستندات تحلیل مدل‌ها" : "Read LLM Docs"}</span>
                 <ExternalLink size={10} />
-              </span>
+              </Link>
             </div>
 
             {/* Step 4: Visualize */}
@@ -345,17 +459,22 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                   ? "نمایش روابط گراف دانش، پایش توهم و تولید راهکارهای بهبود رتبه برند در هوش مصنوعی (AEO)."
                   : "Generating interactive graph networks and direct optimization proposals for brand discovery."}
               </p>
-              <span className="text-[11px] font-bold text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer">
+              <Link
+                href={`/${locale}/docs/knowledge-graph-design`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] font-bold text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+              >
                 <span>{isFa ? "مستندات گراف دانش" : "Read Graph Docs"}</span>
                 <ExternalLink size={10} />
-              </span>
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
       {/* 3. Interactive Live Mini-Dashboard Section */}
-      <section ref={dashboardPreviewRef} className="py-24 bg-[var(--background)] dark:bg-[#080b11] relative border-t border-[var(--border)]">
+      <section id="platforms" ref={dashboardPreviewRef} className="py-24 bg-[var(--background)] dark:bg-[#080b11] relative border-t border-[var(--border)]">
         <div className="absolute top-1/4 right-1/3 w-[30vw] h-[30vw] bg-gradient-to-br from-[#38bdf8]/10 to-transparent rounded-full blur-[80px] pointer-events-none -z-10" />
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
@@ -609,7 +728,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       </section>
 
       {/* 4. Comparison Table Section */}
-      <section className="py-24 bg-[var(--background-subtle)]/30 dark:bg-[#0a0d16]/30 relative border-t border-[var(--border)]">
+      <section id="metrics" className="py-24 bg-[var(--background-subtle)]/30 dark:bg-[#0a0d16]/30 relative border-t border-[var(--border)]">
         <div className="absolute inset-0 grid-backdrop opacity-[0.25] pointer-events-none" />
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
