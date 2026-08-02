@@ -8,9 +8,9 @@ import { marketingContent as C } from "./content";
 import { SeorchableLogo } from "./SeorchableLogo";
 
 /**
- * Enterprise-grade, high-fidelity multi-column footer for seorchable.ir.
- * Structured with clear navigation groups: Platform, Solutions, Documentation, Resources, Legal, Company, and Socials.
- * Every link maps to a valid system path with localized parameters.
+ * Enterprise Sitemap Footer for seorchable.ir.
+ * Organized into comprehensive, structured columns mapping nearly the entire platform hierarchy,
+ * including Platform, Solutions, Documentation, Developers, Resources, Company, Legal, and Support.
  */
 export function LandingFooter() {
   const { language } = useTheme();
@@ -18,16 +18,18 @@ export function LandingFooter() {
 
   const footerGroups = [
     {
-      heading: isFa ? "پلتفرم" : "Platform",
+      heading: isFa ? "پلتفرم نرم‌افزاری" : "Platform",
       links: [
         { label: isFa ? "میز فرماندهی هوشمند" : "Command Center", href: `/${language}/dashboard` },
         { label: isFa ? "تحلیل استاندارد برند" : "Standard Brand Audit", href: `/${language}/dashboard/intelligence` },
         { label: isFa ? "گراف دانش سازمانی" : "Enterprise Knowledge Graph", href: `/${language}/dashboard/entities` },
         { label: isFa ? "جستجوی معنایی RAG" : "AI Semantic Discovery", href: `/${language}/dashboard/query` },
+        { label: isFa ? "پایش پرومپت‌ها" : "Prompt Monitoring", href: `/${language}/dashboard` },
+        { label: isFa ? "آنالیز موتورهای پاسخگو" : "AI Search Analytics", href: `/${language}/dashboard` },
       ],
     },
     {
-      heading: isFa ? "راهکارها" : "Solutions",
+      heading: isFa ? "راهکارهای سازمانی" : "Solutions",
       links: [
         { label: isFa ? "بهینه‌سازی GEO" : "GEO Optimization", href: `/${language}/solutions/geo` },
         { label: isFa ? "بهینه‌سازی پاسخ‌ها AEO" : "AEO Optimization", href: `/${language}/solutions/aeo` },
@@ -39,25 +41,28 @@ export function LandingFooter() {
       heading: isFa ? "مستندات فنی" : "Documentation",
       links: [
         { label: isFa ? "مقدمه و شروع سریع" : "Getting Started", href: `/${language}/docs/introduction-to-brandgraph`, external: true },
-        { label: isFa ? "معماری زیرساخت خزش" : "Crawling Infrastructure", href: `/${language}/docs/infrastructure-architecture`, external: true },
-        { label: isFa ? "مدیریت چندمستأجری" : "Multi-Tenant Security", href: `/${language}/docs/multi-tenant-isolation`, external: true },
-        { label: isFa ? "جریان استخراج و تحلیل" : "AI Ingestion Flow", href: `/${language}/docs/ai-pipeline-architecture`, external: true },
-        { label: isFa ? "نگاشت گراف دانش" : "Knowledge Graph Design", href: `/${language}/docs/knowledge-graph-design`, external: true },
+        { label: isFa ? "مفاهیم اساسی پلتفرم" : "Platform Concepts", href: `/${language}/docs/infrastructure-architecture`, external: true },
+        { label: isFa ? "راهنمای ساختار REST API" : "REST API Reference", href: `/${language}/docs/ai-pipeline-architecture`, external: true },
+        { label: isFa ? "تامین‌کنندگان هوش زبانی" : "AI Providers", href: `/${language}/docs/introduction-to-brandgraph`, external: true },
+        { label: isFa ? "امنیت و جداسازی داده" : "Architecture & Security", href: `/${language}/docs/multi-tenant-isolation`, external: true },
+      ],
+    },
+    {
+      heading: isFa ? "محیط برنامه‌نویسان" : "Developers",
+      links: [
+        { label: isFa ? "اسناد مرجع API" : "REST API", href: `/${language}/docs/ai-pipeline-architecture`, external: true },
+        { label: isFa ? "مدیریت توکن‌ها و کلید" : "Authentication Tokens", href: `/${language}/docs/multi-tenant-isolation`, external: true },
+        { label: isFa ? "هوک‌های وب (Webhooks)" : "Webhooks Stream", href: `/${language}/docs/ai-pipeline-architecture`, external: true },
+        { label: isFa ? "کیت‌های توسعه (SDKs)" : "Official SDK Library", href: `/${language}/docs/knowledge-graph-design`, external: true },
       ],
     },
     {
       heading: isFa ? "منابع و وبلاگ" : "Resources",
       links: [
-        { label: isFa ? "وبلاگ شرکت" : "Corporate Blog", href: `/${language}/blog` },
-        { label: isFa ? "پیش‌نویس گزارش نمونه" : "Sample Brand Report", href: "/optimus-ai-sample-report.pdf", external: true },
-        { label: isFa ? "وضعیت سامانه‌ها" : "System Status", href: `/${language}/dashboard`, badge: "UP" },
-      ],
-    },
-    {
-      heading: isFa ? "حقوقی و دسترسی" : "Legal & Privacy",
-      links: [
-        { label: isFa ? "حریم خصوصی کاربران" : "Privacy Policy", href: `/${language}/privacy` },
-        { label: isFa ? "قوانین و مقررات استفاده" : "Terms of Service", href: `/${language}/privacy` },
+        { label: isFa ? "وبلاگ مهندسی" : "Corporate Blog", href: `/${language}/blog` },
+        { label: isFa ? "مطالعات موردی موفقیت" : "Case Studies", href: `/${language}/blog` },
+        { label: isFa ? "بنچ‌مارک‌های صنعت" : "Industry Benchmarks", href: `/${language}/blog` },
+        { label: isFa ? "نقشه راه محصول" : "Changelog & Roadmap", href: `/${language}/dashboard` },
       ],
     },
     {
@@ -65,6 +70,22 @@ export function LandingFooter() {
       links: [
         { label: isFa ? "درباره ما" : "About Us", href: `/${language}/about` },
         { label: isFa ? "تماس با کارشناسان" : "Contact Sales", href: `/${language}/contact` },
+        { label: isFa ? "انطباق و امنیت" : "Compliance Stand", href: `/${language}/privacy` },
+      ],
+    },
+    {
+      heading: isFa ? "حقوقی و قوانین" : "Legal",
+      links: [
+        { label: isFa ? "حریم خصوصی کاربران" : "Privacy Policy", href: `/${language}/privacy` },
+        { label: isFa ? "قوانین استفاده از خدمات" : "Terms of Service", href: `/${language}/privacy` },
+      ],
+    },
+    {
+      heading: isFa ? "پشتیبانی" : "Support",
+      links: [
+        { label: isFa ? "وضعیت سامانه‌ها" : "System Status", href: `/${language}/dashboard`, badge: "UP" },
+        { label: isFa ? "مرکز راهنمایی" : "Help Center", href: `/${language}/contact` },
+        { label: isFa ? "جامعه کاربری" : "Community Hub", href: `/${language}/contact` },
       ],
     },
   ];
@@ -78,7 +99,7 @@ export function LandingFooter() {
   return (
     <footer className="mt-16 border-t border-[var(--border)] bg-[var(--background-subtle)]/30 dark:bg-[#07090f]/30">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
-        <div className="grid gap-12 xl:grid-cols-[1fr_2.2fr] pb-12 border-b border-[var(--border)]">
+        <div className="grid gap-12 xl:grid-cols-[1fr_2.5fr] pb-12 border-b border-[var(--border)]">
           {/* Brand & Mission block */}
           <div className="space-y-6 max-w-sm">
             <Link href={`/${language}`} className="flex items-center gap-2.5 shrink-0">
@@ -90,11 +111,10 @@ export function LandingFooter() {
 
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed text-balance">
               {isFa
-                ? "رهبر پایش و بهینه‌سازی حضور برندهای پیشرو در اکوسیستم‌های پاسخگوی مبتنی بر هوش مصنوعی و مدل‌های زبانی فردا."
-                : "The category-defining AI Search Engine Optimization, GEO, and Brand Intelligence platform for modern corporate enterprises."}
+                ? "اکوسیستم پیشرو مدیریت حضور، بهینه‌سازی موتورهای پاسخگو (GEO & AEO) و مانیتورینگ دیده‌شدن برند در مدل‌های هوش مصنوعی."
+                : "The enterprise-defining AI Visibility, Generative Engine Optimization, and conversational search analytics software platform."}
             </p>
 
-            {/* Contacts short info */}
             <div className="space-y-2.5 text-xs text-[var(--text-muted)] font-bold">
               <div className="flex items-center gap-2">
                 <Mail size={14} className="text-[#38bdf8]" />
@@ -126,39 +146,42 @@ export function LandingFooter() {
             </div>
           </div>
 
-          {/* Grid of 6 navigation columns */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
+          {/* Grid of 8 navigation columns (exposing total website hierarchy) */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
             {footerGroups.map((col) => (
               <nav key={col.heading} className="space-y-4">
                 <h3 className="font-display font-black text-sm text-[var(--text-primary)] tracking-wide">
                   {col.heading}
                 </h3>
                 <ul className="space-y-3 text-xs font-bold">
-                  {col.links.map((link) => (
-                    <li key={link.label}>
-                      {link.external ? (
-                        <a
-                          href={link.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[var(--text-secondary)] hover:text-[#38bdf8] transition-colors inline-flex items-center gap-1 group cursor-pointer"
-                        >
-                          <span>{link.label}</span>
-                          <ArrowUpRight size={10} className="opacity-40 group-hover:opacity-100 transition-opacity" />
-                        </a>
-                      ) : (
-                        <Link
-                          href={link.href}
-                          className="text-[var(--text-secondary)] hover:text-[#38bdf8] transition-colors inline-flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <span>{link.label}</span>
-                          {link.badge && (
-                            <span className="text-[9px] bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded font-black font-mono tracking-widest">{link.badge}</span>
-                          )}
-                        </Link>
-                      )}
-                    </li>
-                  ))}
+                  {col.links.map((link) => {
+                    const l = link as { label: string; href: string; external?: boolean; badge?: string };
+                    return (
+                      <li key={l.label}>
+                        {l.external ? (
+                          <a
+                            href={l.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[var(--text-secondary)] hover:text-[#38bdf8] transition-colors inline-flex items-center gap-1 group cursor-pointer"
+                          >
+                            <span>{l.label}</span>
+                            <ArrowUpRight size={10} className="opacity-40 group-hover:opacity-100 transition-opacity" />
+                          </a>
+                        ) : (
+                          <Link
+                            href={l.href}
+                            className="text-[var(--text-secondary)] hover:text-[#38bdf8] transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <span>{l.label}</span>
+                            {l.badge && (
+                              <span className="text-[9px] bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded font-black font-mono tracking-widest">{l.badge}</span>
+                            )}
+                          </Link>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </nav>
             ))}

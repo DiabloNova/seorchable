@@ -10,8 +10,7 @@ import { Dropdown } from "@/components/Dropdown";
 
 /**
  * Enterprise-grade Sticky navigation bar with advanced dropdown selectors,
- * clear navigation groups (Platform, Solutions, Pricing, Documentation, Resources, About, Contact),
- * and responsive CTA buttons.
+ * mapped to the product-first flow sections (Platform, Solutions, Comparison, Trust, Pricing, Docs, Resources).
  */
 export function LandingHeader() {
   const { language, setLanguage, theme, setTheme } = useTheme();
@@ -33,10 +32,10 @@ export function LandingHeader() {
   ];
 
   const platformItems = [
-    { label: isFa ? "میز فرماندهی هوشمند" : "Command Center", value: "dashboard", href: `/${language}/dashboard` },
-    { label: isFa ? "تحلیل استاندارد برند" : "Standard Brand Audit", value: "intelligence", href: `/${language}/dashboard/intelligence` },
-    { label: isFa ? "گراف دانش سازمانی" : "Enterprise Knowledge Graph", value: "entities", href: `/${language}/dashboard/entities` },
-    { label: isFa ? "جستجوی معنایی RAG" : "AI Semantic Discovery", value: "query", href: `/${language}/dashboard/query` },
+    { label: isFa ? "معماری اکوسیستم" : "Ecosystem Architecture", value: "ecosystem", href: `/${language}/#ecosystem` },
+    { label: isFa ? "بررسی کلان پلتفرم" : "Platform Overview", value: "overview", href: `/${language}/#overview` },
+    { label: isFa ? "داستان چرخه محصول" : "Product Lifecycle Story", value: "story", href: `/${language}/#story` },
+    { label: isFa ? "پیش‌نمایش داشبوردها" : "Interactive Dashboard Sim", value: "dashboards", href: `/${language}/#dashboards` },
   ];
 
   return (
@@ -88,6 +87,14 @@ export function LandingHeader() {
             }))}
           />
 
+          {/* Comparison table link */}
+          <a
+            href={`/${language}/#why-different`}
+            className="px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-[var(--radius-md)] transition-colors"
+          >
+            {isFa ? "تمایز ما" : "Why Us"}
+          </a>
+
           {/* Pricing Link */}
           <a
             href={`/${language}/#pricing`}
@@ -109,10 +116,10 @@ export function LandingHeader() {
 
           {/* Resources */}
           <Link
-            href={`/${language}/blog`}
+            href={`/${language}/#resources`}
             className="px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-[var(--radius-md)] transition-colors"
           >
-            {isFa ? "وبلاگ و منابع" : "Resources"}
+            {isFa ? "منابع" : "Resources"}
           </Link>
 
           {/* About */}
@@ -121,14 +128,6 @@ export function LandingHeader() {
             className="px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-[var(--radius-md)] transition-colors"
           >
             {isFa ? "درباره ما" : "About"}
-          </Link>
-
-          {/* Contact */}
-          <Link
-            href={`/${language}/contact`}
-            className="px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-[var(--radius-md)] transition-colors"
-          >
-            {isFa ? "تماس با ما" : "Contact"}
           </Link>
         </nav>
 
