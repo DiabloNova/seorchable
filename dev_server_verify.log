@@ -1,44 +1,8 @@
 
-> ai-branding-platform@0.1.0 dev /app
-> next dev
+> ai-branding-platform@0.1.0 start /app
+> next start
 
-⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
-▲ Next.js 16.2.11 (Turbopack)
-- Local:         ht GET /fa/dashboard 200 in 1748ms (next.js: 840ms, application-code: 909ms)
- POST /fa/dashboard 200 in 315ms (next.js: 75ms, application-code: 241ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 33ms src/actions/auth.ts
-[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
-[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
-[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [ws-tehran]
-[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
- GET /api/v1/analytics/summary 200 in 452ms (next.js: 322ms, application-code: 130ms)
-[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
-[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
-[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [demo-tenant-id]
-[Postgres Transacted SQL] Executing Parameterised Query: "
-            SELECT id, name, type, properties
-            FROM kg_entities
-            WHERE organization_id = $1 AND LOWER(name) = LOWER($2)
-            LIMIT 1;
-          " with values: [demo-tenant-id, اپتیموس]
-[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
- POST /api/v1/knowledge-graph/query 200 in 183ms (next.js: 144ms, application-code: 39ms)
- GET /fa/dashboard 200 in 327ms (next.js: 27ms, application-code: 300ms)
- POST /fa/dashboard 200 in 75ms (next.js: 24ms, application-code: 51ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 3ms src/actions/auth.ts
-[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
-[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
-[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [ws-tehran]
-[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
- GET /api/v1/analytics/summary 200 in 24ms (next.js: 3ms, application-code: 21ms)
-[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
-[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
-[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [demo-tenant-id]
-[Postgres Transacted SQL] Executing Parameterised Query: "
-            SELECT id, name, type, properties
-            FROM kg_entities
-            WHERE organization_id = $1 AND LOWER(name) = LOWER($2)
-            LIMIT 1;
-          " with values: [demo-tenant-id, اپتیموس]
-[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
- POST /api/v1/knowledge-graph/query 200 in 27ms (next.js: 4ms, application-code: 23ms)
+▲ Next.js 16.2.11
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+✓ Ready in 339ms
