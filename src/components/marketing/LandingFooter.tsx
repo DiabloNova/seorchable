@@ -9,8 +9,8 @@ import { SeorchableLogo } from "./SeorchableLogo";
 
 /**
  * Enterprise Sitemap Footer for seorchable.ir.
- * Reorganized into exactly 5 logical groups: Products, Documentation, Customers, Company, and Legal.
- * Preserves every single pre-existing link, route, URL, and page.
+ * Reorganized into exactly 6 requested groups: Products, Services, Documentation, Resources, Company, and Legal.
+ * Preserves pre-existing links, routes, URLs, and pages.
  */
 export function LandingFooter() {
   const { language } = useTheme();
@@ -26,107 +26,45 @@ export function LandingFooter() {
         { label: isFa ? "جستجوی معنایی RAG" : "AI Semantic Discovery", href: `/${language}/dashboard/query` },
         { label: isFa ? "پایش پرومپت‌ها" : "Prompt Monitoring", href: `/${language}/dashboard` },
         { label: isFa ? "آنالیز موتورهای پاسخگو" : "AI Search Analytics", href: `/${language}/dashboard` },
+      ],
+    },
+    {
+      heading: isFa ? "خدمات" : "Services",
+      links: [
         { label: isFa ? "بهینه‌سازی GEO" : "GEO Optimization", href: `/${language}/solutions/geo` },
         { label: isFa ? "بهینه‌سازی پاسخ‌ها AEO" : "AEO Optimization", href: `/${language}/solutions/aeo` },
         { label: isFa ? "محافظت از برند" : "Brand Protection", href: `/${language}/solutions/protection` },
         { label: isFa ? "رادار پایش رقبا" : "Competitive Radar", href: `/${language}/solutions/radar` },
+        { label: isFa ? "راهکارهای ویژه سازمانی" : "Enterprise Solutions", href: `/${language}/contact` },
       ],
     },
     {
-      heading: isFa ? "مستندات و توسعه‌دهندگان" : "Documentation",
+      heading: isFa ? "مستندات" : "Documentation",
       links: [
-{
-  heading: isFa ? "مستندات" : "Documentation",
-  links: [
-    {
-      label: isFa ? "مقدمه و شروع سریع" : "Getting Started",
-      href: `/${language}/docs/introduction`,
-      external: true,
-    },
-    {
-      label: isFa ? "مفاهیم پلتفرم" : "Platform Concepts",
-      href: `/${language}/docs/admin-architecture`,
-      external: true,
-    },
-    {
-      label: isFa ? "راهنمای REST API" : "REST API Reference",
-      href: `/${language}/docs/api-reference`,
-      external: true,
-    },
-    {
-      label: isFa ? "ادغام مدل‌های زبانی" : "AI LLM Integration",
-      href: `/${language}/docs/ai-pipeline-architecture`,
-      external: true,
-    },
-    {
-      label: isFa ? "امنیت و جداسازی داده" : "Architecture & Security",
-      href: `/${language}/docs/tenant-context-spec`,
-      external: true,
-    },
-  ],
-},
-{
-  heading: isFa ? "محیط برنامه‌نویسان" : "Developers",
-  links: [
-    {
-      label: isFa ? "اسناد مرجع API" : "REST API",
-      href: `/${language}/docs/api-reference`,
-      external: true,
-    },
-    {
-      label: isFa ? "مدیریت کنترل دسترسی" : "RBAC Security",
-      href: `/${language}/docs/rbac-model`,
-      external: true,
-    },
-    {
-      label: isFa ? "امنیت هوش مصنوعی" : "AI Security Model",
-      href: `/${language}/docs/security-model`,
-      external: true,
-    },
-    {
-      label: isFa ? "طراحی گراف دانش" : "Knowledge Graph Design",
-      href: `/${language}/docs/knowledge-graph-design`,
-      external: true,
-    },
-    {
-      label: isFa ? "مدیریت توکن‌ها و کلیدها" : "Authentication Tokens",
-      href: `/${language}/docs/authentication`,
-      external: true,
-    },
-    {
-      label: isFa ? "وب‌هوک‌ها" : "Webhooks",
-      href: `/${language}/docs/webhooks`,
-      external: true,
-    },
-    {
-      label: isFa ? "SDKهای رسمی" : "Official SDKs",
-      href: `/${language}/docs/sdks`,
-      external: true,
-    },
-  ],
-},
+        { label: isFa ? "مقدمه و شروع سریع" : "Getting Started", href: `/${language}/docs/introduction-to-brandgraph`, external: true },
+        { label: isFa ? "مفاهیم اساسی پلتفرم" : "Platform Concepts", href: `/${language}/docs/infrastructure-architecture`, external: true },
+        { label: isFa ? "رابط برنامه‌نویسی REST API" : "REST API Reference", href: `/${language}/docs/ai-pipeline-architecture`, external: true },
+        { label: isFa ? "تامین‌کنندگان هوش زبانی" : "AI Providers", href: `/${language}/docs/introduction-to-brandgraph`, external: true },
+        { label: isFa ? "امنیت و جداسازی داده" : "Architecture & Security", href: `/${language}/docs/multi-tenant-isolation`, external: true },
       ],
     },
     {
-      heading: isFa ? "امور مشتریان" : "Customers",
+      heading: isFa ? "منابع" : "Resources",
       links: [
         { label: isFa ? "ابزارهای رایگان سنجش" : "Free Tools", href: `/${language}/#free-audit` },
-        { label: isFa ? "تعرفه‌ها" : "Pricing", href: `/${language}/#pricing` },
-        { label: isFa ? "راهکارهای ویژه سازمانی" : "Enterprise Solutions", href: `/${language}/contact` },
-        { label: isFa ? "وضعیت سامانه‌ها" : "System Status", href: `/${language}/dashboard`, badge: "UP" },
-        { label: isFa ? "مرکز راهنمایی" : "Help Center", href: `/${language}/contact` },
-        { label: isFa ? "جامعه کاربری" : "Community Hub", href: `/${language}/contact` },
+        { label: isFa ? "وبلاگ مهندسی" : "Corporate Blog", href: `/${language}/blog` },
+        { label: isFa ? "مطالعات موردی موفقیت" : "Case Studies", href: `/${language}/blog` },
+        { label: isFa ? "بنچ‌مارک‌های صنعت" : "Industry Benchmarks", href: `/${language}/blog` },
+        { label: isFa ? "کیت‌های توسعه (SDKs)" : "Official SDK Library", href: `/${language}/docs/knowledge-graph-design`, external: true },
+        { label: isFa ? "هوک‌های وب (Webhooks)" : "Webhooks Stream", href: `/${language}/docs/ai-pipeline-architecture`, external: true },
       ],
     },
     {
-      heading: isFa ? "مجموعه و شرکت" : "Company",
+      heading: isFa ? "شرکت" : "Company",
       links: [
         { label: isFa ? "درباره ما" : "About Us", href: `/${language}/about` },
         { label: isFa ? "همکاری با ما" : "Careers", href: `/${language}/about` },
         { label: isFa ? "تماس با ما" : "Contact Us", href: `/${language}/contact` },
-        { label: isFa ? "وبلاگ مهندسی" : "Corporate Blog", href: `/${language}/blog` },
-        { label: isFa ? "مطالعات موردی موفقیت" : "Case Studies", href: `/${language}/blog` },
-        { label: isFa ? "بنچ‌مارک‌های صنعت" : "Industry Benchmarks", href: `/${language}/blog` },
         { label: isFa ? "نقشه راه محصول" : "Changelog & Roadmap", href: `/${language}/dashboard` },
       ],
     },
@@ -196,8 +134,8 @@ export function LandingFooter() {
             </div>
           </div>
 
-          {/* Grid of 5 logical navigation columns */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-8">
+          {/* Grid of 6 logical navigation columns */}
+          <div className="grid grid-cols-2 sm:grid-cols-6 gap-6">
             {footerGroups.map((col) => (
               <nav key={col.heading} className="space-y-4">
                 <h3 className="font-display font-black text-sm text-[var(--text-primary)] tracking-wide">

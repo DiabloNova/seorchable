@@ -1,159 +1,193 @@
-import React from "react";
-import { Metadata } from "next";
+"use client";
+
+import React, { use } from "react";
+import { useRouter } from "next/navigation";
+import { DOCS_TOPICS } from "@/lib/docsData";
+import { ArrowLeft, BookOpen, Clock, Tag } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
-import { DocsService } from "@/lib/docsService";
-import { ArticleHeader } from "@/components/docs/ArticleHeader";
-import { ArticleContent } from "@/components/docs/ArticleContent";
-import { TableOfContents } from "@/components/docs/TableOfContents";
-import { PreviousNextNavigation } from "@/components/docs/PreviousNextNavigation";
 
 interface DocDetailPageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
 
-/**
- * Dynamic SEO metadata generation for Google and AI Search Engines
- */
-export async function generateMetadata({ params }: DocDetailPageProps): Promise<Metadata> {
-  const resolvedParams = await params;
-  const locale = (resolvedParams.locale || "fa") as "en" | "fa";
+export default function DocDetailPage({ params }: DocDetailPageProps) {
+  const resolvedParams = use(params);
+  const locale = resolvedParams.locale;
   const slug = resolvedParams.slug;
-
-  const article = DocsService.getArticle(slug, locale);
-
-  if (!article) {
-    return {
-      title: "Page Not Found - Seorchable Docs",
-    };
-  }
-
-  const keywordsList = article.metadata.keywords
-    ? article.metadata.keywords.split(",").map((k) => k.trim())
-    : ["seorchable", "docs", "seo", "geo", "aeo"];
-
-  const canonicalUrl = `https://seorchable.ir/${locale}/docs/${slug}`;
-
-  return {
-    title: `${article.metadata.title} | Seorchable Documentation`,
-    description: article.metadata.description,
-    keywords: keywordsList,
-    alternates: {
-      canonical: canonicalUrl,
-    },
-    openGraph: {
-      title: article.metadata.title,
-      description: article.metadata.description,
-      url: canonicalUrl,
-      type: "article",
-      siteName: "Seorchable Docs",
-      publishedTime: article.metadata.lastUpdated,
-      authors: [article.metadata.author],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: article.metadata.title,
-      description: article.metadata.description,
-    },
-  };
-}
-
-export default async function DocDetailPage({ params }: DocDetailPageProps) {
-  const resolvedParams = await params;
-  const locale = (resolvedParams.locale || "fa") as "en" | "fa";
-  const slug = resolvedParams.slug;
+  const router = useRouter();
   const isFa = locale === "fa";
 
-  const article = DocsService.getArticle(slug, locale);
+  const topic = DOCS_TOPICS.find((t) => t.slug === slug);
 
-  if (!article) {
-    notFound();
+  if (!topic) {
+    return (
+      <div className="text-center py-20 space-y-4 animate-fade-in">
+        <h1 className="text-2xl font-black text-white font-display">
+          {isFa ? "مستند مورد نظر پیدا نشد" : "Documentation Topic Not Found"}
+        </h1>
+        <p className="text-xs text-slate-400">
+          {isFa
+            ? "متأسفانه سرفصل درخواستی در لیست مستندات معتبر سامانه وجود ندارد."
+            : "The requested slug does not exist in our system."}
+        </p>
+        <Link
+          href={`/${locale}/docs`}
+          className="inline-flex px-5 py-2.5 rounded-xl bg-slate-900 text-xs font-bold text-slate-300 hover:text-white transition-all border border-white/10"
+        >
+          {isFa ? "بازگشت به صفحه مستندات" : "Back to Documentation Index"}
+        </Link>
+      </div>
+    );
   }
 
-  // Find previous and next articles on the server
-  const articles = DocsService.getAllArticles().filter((art) => art.locale === locale);
-  const currentIndex = articles.findIndex((art) => art.slug === slug);
-  const prevArticle = currentIndex > 0 ? { title: articles[currentIndex - 1].metadata.title, slug: articles[currentIndex - 1].slug } : null;
-  const nextArticle = currentIndex < articles.length - 1 ? { title: articles[currentIndex + 1].metadata.title, slug: articles[currentIndex + 1].slug } : null;
+  // Parse lines of the translated content into custom rendered blocks
+  // to support rich Markdown headings, bullet points, code blocks and paragraphs safely
+  const renderRichContent = (text: string) => {
+    const lines = text.split("\n");
+    let inCodeBlock = false;
+    let codeContent: string[] = [];
 
-  // Structured Data (JSON-LD) for SEO
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "TechArticle",
-    "headline": article.metadata.title,
-    "description": article.metadata.description,
-    "datePublished": article.metadata.lastUpdated,
-    "dateModified": article.metadata.lastUpdated,
-    "author": {
-      "@type": "Organization",
-      "name": article.metadata.author,
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Seorchable",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://seorchable.ir/logo.png",
-      },
-    },
-    "inLanguage": locale,
-    "articleSection": article.metadata.category,
+    return lines.map((line, idx) => {
+      const trimmed = line.trim();
+
+      // Handle Code Blocks
+      if (trimmed.startsWith("```")) {
+        if (inCodeBlock) {
+          inCodeBlock = false;
+          const content = codeContent.join("\n");
+          codeContent = [];
+          return (
+            <pre
+              key={idx}
+              className="p-4 rounded-xl bg-slate-950 border border-white/10 font-mono text-[11px] text-orange-400 overflow-x-auto my-4 text-left select-all leading-relaxed"
+              dir="ltr"
+            >
+              <code>{content}</code>
+            </pre>
+          );
+        } else {
+          inCodeBlock = true;
+          return null;
+        }
+      }
+
+      if (inCodeBlock) {
+        codeContent.push(line);
+        return null;
+      }
+
+      // Empty Lines
+      if (!trimmed) {
+        return <div key={idx} className="h-2" />;
+      }
+
+      // H1 Header
+      if (trimmed.startsWith("# ")) {
+        return (
+          <h1
+            key={idx}
+            className="text-xl sm:text-2xl font-black text-white font-display border-b border-white/10 pb-4 mb-6 mt-2"
+          >
+            {trimmed.substring(2)}
+          </h1>
+        );
+      }
+
+      // H2 Header
+      if (trimmed.startsWith("## ")) {
+        return (
+          <h2
+            key={idx}
+            className="text-base sm:text-lg font-extrabold text-[var(--sky-blue-500)] font-display mt-8 mb-4 flex items-center gap-2"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--sky-blue-500)]" />
+            <span>{trimmed.substring(3)}</span>
+          </h2>
+        );
+      }
+
+      // Divider
+      if (trimmed === "---") {
+        return <hr key={idx} className="border-white/10 my-6" />;
+      }
+
+      // Unordered list bullet
+      if (trimmed.startsWith("- ")) {
+        return (
+          <li key={idx} className="list-none flex items-start gap-2.5 text-xs text-slate-300 leading-relaxed my-2.5 ps-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--orange-500)] shrink-0 mt-2" />
+            <span>{trimmed.substring(2)}</span>
+          </li>
+        );
+      }
+
+      // Numbered list
+      if (/^\d+\.\s/.test(trimmed)) {
+        const dotIndex = trimmed.indexOf(".");
+        const num = trimmed.substring(0, dotIndex);
+        const rest = trimmed.substring(dotIndex + 1).trim();
+        return (
+          <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-300 leading-relaxed my-3 ps-2">
+            <span className="font-black text-[var(--sky-blue-500)] font-mono text-xs">{num}.</span>
+            <span>{rest}</span>
+          </div>
+        );
+      }
+
+      // Normal paragraph
+      return (
+        <p key={idx} className="text-xs sm:text-sm text-slate-300 leading-relaxed my-3.5 text-justify">
+          {trimmed}
+        </p>
+      );
+    });
   };
 
   return (
-    <>
-      {/* Structured data injection */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+    <article className="space-y-6 animate-fade-in text-start">
+      {/* Breadcrumb Metadata */}
+      <div className="flex flex-wrap items-center gap-3 text-[10px] sm:text-xs text-slate-500 font-bold">
+        <Link href={`/${locale}/docs`} className="hover:text-white transition-colors">
+          {isFa ? "مستندات" : "Docs"}
+        </Link>
+        <span>/</span>
+        <span className="text-slate-400">{topic.categoryFa}</span>
+        <span>/</span>
+        <span className="text-slate-300 font-black">{isFa ? topic.titleFa : topic.titleEn}</span>
+      </div>
 
-      {/* Main Grid Viewport - Supporting 3-column split */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 xl:gap-12 relative w-full items-start">
-        {/* CENTER CONTENT COLUMN */}
-        <div className="lg:col-span-3 space-y-8 min-w-0">
-          {/* Breadcrumbs */}
-          <div className="flex flex-wrap items-center gap-2 text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider" dir={isFa ? "rtl" : "ltr"}>
-            <Link href={`/${locale}/docs`} className="hover:text-[var(--text-primary)] transition-colors">
-              {isFa ? "مستندات" : "Docs"}
-            </Link>
-            <span>/</span>
-            <span className="text-slate-400">
-              {isFa && article.metadata.categoryFa ? article.metadata.categoryFa : article.metadata.category}
+      {/* Main Container */}
+      <div className="p-6 sm:p-10 rounded-3xl border border-white/10 bg-slate-900/10 backdrop-blur-md shadow-2xl relative">
+        <div className="absolute top-0 right-1/4 w-40 h-40 bg-[var(--sky-blue-500)]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-40 h-40 bg-[var(--orange-500)]/5 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Action Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6 text-slate-400">
+          <div className="flex items-center gap-4 text-[10px] sm:text-xs font-mono">
+            <span className="flex items-center gap-1">
+              <Tag size={12} className="text-[var(--sky-blue-500)]" />
+              <span>{topic.category.toUpperCase()}</span>
             </span>
-            <span>/</span>
-            <span className="text-[var(--text-primary)] font-black truncate max-w-[200px]">
-              {article.metadata.title}
+            <span className="flex items-center gap-1">
+              <Clock size={12} className="text-[var(--orange-500)]" />
+              <span>{isFa ? "زمان مطالعه: ۵ دقیقه" : "5 min read"}</span>
             </span>
           </div>
 
-          {/* Premium styled container */}
-          <div className="glass-panel p-6 sm:p-10 rounded-3xl border border-white/10 dark:border-white/10 light:border-slate-200 bg-slate-900/10 backdrop-blur-md shadow-2xl relative">
-            {/* Ambient gradients */}
-            <div className="absolute top-0 right-1/4 w-40 h-40 bg-[var(--sky-blue-500)]/5 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/4 w-40 h-40 bg-[var(--orange-500)]/5 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="relative z-10 space-y-8">
-              {/* Specialized Header */}
-              <ArticleHeader metadata={article.metadata} locale={locale} />
-
-              {/* Dynamic Content Engine */}
-              <ArticleContent content={article.content} locale={locale} />
-
-              {/* Previous / Next pagination controller */}
-              <PreviousNextNavigation prevArticle={prevArticle} nextArticle={nextArticle} locale={locale} />
-            </div>
-          </div>
+          <Link
+            href={`/${locale}/docs`}
+            className="flex items-center gap-1.5 text-xs font-bold hover:text-white transition-all border border-white/5 bg-white/[0.02] px-3.5 py-1.5 rounded-xl hover:border-white/10"
+          >
+            <ArrowLeft size={14} className="rtl:rotate-180" />
+            <span>{isFa ? "فهرست مستندات" : "Back to Index"}</span>
+          </Link>
         </div>
 
-        {/* RIGHT SIDEBAR COLUMN (Table Of Contents) */}
-        <aside className="hidden lg:block lg:col-span-1 sticky top-24 shrink-0 overflow-hidden max-h-[calc(100vh-8rem)]">
-          <div className="p-6 rounded-2xl border border-white/10 dark:border-white/10 light:border-slate-200 bg-slate-950/20 backdrop-blur-sm shadow-sm space-y-6">
-            <TableOfContents content={article.content} locale={locale} />
-          </div>
-        </aside>
+        {/* Content Rendered with Premium Styling */}
+        <div className="space-y-4 text-white">
+          {renderRichContent(topic.contentFa)}
+        </div>
       </div>
-    </>
+    </article>
   );
 }
