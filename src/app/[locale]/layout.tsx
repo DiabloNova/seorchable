@@ -4,16 +4,17 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { persianPrimary, persianDisplay } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
+import FloatingSidebar from "../../../components/navigation/FloatingSidebar";
 import "../globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: `${siteConfig.name} — هوشمندی و دیده‌شدن برند`,
+    default: `${siteConfig.name} — هوشمندی و دیده‌شدن برند سئورچبل`,
     template: `%s | ${siteConfig.name}`,
   },
   description:
-    "سنجش، محافظت و بهینه‌سازی نحوه‌ی ارجاع به برند شما در ChatGPT، Gemini، Claude و Perplexity. پلتفرم نسل‌بعدی AEO و GEO.",
-  keywords: ["AEO", "GEO", "Brand Intelligence", "AI visibility", "هوشمندی برند", "دیده‌شدن برند"],
+    "سنجش، محافظت و بهینه‌سازی نحوه‌ی ارجاع به برند شما در ChatGPT، Gemini، Claude و Perplexity. پلتفرم نسل‌بعدی AEO و GEO با سئورچبل seorchable.ir.",
+  keywords: ["AEO", "GEO", "Brand Intelligence", "AI visibility", "سئورچبل", "seorchable.ir", "دیده‌شدن برند"],
   metadataBase: new URL(siteConfig.url),
   openGraph: {
     title: siteConfig.name,
@@ -60,6 +61,7 @@ export default async function RootLayout({ children, params }: LayoutProps) {
         <ThemeProvider initialLanguage={locale as "en" | "fa"}>
           <AuthProvider>
             {children}
+            <FloatingSidebar />
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -7,8 +7,8 @@ export type Lang = "fa" | "en";
 
 export const marketingContent = {
   brand: {
-    fa: "هوشمندی برند",
-    en: "BrandIntelligence",
+    fa: "seorchable.ir (سئورچبل)",
+    en: "seorchable.ir",
   },
   nav: {
     features: { fa: "قابلیت‌ها", en: "Features" },

@@ -2,9 +2,10 @@
 
 import React from "react";
 import Link from "next/link";
-import { Sparkles, ShieldCheck, Globe, AtSign, Send } from "lucide-react";
+import { ShieldCheck, Globe, AtSign, Send } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import { marketingContent as C } from "./content";
+import { SeorchableLogo } from "./SeorchableLogo";
 
 /**
  * Rich multi-column footer with a glass surface, grouped navigation, social
@@ -18,28 +19,28 @@ export function LandingFooter() {
     {
       heading: isFa ? "محصول" : "Product",
       links: [
-        { label: isFa ? "قابلیت‌ها" : "Features", href: "#features" },
-        { label: isFa ? "موتورها" : "Engines", href: "#platforms" },
-        { label: isFa ? "فرآیند" : "How it works", href: "#process" },
-        { label: isFa ? "دستاوردها" : "Impact", href: "#metrics" },
+        { label: isFa ? "قابلیت‌ها" : "Features", href: `/${language}/#features` },
+        { label: isFa ? "موتورها" : "Engines", href: `/${language}/#platforms` },
+        { label: isFa ? "فرآیند" : "How it works", href: `/${language}/#process` },
+        { label: isFa ? "دستاوردها" : "Impact", href: `/${language}/#metrics` },
       ],
     },
     {
       heading: isFa ? "راهکارها" : "Solutions",
       links: [
-        { label: isFa ? "بهینه‌سازی GEO" : "GEO optimization", href: "#features" },
-        { label: isFa ? "بهینه‌سازی AEO" : "AEO optimization", href: "#features" },
-        { label: isFa ? "محافظت از برند" : "Brand protection", href: "#features" },
-        { label: isFa ? "رصد رقبا" : "Competitive radar", href: "#features" },
+        { label: isFa ? "بهینه‌سازی GEO" : "GEO optimization", href: `/${language}/solutions/geo` },
+        { label: isFa ? "بهینه‌سازی AEO" : "AEO optimization", href: `/${language}/solutions/aeo` },
+        { label: isFa ? "محافظت از برند" : "Brand protection", href: `/${language}/solutions/protection` },
+        { label: isFa ? "رصد رقبا" : "Competitive radar", href: `/${language}/solutions/radar` },
       ],
     },
     {
       heading: isFa ? "شرکت" : "Company",
       links: [
-        { label: isFa ? "درباره‌ی ما" : "About", href: "#" },
-        { label: isFa ? "وبلاگ" : "Blog", href: "#" },
-        { label: isFa ? "تماس با ما" : "Contact", href: "#" },
-        { label: isFa ? "حریم خصوصی" : "Privacy", href: "#" },
+        { label: isFa ? "درباره‌ی ما" : "About", href: `/${language}/about` },
+        { label: isFa ? "وبلاگ" : "Blog", href: `/${language}/blog` },
+        { label: isFa ? "تماس با ما" : "Contact", href: `/${language}/contact` },
+        { label: isFa ? "حریم خصوصی" : "Privacy", href: `/${language}/privacy` },
       ],
     },
   ];
@@ -58,10 +59,8 @@ export function LandingFooter() {
             {/* Brand block */}
             <div className="space-y-4">
               <Link href={`/${language}`} className="flex items-center gap-2.5">
-                <span className="grid place-items-center w-9 h-9 rounded-[var(--radius-md)] bg-[var(--color-primary-600)] text-white">
-                  <Sparkles size={18} />
-                </span>
-                <span className="font-display font-extrabold text-lg text-[var(--text-primary)]">
+                <SeorchableLogo className="w-9 h-9" />
+                <span className="font-display font-black text-lg text-[var(--text-primary)]">
                   {C.brand[language]}
                 </span>
               </Link>
@@ -96,12 +95,12 @@ export function LandingFooter() {
                 <ul className="space-y-2.5">
                   {col.links.map((link) => (
                     <li key={link.label}>
-                      <a
+                      <Link
                         href={link.href}
                         className="text-sm text-[var(--text-secondary)] hover:text-[var(--color-primary-600)] transition-colors"
                       >
                         {link.label}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>

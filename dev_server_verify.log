@@ -4,16 +4,96 @@
 
 ⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
 ▲ Next.js 16.2.11 (Turbopack)
-- Local:         http://localhost:3001
-- Network:       http://192.168.0.2:3001
-✓ Ready in 585ms
-⨯ Another next dev server is already running.
-
-- Local:        http://localhost:3000
-- PID:          168289
-- Dir:          /app
-- Log:          .next/dev/logs/next-development.log
-
-Run kill 168289 to stop it.
-[?25h
- ELIFECYCLE  Command failed with exit code 1.
+- Local:         ht GET /fa/dashboard 200 in 1748ms (next.js: 840ms, application-code: 909ms)
+ POST /fa/dashboard 200 in 315ms (next.js: 75ms, application-code: 241ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 33ms src/actions/auth.ts
+[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
+[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
+[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [ws-tehran]
+[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
+ GET /api/v1/analytics/summary 200 in 452ms (next.js: 322ms, application-code: 130ms)
+[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
+[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
+[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [demo-tenant-id]
+[Postgres Transacted SQL] Executing Parameterised Query: "
+            SELECT id, name, type, properties
+            FROM kg_entities
+            WHERE organization_id = $1 AND LOWER(name) = LOWER($2)
+            LIMIT 1;
+          " with values: [demo-tenant-id, اپتیموس]
+[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
+ POST /api/v1/knowledge-graph/query 200 in 183ms (next.js: 144ms, application-code: 39ms)
+ GET /fa/dashboard 200 in 327ms (next.js: 27ms, application-code: 300ms)
+ POST /fa/dashboard 200 in 75ms (next.js: 24ms, application-code: 51ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 3ms src/actions/auth.ts
+[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
+[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
+[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [ws-tehran]
+[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
+ GET /api/v1/analytics/summary 200 in 24ms (next.js: 3ms, application-code: 21ms)
+[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
+[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
+[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [demo-tenant-id]
+[Postgres Transacted SQL] Executing Parameterised Query: "
+            SELECT id, name, type, properties
+            FROM kg_entities
+            WHERE organization_id = $1 AND LOWER(name) = LOWER($2)
+            LIMIT 1;
+          " with values: [demo-tenant-id, اپتیموس]
+[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
+ POST /api/v1/knowledge-graph/query 200 in 27ms (next.js: 4ms, application-code: 23ms)
+✓ Compiled in 915ms
+✓ Compiled in 327ms
+○ Compiling /[locale] ...
+ GET /fa 200 in 5.6s (next.js: 4.6s, application-code: 959ms)
+ POST /fa 200 in 102ms (next.js: 34ms, application-code: 68ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 5ms src/actions/auth.ts
+ GET /fa 200 in 513ms (next.js: 87ms, application-code: 426ms)
+ POST /fa 200 in 189ms (next.js: 33ms, application-code: 156ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 2ms src/actions/auth.ts
+ GET /fa/about 200 in 2.1s (next.js: 1946ms, application-code: 148ms)
+ POST /fa/about 200 in 117ms (next.js: 38ms, application-code: 79ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 4ms src/actions/auth.ts
+ GET /fa/solutions/geo 200 in 2.3s (next.js: 2.1s, application-code: 105ms)
+ POST /fa/solutions/geo 200 in 112ms (next.js: 35ms, application-code: 77ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 6ms src/actions/auth.ts
+✓ Compiled in 9.6s
+ HEAD /fa/dashboard 200 in 3.4s (next.js: 578ms, application-code: 2.8s)
+ GET /fa/dashboard 200 in 155ms (next.js: 43ms, application-code: 112ms)
+ POST /fa/dashboard 200 in 117ms (next.js: 38ms, application-code: 79ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 3ms src/actions/auth.ts
+[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
+[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
+[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [ws-tehran]
+[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
+ GET /api/v1/analytics/summary 200 in 214ms (next.js: 123ms, application-code: 91ms)
+[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
+[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
+[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [demo-tenant-id]
+[Postgres Transacted SQL] Executing Parameterised Query: "
+            SELECT id, name, type, properties
+            FROM kg_entities
+            WHERE organization_id = $1 AND LOWER(name) = LOWER($2)
+            LIMIT 1;
+          " with values: [demo-tenant-id, اپتیموس]
+[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
+ POST /api/v1/knowledge-graph/query 200 in 226ms (next.js: 192ms, application-code: 34ms)
+ GET /fa/dashboard 200 in 155ms (next.js: 37ms, application-code: 117ms)
+ POST /fa/dashboard 200 in 106ms (next.js: 35ms, application-code: 71ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 15ms src/actions/auth.ts
+[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
+[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
+[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [ws-tehran]
+[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
+ GET /api/v1/analytics/summary 200 in 21ms (next.js: 3ms, application-code: 17ms)
+[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.
+[Postgres Transacted SQL] Executing Parameterised Query: "BEGIN" with values: []
+[Postgres Transacted SQL] Executing Parameterised Query: "SET LOCAL app.current_tenant_id = $1" with values: [demo-tenant-id]
+[Postgres Transacted SQL] Executing Parameterised Query: "
+            SELECT id, name, type, properties
+            FROM kg_entities
+            WHERE organization_id = $1 AND LOWER(name) = LOWER($2)
+            LIMIT 1;
+          " with values: [demo-tenant-id, اپتیموس]
+[Postgres Transacted SQL] Executing Parameterised Query: "COMMIT" with values: []
+ POST /api/v1/knowledge-graph/query 200 in 27ms (next.js: 3ms, application-code: 24ms)

@@ -32,24 +32,8 @@ import { Button } from "@/components/Button";
 import { FreeAuditPanel } from "@/components/features/audit/FreeAuditPanel";
 import { useAuth } from "@/components/AuthProvider";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-
-// Interfaces for our interactive Canvas Knowledge Graph
-interface GraphNode {
-  id: string;
-  label: string;
-  type: "brand" | "competitor" | "model" | "feature";
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  radius: number;
-}
-
-interface GraphLink {
-  source: string;
-  target: string;
-  label: string;
-}
+import { RadialPolarGraph } from "@/components/features/graph/RadialPolarGraph";
+import AppSidebar from "@/components/navigation/AppSidebar";
 
 /**
  * Redesigned category-leading brand landing page for Optimus AI.
@@ -74,281 +58,9 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
   // State to control active node in mini-dashboard graph view
   const [selectedGraphNode, setSelectedGraphNode] = useState<string | null>(null);
 
-  // References for Canvas animation
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const mouseRef = useRef({ x: 0, y: 0, isOver: false, hoveredNodeId: null as string | null });
-
   // References for scrolling to sections
   const dashboardPreviewRef = useRef<HTMLDivElement | null>(null);
   const freeAuditRef = useRef<HTMLDivElement | null>(null);
-
-  // 1. Initialise and run interactive Canvas Knowledge Graph
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animationFrameId: number;
-
-    const nodes: GraphNode[] = [
-      { id: "optimus", label: isFa ? "اپتیموس هوش مصنوعی" : "Optimus AI", type: "brand", x: 250, y: 180, vx: 0, vy: 0, radius: 45 },
-      { id: "digikala", label: isFa ? "دیجی‌کالا" : "Digikala", type: "competitor", x: 100, y: 100, vx: 0, vy: 0, radius: 32 },
-      { id: "snapp", label: isFa ? "اسنپ" : "Snapp", type: "competitor", x: 120, y: 280, vx: 0, vy: 0, radius: 32 },
-      { id: "gpt4", label: "GPT-4o", type: "model", x: 400, y: 90, vx: 0, vy: 0, radius: 35 },
-      { id: "claude", label: "Claude 3.5", type: "model", x: 420, y: 260, vx: 0, vy: 0, radius: 35 },
-      { id: "aeo", label: isFa ? "تولید محتوای AEO" : "AEO Generation", type: "feature", x: 250, y: 50, vx: 0, vy: 0, radius: 30 },
-      { id: "semantic", label: isFa ? "تحلیل معنایی" : "Semantic Analysis", type: "feature", x: 260, y: 320, vx: 0, vy: 0, radius: 30 },
-    ];
-
-    const links: GraphLink[] = [
-      { source: "optimus", target: "digikala", label: isFa ? "رقابت معنایی" : "Semantic Rivalry" },
-      { source: "optimus", target: "snapp", label: isFa ? "رقابت معنایی" : "Semantic Rivalry" },
-      { source: "optimus", target: "gpt4", label: isFa ? "تحلیل‌شده توسط" : "Analyzed By" },
-      { source: "optimus", target: "claude", label: isFa ? "تحلیل‌شده توسط" : "Analyzed By" },
-      { source: "optimus", target: "aeo", label: isFa ? "موتور بهینه‌سازی" : "Optimization Engine" },
-      { source: "optimus", target: "semantic", label: isFa ? "هسته فناوری" : "Tech Core" },
-      { source: "digikala", target: "gpt4", label: isFa ? "سهم صدای رقیب" : "Competitor VoS" },
-      { source: "snapp", target: "claude", label: isFa ? "سهم صدای رقیب" : "Competitor VoS" },
-    ];
-
-    // Helper to resize canvas to container
-    const resizeCanvas = () => {
-      const parent = containerRef.current;
-      if (parent && canvas) {
-        canvas.width = parent.clientWidth;
-        canvas.height = parent.clientHeight;
-
-        // Spread nodes evenly across the dynamically sized canvas
-        nodes[0].x = canvas.width / 2;
-        nodes[0].y = canvas.height / 2;
-        nodes[1].x = canvas.width * 0.2;
-        nodes[1].y = canvas.height * 0.25;
-        nodes[2].x = canvas.width * 0.25;
-        nodes[2].y = canvas.height * 0.75;
-        nodes[3].x = canvas.width * 0.8;
-        nodes[3].y = canvas.height * 0.22;
-        nodes[4].x = canvas.width * 0.75;
-        nodes[4].y = canvas.height * 0.72;
-        nodes[5].x = canvas.width / 2;
-        nodes[5].y = canvas.height * 0.15;
-        nodes[6].x = canvas.width * 0.48;
-        nodes[6].y = canvas.height * 0.82;
-      }
-    };
-
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-
-    // Mouse interactive events
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      mouseRef.current.x = x;
-      mouseRef.current.y = y;
-      mouseRef.current.isOver = true;
-
-      // Detect hover on node
-      let hoveredId: string | null = null;
-      for (const node of nodes) {
-        const dx = x - node.x;
-        const dy = y - node.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < node.radius) {
-          hoveredId = node.id;
-          break;
-        }
-      }
-      mouseRef.current.hoveredNodeId = hoveredId;
-    };
-
-    const handleMouseLeave = () => {
-      mouseRef.current.isOver = false;
-      mouseRef.current.hoveredNodeId = null;
-    };
-
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseleave", handleMouseLeave);
-
-    // Animation Loop (60fps)
-    let particleOffset = 0;
-    const animate = () => {
-      particleOffset += 0.5;
-      if (particleOffset > 100) particleOffset = 0;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const hoveredNodeId = mouseRef.current.hoveredNodeId;
-
-      // 1. Physics & Constraints (Gentle floating motion + Mouse pull)
-      nodes.forEach((node) => {
-        // Floating movement with simple sine waves
-        const time = Date.now() * 0.001;
-        const indexOffset = nodes.indexOf(node) * 1.5;
-        const floatX = Math.sin(time + indexOffset) * 0.15;
-        const floatY = Math.cos(time * 0.8 + indexOffset) * 0.15;
-
-        node.x += floatX;
-        node.y += floatY;
-
-        // Attract toward mouse if mouse is close and node is hovered/related
-        if (mouseRef.current.isOver) {
-          const dx = mouseRef.current.x - node.x;
-          const dy = mouseRef.current.y - node.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 200 && dist > 10) {
-            const pullStrength = 0.04 * (1 - dist / 200);
-            node.x += (dx / dist) * pullStrength;
-            node.y += (dy / dist) * pullStrength;
-          }
-        }
-
-        // Boundary constraints
-        if (node.x < node.radius) node.x = node.radius;
-        if (node.x > canvas.width - node.radius) node.x = canvas.width - node.radius;
-        if (node.y < node.radius) node.y = node.radius;
-        if (node.y > canvas.height - node.radius) node.y = canvas.height - node.radius;
-      });
-
-      // 2. Draw Links (Edges)
-      links.forEach((link) => {
-        const sourceNode = nodes.find((n) => n.id === link.source);
-        const targetNode = nodes.find((n) => n.id === link.target);
-
-        if (!sourceNode || !targetNode) return;
-
-        const isRelatedToHover = hoveredNodeId
-          ? link.source === hoveredNodeId || link.target === hoveredNodeId
-          : false;
-
-        // Custom styling for links based on state
-        ctx.beginPath();
-        ctx.moveTo(sourceNode.x, sourceNode.y);
-        ctx.lineTo(targetNode.x, targetNode.y);
-
-        if (hoveredNodeId) {
-          ctx.strokeStyle = isRelatedToHover
-            ? "rgba(56, 189, 248, 0.7)" // sky blue glow
-            : "rgba(148, 163, 184, 0.08)";
-          ctx.lineWidth = isRelatedToHover ? 2.5 : 1;
-        } else {
-          ctx.strokeStyle = "rgba(148, 163, 184, 0.25)";
-          ctx.lineWidth = 1.2;
-        }
-        ctx.stroke();
-
-        // Draw flowing data particles along links
-        if (!hoveredNodeId || isRelatedToHover) {
-          const segmentCount = 2;
-          for (let i = 0; i < segmentCount; i++) {
-            const t = ((particleOffset + i * (100 / segmentCount)) % 100) / 100;
-            const px = sourceNode.x + (targetNode.x - sourceNode.x) * t;
-            const py = sourceNode.y + (targetNode.y - sourceNode.y) * t;
-
-            ctx.beginPath();
-            ctx.arc(px, py, 2.5, 0, Math.PI * 2);
-            ctx.fillStyle = link.source === "optimus" ? "#38bdf8" : "#f97316"; // sky blue or orange
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = ctx.fillStyle as string;
-            ctx.fill();
-            ctx.shadowBlur = 0; // reset
-          }
-        }
-      });
-
-      // 3. Draw Nodes (Glassmorphic Orbs & Glowing borders)
-      nodes.forEach((node) => {
-        const isHovered = hoveredNodeId === node.id;
-        const isRelated = hoveredNodeId
-          ? node.id === hoveredNodeId || links.some(l => (l.source === hoveredNodeId && l.target === node.id) || (l.target === hoveredNodeId && l.source === node.id))
-          : true;
-
-        ctx.save();
-
-        // Setup node opacity and blur simulation
-        ctx.globalAlpha = isRelated ? 1.0 : 0.25;
-
-        // Node Glow Shadow
-        ctx.shadowBlur = isHovered ? 24 : 12;
-        if (node.type === "brand") {
-          ctx.shadowColor = "rgba(56, 189, 248, 0.4)"; // Sky Blue
-        } else if (node.type === "competitor") {
-          ctx.shadowColor = "rgba(249, 115, 22, 0.3)";  // Orange
-        } else if (node.type === "model") {
-          ctx.shadowColor = "rgba(168, 85, 247, 0.3)";  // Purple
-        } else {
-          ctx.shadowColor = "rgba(16, 185, 129, 0.25)"; // Emerald
-        }
-
-        // Draw Glassmorphic Inner Node
-        const gradient = ctx.createRadialGradient(node.x, node.y, 5, node.x, node.y, node.radius);
-        if (node.type === "brand") {
-          gradient.addColorStop(0, "rgba(15, 23, 42, 0.85)");
-          gradient.addColorStop(1, "rgba(56, 189, 248, 0.15)");
-        } else if (node.type === "competitor") {
-          gradient.addColorStop(0, "rgba(15, 23, 42, 0.85)");
-          gradient.addColorStop(1, "rgba(249, 115, 22, 0.12)");
-        } else {
-          gradient.addColorStop(0, "rgba(15, 23, 42, 0.9)");
-          gradient.addColorStop(1, "rgba(255, 255, 255, 0.05)");
-        }
-
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        // Node Border Outline
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        if (node.type === "brand") {
-          ctx.strokeStyle = isHovered ? "#38bdf8" : "rgba(56, 189, 248, 0.45)";
-          ctx.lineWidth = isHovered ? 2.5 : 1.5;
-        } else if (node.type === "competitor") {
-          ctx.strokeStyle = isHovered ? "#f97316" : "rgba(249, 115, 22, 0.35)";
-          ctx.lineWidth = isHovered ? 2.5 : 1.5;
-        } else if (node.type === "model") {
-          ctx.strokeStyle = isHovered ? "#c084fc" : "rgba(168, 85, 247, 0.3)";
-          ctx.lineWidth = isHovered ? 2 : 1;
-        } else {
-          ctx.strokeStyle = isHovered ? "#34d399" : "rgba(52, 211, 153, 0.3)";
-          ctx.lineWidth = isHovered ? 2 : 1;
-        }
-        ctx.stroke();
-
-        // Draw text label
-        ctx.fillStyle = "#ffffff";
-        ctx.font = `600 ${node.type === "brand" ? "13px" : "11px"} system-ui, -apple-system, sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.shadowBlur = 0; // reset shadow for text clarity
-        ctx.fillText(node.label, node.x, node.y - 2);
-
-        // Subtitle type
-        ctx.fillStyle = node.type === "brand" ? "#38bdf8" : node.type === "competitor" ? "#f97316" : "rgba(255, 255, 255, 0.4)";
-        ctx.font = `700 8px system-ui, -apple-system, sans-serif`;
-        ctx.fillText(node.type.toUpperCase(), node.x, node.y + (node.type === "brand" ? 14 : 12));
-
-        ctx.restore();
-      });
-
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("resize", resizeCanvas);
-      if (canvas) {
-        canvas.removeEventListener("mousemove", handleMouseMove);
-        canvas.removeEventListener("mouseleave", handleMouseLeave);
-      }
-    };
-  }, [isFa]);
 
   // Smooth scroll handler
   const scrollToRef = (ref: React.RefObject<HTMLDivElement | null>) => {
@@ -436,6 +148,9 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--text-primary)]" style={{ direction: isFa ? "rtl" : "ltr" }}>
+      {/* Overlay Drawer Hamburger Menu */}
+      <AppSidebar />
+
       {/* 1. Glassmorphic Navigation Bar */}
       <LandingHeader />
 
@@ -513,19 +228,18 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </div>
           </div>
 
-          {/* Interactive Knowledge Graph Canvas Container (Glassmorphic) */}
-          <div ref={containerRef} className="relative w-full h-[380px] sm:h-[450px] rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-md shadow-2xl overflow-hidden group">
-            {/* Magnifying Glass Blur overlay simulation */}
+          {/* Interactive Polar Radar Graph Container */}
+          <div className="relative w-full h-[380px] sm:h-[450px] rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-md shadow-2xl overflow-hidden group">
             <div className="absolute top-4 left-4 z-10 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/50 border border-[#38bdf8]/20 text-xs text-[#38bdf8] backdrop-blur-lg">
               <Network size={14} className="animate-pulse" />
               <span className="font-mono text-[10px] uppercase tracking-wider">{isFa ? "گراف روابط زنده" : "Interactive KG Core"}</span>
             </div>
 
-            <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full cursor-pointer" />
+            <RadialPolarGraph className="w-full h-full" />
 
             <div className="absolute bottom-4 inset-x-4 text-center pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity duration-300">
               <p className="text-[10px] text-slate-400">
-                {isFa ? "موس خود را روی موجودیت‌ها بکشید یا نگه دارید تا ارتباطات معنایی را کاوش کنید" : "Hover or slide over nodes to inspect real-time semantic relationships"}
+                {isFa ? "موس خود را روی بخش‌های مختلف حرکت دهید تا ارتباطات و بردارهای استنادی را پایش کنید" : "Hover over segments to inspect semantic vectors and citation patterns"}
               </p>
             </div>
           </div>

@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Moon, Sun, Languages, Sparkles } from "lucide-react";
+import { Moon, Sun, Languages } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/Button";
 import { marketingContent as C } from "./content";
+import { SeorchableLogo } from "./SeorchableLogo";
 
 /**
  * Sticky glassmorphic navigation bar with theme + language toggles and a
@@ -42,11 +43,9 @@ export function LandingHeader() {
         }`}
       >
         {/* Brand */}
-        <Link href={`/${language}`} className="flex items-center gap-2.5 shrink-0">
-          <span className="relative grid place-items-center w-9 h-9 rounded-[var(--radius-md)] bg-[var(--color-primary-600)] text-white glow-ring">
-            <Sparkles size={18} />
-          </span>
-          <span className="font-display font-extrabold text-base sm:text-lg tracking-tight text-[var(--text-primary)]">
+        <Link href={`/${language}`} className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          <SeorchableLogo className="w-9 h-9" />
+          <span className="font-display font-black text-base sm:text-lg tracking-tight text-[var(--text-primary)]">
             {C.brand[language]}
           </span>
         </Link>
