@@ -60,9 +60,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { label: language === "fa" ? "خروج" : "Sign out", value: "logout" },
   ];
 
-  // Since the sidebar is ALWAYS fixed right (as required by RTL layout constraints),
-  // the main content area must ALWAYS have spacing on the right side on desktop viewports.
-  const spacingClasses = collapsed ? "md:mr-[72px] mr-0 ml-0" : "md:mr-[280px] mr-0 ml-0";
+  // No right-side spacing since the menu is a horizontal overlay
+  const spacingClasses = "mr-0 ml-0";
 
   return (
     <ProtectedRoute>
