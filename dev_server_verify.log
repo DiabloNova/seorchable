@@ -17,3 +17,4 @@
  GET /fa/docs 200 in 1523ms (next.js: 1425ms, application-code: 98ms)
  POST /fa/docs 200 in 161ms (next.js: 34ms, application-code: 127ms)
   └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 4ms src/actions/auth.ts
+✓ Compiled in 350ms
