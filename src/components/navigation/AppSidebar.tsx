@@ -8,8 +8,9 @@ import { useTheme } from "@/components/ThemeProvider";
 import {
   LayoutDashboard, Database, Search, Network,
   BarChart3, Star, FileText, Bot, Compass,
-  Settings, User, X, Menu, Sparkles
+  Settings, User, X, Menu
 } from "lucide-react";
+import { SeorchableLogo } from "../marketing/SeorchableLogo";
 
 interface NavItem {
   href: string;
@@ -87,7 +88,7 @@ export default function AppSidebar({
   return (
     <>
       {/* HAMBURGER TOGGLE BUTTON IN TOP LEFT */}
-      <div className="fixed top-3 left-4 z-50">
+      <div className="fixed top-3 left-4 z-[60]">
         <button
           onClick={handleToggle}
           aria-label="Toggle navigation menu"
@@ -122,7 +123,7 @@ export default function AppSidebar({
       {/* OVERLAY DRAWER PANEL */}
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-40" dir={isFa ? "rtl" : "ltr"}>
+          <div className="fixed inset-0 z-[55]" dir={isFa ? "rtl" : "ltr"}>
             {/* Backdrop Blur Overlay */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -144,11 +145,9 @@ export default function AppSidebar({
               {/* Drawer Header */}
               <div className="h-16 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--sky-blue-500)] to-[var(--orange-500)] flex items-center justify-center text-white font-black text-xs">
-                    AI
-                  </div>
+                  <SeorchableLogo className="w-8 h-8" />
                   <span className="font-bold text-slate-100 text-sm">
-                    {isFa ? "ناوبری هوش برند" : "Brand AI Navigation"}
+                    {isFa ? "ناوبری سئورچبل" : "seorchable.ir Navigation"}
                   </span>
                 </div>
                 <button
@@ -252,8 +251,9 @@ export default function AppSidebar({
               </nav>
 
               {/* Drawer Footer / Powered By */}
-              <div className="p-6 border-t border-white/10 bg-black/20 text-center text-[10px] text-slate-500 select-none shrink-0">
-                <span>{isFa ? "قدرت گرفته از هوش برند" : "Powered by Brand Intelligence"}</span>
+              <div className="p-6 border-t border-white/10 bg-black/20 flex items-center justify-between text-[10px] text-slate-500 select-none shrink-0" dir={isFa ? "rtl" : "ltr"}>
+                <span>{isFa ? "سئورچبل (seorchable.ir)" : "Powered by seorchable.ir"}</span>
+                <SeorchableLogo className="w-5 h-5" glow={false} />
               </div>
             </motion.div>
           </div>
