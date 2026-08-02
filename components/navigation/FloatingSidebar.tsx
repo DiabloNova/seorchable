@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "../../src/components/ThemeProvider";
+import { useAuth } from "../../src/components/AuthProvider";
 import { SeorchableLogo } from "../../src/components/marketing/SeorchableLogo";
 import {
   Home,
@@ -16,8 +17,11 @@ import {
   User,
   Menu,
   X,
-  Compass,
-  Sparkles
+  LogOut,
+  Sun,
+  Moon,
+  Languages,
+  Receipt
 } from "lucide-react";
 
 interface SidebarItem {
@@ -30,50 +34,51 @@ interface SidebarItem {
 const SIDEBAR_ITEMS: SidebarItem[] = [
   {
     icon: Home,
-    labelEn: "Home",
-    labelFa: "خانه",
+    labelEn: "Command Center",
+    labelFa: "صفحه نخست",
     path: "/"
   },
   {
     icon: BarChart2,
-    labelEn: "GEO Optimization",
-    labelFa: "بهینه‌سازی GEO",
+    labelEn: "GEO Optimization Engine",
+    labelFa: "موتور بهینه‌سازی GEO",
     path: "/solutions/geo"
   },
   {
     icon: Globe,
-    labelEn: "AEO Optimization",
-    labelFa: "بهینه‌سازی AEO",
+    labelEn: "AEO Optimization Studio",
+    labelFa: "استودیو بهینه‌سازی AEO",
     path: "/solutions/aeo"
   },
   {
     icon: Shield,
-    labelEn: "Brand Protection",
-    labelFa: "محافظت از برند",
+    labelEn: "Cognitive Brand Protection",
+    labelFa: "محافظت از هویت برند",
     path: "/solutions/protection"
   },
   {
     icon: Radar,
-    labelEn: "Competitive Radar",
-    labelFa: "رادار رقابتی",
+    labelEn: "Competitive Intelligence Radar",
+    labelFa: "رادار تحلیل رقابتی برند",
     path: "/solutions/radar"
   },
   {
     icon: Settings,
-    labelEn: "Settings",
-    labelFa: "تنظیمات",
+    labelEn: "System Configuration",
+    labelFa: "پیکربندی سیستم",
     path: "/settings"
   },
   {
     icon: User,
-    labelEn: "Profile",
-    labelFa: "پروفایل",
+    labelEn: "User Account Profile",
+    labelFa: "حساب کاربری",
     path: "/profile"
   }
 ];
 
 export default function FloatingSidebar() {
-  const { language } = useTheme();
+  const { language, setLanguage, theme, setTheme } = useTheme();
+  const { logout } = useAuth();
   const pathname = usePathname();
   const isFa = language === "fa";
 
@@ -112,7 +117,7 @@ export default function FloatingSidebar() {
       >
         <div
           className={`glass-panel border border-white/10 dark:border-white/5 shadow-2xl rounded-full px-5 py-3 flex items-center gap-4 transition-all duration-500 ease-in-out backdrop-blur-2xl bg-slate-950/85 text-white ${
-            isHovered ? "max-w-[90vw] scale-100 opacity-100" : "max-w-[280px] scale-95 opacity-90"
+            isHovered ? "max-w-[95vw] scale-100 opacity-100" : "max-w-[280px] scale-95 opacity-90"
           }`}
           style={{
             boxShadow: isHovered
@@ -136,9 +141,9 @@ export default function FloatingSidebar() {
                 </div>
                 <div className="flex flex-col text-start">
                   <span className="text-[11px] font-black tracking-wider text-[var(--sky-blue-500)] uppercase font-display">
-                    {isFa ? "منوی پیشرفته" : "ADVANCED MENU"}
+                    {isFa ? "منوی هوشمند ناوبری" : "SMART NAVIGATION"}
                   </span>
-                  <span className="text-[9px] text-slate-400 font-medium">
+                  <span className="text-[9px] text-slate-400 font-medium font-mono">
                     {isFa ? "برای نمایش نگه دارید" : "Hover to Expand"}
                   </span>
                 </div>
@@ -151,11 +156,11 @@ export default function FloatingSidebar() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.4 }}
-                className="flex items-center gap-6"
+                className="flex items-center gap-5"
                 dir={isFa ? "rtl" : "ltr"}
               >
-                {/* Logo and Brand on the start/end depending on dir */}
-                <div className="flex items-center gap-2 px-1 border-r border-white/10 rtl:border-r-0 rtl:border-l pl-3 rtl:pl-0 rtl:pr-3">
+                {/* Logo and Brand */}
+                <div className="flex items-center gap-2 px-1 border-r border-white/10 rtl:border-r-0 rtl:border-l pl-3 rtl:pl-0 rtl:pr-3 shrink-0">
                   <SeorchableLogo className="w-7 h-7" glow={false} />
                   <span className="text-[11px] font-black bg-gradient-to-r from-[var(--sky-blue-500)] to-[var(--orange-500)] bg-clip-text text-transparent font-display">
                     {isFa ? "سئورچبل" : "Seorchable"}
@@ -163,7 +168,7 @@ export default function FloatingSidebar() {
                 </div>
 
                 {/* Horizontal Navigation Links */}
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 shrink-0">
                   {SIDEBAR_ITEMS.map((item) => {
                     const Icon = item.icon;
                     const isActive = isItemActive(item.path);
@@ -180,7 +185,7 @@ export default function FloatingSidebar() {
                         }`}
                       >
                         <Icon
-                          className={`w-4 h-4 shrink-0 transition-transform duration-300 group-hover:scale-110 ${
+                          className={`w-4 h-4 shrink-0 transition-transform duration-300 ${
                             isActive ? "text-[var(--sky-blue-500)]" : "text-slate-400"
                           }`}
                         />
@@ -188,6 +193,55 @@ export default function FloatingSidebar() {
                       </Link>
                     );
                   })}
+                </div>
+
+                {/* Divider */}
+                <div className="w-px h-6 bg-white/10 shrink-0" />
+
+                {/* Theme, Language and Invoice Controls right next to each other */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {/* Language */}
+                  <button
+                    onClick={() => setLanguage(language === "fa" ? "en" : "fa")}
+                    title={isFa ? "Switch to English" : "تغییر به فارسی"}
+                    className="p-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer text-[10px] font-black flex items-center gap-0.5"
+                  >
+                    <Languages className="w-4 h-4 text-[var(--sky-blue-500)]" />
+                    <span>{isFa ? "EN" : "فا"}</span>
+                  </button>
+
+                  {/* Theme Toggle */}
+                  <button
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    title={isFa ? "تغییر پوسته" : "Toggle Theme"}
+                    className="p-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  >
+                    {theme === "dark" ? (
+                      <Sun className="w-4 h-4 text-[var(--orange-500)]" />
+                    ) : (
+                      <Moon className="w-4 h-4 text-[var(--orange-500)]" />
+                    )}
+                  </button>
+
+                  {/* Invoice */}
+                  <Link
+                    href={`/${language}/invoice`}
+                    title={isFa ? "پرداخت صورتحساب" : "Invoice Payment"}
+                    className="p-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  >
+                    <Receipt className="w-4 h-4 text-[var(--sky-blue-500)]" />
+                  </Link>
+
+                  {/* Logout */}
+                  <button
+                    onClick={async () => {
+                      await logout();
+                    }}
+                    title={isFa ? "خروج از سیستم" : "Sign Out"}
+                    className="p-1.5 rounded-full text-rose-400 hover:text-rose-300 hover:bg-rose-500/15 transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
                 </div>
               </motion.div>
             )}
@@ -210,7 +264,7 @@ export default function FloatingSidebar() {
           ) : (
             <>
               <Menu className="w-4 h-4" />
-              <span>{isFa ? "منوی پیشرفته" : "Advanced Menu"}</span>
+              <span>{isFa ? "منوی ناوبری هوشمند" : "Smart Menu"}</span>
             </>
           )}
         </button>
@@ -236,7 +290,7 @@ export default function FloatingSidebar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: "15%" }}
               transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-              className="absolute bottom-24 left-4 right-4 glass-panel border border-white/10 rounded-3xl p-6 bg-slate-950/90 text-white shadow-2xl flex flex-col gap-4 max-h-[75vh] overflow-y-auto"
+              className="absolute bottom-24 left-4 right-4 glass-panel border border-white/10 rounded-3xl p-6 bg-slate-950/95 text-white shadow-2xl flex flex-col gap-4 max-h-[75vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between pb-3 border-b border-white/10">
                 <div className="flex items-center gap-2">
@@ -251,6 +305,38 @@ export default function FloatingSidebar() {
                 >
                   <X size={16} />
                 </button>
+              </div>
+
+              {/* Quick controls inside Mobile overlay */}
+              <div className="flex items-center justify-around py-2.5 bg-white/5 rounded-xl border border-white/5">
+                <button
+                  onClick={() => setLanguage(language === "fa" ? "en" : "fa")}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-white/10 text-slate-300 hover:text-white cursor-pointer"
+                >
+                  <Languages className="w-4 h-4 text-[var(--sky-blue-500)]" />
+                  <span>{isFa ? "English" : "فارسی"}</span>
+                </button>
+
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-white/10 text-slate-300 hover:text-white cursor-pointer"
+                >
+                  {theme === "dark" ? (
+                    <Sun className="w-4 h-4 text-[var(--orange-500)]" />
+                  ) : (
+                    <Moon className="w-4 h-4 text-[var(--orange-500)]" />
+                  )}
+                  <span>{isFa ? "پوسته" : "Theme"}</span>
+                </button>
+
+                <Link
+                  href={`/${language}/invoice`}
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-white/10 text-slate-300 hover:text-white cursor-pointer"
+                >
+                  <Receipt className="w-4 h-4 text-[var(--sky-blue-500)]" />
+                  <span>{isFa ? "صورتحساب" : "Invoice"}</span>
+                </Link>
               </div>
 
               {/* Mobile item list */}
@@ -280,6 +366,18 @@ export default function FloatingSidebar() {
                     </Link>
                   );
                 })}
+
+                {/* Mobile Logout Button */}
+                <button
+                  onClick={async () => {
+                    setIsOpen(false);
+                    await logout();
+                  }}
+                  className="w-full flex items-center gap-3.5 p-3.5 rounded-2xl transition-all duration-300 border text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 border-transparent cursor-pointer text-start"
+                >
+                  <LogOut className="w-5 h-5 shrink-0 text-rose-400" />
+                  <span className="text-sm">{isFa ? "خروج از حساب کاربری" : "Logout of Account"}</span>
+                </button>
               </div>
 
               {/* Branding Footer inside mobile drawer */}

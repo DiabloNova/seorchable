@@ -5,10 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
+import { useAuth } from "@/components/AuthProvider";
 import {
   LayoutDashboard, Database, Search, Network,
-  BarChart3, Star, FileText, Bot, Compass,
-  Settings, User, X, Menu
+  BarChart3, Star, Settings, User, X, Menu,
+  LogOut, Sun, Moon, Languages, Receipt
 } from "lucide-react";
 import { SeorchableLogo } from "../marketing/SeorchableLogo";
 
@@ -18,6 +19,7 @@ interface NavItem {
   labelEn: string;
   labelFa: string;
   badge?: string;
+  badgeBg?: string;
 }
 
 interface AppSidebarProps {
@@ -32,7 +34,8 @@ export default function AppSidebar({
   setMobileOpen
 }: AppSidebarProps) {
   const pathname = usePathname();
-  const { language, theme } = useTheme();
+  const { language, setLanguage, theme, setTheme } = useTheme();
+  const { logout } = useAuth();
   const isFa = language === "fa";
 
   // Unified menu open state for both desktop and mobile
@@ -70,20 +73,43 @@ export default function AppSidebar({
   };
 
   const baseItems: NavItem[] = [
-    { href: "/dashboard", icon: LayoutDashboard, labelEn: "Dashboard", labelFa: "داشبورد" },
-    { href: "/dashboard/ingest", icon: Database, labelEn: "Ingest Documents", labelFa: "ورود اسناد" },
-    { href: "/dashboard/rag", icon: Search, labelEn: "RAG Search", labelFa: "جستجوی RAG" },
-    { href: "/dashboard/graph", icon: Network, labelEn: "Knowledge Graph", labelFa: "گراف دانش" },
+    { href: "/dashboard", icon: LayoutDashboard, labelEn: "Command Center", labelFa: "میز فرماندهی هوشمند" },
+    { href: "/dashboard/ingest", icon: Database, labelEn: "Data Ingestion Engine", labelFa: "موتور ورود و پایش اسناد" },
+    { href: "/dashboard/rag", icon: Search, labelEn: "AI Semantic Discovery", labelFa: "جستجوی پیشرفته معنایی RAG" },
+    { href: "/dashboard/graph", icon: Network, labelEn: "Enterprise Knowledge Graph", labelFa: "گراف دانش سازمانی" },
   ];
 
   const analysisItems: NavItem[] = [
-    { href: "/dashboard/audit/free", icon: BarChart3, labelEn: "Free Analysis", labelFa: "تحلیل رایگان" },
-    { href: "/dashboard/audit/premium", icon: Star, labelEn: "Premium Analysis", labelFa: "تحلیل پیشرفته", badge: "Pro" },
-    { href: "/dashboard/optimization/technical", icon: Settings, labelEn: "Technical Optimization", labelFa: "بهینه‌سازی فنی", badge: "Pro" },
-    { href: "/dashboard/content", icon: FileText, labelEn: "Content Studio", labelFa: "استودیو محتوا" },
-    { href: "/dashboard/analytics/llm", icon: Bot, labelEn: "LLM Analytics", labelFa: "تحلیل مدل‌های زبانی" },
-    { href: "/dashboard/competitors", icon: Compass, labelEn: "Competitor Analysis", labelFa: "تحلیل رقابتی", badge: "Pro" },
+    { href: "/dashboard/audit/free", icon: BarChart3, labelEn: "Standard Brand Audit", labelFa: "تحلیل استاندارد برند" },
+    { href: "/dashboard/audit/premium", icon: Star, labelEn: "Enterprise Cognitive Audit", labelFa: "تحلیل پیشرفته و همه‌جانبه برند", badge: "Pro" },
+    { href: "/dashboard/optimization/technical", icon: Settings, labelEn: "Engine Optimization Studio", labelFa: "کارگاه بهینه‌سازی موتورهای پاسخگو", badge: "Pro" },
+    { href: "/dashboard/content", icon: LayoutDashboard, labelEn: "Cognitive Content Studio", labelFa: "استودیو تولید محتوای هوشمند" },
+    { href: "/dashboard/analytics/llm", icon: BotIcon, labelEn: "Language Model Analytics", labelFa: "تحلیل پاسخ‌های مدل‌های زبانی" },
+    { href: "/dashboard/competitors", icon: CompassIcon, labelEn: "Competitive Intelligence Radar", labelFa: "رادار تحلیل رقابتی برند", badge: "Pro" },
   ];
+
+  // Custom inline components for SVGs to ensure exact lucide representation
+  function BotIcon(props: any) {
+    return (
+      <svg {...props} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 8V4H8" />
+        <rect width="16" height="12" x="4" y="8" rx="2" />
+        <path d="M2 14h2" />
+        <path d="M20 14h2" />
+        <path d="M15 13v2" />
+        <path d="M9 13v2" />
+      </svg>
+    );
+  }
+
+  function CompassIcon(props: any) {
+    return (
+      <svg {...props} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+      </svg>
+    );
+  }
 
   return (
     <>
@@ -92,7 +118,7 @@ export default function AppSidebar({
         <button
           onClick={handleToggle}
           aria-label="Toggle navigation menu"
-          className="flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-500 shadow-lg border border-[var(--glass-border)] backdrop-blur-2xl bg-slate-950/60 dark:bg-slate-950/60 light:bg-white/60 hover:bg-slate-950/85 text-[var(--text-primary)] cursor-pointer hover:scale-105 active:scale-95"
+          className="flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-500 shadow-lg border border-[var(--glass-border)] backdrop-blur-2xl bg-slate-950/60 dark:bg-slate-950/60 light:bg-white/60 hover:bg-slate-950/85 text-[var(--sky-blue-500)] hover:text-[var(--orange-500)] cursor-pointer hover:scale-105 active:scale-95"
         >
           <AnimatePresence mode="wait" initial={false}>
             {isOpen ? (
@@ -103,7 +129,7 @@ export default function AppSidebar({
                 exit={{ rotate: 90, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <X size={20} />
+                <X size={20} className="text-[var(--orange-500)]" />
               </motion.div>
             ) : (
               <motion.div
@@ -113,7 +139,7 @@ export default function AppSidebar({
                 exit={{ rotate: -90, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <Menu size={20} />
+                <Menu size={20} className="text-[var(--sky-blue-500)]" />
               </motion.div>
             )}
           </AnimatePresence>
@@ -140,12 +166,12 @@ export default function AppSidebar({
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.5 }}
-              className="absolute top-0 bottom-0 left-0 w-80 sm:w-85 border-r border-[var(--glass-border)] bg-slate-950/90 text-white shadow-2xl flex flex-col overflow-hidden"
+              className="absolute top-0 bottom-0 left-0 w-80 sm:w-85 border-r border-white/10 bg-slate-950/95 text-white shadow-2xl flex flex-col overflow-hidden"
             >
               {/* Drawer Header */}
               <div className="h-16 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <SeorchableLogo className="w-8 h-8" />
+                  <SeorchableLogo className="w-8 h-8" glow={false} />
                   <span className="font-bold text-slate-100 text-sm">
                     {isFa ? "ناوبری سئورچبل" : "seorchable.ir Navigation"}
                   </span>
@@ -158,12 +184,48 @@ export default function AppSidebar({
                 </button>
               </div>
 
+              {/* Quick Controls Row (Language, Theme, Invoice icon placement) */}
+              <div className="px-6 py-3.5 border-b border-white/10 flex items-center justify-around bg-slate-900/50 shrink-0">
+                {/* Language Toggle */}
+                <button
+                  onClick={() => setLanguage(language === "fa" ? "en" : "fa")}
+                  title={isFa ? "Switch to English" : "تغییر به فارسی"}
+                  className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer"
+                >
+                  <Languages size={16} className="text-[var(--sky-blue-500)]" />
+                  <span>{isFa ? "EN" : "فا"}</span>
+                </button>
+
+                {/* Theme Toggle */}
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  title={isFa ? "تغییر پوسته تم" : "Toggle Color Theme"}
+                  className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                >
+                  {theme === "dark" ? (
+                    <Sun size={16} className="text-[var(--orange-500)]" />
+                  ) : (
+                    <Moon size={16} className="text-[var(--orange-500)]" />
+                  )}
+                </button>
+
+                {/* Invoice Icon placed next to Language and Theme */}
+                <Link
+                  href={`/${language}/invoice`}
+                  onClick={handleClose}
+                  title={isFa ? "پرداخت صورتحساب" : "Invoice Payment"}
+                  className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                >
+                  <Receipt size={16} className="text-[var(--sky-blue-500)]" />
+                </Link>
+              </div>
+
               {/* Navigation links inside Drawer */}
               <nav className="flex-1 overflow-y-auto px-6 py-6 space-y-6 scrollbar-none">
                 {/* Base Section */}
                 <div className="space-y-1.5">
                   <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
-                    {isFa ? "پایه" : "Base"}
+                    {isFa ? "مرکز عملیات هسته" : "Core Operations"}
                   </p>
                   <div className="space-y-1">
                     {baseItems.map((item) => {
@@ -191,7 +253,7 @@ export default function AppSidebar({
                 {/* Analysis & Intelligence Section */}
                 <div className="space-y-1.5">
                   <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
-                    {isFa ? "تحلیل و هوشمندی" : "Analysis & Intelligence"}
+                    {isFa ? "هوشمندی و تحلیل‌های ژرف" : "Intelligence & Deep Analysis"}
                   </p>
                   <div className="space-y-1">
                     {analysisItems.map((item) => {
@@ -221,7 +283,7 @@ export default function AppSidebar({
                   </div>
                 </div>
 
-                {/* Settings & Profile Section */}
+                {/* Settings, Profile & Logout Section */}
                 <div className="space-y-1.5 pt-4 border-t border-white/10">
                   <Link
                     href={getLocalizedHref("/settings")}
@@ -233,7 +295,7 @@ export default function AppSidebar({
                       }`}
                   >
                     <Settings size={16} className="shrink-0 text-slate-400" />
-                    <span>{isFa ? "تنظیمات" : "Settings"}</span>
+                    <span>{isFa ? "پیکربندی سیستم" : "System Configuration"}</span>
                   </Link>
                   <Link
                     href={getLocalizedHref("/profile")}
@@ -245,8 +307,19 @@ export default function AppSidebar({
                       }`}
                   >
                     <User size={16} className="shrink-0 text-slate-400" />
-                    <span>{isFa ? "پروفایل" : "Profile"}</span>
+                    <span>{isFa ? "حساب کاربری" : "User Account Profile"}</span>
                   </Link>
+                  {/* Logout Button in Drawer */}
+                  <button
+                    onClick={async () => {
+                      handleClose();
+                      await logout();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-300 border text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 border-transparent cursor-pointer text-start"
+                  >
+                    <LogOut size={16} className="shrink-0 text-rose-400" />
+                    <span>{isFa ? "خروج از سیستم" : "Logout of System"}</span>
+                  </button>
                 </div>
               </nav>
 
