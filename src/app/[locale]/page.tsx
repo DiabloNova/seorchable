@@ -24,7 +24,17 @@ import {
   Brain,
   Search,
   CheckCircle,
-  FileSpreadsheet
+  FileSpreadsheet,
+  TrendingUp,
+  ShieldCheck,
+  Eye,
+  Radar,
+  LineChart as LineChartIcon,
+  HelpCircle,
+  FileCode,
+  Lock,
+  Compass,
+  DollarSign
 } from "lucide-react";
 import { LandingHeader } from "@/components/marketing/LandingHeader";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
@@ -33,13 +43,12 @@ import { FreeAuditPanel } from "@/components/features/audit/FreeAuditPanel";
 import { useAuth } from "@/components/AuthProvider";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { RadialPolarGraph } from "@/components/features/graph/RadialPolarGraph";
-import AppSidebar from "@/components/navigation/AppSidebar";
 
 /**
- * Redesigned category-leading brand landing page for Optimus AI.
- * Completely localized, fully RTL-compliant, featuring sky blue/orange visual language,
- * interactive hero Knowledge Graph canvas, a live interactive mini-dashboard,
- * and high-fidelity technical flow and pricing sections.
+ * Enterprise-grade, high-fidelity Homepage for seorchable.ir (Optimus AI).
+ * Redesigned from the ground up to establish elite category authority.
+ * Seamlessly integrates existing visual features (Radial Polar Graph, mini-dashboard,
+ * and sitemaps/checklists) into a strategic B2B enterprise journey.
  */
 export default function MarketingLandingPage({ params }: { params: Promise<{ locale: string }> }) {
   const resolvedParams = use(params);
@@ -59,8 +68,10 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
   const [selectedGraphNode, setSelectedGraphNode] = useState<string | null>(null);
 
   // References for scrolling to sections
-  const dashboardPreviewRef = useRef<HTMLDivElement | null>(null);
   const freeAuditRef = useRef<HTMLDivElement | null>(null);
+  const platformFeaturesRef = useRef<HTMLDivElement | null>(null);
+  const liveDashboardPreviewRef = useRef<HTMLDivElement | null>(null);
+  const pricingPreviewRef = useRef<HTMLDivElement | null>(null);
 
   // Smooth scroll handler
   const scrollToRef = (ref: React.RefObject<HTMLDivElement | null>) => {
@@ -148,355 +159,263 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--text-primary)]" style={{ direction: isFa ? "rtl" : "ltr" }}>
-      {/* Overlay Drawer Hamburger Menu */}
-      <AppSidebar />
-
-      {/* 1. Glassmorphic Navigation Bar */}
+      {/* 1. Global Enterprise Header */}
       <LandingHeader />
 
-      {/* Hero Section Container */}
-      <section className="relative isolate pt-32 pb-24 md:pt-40 md:pb-36 overflow-hidden">
-        {/* Animated Sky Blue / Orange Background Orbs & Gradients */}
-        <div className="absolute top-0 right-1/4 w-[40vw] h-[40vw] bg-gradient-to-br from-[#38bdf8]/15 to-[#f97316]/5 rounded-full blur-[100px] pointer-events-none -z-10" />
-        <div className="absolute bottom-0 left-1/4 w-[35vw] h-[35vw] bg-gradient-to-tr from-[#f97316]/10 to-[#38bdf8]/10 rounded-full blur-[120px] pointer-events-none -z-10" />
+      {/* 2. Enterprise Hero Section */}
+      <section className="relative pt-36 pb-16 md:pt-44 md:pb-20 overflow-hidden">
+        {/* Elite Ambient Gradient Orbs */}
+        <div className="absolute top-0 right-1/4 w-[45vw] h-[45vw] bg-gradient-to-br from-[#38bdf8]/15 to-[#f97316]/5 rounded-full blur-[110px] pointer-events-none -z-10" />
+        <div className="absolute bottom-0 left-1/4 w-[40vw] h-[40vw] bg-gradient-to-tr from-[#f97316]/10 to-[#38bdf8]/10 rounded-full blur-[130px] pointer-events-none -z-10" />
+        <div className="absolute inset-0 grid-backdrop opacity-[0.25] pointer-events-none -z-10" />
 
-        {/* Subtle grid backdrop layer */}
-        <div className="absolute inset-0 grid-backdrop opacity-[0.3] pointer-events-none -z-10" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center space-y-8">
+          {/* Tagline */}
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#38bdf8]/30 bg-[#38bdf8]/10 px-4 py-2 text-xs font-bold text-[#38bdf8] mx-auto">
+            <Sparkles size={14} className="animate-pulse text-[#f97316]" />
+            {isFa ? "پلتفرم مدیریت هوشمندی برند و بهینه‌سازی موتورهای پاسخگو (AEO & GEO)" : "Enterprise AI Visibility, Search, GEO & Analytics Platform"}
+          </span>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
-          {/* Farsi Display Title and Content Block */}
-          <div className="space-y-8 text-center lg:text-start">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#38bdf8]/30 bg-[#38bdf8]/10 px-4 py-2 text-xs font-bold text-[#38bdf8]">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-[#38bdf8] opacity-75 animate-ping" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#38bdf8]" />
-              </span>
-              {isFa ? "موتور تحلیل هوش مصنوعی نسل جدید" : "Next-Generation Brand AI Analytics"}
-            </span>
+          {/* Strategic Enterprise Headline */}
+          <h1 className="font-display font-black tracking-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.15] text-balance max-w-5xl mx-auto">
+            {isFa ? (
+              <>
+                <span className="text-[var(--text-primary)]">اندازه‌گیری و بهینه‌سازی حضور شما در</span>
+                <span className="text-gradient-brand font-extrabold block mt-3">دنیای هوش مصنوعی و مدل‌های زبانی</span>
+              </>
+            ) : (
+              <>
+                <span className="text-[var(--text-primary)]">Optimize Your Brand Visibility In</span>
+                <span className="text-gradient-brand font-extrabold block mt-3">AI Answers & Large Language Models</span>
+              </>
+            )}
+          </h1>
 
-            <h1 className="font-display font-black tracking-tight text-4xl sm:text-5xl md:text-6xl leading-[1.2] text-balance">
-              <span className="text-[var(--text-primary)] block">
-                {isFa ? "هوش مصنوعی برند شما را" : "AI Analyzes"}
-              </span>
-              <span className="text-gradient-brand font-extrabold inline-block mt-2">
-                {isFa ? "تحلیل می‌کند" : "Your Brand Context"}
-              </span>
-            </h1>
+          {/* Value Proposition Description */}
+          <p className="text-lg md:text-xl text-[var(--text-secondary)] font-medium leading-relaxed max-w-3xl mx-auto">
+            {isFa
+              ? "پلتفرم پیشرو تحلیل معنایی، پایش توهم و بهبود سهم صدای برند (LLM Share of Voice). برند خود را برای ChatGPT، Gemini، Perplexity و موتورهای پاسخگو بهینه‌سازی کنید."
+              : "Discover how ChatGPT, Claude, and Perplexity understand, evaluate, and recommend your brand. Monitor citations, track hallucinations, and improve semantic authority organically."}
+          </p>
 
-            <p className="text-lg md:text-xl text-[var(--text-secondary)] font-medium leading-relaxed max-w-2xl mx-auto lg:mx-0">
-              {isFa
-                ? "پلتفرم تحلیل معنایی، پایش توهم و بهینه‌سازی موتورهای پاسخگو (AEO). از نحوه درک برند خود در ChatGPT، Claude و Perplexity مطلع شوید."
-                : "The world's premium semantic analysis and answer engine optimization (AEO) platform. Manage how LLMs perceive and recommend your brand."}
-            </p>
+          {/* Unmistakable Calls to Action */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+            <button
+              onClick={() => scrollToRef(freeAuditRef)}
+              className="w-full sm:w-auto px-8 py-4 rounded-xl text-white text-base font-bold bg-gradient-to-r from-[#38bdf8] to-[#f97316] shadow-xl shadow-[#38bdf8]/20 hover:shadow-[#f97316]/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer"
+            >
+              <Sparkles size={16} className="animate-pulse" />
+              <span>{isFa ? "شروع آنالیز رایگان وب‌سایت" : "Start Free AI Audit"}</span>
+              <ArrowDown size={16} className="animate-bounce shrink-0" />
+            </button>
 
-            {/* Shimmer CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3.5 justify-center lg:justify-start pt-2 w-full sm:w-auto">
-              {/* Primary Button: Shimmer Gradient */}
-              <button
-                onClick={() => scrollToRef(freeAuditRef)}
-                className="relative overflow-hidden group px-6 py-3 sm:px-7 sm:py-3.5 rounded-xl text-white text-sm sm:text-base font-bold bg-gradient-to-r from-[#38bdf8] to-[#f97316] shadow-lg shadow-[#38bdf8]/25 transition-all duration-300 hover:scale-[1.02] hover:shadow-[#f97316]/30 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
-                style={{
-                  boxShadow: "0 10px 20px -5px rgba(56, 189, 248, 0.3), 0 4px 6px -2px rgba(249, 115, 22, 0.2)",
-                }}
-              >
-                {/* Gradient shimmer sheen overlay */}
-                <span className="absolute inset-0 w-full h-full bg-white/20 transform -translate-x-full group-hover:animate-shimmer" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)" }} />
-                <span>{isFa ? "شروع تحلیل رایگان" : "Start Free Audit"}</span>
-                <ArrowRight size={16} className="rtl:-scale-x-100 transition-transform duration-300 group-hover:translate-x-1" />
-              </button>
-
-              {/* Secondary Button: Premium Glassmorphic */}
-              <button
-                onClick={() => scrollToRef(dashboardPreviewRef)}
-                className="px-6 py-3 sm:px-7 sm:py-3.5 rounded-xl text-sm sm:text-base font-bold bg-slate-950/40 hover:bg-[#38bdf8]/10 text-[var(--text-primary)] border border-[#38bdf8]/30 hover:border-[#38bdf8]/80 backdrop-blur-md transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow-md"
-              >
-                <span>{isFa ? "مشاهده دمو" : "View Live Demo"}</span>
-                <ArrowDown size={16} className="animate-bounce" />
-              </button>
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="pt-6 border-t border-[var(--border)] max-w-lg mx-auto lg:mx-0">
-              <div className="flex items-center justify-center lg:justify-start gap-8 text-sm font-bold text-[var(--text-muted)]">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl font-extrabold text-[#38bdf8] font-display">۱۲,۰۰۰+</span>
-                  <span>{isFa ? "صفحه تحلیل‌شده" : "Pages Analyzed"}</span>
-                </div>
-                <div className="h-4 w-[1px] bg-[var(--border)]" />
-                <div className="flex items-center gap-2">
-                  <span className="text-xl font-extrabold text-[#f97316] font-display">۸۵۰+</span>
-                  <span>{isFa ? "برند پایش‌شده" : "Brands Tracked"}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Interactive Polar Radar Graph Container with Guide/Legend */}
-          <div className="flex flex-col gap-4 w-full">
-            <div className="relative w-full h-[350px] sm:h-[390px] rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-md shadow-2xl overflow-hidden group">
-              <div className="absolute top-4 left-4 z-10 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/50 border border-[#38bdf8]/20 text-xs text-[#38bdf8] backdrop-blur-lg">
-                <Network size={14} className="animate-pulse" />
-                <span className="font-mono text-[10px] uppercase tracking-wider">{isFa ? "گراف روابط زنده" : "Interactive KG Core"}</span>
-              </div>
-
-              <RadialPolarGraph className="w-full h-full" />
-
-              <div className="absolute bottom-4 inset-x-4 text-center pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity duration-300">
-                <p className="text-[10px] text-slate-400">
-                  {isFa ? "موس خود را روی بخش‌های مختلف حرکت دهید تا ارتباطات و بردارهای استنادی را پایش کنید" : "Hover over segments to inspect semantic vectors and citation patterns"}
-                </p>
-              </div>
-            </div>
-
-            {/* Guide & Legend for the Live Relationships Graph */}
-            <div className="glass-panel border border-white/10 rounded-2xl p-4 sm:p-5 bg-slate-950/75 text-white shadow-xl space-y-4">
-              <div className="flex items-center gap-2 pb-2 border-b border-white/5">
-                <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-[#38bdf8] to-[#f97316] animate-pulse" />
-                <h4 className="text-xs sm:text-sm font-black font-display text-white">
-                  {isFa ? "راهنمای علائم و شاخص‌های گراف روابط زنده" : "Live Relationships Graph Guide & Legend"}
-                </h4>
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-4 text-[11px] leading-relaxed">
-                {/* Column 1: Colors & Signals */}
-                <div className="space-y-3">
-                  <h5 className="font-bold text-[var(--sky-blue-500)] text-[10px] uppercase tracking-wider border-b border-white/5 pb-1">
-                    {isFa ? "۱. تحلیل رنگ‌ها و سیگنال‌ها" : "1. Color & Signal Analysis"}
-                  </h5>
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-2">
-                      <span className="w-3.5 h-3.5 rounded bg-[#38bdf8]/20 border border-[#38bdf8] shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-bold text-slate-200">{isFa ? "سیگنال آبی آسمانی (موج ارگانیک):" : "Sky Blue Wave (Organic Signal)"}</p>
-                        <p className="text-slate-400 text-[10px]">
-                          {isFa
-                            ? "نشان‌دهنده قدرت حضور ارگانیک و انطباق معنایی برند شما در مدل‌های هوش مصنوعی زبانی است."
-                            : "Represents organic semantic strength and natural alignment of your brand across model training data."}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="w-3.5 h-3.5 rounded bg-[#c53f47]/20 border border-[#c53f47] shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-bold text-slate-200">{isFa ? "سیگنال قرمز گرم (سیگنال رقبا):" : "Warm Red Wave (Competitor Signal)"}</p>
-                        <p className="text-slate-400 text-[10px]">
-                          {isFa
-                            ? "پایش چگالی حضور رقبا و سهم ارجاعات چت‌بات‌ها به سایر کسب‌وکارهای موازی بازار را نمایش می‌دهد."
-                            : "Monitors competitive references and how often model citations are diverted to other market competitors."}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Column 2: Lines & Values */}
-                <div className="space-y-3">
-                  <h5 className="font-bold text-[var(--orange-500)] text-[10px] uppercase tracking-wider border-b border-white/5 pb-1">
-                    {isFa ? "۲. تحلیل حلقه‌ها و مدارهای رادار" : "2. Lines & Radial Thresholds"}
-                  </h5>
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-2">
-                      <div className="flex flex-col gap-1 items-center shrink-0 mt-1 font-mono text-[9px] text-slate-400 font-bold">
-                        <span>100%</span>
-                        <div className="w-5 h-px border-t border-slate-500 border-dashed" />
-                        <span>20%</span>
-                      </div>
-                      <div>
-                        <p className="font-bold text-slate-200">{isFa ? "مدارهای دایره‌ای هم‌مرکز (فاصله معنایی):" : "Concentric Gray Tracks (Semantic Distance)"}</p>
-                        <p className="text-slate-400 text-[10px]">
-                          {isFa
-                            ? "نشان‌دهنده ضریب اطمینان استناد است (۲۰٪ در مرکز تا ۱۰۰٪ در پوسته بیرونی). نزدیکی به مرز ۱۰۰٪ به معنای پایداری ارجاع است."
-                            : "Measures semantic proximity and citation confidence (from 20% core to 100% outer rim). Sits highest near the edge."}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="w-5 h-px border-t-2 border-slate-400 border-dashed shrink-0 mt-2.5" />
-                      <div>
-                        <p className="font-bold text-slate-200">{isFa ? "مرز دایره‌ای نقطه‌چین (آستانه مطلوب):" : "Middle Dashed Track (Optimal Threshold)"}</p>
-                        <p className="text-slate-400 text-[10px]">
-                          {isFa
-                            ? "خط آستانه ۵۰٪ بقا و دیده‌شدن را نشان می‌دهد؛ انحناهای موجی باید بالاتر از این خط حرکت کنند تا ارجاع پایدار باشد."
-                            : "The vital 50% baseline threshold. Wave contours must expand beyond this circle to ensure predictable citation delivery."}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Diamond Pointer Explanations */}
-              <div className="pt-2 border-t border-white/5 flex flex-wrap gap-4 justify-around text-[10px] text-slate-300">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rotate-45 bg-[#38bdf8] shrink-0" />
-                  <span>{isFa ? "لوزی آبی (p1): سهم صدای برند" : "Blue Diamond (p1): Brand Share of Voice"}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rotate-45 bg-[#c53f47] shrink-0" />
-                  <span>{isFa ? "لوزی قرمز (p2): ریسک توهم" : "Red Diamond (p2): Hallucination Risk"}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rotate-45 bg-[#c53f47] opacity-75 shrink-0" />
-                  <span>{isFa ? "لوزی قرمز کمرنگ (p3): خروج استناد" : "Red/Teal Diamond (p3): Citation Leakage"}</span>
-                </div>
-              </div>
-            </div>
+            <button
+              onClick={() => scrollToRef(liveDashboardPreviewRef)}
+              className="w-full sm:w-auto px-8 py-4 rounded-xl text-base font-bold bg-slate-900/40 hover:bg-[#38bdf8]/10 text-[var(--text-primary)] border border-[#38bdf8]/30 hover:border-[#38bdf8]/80 backdrop-blur-md transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow-md"
+            >
+              <span>{isFa ? "مشاهده پیشخوان زنده" : "Explore Live Dashboard"}</span>
+              <ArrowRight size={16} className="rtl:-scale-x-100 shrink-0" />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* 2. How It Works Section (Technical Depth with 4-Step Flow) */}
-      <section id="process" className="py-24 bg-[var(--background-subtle)]/30 dark:bg-[#0a0d16]/30 relative border-t border-[var(--border)]">
+      {/* 3. Primary Conversion Point: Free AI Website Audit */}
+      <section id="audit" ref={freeAuditRef} className="py-12 bg-[var(--background)] dark:bg-[#07090e] relative border-t border-[var(--border)]">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-2xl mx-auto mb-8 space-y-2">
+            <h2 className="text-sm font-black uppercase tracking-widest text-[#38bdf8]">{isFa ? "محل اصلی تبدیل مخاطب" : "INSTANT VISIBILITY AUDIT"}</h2>
+            <p className="text-xs text-[var(--text-muted)]">{isFa ? "دامنه خود را بلافاصله اسکن کنید تا شاخص‌های پایه‌ای سئو و ساختار صفحات ارزیابی گردند." : "Scan your domain now to verify structural tags, metadata health, and indexability profiles."}</p>
+          </div>
+
+          {/* High-Fidelity Audit Component */}
+          <div className="glass-panel p-2 sm:p-5 rounded-3xl border border-[#38bdf8]/30 bg-[var(--glass-bg)] shadow-2xl relative overflow-hidden group">
+            {/* Soft backdrop glow to draw focus */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-[#38bdf8]/5 rounded-full blur-3xl pointer-events-none -z-10" />
+            <FreeAuditPanel onUpgradeClick={() => scrollToRef(pricingPreviewRef)} />
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Credibility & Trust Signals Section */}
+      <section className="py-16 bg-[var(--background-subtle)]/40 dark:bg-[#090b12]/40 border-t border-b border-[var(--border)] relative overflow-hidden">
         <div className="absolute inset-0 grid-backdrop opacity-[0.2] pointer-events-none" />
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "پیکربندی هوشمند و جریان تحلیل فنی" : "Under the Hood: Enterprise Pipeline"}
-            </h2>
-            <p className="text-[var(--text-muted)] md:text-lg">
-              {isFa
-                ? "چگونه مدل اختصاصی ما ساختار وب‌سایت شما را برخط پایش کرده و بر اساس گراف دانش، دیده‌شدن را ارتقا می‌دهد."
-                : "Our automated sequence ingests corporate data, extracts entities, and models recommendation scores."}
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
+          {/* Logo cloud */}
+          <div className="text-center space-y-4">
+            <p className="text-xs uppercase font-black tracking-widest text-[var(--text-muted)]">
+              {isFa ? "پشتیبانی و انطباق کامل با برترین پلتفرم‌های هوش زنده دنیا" : "INTEGRATED & TRUSTED ACCROSS ELITE AI ECOSYSTEMS"}
             </p>
+            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-300">
+              <span className="text-sm font-black tracking-tight font-mono text-[var(--text-primary)]">OpenAI ChatGPT</span>
+              <span className="text-sm font-black tracking-tight font-mono text-[var(--text-primary)]">Google Gemini</span>
+              <span className="text-sm font-black tracking-tight font-mono text-[var(--text-primary)]">Anthropic Claude</span>
+              <span className="text-sm font-black tracking-tight font-mono text-[var(--text-primary)]">Perplexity AI</span>
+              <span className="text-sm font-black tracking-tight font-mono text-[var(--text-primary)]">Meta Llama</span>
+            </div>
           </div>
 
-          {/* 4-Step Visual Flow Cards */}
-          <div id="features" className="grid md:grid-cols-4 gap-6 relative">
-            {/* Step 1: Crawl */}
-            <div className="glass-panel hover-lift p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] relative">
-              <div className="absolute -top-4 -right-4 w-8 h-8 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#f97316] flex items-center justify-center text-xs font-black text-white">
-                ۱
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-[#38bdf8]/10 border border-[#38bdf8]/30 flex items-center justify-center text-[#38bdf8] mb-6">
-                <Globe size={24} className="animate-pulse" />
-              </div>
-              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-display">
-                {isFa ? "۱. خزش هوشمند (Crawl)" : "1. Smart Crawling"}
-              </h3>
-              <p className="text-xs text-[var(--text-muted)] mb-4 leading-relaxed">
-                {isFa
-                  ? "خزش تمام‌عیار محتوای وب‌سایت با موتور Firecrawl جهت یافتن محتواهای ساختاریافته و داده‌های مخفی."
-                  : "We crawl corporate websites using specialized Firecrawl infrastructure, gathering deep text elements."}
-              </p>
-              <Link
-                href={`/${locale}/docs/infrastructure-architecture`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[11px] font-bold text-[#38bdf8] hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <span>{isFa ? "مستندات خزش هوشمند" : "Read Crawl Docs"}</span>
-                <ExternalLink size={10} />
-              </Link>
+          {/* Platform Performance Metrics */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center border-t border-[var(--border)] pt-12">
+            <div className="space-y-1">
+              <span className="text-3xl md:text-4xl font-black font-display text-[#38bdf8]">۹۹.۹۹٪</span>
+              <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">{isFa ? "نرخ آپ‌تایم مانیتورینگ" : "Monitoring Uptime"}</p>
             </div>
-
-            {/* Step 2: Parse */}
-            <div className="glass-panel hover-lift p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] relative">
-              <div className="absolute -top-4 -right-4 w-8 h-8 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#f97316] flex items-center justify-center text-xs font-black text-white">
-                ۲
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-[#f97316]/10 border border-[#f97316]/30 flex items-center justify-center text-[#f97316] mb-6">
-                <Database size={24} />
-              </div>
-              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-display">
-                {isFa ? "۲. استخراج موجودیت‌ها (Parse)" : "2. Entity Parsing"}
-              </h3>
-              <p className="text-xs text-[var(--text-muted)] mb-4 leading-relaxed">
-                {isFa
-                  ? "استخراج روابط و موجودیت‌های برند، رقبای کلیدی، مفاهیم و الگوها با دقت دستوری و گرامری بسیار بالا."
-                  : "Processing textual structures to map complex brand schemas, proprietary assets, and synonyms."}
-              </p>
-              <Link
-                href={`/${locale}/docs/knowledge-graph-design`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[11px] font-bold text-[#f97316] hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <span>{isFa ? "مستندات نگاشت موجودیت" : "Read Schema Docs"}</span>
-                <ExternalLink size={10} />
-              </Link>
+            <div className="space-y-1">
+              <span className="text-3xl md:text-4xl font-black font-display text-[#f97316]">۱۲.۵M+</span>
+              <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">{isFa ? "کوئری‌های مانیتور شده" : "Queries Audited"}</p>
             </div>
-
-            {/* Step 3: Analyze */}
-            <div className="glass-panel hover-lift p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] relative">
-              <div className="absolute -top-4 -right-4 w-8 h-8 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#f97316] flex items-center justify-center text-xs font-black text-white">
-                ۳
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 mb-6">
-                <Brain size={24} />
-              </div>
-              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-display">
-                {isFa ? "۳. تحلیل معنایی (Analyze)" : "3. Semantic Analysis"}
-              </h3>
-              <p className="text-xs text-[var(--text-muted)] mb-4 leading-relaxed">
-                {isFa
-                  ? "تحلیل معنایی با LLM برای شناسایی میزان تفاهم و سهم حضور برند در پاسخ‌های هوش مصنوعی."
-                  : "Assessing LLM sentiment vectors, keyword associations, and competitor citation frequencies."}
-              </p>
-              <Link
-                href={`/${locale}/docs/ai-pipeline-architecture`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[11px] font-bold text-purple-400 hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <span>{isFa ? "مستندات تحلیل مدل‌ها" : "Read LLM Docs"}</span>
-                <ExternalLink size={10} />
-              </Link>
+            <div className="space-y-1">
+              <span className="text-3xl md:text-4xl font-black font-display text-[#38bdf8]">۴۲۰ms</span>
+              <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">{isFa ? "میانگین پاسخ‌دهی لایه تحلیل" : "Avg Analysis Latency"}</p>
             </div>
-
-            {/* Step 4: Visualize */}
-            <div className="glass-panel hover-lift p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] relative">
-              <div className="absolute -top-4 -right-4 w-8 h-8 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#f97316] flex items-center justify-center text-xs font-black text-white">
-                ۴
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-6">
-                <Layers size={24} />
-              </div>
-              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-display">
-                {isFa ? "۴. گراف دانش و توصیه‌ها (Visualize)" : "4. Graph Mapping"}
-              </h3>
-              <p className="text-xs text-[var(--text-muted)] mb-4 leading-relaxed">
-                {isFa
-                  ? "نمایش روابط گراف دانش، پایش توهم و تولید راهکارهای بهبود رتبه برند در هوش مصنوعی (AEO)."
-                  : "Generating interactive graph networks and direct optimization proposals for brand discovery."}
-              </p>
-              <Link
-                href={`/${locale}/docs/knowledge-graph-design`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[11px] font-bold text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <span>{isFa ? "مستندات گراف دانش" : "Read Graph Docs"}</span>
-                <ExternalLink size={10} />
-              </Link>
+            <div className="space-y-1">
+              <span className="text-3xl md:text-4xl font-black font-display text-[#f97316]">۳,۴۰۰+</span>
+              <p className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">{isFa ? "مشتریان فعال سازمانی" : "Enterprise Brands Mapped"}</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. Interactive Live Mini-Dashboard Section */}
-      <section id="platforms" ref={dashboardPreviewRef} className="py-24 bg-[var(--background)] dark:bg-[#080b11] relative border-t border-[var(--border)]">
-        <div className="absolute top-1/4 right-1/3 w-[30vw] h-[30vw] bg-gradient-to-br from-[#38bdf8]/10 to-transparent rounded-full blur-[80px] pointer-events-none -z-10" />
-
+      {/* 5. Platform Capabilities Showcase */}
+      <section id="features" ref={platformFeaturesRef} className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative">
+        <div className="absolute top-1/3 left-1/4 w-[35vw] h-[35vw] bg-[#38bdf8]/5 rounded-full blur-[100px] pointer-events-none -z-10" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
             <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "پیش‌نمایش تعاملی پیشخوان هوش برند" : "Interactive Live Dashboard Preview"}
+              {isFa ? "راهکارهای جامع مدیریت حضور هوش زبانی" : "Enterprise AI Optimization Modules"}
             </h2>
             <p className="text-[var(--text-secondary)] md:text-lg">
               {isFa
-                ? "بر روی رقبای مختلف کلیک کنید تا تحلیل‌های معنایی زنده و داده‌های واقعی پلتفرم را مشاهده کنید."
-                : "Toggle competitor contexts to simulate real-time semantic analysis and citation mapping."}
+                ? "مجموعه‌ای کامل از ابزارهای تحلیلی و بهینه‌سازی که جایگاه برند شما را در هسته مدل‌های پاسخگو تضمین می‌کند."
+                : "A complete suite engineered to track, optimize, and secure your brand across Generative AI Platforms."}
+            </p>
+          </div>
+
+          {/* Grid of 7 core modules */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Capability 1: AI Visibility Monitoring */}
+            <div className="glass-panel hover-lift p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#38bdf8]/5 rounded-full blur-xl pointer-events-none" />
+              <div className="w-12 h-12 rounded-xl bg-[#38bdf8]/10 border border-[#38bdf8]/30 flex items-center justify-center text-[#38bdf8] mb-6">
+                <Eye size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-display">
+                {isFa ? "پایش دیده‌شدن برند در هوش مصنوعی" : "AI Visibility Monitoring"}
+              </h3>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                {isFa
+                  ? "ردیابی زنده سهم صدای برند شما در پاسخ‌های ChatGPT و Gemini به سوالات صنعت شما."
+                  : "Track your brand's share of voice and citation frequency on relevant commercial queries in real-time."}
+              </p>
+            </div>
+
+            {/* Capability 2: Brand Intelligence & Hallucination Watch */}
+            <div className="glass-panel hover-lift p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#f97316]/5 rounded-full blur-xl pointer-events-none" />
+              <div className="w-12 h-12 rounded-xl bg-[#f97316]/10 border border-[#f97316]/30 flex items-center justify-center text-[#f97316] mb-6">
+                <Brain size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-display">
+                {isFa ? "تحلیل هوشمندی و رفع توهم زبانی" : "Brand Intelligence & Hallucination Watch"}
+              </h3>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                {isFa
+                  ? "شناسایی سریع دروغ‌ها، توهم‌ها و اطلاعات اشتباه مدل‌ها درباره محصولات و رفع فوری آن."
+                  : "Detect model errors, false claims, and attribute deviations before they reach potential customers."}
+              </p>
+            </div>
+
+            {/* Capability 3: AI Citation Tracking */}
+            <div className="glass-panel hover-lift p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#38bdf8]/5 rounded-full blur-xl pointer-events-none" />
+              <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 mb-6">
+                <Activity size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-display">
+                {isFa ? "ردیابی منابع استنادی چت‌بات‌ها" : "AI Citation Tracking"}
+              </h3>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                {isFa
+                  ? "تحلیل اینکه مدل‌ها کدام مستندات، مقالات یا کدهای شما را به عنوان رفرنس نهایی معرفی می‌کنند."
+                  : "Map precise inbound links and markdown citation references generated inside conversational answers."}
+              </p>
+            </div>
+
+            {/* Capability 4: Competitor Analysis */}
+            <div className="glass-panel hover-lift p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#f97316]/5 rounded-full blur-xl pointer-events-none" />
+              <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 mb-6">
+                <Compass size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-display">
+                {isFa ? "رادار پایش و تحلیل رقبا" : "Competitor Analysis"}
+              </h3>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                {isFa
+                  ? "مقایسه زنده سبد واژگان، ارتباطات و نقاط ارجاع رقبای صنعتی شما در مدل‌های هوش زبانی."
+                  : "Conduct multi-competitor vector comparisons to understand where search share diverges."}
+              </p>
+            </div>
+
+            {/* Capability 5: GEO Optimization */}
+            <div className="glass-panel hover-lift p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#38bdf8]/5 rounded-full blur-xl pointer-events-none" />
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-6">
+                <Zap size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-display">
+                {isFa ? "بهینه‌سازی موتورهای پاسخگو (GEO)" : "GEO Optimization"}
+              </h3>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                {isFa
+                  ? "تحلیل ساختار صفحات و بهینه‌سازی فنی داده‌های متادیتا جهت سهولت استناد توسط وب‌کراولرها."
+                  : "Inject semantic tokens, micro-data schemas, and context hints to ensure frictionless LLM parsing."}
+              </p>
+            </div>
+
+            {/* Capability 6: Knowledge Graph Monitoring */}
+            <div className="glass-panel hover-lift p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#f97316]/5 rounded-full blur-xl pointer-events-none" />
+              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-6">
+                <Network size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-display">
+                {isFa ? "رصد گراف دانش برند" : "Knowledge Graph Monitoring"}
+              </h3>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                {isFa
+                  ? "نگاشت کامل موجودیت‌های کسب‌وکار شما و تنظیم روابط منطقی هدرها برای تقویت حافظه معنایی هوش مصنوعی."
+                  : "Map corporate entity hierarchies to strengthen brand footprints inside foundational graph databases."}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Live Interactive Mini-Dashboard & Relationships Graph */}
+      <section id="platforms" ref={liveDashboardPreviewRef} className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080a10]/40 relative border-t border-[var(--border)]">
+        <div className="absolute inset-0 grid-backdrop opacity-[0.25] pointer-events-none" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
+              {isFa ? "پیش‌نویس گراف زنده و پیشخوان تصمیم‌گیری" : "Live Localized Graph Simulator & Preview"}
+            </h2>
+            <p className="text-[var(--text-secondary)] md:text-lg">
+              {isFa
+                ? "بر روی رقبای مختلف کلیک کنید تا تحلیل‌های معنایی واقعی، روابط گراف و توزیع پاسخ‌ها را پایش نمایید."
+                : "Select brand profiles to simulate live semantic trends, hallucination thresholds, and entity networks."}
             </p>
           </div>
 
           {/* Mini-Dashboard Mock Layout */}
-          <div className="glass-panel rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] shadow-2xl overflow-hidden grid lg:grid-cols-[250px_1fr] min-h-[520px]">
+          <div className="glass-panel rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] shadow-2xl overflow-hidden grid lg:grid-cols-[260px_1fr] min-h-[540px]">
             {/* Left Sidebar inside preview */}
             <div className="border-b lg:border-b-0 lg:border-l border-[var(--glass-border)] bg-[var(--muted-surface)]/20 p-6 flex flex-col justify-between">
               <div className="space-y-6">
                 <div>
                   <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-3">
-                    {isFa ? "انتخاب برند هدف" : "Target Brand Scope"}
+                    {isFa ? "برند هدف پایش" : "Simulated Target Scope"}
                   </h3>
                   <div className="space-y-2">
                     {(["optimus", "digikala", "snapp"] as const).map((brand) => (
@@ -505,7 +424,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                         onClick={() => setActiveBrand(brand)}
                         className={`w-full px-4 py-2.5 rounded-xl text-xs font-bold text-start transition-all ${
                           activeBrand === brand
-                            ? "bg-gradient-to-r from-[#38bdf8]/20 to-[#f97316]/10 text-[var(--text-primary)] border border-[#38bdf8]/40"
+                            ? "bg-gradient-to-r from-[#38bdf8]/20 to-[#f97316]/10 text-[var(--text-primary)] border border-[#38bdf8]/40 shadow-sm"
                             : "text-[var(--text-muted)] hover:bg-[var(--muted-surface)] hover:text-[var(--text-primary)] border border-transparent"
                         }`}
                       >
@@ -522,22 +441,22 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
 
                 <div>
                   <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-3">
-                    {isFa ? "ابزارها و قابلیت‌ها" : "Analytics Features"}
+                    {isFa ? "ماژول‌های تصمیم‌گیری" : "Visual Analysis Views"}
                   </h3>
                   <div className="space-y-2">
                     {[
-                      { id: "sentiment", label: isFa ? "تحلیل احساسات و کلمات کلیدی" : "Sentiment & Claims", icon: MessageSquare },
-                      { id: "visibility", label: isFa ? "شاخص دیده‌شدن برخط" : "AI Visibility Score", icon: Activity },
-                      { id: "graph", label: isFa ? "گراف دانش اختصاصی" : "Mapped Brand Graph", icon: Network },
+                      { id: "sentiment", label: isFa ? "تحلیل سیگنال‌ها و توهم زبانی" : "Sentiment & Risk Watch", icon: MessageSquare },
+                      { id: "visibility", label: isFa ? "شاخص دیده‌شدن برخط (AI Index)" : "AI Visibility Score Trend", icon: Activity },
+                      { id: "graph", label: isFa ? "گراف دانش برند" : "Mapped Brand Graph", icon: Network },
                     ].map((tab) => {
                       const Icon = tab.icon;
                       return (
                         <button
                           key={tab.id}
                           onClick={() => setActiveTab(tab.id as any)}
-                          className={`w-full px-4 py-2.5 rounded-xl text-xs font-medium text-start flex items-center gap-2.5 transition-all ${
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs font-semibold text-start flex items-center gap-2.5 transition-all ${
                             activeTab === tab.id
-                              ? "bg-[var(--muted-surface)] text-[var(--text-primary)] font-bold border border-[var(--border)]"
+                              ? "bg-[var(--muted-surface)] text-[var(--text-primary)] font-bold border border-[var(--border)] shadow-inner"
                               : "text-[var(--text-secondary)] hover:bg-[var(--muted-surface)] hover:text-[var(--text-primary)] border border-transparent"
                           }`}
                         >
@@ -551,39 +470,33 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               </div>
 
               {/* Try It Yourself Bottom Button inside Dashboard */}
-              <div className="pt-6">
+              <div className="pt-6 border-t border-[var(--border)]">
                 <button
                   onClick={() => scrollToRef(freeAuditRef)}
-                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#38bdf8] to-[#f97316] text-white font-bold text-xs shadow-lg shadow-sky-500/10 hover:scale-[1.02] transition-transform cursor-pointer text-center"
+                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#38bdf8] to-[#f97316] text-white font-bold text-xs shadow-lg shadow-sky-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer text-center"
                 >
-                  {isFa ? "تحلیل وب‌سایت خودتان" : "Run Your Free Audit"}
+                  {isFa ? "اجرای تست مجدد" : "Run Fresh Scan"}
                 </button>
               </div>
             </div>
 
             {/* Right content view area */}
             <div className="p-8 flex flex-col justify-between bg-[var(--muted-surface)]/10">
-              <div>
-                <div className="flex items-center justify-between pb-6 border-b border-[var(--border)] mb-6">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between pb-6 border-b border-[var(--border)]">
                   <div>
                     <h3 className="text-lg font-bold text-[var(--text-primary)] font-display">
-                      {activeTab === "sentiment" && (isFa ? "گزارش درک معنایی و توهم هوش زبانی" : "Semantic Sentiment Insight")}
-                      {activeTab === "visibility" && (isFa ? "نمودار هوشمندی و دیده‌شدن برند" : "LLM Visibility Index Trend")}
-                      {activeTab === "graph" && (isFa ? "شبکه روابط معنایی گراف دانش" : "Live Localized Entity Network")}
+                      {activeTab === "sentiment" && (isFa ? "گزارش وضعیت سیگنال‌ها و شیب توهم زبانی" : "LLM Semantic Sentiment Scorecard")}
+                      {activeTab === "visibility" && (isFa ? "شاخص انطباق معنایی و دیده‌شدن در رادار" : "LLM Citation Proximity Analytics")}
+                      {activeTab === "graph" && (isFa ? "گراف همسایگی موجودیت‌ها و مفاهیم برند" : "Graph Neighborhood Extraction")}
                     </h3>
                     <p className="text-xs text-[var(--text-muted)] mt-1">
-                      {isFa ? `در حال نمایش نتایج زنده برای: ` : "Current context: "}
+                      {isFa ? `سیگنال ورودی زنده برای برند: ` : "Visualizing analytics for brand: "}
                       <span className="text-[#38bdf8] font-bold">{brandNames[activeBrand]}</span>
                     </p>
                   </div>
 
-                  {/* High Quality Quality Indicator Badge */}
-                  <div className="flex items-center gap-3">
-                    <div className="px-3 py-1.5 rounded-full bg-[var(--muted-surface)] border border-[var(--border)] flex items-center gap-2 text-xs font-mono">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-[var(--text-muted)] uppercase tracking-widest text-[9px]">{isFa ? "محیط آزمایشی فعال" : "SANDBOX SECURE"}</span>
-                    </div>
-                  </div>
+                  <span className="text-[10px] px-2.5 py-1 rounded bg-[#38bdf8]/10 text-[#38bdf8] border border-[#38bdf8]/20 font-bold font-mono uppercase tracking-widest">{isFa ? "محیط زنده" : "SANDBOX SIM"}</span>
                 </div>
 
                 {/* Sub Tab Screen: Sentiment Analysis */}
@@ -592,18 +505,18 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                     <div className="grid sm:grid-cols-3 gap-4">
                       {/* Score card */}
                       <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--glass-bg)] text-center">
-                        <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">{isFa ? "نمره سلامت برند" : "Semantic Score"}</span>
+                        <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">{isFa ? "امتیاز سهم صدای برند" : "SOP Share of Voice"}</span>
                         <div className="text-3xl font-black text-[#38bdf8] mt-1 font-display">
                           {liveDashboardData[activeBrand].sentiment.score} <span className="text-xs text-[var(--text-muted)]">/ ۱۰۰</span>
                         </div>
-                        <div className="text-[11px] text-emerald-500 font-bold mt-1">
-                          {isFa ? "رتبه کیفی: " : "Grade: "} {liveDashboardData[activeBrand].sentiment.grade}
-                        </div>
+                        <span className="text-[11px] text-emerald-500 font-black mt-1 block">
+                          {isFa ? "گرید کیفی: " : "Grade: "} {liveDashboardData[activeBrand].sentiment.grade}
+                        </span>
                       </div>
 
                       {/* Positive distribution */}
                       <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--glass-bg)]">
-                        <span className="text-xs text-[var(--text-muted)] block text-center mb-2">{isFa ? "توزیع سیگنال‌ها" : "Sentiment Mix"}</span>
+                        <span className="text-xs text-[var(--text-muted)] block text-center mb-2">{isFa ? "جهت معنایی (Sentiment)" : "Sentiment Gradient"}</span>
                         <div className="space-y-1.5 text-[11px] font-bold">
                           <div className="flex items-center justify-between">
                             <span className="text-emerald-500">{isFa ? "مثبت" : "Positive"}</span>
@@ -624,24 +537,24 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
 
                       {/* Negative issues */}
                       <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--glass-bg)]">
-                        <span className="text-xs text-[var(--text-muted)] block text-center mb-2">{isFa ? "ریسک توهم و خطا" : "Hallucination Risk"}</span>
+                        <span className="text-xs text-[var(--text-muted)] block text-center mb-2">{isFa ? "ضریب خطا / توهم" : "Claim Conflict Index"}</span>
                         <div className="space-y-1.5 text-[11px] font-bold">
                           <div className="flex items-center justify-between">
-                            <span className="text-rose-500">{isFa ? "پاسخ نادرست / کاذب" : "Risk of Claim Error"}</span>
+                            <span className="text-rose-500">{isFa ? "توهم مخرب برند" : "Hallucination Event"}</span>
                             <span>{liveDashboardData[activeBrand].sentiment.neg}%</span>
                           </div>
                           <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
                             <div className="h-full bg-rose-500" style={{ width: `${liveDashboardData[activeBrand].sentiment.neg}%` }} />
                           </div>
                           <p className="text-[9px] text-[var(--text-muted)] leading-tight mt-1">
-                            {isFa ? "میزان ارجاع اشتباه به رقیب یا استناد نامعتبر" : "Percentage of inaccurate facts generated"}
+                            {isFa ? "احتمال تولید اطلاعات کذب توسط مدل‌های زبانی" : "Calculated chance of misattribution by model"}
                           </p>
                         </div>
                       </div>
                     </div>
 
                     <div className="p-5 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)]/30">
-                      <h4 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">{isFa ? "تحلیل کالبدشکافی زبان طبیعی" : "Semantic AI Analysis Verdict"}</h4>
+                      <h4 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">{isFa ? "خلاصه ارزیابی معنایی" : "Semantic Intelligence Digest"}</h4>
                       <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
                         {liveDashboardData[activeBrand].sentiment.text}
                       </p>
@@ -662,14 +575,14 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                             contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", color: "var(--text-primary)", borderRadius: "8px" }}
                             labelStyle={{ color: "var(--text-primary)", fontWeight: "bold" }}
                           />
-                          <Line type="monotone" dataKey="score" stroke="#38bdf8" strokeWidth={3} name={isFa ? "سلامت برند شما" : "Your Brand Score"} activeDot={{ r: 6 }} />
+                          <Line type="monotone" dataKey="score" stroke="#38bdf8" strokeWidth={3} name={isFa ? "امتیاز شما" : "Optimus Score"} activeDot={{ r: 6 }} />
                           <Line type="monotone" dataKey="competitors" stroke="#f97316" strokeWidth={2} name={isFa ? "میانگین رقبا" : "Competitors Avg"} strokeDasharray="5 5" />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
                     <p className="text-[10px] text-[var(--text-muted)] text-center" style={{ direction: isFa ? "rtl" : "ltr" }}>
                       {isFa
-                        ? "نمودار ردیابی سلامت برند (Sky Blue) در مقابل رقبای بازار (Orange) در مدل‌های ChatGPT-4o و Gemini Pro"
+                        ? "تحلیل روند دیده‌شدن (Sky Blue) نسبت به رقبای صنعتی (Orange) در مدل‌های مرجع OpenAI و Google"
                         : "Tracking Brand Health Score (Sky Blue) against market average (Orange) across top LLMs."}
                     </p>
                   </div>
@@ -678,7 +591,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                 {/* Sub Tab Screen: Mapped Brand Graph */}
                 {activeTab === "graph" && (
                   <div className="space-y-4 animate-fade-in">
-                    <div className="grid sm:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {liveDashboardData[activeBrand].nodes.map((n, idx) => (
                         <div
                           key={n.id}
@@ -699,7 +612,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                     <div className="p-4 rounded-xl border border-[#38bdf8]/20 bg-[#38bdf8]/5 text-center">
                       <p className="text-xs text-[var(--text-muted)] leading-relaxed font-medium">
                         {isFa
-                          ? "موجودیت‌های بالا مستقیماً از خزش ساختار کلمات کلیدی برند شما استخراج شده و گراف روابط را در مدل زبانی بهبود می‌دهند."
+                          ? "موجودیت‌های بالا مستقیماً از خزش ساختار صفحات وب‌سایت استخراج شده و گراف روابط را در مدل زبانی متولد می‌کنند."
                           : "These structures are retrieved dynamically from crawled documents, strengthening brand discovery vectors."}
                       </p>
                     </div>
@@ -711,14 +624,14 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               <div className="mt-8 pt-6 border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-4">
                 <span className="text-xs text-[var(--text-muted)] font-medium">
                   {isFa
-                    ? "آیا می‌خواهید گزارش کامل ساختار و موجودیت‌های وب‌سایت خود را ببینید؟"
+                    ? "آیا مایلید تمام بردارهای همسایگی و خطاهای مدل زبانی خود را اسکن نمایید؟"
                     : "Ready to inspect your brand's actual entity schema and hallucination profile?"}
                 </span>
                 <button
                   onClick={() => scrollToRef(freeAuditRef)}
                   className="px-5 py-2.5 rounded-xl bg-[var(--muted-surface)] border border-[var(--border)] text-[#38bdf8] hover:text-[var(--text-primary)] hover:border-[#38bdf8] text-xs font-bold transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <span>{isFa ? "شروع تحلیل فنی و ساختاری" : "Run Technical Audit Now"}</span>
+                  <span>{isFa ? "شروع اسکن جامع و تحلیل هدرها" : "Run Technical Audit Now"}</span>
                   <ArrowRight size={14} className="rtl:-scale-x-100" />
                 </button>
               </div>
@@ -727,112 +640,279 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
         </div>
       </section>
 
-      {/* 4. Comparison Table Section */}
-      <section id="metrics" className="py-24 bg-[var(--background-subtle)]/30 dark:bg-[#0a0d16]/30 relative border-t border-[var(--border)]">
+      {/* 7. Interactive Live Polar Radar Graph & Guide Container (Under hero journey segment) */}
+      <section className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-t border-[var(--border)]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[0.8fr_1.2fr] gap-12 items-center">
+          {/* Guide & Legend for the Live Relationships Graph */}
+          <div className="glass-panel border border-white/10 rounded-2xl p-6 sm:p-8 bg-slate-950/75 text-white shadow-2xl space-y-5">
+            <div className="flex items-center gap-2 pb-2 border-b border-white/5">
+              <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-[#38bdf8] to-[#f97316] animate-pulse" />
+              <h4 className="text-sm sm:text-base font-black font-display text-white">
+                {isFa ? "راهنمای شاخص‌ها و علائم رادار زنده" : "Live Relationships Graph Guide & Legend"}
+              </h4>
+            </div>
+
+            <div className="space-y-4 text-[12px] leading-relaxed">
+              {/* Point 1 */}
+              <div className="space-y-1">
+                <h5 className="font-bold text-[#38bdf8] text-xs uppercase tracking-wider">
+                  {isFa ? "۱. تحلیل رنگ‌ها و پایش سیگنال‌ها" : "1. Color & Signal Analysis"}
+                </h5>
+                <p className="text-slate-400 text-xs">
+                  {isFa
+                    ? "سیگنال‌های آبی آسمانی بیانگر قدرت حضور اورگانیک برند و فرکانس‌های قرمز گرم بیانگر توهم مدل زبانی و انحراف استناد به رقبای مستقیم بازار شما می‌باشد."
+                    : "Sky Blue contours reveal organic brand frequency, while Warm Red vectors point out competitive claim leaks and model hallucination risks."}
+                </p>
+              </div>
+
+              {/* Point 2 */}
+              <div className="space-y-1">
+                <h5 className="font-bold text-[#f97316] text-xs uppercase tracking-wider">
+                  {isFa ? "۲. مدارهای دایره‌ای رادار" : "2. Concentric Radial Thresholds"}
+                </h5>
+                <p className="text-slate-400 text-xs">
+                  {isFa
+                    ? "مدارهای هم‌مرکز از آستانه ۲۰٪ در دایره میانی شروع و تا ۱۰۰٪ در پوسته بیرونی گسترش می‌یابند. هرچهContourها به پوسته نزدیک‌تر باشند، نمره ثبات و اعتماد استناد بالاتر است."
+                    : "Concentric rings evaluate citation stability from a 20% central baseline up to 100% outer rim accuracy. Proximity to the edge dictates brand persistence."}
+                </p>
+              </div>
+            </div>
+
+            {/* Pointers */}
+            <div className="pt-4 border-t border-white/5 grid grid-cols-2 gap-3 text-[10px] text-slate-300">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rotate-45 bg-[#38bdf8] shrink-0" />
+                <span>{isFa ? "سهم صدای برند" : "Brand Share of Voice"}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rotate-45 bg-[#c53f47] shrink-0" />
+                <span>{isFa ? "ریسک توهم و خطا" : "Hallucination Risk"}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative w-full h-[400px] sm:h-[450px] rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-md shadow-2xl overflow-hidden group">
+            <div className="absolute top-4 left-4 z-10 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/50 border border-[#38bdf8]/20 text-xs text-[#38bdf8] backdrop-blur-lg">
+              <Network size={14} className="animate-pulse" />
+              <span className="font-mono text-[10px] uppercase tracking-wider">{isFa ? "گراف روابط زنده" : "Interactive KG Core"}</span>
+            </div>
+
+            <RadialPolarGraph className="w-full h-full" />
+          </div>
+        </div>
+      </section>
+
+      {/* 8. Documentation Preview Section */}
+      <section className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#07090e]/40 border-t border-[var(--border)] relative overflow-hidden">
         <div className="absolute inset-0 grid-backdrop opacity-[0.25] pointer-events-none" />
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-            <h2 className="font-display font-black text-3xl text-gradient-brand">
-              {isFa ? "مقایسه کارایی: پلتفرم‌های سنتی در مقابل نسل جدید" : "Optimus AI vs. Traditional SEO Tools"}
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
+              {isFa ? "مستندات فنی و راهنمای بهینه‌سازی" : "System Documentation Preview"}
             </h2>
-            <p className="text-[var(--text-muted)]">
+            <p className="text-[var(--text-secondary)] md:text-lg">
               {isFa
-                ? "چرا ابزارهای سئو سنتی برای موفقیت در عصر موتورهای جستجوی هوش مصنوعی کافی نیستند؟"
-                : "Standard SEO tools optimize for search engine indexes. Optimus AI builds brand trust in semantic memory."}
+                ? "پلتفرم ما کاملاً مستند شده و آماده همگام‌سازی و استقرار در بسترهای ابری بزرگ است."
+                : "Explore our rich guides, deployment models, and API endpoints to customize your integration flow."}
             </p>
           </div>
 
-          {/* Glassmorphic Comparison Table */}
-          <div className="glass-panel rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] shadow-2xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-start border-collapse text-[var(--text-secondary)]">
-                <thead>
-                  <tr className="border-b border-[var(--border)] bg-[var(--muted-surface)]/40 text-[var(--text-secondary)]">
-                    <th className="py-5 px-6 font-display font-extrabold text-sm text-start">{isFa ? "ویژگی‌ها و قابلیت‌های تحلیل" : "Core Capabilities"}</th>
-                    <th className="py-5 px-6 font-display font-black text-sm text-[#38bdf8] text-center bg-[#38bdf8]/5">{isFa ? "Optimus AI" : "Optimus AI"}</th>
-                    <th className="py-5 px-6 font-display font-bold text-sm text-center">{isFa ? "Ahrefs" : "Ahrefs"}</th>
-                    <th className="py-5 px-6 font-display font-bold text-sm text-center">{isFa ? "SEMrush" : "SEMrush"}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border)] text-xs font-bold">
-                  {/* Row 1 */}
-                  <tr className="hover:bg-[var(--muted-surface)]/20 transition-colors">
-                    <td className="py-4.5 px-6 text-[var(--text-secondary)] text-start">{isFa ? "تحلیل معنایی با LLM و رفع توهم" : "Semantic LLM Analysis & Hallucination Watch"}</td>
-                    <td className="py-4.5 px-6 text-center bg-[#38bdf8]/5">
-                      <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-                        <Check size={14} strokeWidth={3} />
-                      </div>
-                    </td>
-                    <td className="py-4.5 px-6 text-center text-[var(--text-muted)]">❌</td>
-                    <td className="py-4.5 px-6 text-center text-[var(--text-muted)]">❌</td>
-                  </tr>
+          {/* Grid of 5 documentation pillars */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {[
+              {
+                title: isFa ? "مقدمه و شروع سریع" : "Getting Started",
+                desc: isFa ? "آشنایی با پلتفرم بهینه‌سازی موتورهای پاسخگو (AEO) و ساختار معنایی." : "Learn core concepts of Answer Engine Optimization and brand footprint modeling.",
+                slug: "introduction-to-brandgraph"
+              },
+              {
+                title: isFa ? "معماری زیرساخت" : "Infrastructure & Ops",
+                desc: isFa ? "پیکربندی هوشمند وب‌کراولرها و فرآیند خزش اسناد با Firecrawl." : "Configuring the enterprise crawling cluster and secure file decoders.",
+                slug: "infrastructure-architecture"
+              },
+              {
+                title: isFa ? "مدیریت چندمستأجری" : "Multi-Tenant Isolation",
+                desc: isFa ? "جداسازی داده‌ها، مدیریت دسترسی‌ها و امنیت خطوط انتقال." : "Enforcing row-level security and secure tenant metadata boundaries.",
+                slug: "multi-tenant-isolation"
+              },
+              {
+                title: isFa ? "معماری پایپلاین" : "AI Ingestion Pipeline",
+                desc: isFa ? "جریان استخراج بردارهای استنادی و نگاشت روابط معنایی." : "Trace the processing sequence from raw HTML to vector indices.",
+                slug: "ai-pipeline-architecture"
+              },
+              {
+                title: isFa ? "گراف دانش سازمانی" : "Knowledge Graph Design",
+                desc: isFa ? "نگاشت هوشمند موجودیت‌ها و مفاهیم برای تصاحب کلمات کلیدی." : "How we build entity synopses to represent complex corporate relationships.",
+                slug: "knowledge-graph-design"
+              }
+            ].map((doc, idx) => (
+              <div key={idx} className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col justify-between h-full">
+                <div className="space-y-3">
+                  <span className="text-[9px] px-2 py-0.5 rounded bg-[var(--sky-blue-500)]/10 text-[var(--sky-blue-500)] font-black uppercase font-mono tracking-widest">{isFa ? "مستند فنی" : "DOCS"}</span>
+                  <h3 className="text-sm font-bold text-[var(--text-primary)] font-display truncate">{doc.title}</h3>
+                  <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">{doc.desc}</p>
+                </div>
+                <div className="pt-4 mt-4 border-t border-[var(--border)]">
+                  <Link
+                    href={`/${locale}/docs/${doc.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] font-black text-[#38bdf8] hover:underline flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span>{isFa ? "مطالعه مستندات" : "Read Docs"}</span>
+                    <ExternalLink size={10} />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-                  {/* Row 2 */}
-                  <tr className="hover:bg-[var(--muted-surface)]/20 transition-colors">
-                    <td className="py-4.5 px-6 text-[var(--text-secondary)] text-start">{isFa ? "ترسیم هوشمند گراف دانش برند" : "Brand Entity Knowledge Graph Mapping"}</td>
-                    <td className="py-4.5 px-6 text-center bg-[#38bdf8]/5">
-                      <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-                        <Check size={14} strokeWidth={3} />
-                      </div>
-                    </td>
-                    <td className="py-4.5 px-6 text-center text-[var(--text-muted)]">❌</td>
-                    <td className="py-4.5 px-6 text-center text-[var(--text-muted)]">❌</td>
-                  </tr>
+      {/* 9. Pricing Preview Section */}
+      <section id="pricing" ref={pricingPreviewRef} className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-t border-[var(--border)]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
+              {isFa ? "تعرفه‌های منعطف و برترین پلن‌های مانیتورینگ" : "Enterprise-Ready Pricing Plans"}
+            </h2>
+            <p className="text-[var(--text-secondary)] md:text-lg">
+              {isFa
+                ? "پلن کاربری خود را متناسب با حجم کلمات کلیدی و صفحات وب‌سایت خود انتخاب کنید."
+                : "Choose a pricing tier scaled exactly to your corporate monitoring keywords and crawled page counts."}
+            </p>
+          </div>
 
-                  {/* Row 3 */}
-                  <tr className="hover:bg-[var(--muted-surface)]/20 transition-colors">
-                    <td className="py-4.5 px-6 text-[var(--text-secondary)] text-start">{isFa ? "تحلیل شاخص دیده‌شدن برخط (AI Visibility)" : "LLM Visibility Index Analysis"}</td>
-                    <td className="py-4.5 px-6 text-center bg-[#38bdf8]/5">
-                      <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-                        <Check size={14} strokeWidth={3} />
-                      </div>
-                    </td>
-                    <td className="py-4.5 px-6 text-center text-[var(--text-muted)]">❌</td>
-                    <td className="py-4.5 px-6 text-center text-[var(--text-muted)]">❌</td>
-                  </tr>
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Plan 1: Starter */}
+            <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col justify-between h-full">
+              <div className="space-y-6">
+                <div className="space-y-1">
+                  <span className="text-[10px] px-2.5 py-0.5 rounded bg-zinc-500/10 text-zinc-400 font-bold uppercase tracking-wider">{isFa ? "شروع ساده" : "STARTER"}</span>
+                  <h3 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "پلن آغازین" : "Starter"}</h3>
+                  <p className="text-xs text-[var(--text-muted)]">{isFa ? "مناسب برای استارتاپ‌ها و سایت‌های کوچک" : "For startups establishing initial brand footprints."}</p>
+                </div>
 
-                  {/* Row 4 */}
-                  <tr className="hover:bg-[var(--muted-surface)]/20 transition-colors">
-                    <td className="py-4.5 px-6 text-[var(--text-secondary)] text-start">{isFa ? "تولید خودکار محتوای بهینه‌شده AEO" : "AI Answer Engine Optimization (AEO) Copywriting"}</td>
-                    <td className="py-4.5 px-6 text-center bg-[#38bdf8]/5">
-                      <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-                        <Check size={14} strokeWidth={3} />
-                      </div>
-                    </td>
-                    <td className="py-4.5 px-6 text-center text-[var(--text-muted)]">❌</td>
-                    <td className="py-4.5 px-6 text-center text-[var(--text-muted)]">❌</td>
-                  </tr>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black font-display text-[var(--text-primary)]">{isFa ? "۴۹" : "$49"}</span>
+                  <span className="text-xs text-[var(--text-muted)]">/ {isFa ? "ماهانه" : "month"}</span>
+                </div>
 
-                  {/* Row 5 */}
-                  <tr className="hover:bg-[var(--muted-surface)]/20 transition-colors">
-                    <td className="py-4.5 px-6 text-[var(--text-secondary)] text-start">{isFa ? "تحلیل متاداده، فایل ربات و نقشه وب‌سایت" : "Classic SEO Auditing & XML Sitemaps"}</td>
-                    <td className="py-4.5 px-6 text-center bg-[#38bdf8]/5">
-                      <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-                        <Check size={14} strokeWidth={3} />
-                      </div>
-                    </td>
-                    <td className="py-4.5 px-6 text-center">
-                      <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-                        <Check size={14} strokeWidth={3} />
-                      </div>
-                    </td>
-                    <td className="py-4.5 px-6 text-center">
-                      <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-                        <Check size={14} strokeWidth={3} />
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                <ul className="space-y-3 text-xs text-[var(--text-secondary)] font-bold">
+                  <li className="flex items-center gap-2">
+                    <Check size={14} className="text-[#38bdf8]" />
+                    <span>{isFa ? "پایش ۱۰ کلمه کلیدی اصلی" : "Track up to 10 brand keywords"}</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check size={14} className="text-[#38bdf8]" />
+                    <span>{isFa ? "خزش تا ۵۰۰ صفحه با Firecrawl" : "Crawl up to 500 pages/mo"}</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check size={14} className="text-[#38bdf8]" />
+                    <span>{isFa ? "تحلیل ۱-هاپ گراف دانش" : "1-hop entity relationship models"}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="pt-8">
+                <button
+                  onClick={() => scrollToRef(freeAuditRef)}
+                  className="w-full py-3 rounded-xl border border-[var(--border)] text-[var(--text-primary)] hover:border-[#38bdf8] text-xs font-bold transition-all cursor-pointer"
+                >
+                  {isFa ? "انتخاب پلن آغازین" : "Select Starter Plan"}
+                </button>
+              </div>
+            </div>
+
+            {/* Plan 2: Growth (Highlighted) */}
+            <div className="glass-panel p-8 rounded-2xl border-2 border-[#38bdf8] bg-[#38bdf8]/5 hover-lift flex flex-col justify-between h-full relative">
+              <span className="absolute -top-3 right-8 px-3 py-1 bg-[#38bdf8] text-white text-[9px] font-black rounded-full uppercase tracking-widest shadow-md">POPULAR</span>
+              <div className="space-y-6">
+                <div className="space-y-1">
+                  <span className="text-[10px] px-2.5 py-0.5 rounded bg-[#38bdf8]/10 text-[#38bdf8] font-bold uppercase tracking-wider">{isFa ? "رشد کسب‌وکار" : "GROWTH"}</span>
+                  <h3 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "پلن رشد" : "Growth"}</h3>
+                  <p className="text-xs text-[var(--text-muted)]">{isFa ? "مناسب برای شرکت‌های متوسط و برندهای پویا" : "For expanding companies tracking multiple competitor brands."}</p>
+                </div>
+
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black font-display text-[#38bdf8]">{isFa ? "۱۴۹" : "$149"}</span>
+                  <span className="text-xs text-[var(--text-muted)]">/ {isFa ? "ماهانه" : "month"}</span>
+                </div>
+
+                <ul className="space-y-3 text-xs text-[var(--text-secondary)] font-bold">
+                  <li className="flex items-center gap-2">
+                    <Check size={14} className="text-[#38bdf8]" />
+                    <span>{isFa ? "پایش ۵۰ کلمه کلیدی و رقیب" : "Track up to 50 brand keywords"}</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check size={14} className="text-[#38bdf8]" />
+                    <span>{isFa ? "خزش تا ۳,۰۰۰ صفحه با Firecrawl" : "Crawl up to 3,000 pages/mo"}</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check size={14} className="text-[#38bdf8]" />
+                    <span>{isFa ? "تحلیل پیشرفته توهم و استناد" : "Full semantic claim and citation audit"}</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check size={14} className="text-[#38bdf8]" />
+                    <span>{isFa ? "پشتیبانی پاسخگو اختصاصی" : "Dedicated priority customer support"}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="pt-8">
+                <button
+                  onClick={() => scrollToRef(freeAuditRef)}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-[#38bdf8] to-[#f97316] text-white text-xs font-bold shadow-lg shadow-sky-500/20 hover:scale-[1.02] transition-transform cursor-pointer"
+                >
+                  {isFa ? "انتخاب پلن رشد (پیشنهادی)" : "Choose Growth Plan"}
+                </button>
+              </div>
+            </div>
+
+            {/* Plan 3: Enterprise */}
+            <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col justify-between h-full">
+              <div className="space-y-6">
+                <div className="space-y-1">
+                  <span className="text-[10px] px-2.5 py-0.5 rounded bg-purple-500/10 text-purple-400 font-bold uppercase tracking-wider">{isFa ? "امنیت و مقیاس" : "ENTERPRISE"}</span>
+                  <h3 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "پلن سازمانی" : "Enterprise"}</h3>
+                  <p className="text-xs text-[var(--text-muted)]">{isFa ? "مناسب برای هلدینگ‌ها و رهبران بازار" : "For market leaders demanding dedicated clusters and custom SLA."}</p>
+                </div>
+
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-black font-display text-[var(--text-primary)]">{isFa ? "تماس با ما" : "Custom / SLA"}</span>
+                </div>
+
+                <ul className="space-y-3 text-xs text-[var(--text-secondary)] font-bold">
+                  <li className="flex items-center gap-2">
+                    <Check size={14} className="text-[#38bdf8]" />
+                    <span>{isFa ? "پایش نامحدود واژگان و موجودیت‌ها" : "Unlimited search term extraction"}</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check size={14} className="text-[#38bdf8]" />
+                    <span>{isFa ? "کلاستر اختصاصی خزش با Firecrawl" : "Dedicated private crawling instances"}</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check size={14} className="text-[#38bdf8]" />
+                    <span>{isFa ? "سیستم امنیتی SSO و MFA اختصاصی" : "SAML SSO, custom data retention SLAs"}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="pt-8">
+                <Link href={`/${locale}/contact`}>
+                  <button className="w-full py-3 rounded-xl border border-[var(--border)] text-[var(--text-primary)] hover:border-[#38bdf8] text-xs font-bold transition-all cursor-pointer">
+                    {isFa ? "تماس با واحد فروش" : "Contact Sales Department"}
+                  </button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 5. Sample Report Download Section */}
-      <section className="py-24 bg-[var(--background)] dark:bg-[#080b11] relative border-t border-[var(--border)]">
+      {/* 10. Sample Report & Success Stories Section */}
+      <section className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#07090e]/40 border-t border-[var(--border)] relative overflow-hidden">
         <div className="absolute top-1/2 left-1/4 w-[35vw] h-[35vw] bg-gradient-to-br from-[#f97316]/10 to-transparent rounded-full blur-[100px] pointer-events-none -z-10" />
-
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="glass-panel rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-8 md:p-12 grid md:grid-cols-[1fr_400px] gap-12 items-center">
             {/* Download Content */}
@@ -843,7 +923,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               </span>
 
               <h2 className="font-display font-black text-3xl text-[var(--text-primary)]">
-                {isFa ? "نمونه گزارش تحلیل را دانلود کنید" : "Download Sample Analytics Report"}
+                {isFa ? "نمونه گزارش مانیتورینگ را دریافت کنید" : "Download Sample Analytics Report"}
               </h2>
 
               <p className="text-[var(--text-secondary)] leading-relaxed font-medium">
@@ -942,23 +1022,22 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
         </div>
       </section>
 
-      {/* 6. Testimonials Section */}
-      <section className="py-24 bg-[var(--background-subtle)]/30 dark:bg-[#0a0d16]/30 relative border-t border-[var(--border)]">
+      {/* 11. Customer Success Testimonials */}
+      <section className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#06080d]/40 border-t border-[var(--border)] relative overflow-hidden">
         <div className="absolute inset-0 grid-backdrop opacity-[0.2] pointer-events-none" />
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
+          <div className="text-center max-w-3xl mx-auto space-y-4">
             <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "مورد اعتماد مدیران بازاریابی و متخصصان رشد" : "Trusted by Category-Leading Brands"}
+              {isFa ? "مورد اعتماد رهبران تکنولوژی و مدیران بازاریابی" : "Enterprise Case Studies & Stories"}
             </h2>
             <p className="text-[var(--text-muted)] md:text-lg">
               {isFa
-                ? "نظرات کارشناسان و متخصصان بهینه‌سازی که توانسته‌اند توهم برند خود را در مدل‌های زبانی رفع کنند."
-                : "See how enterprise companies analyze and optimize their AI presence to capture citations."}
+                ? "ببینید شرکت‌های مطرح چگونه با اصلاح لایه‌های وب و تزریق گراف دانش توانسته‌اند توهم‌های مربوط به خود را مرتفع نمایند."
+                : "Real brand optimization cases executing semantic authority alignment strategies."}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Testimonial 1 */}
             <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] flex flex-col justify-between h-full hover-lift">
               <div className="space-y-4">
                 <div className="flex gap-1 text-orange-500">
@@ -981,7 +1060,6 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               </div>
             </div>
 
-            {/* Testimonial 2 */}
             <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] flex flex-col justify-between h-full hover-lift">
               <div className="space-y-4">
                 <div className="flex gap-1 text-orange-500">
@@ -1004,7 +1082,6 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               </div>
             </div>
 
-            {/* Testimonial 3 */}
             <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] flex flex-col justify-between h-full hover-lift">
               <div className="space-y-4">
                 <div className="flex gap-1 text-orange-500">
@@ -1030,33 +1107,38 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
         </div>
       </section>
 
-      {/* 7. Active Embedded Technical Audit Section */}
-      <section ref={freeAuditRef} className="py-24 bg-[var(--background)] dark:bg-[#080b11] relative border-t border-[var(--border)]">
-        <div className="absolute inset-0 grid-backdrop opacity-[0.2] pointer-events-none" />
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-xs font-bold text-sky-400">
-              <Sparkles size={12} className="animate-pulse" />
-              <span>{isFa ? "تحلیل ساختار برخط سایت" : "Online Audit Suite"}</span>
-            </span>
-            <h2 className="font-display font-black text-3xl text-[var(--text-primary)]">
-              {isFa ? "همین حالا ساختار وب‌سایت خود را تحلیل کنید" : "Audit Your Brand SEO Core"}
-            </h2>
-            <p className="text-[var(--text-muted)]">
-              {isFa
-                ? "دامنه سایت خود را به صورت زنده وارد کنید تا تگ‌های متادیتا، ساختار ربات‌ها و کیفیت خوانش وب‌سایت با Firecrawl بررسی گردد."
-                : "Submit your domain URL. Retrieve standard diagnostics on crawlability, declared lang structures, and heading scores."}
-            </p>
-          </div>
+      {/* 12. Final Call to Action Segment */}
+      <section className="py-24 bg-gradient-to-b from-[#38bdf8]/5 to-[#f97316]/5 dark:from-[#0a0d16]/30 dark:to-slate-950 border-t border-[var(--border)] text-center relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-[#38bdf8]/5 rounded-full blur-[140px] pointer-events-none" />
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10 space-y-8">
+          <h2 className="font-display font-black text-4xl md:text-5xl tracking-tight text-[var(--text-primary)] leading-tight text-balance">
+            {isFa ? "آماده تصاحب جایگاه برتر در پاسخ‌های هوش زبانی هستید؟" : "Supercharge Your Brand In AI Answers Today"}
+          </h2>
+          <p className="text-base md:text-lg text-[var(--text-secondary)] font-medium leading-relaxed max-w-2xl mx-auto">
+            {isFa
+              ? "به جمع برندهایی بپیوندید که پیش از این سهم ارگانیک خود را در پاسخ چت‌بات‌ها تثبیت کرده‌اند."
+              : "Begin optimizing for search engine results of the next decade. Start your enterprise trial now."}
+          </p>
 
-          {/* Render the core system Free Audit Panel directly for maximum value */}
-          <div className="glass-panel p-2 sm:p-4 rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] shadow-2xl">
-            <FreeAuditPanel onUpgradeClick={() => {}} />
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button
+              onClick={() => scrollToRef(freeAuditRef)}
+              className="w-full sm:w-auto px-8 py-4 rounded-xl text-white text-base font-bold bg-gradient-to-r from-[#38bdf8] to-[#f97316] shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Sparkles size={16} className="animate-pulse" />
+              <span>{isFa ? "شروع آنالیز فنی رایگان" : "Start Free Audit Scanner"}</span>
+            </button>
+
+            <Link href={`/${locale}/contact`} className="w-full sm:w-auto">
+              <button className="w-full px-8 py-4 rounded-xl text-base font-bold bg-slate-900/40 hover:bg-[#38bdf8]/10 text-[var(--text-primary)] border border-[var(--glass-border)] transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <span>{isFa ? "تماس با کارشناسان ما" : "Contact Sales Unit"}</span>
+              </button>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* 8. Footer Section */}
+      {/* 13. High-Fidelity Enterprise Footer */}
       <LandingFooter />
     </div>
   );
