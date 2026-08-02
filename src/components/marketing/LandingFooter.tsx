@@ -40,20 +40,20 @@ export function LandingFooter() {
     {
       heading: isFa ? "مستندات فنی" : "Documentation",
       links: [
-        { label: isFa ? "مقدمه و شروع سریع" : "Getting Started", href: `/${language}/docs/introduction-to-brandgraph`, external: true },
-        { label: isFa ? "مفاهیم اساسی پلتفرم" : "Platform Concepts", href: `/${language}/docs/infrastructure-architecture`, external: true },
-        { label: isFa ? "راهنمای ساختار REST API" : "REST API Reference", href: `/${language}/docs/ai-pipeline-architecture`, external: true },
-        { label: isFa ? "تامین‌کنندگان هوش زبانی" : "AI Providers", href: `/${language}/docs/introduction-to-brandgraph`, external: true },
-        { label: isFa ? "امنیت و جداسازی داده" : "Architecture & Security", href: `/${language}/docs/multi-tenant-isolation`, external: true },
+        { label: isFa ? "مقدمه و شروع سریع" : "Getting Started", href: `/${language}/docs/introduction`, external: true },
+        { label: isFa ? "معماری کلی ماژول مدیریت" : "Platform Concepts", href: `/${language}/docs/admin-architecture`, external: true },
+        { label: isFa ? "راهنمای ساختار REST API" : "REST API Reference", href: `/${language}/docs/api-reference`, external: true },
+        { label: isFa ? "ادغام مدل‌های زبانی" : "AI LLM Integration", href: `/${language}/docs/ai-pipeline-architecture`, external: true },
+        { label: isFa ? "امنیت و جداسازی داده" : "Architecture & Security", href: `/${language}/docs/tenant-context-spec`, external: true },
       ],
     },
     {
       heading: isFa ? "محیط برنامه‌نویسان" : "Developers",
       links: [
-        { label: isFa ? "اسناد مرجع API" : "REST API", href: `/${language}/docs/ai-pipeline-architecture`, external: true },
-        { label: isFa ? "مدیریت توکن‌ها و کلید" : "Authentication Tokens", href: `/${language}/docs/multi-tenant-isolation`, external: true },
-        { label: isFa ? "هوک‌های وب (Webhooks)" : "Webhooks Stream", href: `/${language}/docs/ai-pipeline-architecture`, external: true },
-        { label: isFa ? "کیت‌های توسعه (SDKs)" : "Official SDK Library", href: `/${language}/docs/knowledge-graph-design`, external: true },
+        { label: isFa ? "اسناد مرجع API" : "REST API", href: `/${language}/docs/api-reference`, external: true },
+        { label: isFa ? "مدیریت کنترل دسترسی" : "RBAC Security", href: `/${language}/docs/rbac-model`, external: true },
+        { label: isFa ? "امنیت هوش مصنوعی" : "AI Security Model", href: `/${language}/docs/security-model`, external: true },
+        { label: isFa ? "طراحی گراف دانش" : "Knowledge Graph Design", href: `/${language}/docs/knowledge-graph-design`, external: true },
       ],
     },
     {
