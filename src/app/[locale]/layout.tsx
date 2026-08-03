@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { persianPrimary, persianDisplay } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
 import FloatingSidebar from "../../../components/navigation/FloatingSidebar";
+import GlobalNavigationControls from "@/components/navigation/GlobalNavigationControls";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -62,6 +63,7 @@ export default async function RootLayout({ children, params }: LayoutProps) {
           <AuthProvider>
             {children}
             <FloatingSidebar />
+            <GlobalNavigationControls />
           </AuthProvider>
         </ThemeProvider>
       </body>
