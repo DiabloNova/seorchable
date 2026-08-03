@@ -27,6 +27,15 @@ export const persianPrimary = localFont({
 });
 
 // ==========================================
+// ENGLISH TITLE — Website Title Font (SEO)
+// ==========================================
+export const englishTitleFont = localFont({
+  src: "../../fonts/English/Tajrid-Bold.woff",
+  variable: "--font-english-title",
+  display: "swap",
+});
+
+// ==========================================
 // PEYDA — Display / heading typeface (titles)
 // ==========================================
 export const persianDisplay = localFont({

@@ -50,8 +50,11 @@ export function LandingHeader() {
         {/* Brand & Logo */}
         <Link href={`/${language}`} className="flex items-center gap-2.5 shrink-0">
           <SeorchableLogo className="w-9 h-9" />
-          <span className="font-display font-black text-base sm:text-lg tracking-tight text-[var(--text-primary)]">
-            {C.brand[language]}
+          <span
+            className="text-base sm:text-lg tracking-tight text-[var(--text-primary)] font-bold"
+            style={{ fontFamily: "var(--font-english-title)" }}
+          >
+            SEO
           </span>
         </Link>
 

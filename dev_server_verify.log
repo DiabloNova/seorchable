@@ -33,3 +33,5 @@
  POST /fa/docs 200 in 118ms (next.js: 3ms, application-code: 114ms)
   └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 1ms src/actions/auth.ts
  GET /api/docs/search?q=RLS&locale=fa 200 in 544ms (next.js: 516ms, application-code: 28ms)
+✓ Compiled in 2.7s
+✓ Compiled in 968ms

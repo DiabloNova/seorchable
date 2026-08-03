@@ -205,29 +205,6 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
         </div>
       </section>
 
-      {/* FREE AUDIT FUNNEL SECTION */}
-      <section id="free-audit" ref={freeAuditRef} className="py-20 bg-[var(--background)] relative border-b border-[var(--border)] overflow-hidden">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-8 relative z-10 text-center">
-          <div className="max-w-3xl mx-auto space-y-3">
-            <span className="text-xs uppercase font-black tracking-widest text-[var(--sky-blue-500)]">
-              {isFa ? "موتور خزش و ممیزی معنایی" : "REAL-TIME SEMANTIC AUDIT INGESTION"}
-            </span>
-            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "سیگنال‌های دیده‌شدن برند خود را همین حالا بسنجید" : "Audit Your Conversational Presence Instantly"}
-            </h2>
-            <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">
-              {isFa
-                ? "کافی است آدرس وب‌سایت خود را برای اجرای تحلیل خودکار مبتنی بر Firecrawl و جمنی وارد کنید."
-                : "Submit your domain target to deploy active crawlers, map semantic triples, and check your AI discovery health."}
-            </p>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            <FreeAuditPanel />
-          </div>
-        </div>
-      </section>
-
       {/* QUESTION 2: "What does it actually do?" - High-Fidelity Mock Dashboards */}
       <section id="dashboards" ref={dashboardsRef} className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative">
         <div className="absolute inset-0 grid-backdrop opacity-[0.2] pointer-events-none" />
@@ -557,26 +534,26 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
             <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-2">
               <ShieldCheck size={32} className="mx-auto text-[#38bdf8]" />
-              <h4 className="text-lg font-black text-white font-display">{isFa ? "امنیت داده‌ها" : "SSO & MFA Ready"}</h4>
-              <p className="text-[11px] text-slate-400">{isFa ? "پشتیبانی کامل از SAML SSO و تایید دومرحله‌ای" : "Full enterprise SAML Single Sign-On integration."}</p>
+              <h4 className="text-base sm:text-lg font-black text-[var(--text-primary)] font-display">{isFa ? "امنیت داده‌ها" : "SSO & MFA Ready"}</h4>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{isFa ? "پشتیبانی کامل از SAML SSO و تایید دومرحله‌ای" : "Full enterprise SAML Single Sign-On integration."}</p>
             </div>
 
             <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-2">
               <Database size={32} className="mx-auto text-[#f97316]" />
-              <h4 className="text-lg font-black text-white font-display">SOC2 & ISO Ready</h4>
-              <p className="text-[11px] text-slate-400">{isFa ? "منطبق بر الزامات امنیت اطلاعات استاندارد جهانی" : "Adhering to strict compliance and auditing standards."}</p>
+              <h4 className="text-base sm:text-lg font-black text-[var(--text-primary)] font-display">SOC2 & ISO Ready</h4>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{isFa ? "منطبق بر الزامات امنیت اطلاعات استاندارد جهانی" : "Adhering to strict compliance and auditing standards."}</p>
             </div>
 
             <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-2">
               <Globe size={32} className="mx-auto text-emerald-400" />
-              <h4 className="text-lg font-black text-white font-display">GDPR Compliant</h4>
-              <p className="text-[11px] text-slate-400">{isFa ? "رعایت کامل قوانین حفظ حریم خصوصی کاربران" : "Total data privacy guarantee and localized hosting parameters."}</p>
+              <h4 className="text-base sm:text-lg font-black text-[var(--text-primary)] font-display">GDPR Compliant</h4>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{isFa ? "رعایت کامل قوانین حفظ حریم خصوصی کاربران" : "Total data privacy guarantee and localized hosting parameters."}</p>
             </div>
 
             <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-2">
               <Receipt size={32} className="mx-auto text-[#38bdf8]" />
-              <h4 className="text-lg font-black text-white font-display">{isFa ? "شبکه شتاب ایران" : "Iran Payment Support"}</h4>
-              <p className="text-[11px] text-slate-400">{isFa ? "پشتیبانی کامل از درگاه‌های پرداخت عضو شبکه شتاب" : "Fully localized billing integration and printable invoice receipts."}</p>
+              <h4 className="text-base sm:text-lg font-black text-[var(--text-primary)] font-display">{isFa ? "شبکه شتاب ایران" : "Iran Payment Support"}</h4>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{isFa ? "پشتیبانی کامل از درگاه‌های پرداخت عضو شبکه شتاب" : "Fully localized billing integration and printable invoice receipts."}</p>
             </div>
           </div>
         </div>
