@@ -36,8 +36,8 @@ export class LocalDocsSearchEngine implements DocsSearchEngine {
  * Algolia DocSearch placeholder engine (future migration ready)
  */
 export class AlgoliaDocsSearchEngine implements DocsSearchEngine {
-  public async search(query: string, _locale: "en" | "fa"): Promise<DocumentationArticle[]> {
-    console.log("Future migration to Algolia DocSearch triggered with query:", query);
+  public async search(query: string, locale: "en" | "fa"): Promise<DocumentationArticle[]> {
+    console.log("Future migration to Algolia DocSearch triggered with query:", query, "for locale:", locale);
     return [];
   }
 }
@@ -46,8 +46,8 @@ export class AlgoliaDocsSearchEngine implements DocsSearchEngine {
  * AI Semantic Search placeholder engine (future migration ready)
  */
 export class AISemanticSearchEngine implements DocsSearchEngine {
-  public async search(query: string, _locale: "en" | "fa"): Promise<DocumentationArticle[]> {
-    console.log("Future migration to AI Semantic Search triggered with query:", query);
+  public async search(query: string, locale: "en" | "fa"): Promise<DocumentationArticle[]> {
+    console.log("Future migration to AI Semantic Search triggered with query:", query, "for locale:", locale);
     return [];
   }
 }

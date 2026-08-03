@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Search, ChevronRight, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 import { DocumentationArticle } from "@/lib/docsService";
 
 interface SearchResultsProps {

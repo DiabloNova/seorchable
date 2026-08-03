@@ -461,7 +461,7 @@ We utilize CSS custom variables defining our core gradients:
 
   fs.writeFileSync(path.join(CONTENT_DIR, "design-system", "design-system-tokens.fa.md"), `---
 title: "سیستم طراحی بصری و توکن‌ها"
-description: "زبان بصری پلتفرم، توکن‌های رنگی، استانداردهای تایپوگرافی و افکت‌های شیشه‌ای."
+description: "زبان بصری پلتفرم, توکن‌های رنگی، استانداردهای تایپوگرافی و افکت‌های شیشه‌ای."
 category: "design-system"
 lastUpdated: "1404-05-11"
 author: "تیم محصول و دیزاین سئورچبل"

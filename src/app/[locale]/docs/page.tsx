@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { DocsService } from "@/lib/docsService";
-import { BookOpen, ShieldCheck, Cpu, Library, HelpCircle, ArrowRight, Shield, Database, Terminal, Settings } from "lucide-react";
+import { BookOpen, Cpu, Library, HelpCircle, ArrowRight, Shield, Database, Terminal, Settings } from "lucide-react";
 
 interface DocsIndexPageProps {
   params: Promise<{ locale: string }>;

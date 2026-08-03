@@ -2,36 +2,18 @@
 > ai-branding-platform@0.1.0 dev /app
 > next dev
 
+⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
 ▲ Next.js 16.2.11 (Turbopack)
-- Local:         http://localhost:3000
-- Network:       http://192.168.0.2:3000
-✓ Ready in 555ms
+- Local:         http://localhost:3001
+- Network:       http://192.168.0.2:3001
+✓ Ready in 693ms
+⨯ Another next dev server is already running.
 
-○ Compiling /[locale]/docs ...
- GET /fa/docs 200 in 6.0s (next.js: 5.2s, application-code: 751ms)
- POST /fa/docs 200 in 200ms (next.js: 38ms, application-code: 162ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 10ms src/actions/auth.ts
- GET /fa/docs/admin-architecture 200 in 2.1s (next.js: 1857ms, application-code: 197ms)
- POST /fa/docs/admin-architecture 200 in 152ms (next.js: 32ms, application-code: 120ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 2ms src/actions/auth.ts
- GET /en/docs 200 in 624ms (next.js: 60ms, application-code: 564ms)
- POST /en/docs 200 in 347ms (next.js: 8ms, application-code: 339ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 6ms src/actions/auth.ts
- GET /fa/docs 200 in 224ms (next.js: 33ms, application-code: 192ms)
- POST /fa/docs 200 in 143ms (next.js: 4ms, application-code: 139ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 2ms src/actions/auth.ts
- GET /fa/docs 200 in 388ms (next.js: 35ms, application-code: 353ms)
- POST /fa/docs 200 in 181ms (next.js: 32ms, application-code: 149ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 5ms src/actions/auth.ts
- GET /fa/docs/admin-architecture 200 in 215ms (next.js: 30ms, application-code: 186ms)
- POST /fa/docs/admin-architecture 200 in 135ms (next.js: 34ms, application-code: 100ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 3ms src/actions/auth.ts
- GET /en/docs 200 in 267ms (next.js: 28ms, application-code: 239ms)
- POST /en/docs 200 in 226ms (next.js: 3ms, application-code: 223ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 2ms src/actions/auth.ts
- GET /fa/docs 200 in 180ms (next.js: 29ms, application-code: 150ms)
- POST /fa/docs 200 in 118ms (next.js: 3ms, application-code: 114ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 1ms src/actions/auth.ts
- GET /api/docs/search?q=RLS&locale=fa 200 in 544ms (next.js: 516ms, application-code: 28ms)
-✓ Compiled in 2.7s
-✓ Compiled in 968ms
+- Local:        http://localhost:3000
+- PID:          112971
+- Dir:          /app
+- Log:          .next/dev/logs/next-development.log
+
+Run kill 112971 to stop it.
+[?25h
+ ELIFECYCLE  Command failed with exit code 1.

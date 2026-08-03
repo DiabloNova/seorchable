@@ -56,7 +56,7 @@ export function DocumentationSidebar({
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 scrollbar-none text-xs">
         {categories.map((cat) => (
           <div key={cat.id} className="space-y-2">
-            <h3 className="px-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
+            <h3 className="px-3 text-[10px] font-black uppercase tracking-widest text-slate-500 text-start">
               {isFa ? cat.titleFa : cat.titleEn}
             </h3>
             <div className="space-y-1">

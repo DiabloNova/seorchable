@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Menu, X, Home, Languages, Sun, Moon, Receipt, Search } from "lucide-react";
+import { Menu, X, Languages, Sun, Moon, Receipt, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/components/ThemeProvider";
 import { SeorchableLogo } from "@/components/marketing/SeorchableLogo";
@@ -10,6 +10,7 @@ import { DocumentationSidebar } from "./DocumentationSidebar";
 import { SearchResults } from "./SearchResults";
 import type { DocumentationCategory, DocumentationArticle } from "@/lib/docsService";
 import { DocsSearchClient } from "@/lib/docsSearchClient";
+import { usePathname } from "next/navigation";
 
 interface DocumentationLayoutProps {
   children: React.ReactNode;
@@ -18,15 +19,13 @@ interface DocumentationLayoutProps {
   locale: "en" | "fa";
 }
 
-import { usePathname } from "next/navigation";
-
 export function DocumentationLayout({
   children,
   categories,
   activeSlug,
   locale,
 }: DocumentationLayoutProps) {
-  const { theme, setTheme, language, setLanguage } = useTheme();
+  const { theme, setTheme, setLanguage } = useTheme();
   const isFa = locale === "fa";
   const pathname = usePathname();
 
@@ -62,7 +61,6 @@ export function DocumentationLayout({
   const handleLangToggle = () => {
     const nextLang = locale === "fa" ? "en" : "fa";
     setLanguage(nextLang);
-    // Replace URL path
     const pathParts = window.location.pathname.split("/");
     pathParts[1] = nextLang;
     window.location.pathname = pathParts.join("/");

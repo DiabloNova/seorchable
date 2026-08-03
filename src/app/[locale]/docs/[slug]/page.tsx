@@ -2,7 +2,6 @@ import React from "react";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { DocsService } from "@/lib/docsService";
 import { ArticleHeader } from "@/components/docs/ArticleHeader";
 import { ArticleContent } from "@/components/docs/ArticleContent";

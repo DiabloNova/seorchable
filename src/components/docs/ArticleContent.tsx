@@ -25,17 +25,8 @@ export function ArticleContent({ content, locale }: ArticleContentProps) {
 
   // Inline formatter helper (handles Bold **, Code `, Links [text](href))
   const formatInline = (text: string) => {
-    // Escape standard tags first if needed, but let's parse elements
-    const parts: React.ReactNode[] = [];
-    let currentText = text;
-    let idx = 0;
-
-    // Pattern matching
-    // 1. Links: [label](href)
-    // 2. Bold: **text**
-    // 3. Inline Code: `code`
     const regex = /(\*\*.*?\*\*|`.*?`|\[.*?\]\(.*?\))/g;
-    const matches = currentText.split(regex);
+    const matches = text.split(regex);
 
     return matches.map((part, pIdx) => {
       if (part.startsWith("**") && part.endsWith("**")) {
@@ -120,7 +111,7 @@ export function ArticleContent({ content, locale }: ArticleContentProps) {
 
     if (ordered) {
       return (
-        <ol key={`ol-${key}`} className="space-y-2.5 my-4 ps-5 list-decimal text-slate-300">
+        <ol key={`ol-${key}`} className="space-y-2.5 my-4 ps-5 list-decimal text-slate-300 text-start">
           {items.map((item, iIdx) => (
             <li key={iIdx} className="leading-relaxed text-xs sm:text-sm">
               {formatInline(item)}
@@ -130,7 +121,7 @@ export function ArticleContent({ content, locale }: ArticleContentProps) {
       );
     } else {
       return (
-        <ul key={`ul-${key}`} className="space-y-2 my-4 ps-2 list-none text-slate-300">
+        <ul key={`ul-${key}`} className="space-y-2 my-4 ps-2 list-none text-slate-300 text-start">
           {items.map((item, iIdx) => (
             <li key={iIdx} className="flex items-start gap-2.5 leading-relaxed text-xs sm:text-sm my-1">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--orange-500)] shrink-0 mt-2" />
@@ -277,8 +268,6 @@ export function ArticleContent({ content, locale }: ArticleContentProps) {
       continue;
     } else {
       if (inList && trimmed !== "") {
-        // If line is not empty and we are in a list, we can treat it as a continuation
-        // of the previous bullet, or if it doesn't match list style, flush list first.
         const fl = flushList(i);
         if (fl) blocks.push(fl);
       }
@@ -300,7 +289,7 @@ export function ArticleContent({ content, locale }: ArticleContentProps) {
         <h1
           key={`h1-${i}`}
           id={slugify(text)}
-          className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] font-display border-b border-white/10 pb-3 mb-6 mt-10 scroll-mt-20"
+          className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] font-display border-b border-white/10 pb-3 mb-6 mt-10 scroll-mt-20 text-start"
         >
           {formatInline(text)}
         </h1>
@@ -314,7 +303,7 @@ export function ArticleContent({ content, locale }: ArticleContentProps) {
         <h2
           key={`h2-${i}`}
           id={slugify(text)}
-          className="text-lg sm:text-xl font-extrabold text-[var(--text-primary)] font-display mt-8 mb-4 flex items-center gap-2 scroll-mt-20"
+          className="text-lg sm:text-xl font-extrabold text-[var(--text-primary)] font-display mt-8 mb-4 flex items-center gap-2 scroll-mt-20 text-start"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-[var(--sky-blue-500)]" />
           <span>{formatInline(text)}</span>
@@ -329,7 +318,7 @@ export function ArticleContent({ content, locale }: ArticleContentProps) {
         <h3
           key={`h3-${i}`}
           id={slugify(text)}
-          className="text-base font-bold text-[var(--text-primary)] font-display mt-6 mb-3 scroll-mt-20"
+          className="text-base font-bold text-[var(--text-primary)] font-display mt-6 mb-3 scroll-mt-20 text-start"
         >
           {formatInline(text)}
         </h3>
@@ -341,7 +330,6 @@ export function ArticleContent({ content, locale }: ArticleContentProps) {
     if (trimmed.startsWith(">")) {
       const quoteText = trimmed.replace(/^>\s*/, "").trim();
 
-      // Check if it's an annotated warning/info blockquote, e.g. [!WARNING] or [!NOTE]
       if (quoteText.startsWith("[!NOTE]") || quoteText.startsWith("[!INFO]")) {
         blocks.push(
           <Callout key={`cq-${i}`} type="info">
@@ -364,7 +352,7 @@ export function ArticleContent({ content, locale }: ArticleContentProps) {
         blocks.push(
           <blockquote
             key={`bq-${i}`}
-            className="border-s-4 border-[var(--sky-blue-500)] bg-white/[0.01] px-5 py-3 rounded-r-xl text-slate-400 italic my-5 text-xs sm:text-sm leading-relaxed"
+            className="border-s-4 border-[var(--sky-blue-500)] bg-white/[0.01] px-5 py-3 rounded-r-xl text-slate-400 italic my-5 text-xs sm:text-sm leading-relaxed text-start"
           >
             {formatInline(quoteText)}
           </blockquote>
