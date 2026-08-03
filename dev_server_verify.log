@@ -31,3 +31,30 @@
  GET /en/dashboard/billing 200 in 3.3s (next.js: 3.2s, application-code: 99ms)
  POST /en/dashboard/billing 200 in 96ms (next.js: 44ms, application-code: 51ms)
   └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 4ms src/actions/auth.ts
+ GET /en/pricing 200 in 1479ms (next.js: 758ms, application-code: 721ms)
+ GET /en/pricing 200 in 242ms (next.js: 34ms, application-code: 208ms)
+ POST /en/pricing 200 in 147ms (next.js: 45ms, application-code: 102ms)
+  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 4ms src/actions/auth.ts
+ GET /en/dashboard/audits 200 in 335ms (next.js: 114ms, application-code: 221ms)
+ POST /en/dashboard/audits 200 in 62ms (next.js: 4ms, application-code: 58ms)
+  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 3ms src/actions/auth.ts
+ GET /en/dashboard/audits/aud-001 200 in 192ms (next.js: 70ms, application-code: 122ms)
+ POST /en/dashboard/audits/aud-001 200 in 64ms (next.js: 7ms, application-code: 56ms)
+  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 4ms src/actions/auth.ts
+ GET /en/dashboard/brand-monitoring 200 in 186ms (next.js: 72ms, application-code: 114ms)
+ POST /en/dashboard/brand-monitoring 200 in 66ms (next.js: 4ms, application-code: 62ms)
+  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 2ms src/actions/auth.ts
+ GET /en/dashboard/reports 200 in 140ms (next.js: 62ms, application-code: 78ms)
+ POST /en/dashboard/reports 200 in 56ms (next.js: 4ms, application-code: 51ms)
+  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 3ms src/actions/auth.ts
+ GET /en/dashboard/settings 200 in 126ms (next.js: 57ms, application-code: 69ms)
+ POST /en/dashboard/settings 200 in 55ms (next.js: 5ms, application-code: 50ms)
+  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 2ms src/actions/auth.ts
+ GET /en/dashboard/billing 200 in 196ms (next.js: 56ms, application-code: 140ms)
+ POST /en/dashboard/billing 200 in 55ms (next.js: 3ms, application-code: 52ms)
+  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 1ms src/actions/auth.ts
+ GET /en/pricing 200 in 178ms (next.js: 35ms, application-code: 143ms)
+○ Compiling /[locale]/solutions/aeo ...
+ GET /en/solutions/aeo 200 in 4.4s (next.js: 4.2s, application-code: 149ms)
+ GET /en/about 200 in 3.4s (next.js: 3.1s, application-code: 224ms)
+ GET /en/contact 200 in 2.1s (next.js: 2.0s, application-code: 111ms)
