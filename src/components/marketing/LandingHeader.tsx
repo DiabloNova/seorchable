@@ -67,11 +67,12 @@ export function LandingHeader() {
           }`}
         >
           {/* Brand & Logo */}
-          <Link href={`/${language}`} className="flex items-center gap-2.5 shrink-0">
-            <SeorchableLogo className="w-9 h-9" />
-            <span className="font-display font-black text-base sm:text-lg tracking-tight text-[var(--text-primary)]">
-              {C.brand[language]}
-            </span>
+          <Link
+            href={`/${language}`}
+            aria-label={isFa ? "صفحه نخست سئورچبل" : "Seorchable Homepage"}
+            className="flex items-center justify-center shrink-0 rounded-[var(--radius-md)] focus-visible:ring-2 focus-visible:ring-[var(--sky-blue-500)]/40 focus-visible:outline-none outline-none"
+          >
+            <SeorchableLogo className="w-10 h-10 transition-transform duration-300 hover:scale-[1.05]" />
           </Link>
 
           {/* Enterprise-grade Nav Menu */}
