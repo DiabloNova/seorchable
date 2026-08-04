@@ -555,28 +555,28 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
 
           {/* Stats & Infrastructure partners */}
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-2">
-              <ShieldCheck size={32} className="mx-auto text-[#38bdf8]" />
-              <h4 className="text-lg font-black text-[var(--text-primary)] font-display">{isFa ? "امنیت داده‌ها" : "SSO & MFA Ready"}</h4>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">{isFa ? "پشتیبانی کامل از SAML SSO و تایید دومرحله‌ای" : "Full enterprise SAML Single Sign-On integration."}</p>
+            <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-3">
+              <ShieldCheck size={36} className="mx-auto text-[#38bdf8]" />
+              <h4 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "امنیت داده‌ها" : "SSO & MFA Ready"}</h4>
+              <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">{isFa ? "پشتیبانی کامل از SAML SSO و تایید دومرحله‌ای" : "Full enterprise SAML Single Sign-On integration."}</p>
             </div>
 
-            <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-2">
-              <Database size={32} className="mx-auto text-[#f97316]" />
-              <h4 className="text-lg font-black text-[var(--text-primary)] font-display">SOC2 & ISO Ready</h4>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">{isFa ? "منطبق بر الزامات امنیت اطلاعات استاندارد جهانی" : "Adhering to strict compliance and auditing standards."}</p>
+            <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-3">
+              <Database size={36} className="mx-auto text-[#f97316]" />
+              <h4 className="text-xl font-black text-[var(--text-primary)] font-display">SOC2 & ISO Ready</h4>
+              <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">{isFa ? "منطبق بر الزامات امنیت اطلاعات استاندارد جهانی" : "Adhering to strict compliance and auditing standards."}</p>
             </div>
 
-            <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-2">
-              <Globe size={32} className="mx-auto text-emerald-400" />
-              <h4 className="text-lg font-black text-[var(--text-primary)] font-display">GDPR Compliant</h4>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">{isFa ? "رعایت کامل قوانین حفظ حریم خصوصی کاربران" : "Total data privacy guarantee and localized hosting parameters."}</p>
+            <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-3">
+              <Globe size={36} className="mx-auto text-emerald-400 animate-pulse" />
+              <h4 className="text-xl font-black text-[var(--text-primary)] font-display">GDPR Compliant</h4>
+              <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">{isFa ? "رعایت کامل قوانین حفظ حریم خصوصی کاربران" : "Total data privacy guarantee and localized hosting parameters."}</p>
             </div>
 
-            <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-2">
-              <Receipt size={32} className="mx-auto text-[#38bdf8]" />
-              <h4 className="text-lg font-black text-[var(--text-primary)] font-display">{isFa ? "شبکه شتاب ایران" : "Iran Payment Support"}</h4>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">{isFa ? "پشتیبانی کامل از درگاه‌های پرداخت عضو شبکه شتاب" : "Fully localized billing integration and printable invoice receipts."}</p>
+            <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-3">
+              <Receipt size={36} className="mx-auto text-[#38bdf8]" />
+              <h4 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "شبکه شتاب ایران" : "Iran Payment Support"}</h4>
+              <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">{isFa ? "پشتیبانی کامل از درگاه‌های پرداخت عضو شبکه شتاب" : "Fully localized billing integration and printable invoice receipts."}</p>
             </div>
           </div>
         </div>
