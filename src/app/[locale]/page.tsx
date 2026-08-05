@@ -282,35 +282,35 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               {/* Sub-Screen: Visibility Score Dashboard */}
               {activeDashboardTab === "visibility" && (
                 <div className="space-y-6 animate-fade-in">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 gap-2">
                     <div>
-                      <span className="text-xs md:text-[9px] uppercase tracking-widest text-[#38bdf8] font-bold font-mono">Module :: Visibility Monitoring</span>
-                      <h3 className="text-xl md:text-lg font-black font-display text-white mt-1 leading-snug">{isFa ? "شاخص تجمیعی دیده‌شدن برند" : "SOP / AI Share of Voice"}</h3>
+                      <span className="text-[11px] sm:text-[10px] md:text-[9px] uppercase tracking-wider md:tracking-widest text-[#38bdf8] font-bold font-mono">Module :: Visibility Monitoring</span>
+                      <h3 className="text-lg sm:text-xl md:text-lg font-black font-display text-white mt-1.5 leading-relaxed sm:leading-snug">{isFa ? "شاخص تجمیعی دیده‌شدن برند" : "SOP / AI Share of Voice"}</h3>
                     </div>
-                    <span className="text-xs px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">{isFa ? "برخط" : "ONLINE"}</span>
+                    <span className="self-start sm:self-auto text-xs px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">{isFa ? "برخط" : "ONLINE"}</span>
                   </div>
 
-                  <div className="grid sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <span className="text-xs md:text-[10px] text-slate-400 block">{isFa ? "امتیاز ChatGPT-4o" : "ChatGPT-4o Score"}</span>
-                      <p className="text-2xl font-black text-white mt-1">۸۸٪</p>
-                      <span className="text-xs md:text-[9px] text-emerald-400 font-bold">↑ ۴٪ {isFa ? "رشد معنایی" : "Growth"}</span>
+                      <span className="text-[11px] sm:text-xs md:text-[10px] text-slate-400 block">{isFa ? "امتیاز ChatGPT-4o" : "ChatGPT-4o Score"}</span>
+                      <p className="text-xl sm:text-2xl font-black text-white mt-1">۸۸٪</p>
+                      <span className="text-[11px] sm:text-xs md:text-[9px] text-emerald-400 font-bold">↑ ۴٪ {isFa ? "رشد معنایی" : "Growth"}</span>
                     </div>
                     <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <span className="text-xs md:text-[10px] text-slate-400 block">{isFa ? "امتیاز Claude 3.5" : "Claude 3.5 Score"}</span>
-                      <p className="text-2xl font-black text-white mt-1">۷۹٪</p>
-                      <span className="text-xs md:text-[9px] text-emerald-400 font-bold">↑ ۲٪ {isFa ? "بهبود ارجاع" : "Better citation"}</span>
+                      <span className="text-[11px] sm:text-xs md:text-[10px] text-slate-400 block">{isFa ? "امتیاز Claude 3.5" : "Claude 3.5 Score"}</span>
+                      <p className="text-xl sm:text-2xl font-black text-white mt-1">۷۹٪</p>
+                      <span className="text-[11px] sm:text-xs md:text-[9px] text-emerald-400 font-bold">↑ ۲٪ {isFa ? "بهبود ارجاع" : "Better citation"}</span>
                     </div>
                     <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <span className="text-xs md:text-[10px] text-slate-400 block">{isFa ? "امتیاز Perplexity AI" : "Perplexity Score"}</span>
-                      <p className="text-2xl font-black text-white mt-1">۸۴٪</p>
-                      <span className="text-xs md:text-[9px] text-slate-400">{isFa ? "بدون تغییر" : "Stable"}</span>
+                      <span className="text-[11px] sm:text-xs md:text-[10px] text-slate-400 block">{isFa ? "امتیاز Perplexity AI" : "Perplexity Score"}</span>
+                      <p className="text-xl sm:text-2xl font-black text-white mt-1">۸۴٪</p>
+                      <span className="text-[11px] sm:text-xs md:text-[9px] text-slate-400">{isFa ? "بدون تغییر" : "Stable"}</span>
                     </div>
                   </div>
 
                   <div className="p-4 rounded-xl bg-[#38bdf8]/5 border border-[#38bdf8]/15 space-y-2">
-                    <p className="text-sm md:text-xs font-bold text-white">{isFa ? "تحلیل سیگنال‌ها و ارجاع" : "Recommendation Strategy"}</p>
-                    <p className="text-xs md:text-[11px] text-slate-300 leading-relaxed md:leading-normal">
+                    <p className="text-xs sm:text-sm md:text-xs font-bold text-white">{isFa ? "تحلیل سیگنال‌ها و ارجاع" : "Recommendation Strategy"}</p>
+                    <p className="text-[11px] sm:text-xs md:text-[11px] text-slate-300 leading-relaxed md:leading-normal">
                       {isFa
                         ? "سیگنال‌های ارجاعی در چت‌بات‌ها مثبت است، اما نرخ استناد به مستندات فنی ضعیف عمل می‌کند. کاتالوگ محصولات را با تگ‌های معنایی ساختاردهی کنید."
                         : "Your organic citations remain high, but documentation citation has fallen by 2% due to crawl blocking. Rectify robots.txt tags immediately."}
