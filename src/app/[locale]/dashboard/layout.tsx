@@ -78,6 +78,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           setCollapsed={handleSetCollapsed}
           mobileOpen={mobileOpen}
           setMobileOpen={setMobileOpen}
+          hideToggle={true}
         />
 
         {/* Main Layout Area */}
@@ -88,7 +89,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex items-center gap-3 min-w-0">
               <button
                 onClick={() => setMobileOpen(true)}
-                className="md:hidden p-2 rounded-[var(--radius-md)] hover:bg-[var(--muted-surface)] text-[var(--text-secondary)] cursor-pointer"
+                className="p-2 rounded-[var(--radius-md)] hover:bg-[var(--muted-surface)] text-[var(--text-secondary)] cursor-pointer"
                 aria-label="Open navigation menu"
               >
                 <Menu size={20} />
@@ -107,24 +108,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Header Toolbar */}
             <div className="flex items-center gap-1 sm:gap-2">
-              <Button variant="ghost" size="sm" onClick={toggleLanguage} className="px-2 cursor-pointer" aria-label="Toggle language">
-                <Languages size={16} />
-                <span className="uppercase text-xs">{language}</span>
+              <Button variant="ghost" size="sm" onClick={toggleLanguage} className="h-9 w-16 flex items-center justify-center gap-1 px-2 cursor-pointer shrink-0" aria-label="Toggle language">
+                <Languages size={16} className="shrink-0" />
+                <span className="uppercase text-xs w-4 text-center shrink-0">{language}</span>
               </Button>
 
-              <Button variant="ghost" size="sm" onClick={toggleTheme} className="p-2 cursor-pointer" aria-label="Toggle theme">
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.span
-                    key={theme}
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="inline-flex"
-                  >
-                    {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
-                  </motion.span>
-                </AnimatePresence>
+              <Button variant="ghost" size="sm" onClick={toggleTheme} className="h-9 w-9 flex items-center justify-center p-2 cursor-pointer shrink-0" aria-label="Toggle theme">
+                <div className="w-[18px] h-[18px] relative flex items-center justify-center shrink-0">
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.span
+                      key={theme}
+                      initial={{ rotate: -90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: 90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute flex items-center justify-center"
+                    >
+                      {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+                    </motion.span>
+                  </AnimatePresence>
+                </div>
               </Button>
 
               <span className="hidden sm:inline h-6 w-px bg-[rgba(148,163,184,0.1)] mx-1" />

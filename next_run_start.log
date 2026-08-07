@@ -1,9 +1,8 @@
 
 > ai-branding-platform@0.1.0 start /app
-> next start -p 3005
+> next start
 
 ▲ Next.js 16.2.11
-- Local:         http://localhost:3005
-- Network:       http://192.168.0.2:3005
-✓ Ready i ELIFECYCLE  Command failed.
-failed.
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+✓ Ready in 204ms

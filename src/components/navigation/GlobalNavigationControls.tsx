@@ -50,12 +50,12 @@ export default function GlobalNavigationControls() {
         isFa ? "left-6" : "right-6"
       }`}
     >
-      {/* Back to Previous Page / Home Button */}
+      {/* Back to Previous Page / Home Button (Hidden on mobile to avoid overlapping/blocking footer user guides) */}
       {!isHomepage && (
         <button
           onClick={handleBack}
           aria-label={isFa ? "بازگشت به صفحه قبل" : "Back to Previous Page / Home"}
-          className="flex items-center justify-center w-12 h-12 rounded-full border border-[var(--glass-border)] bg-slate-950/80 backdrop-blur-2xl text-slate-300 hover:text-white hover:border-[var(--sky-blue-500)]/60 shadow-xl transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer group"
+          className="hidden md:flex items-center justify-center w-12 h-12 rounded-full border border-[var(--glass-border)] bg-slate-950/80 backdrop-blur-2xl text-slate-300 hover:text-white hover:border-[var(--sky-blue-500)]/60 shadow-xl transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer group"
           style={{
             boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 10px rgba(56, 189, 248, 0.1)",
           }}

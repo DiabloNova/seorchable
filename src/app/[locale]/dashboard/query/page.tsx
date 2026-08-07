@@ -81,10 +81,10 @@ export default function RAGQueryPage() {
   const strings = {
     title: isRtl ? "جستجوی معنایی و عیب‌یابی RAG" : "Semantic Search & RAG Diagnostics",
     description: isRtl
-      ? "در گراف دانش و بانک برداری مستأجر خود به صورت همزمان جستجو کنید، قطعات متنی مرجع را بازیابی کرده و پاسخ‌های غنی‌شده را بررسی نمایید."
+      ? "در گراف دانش و بانک برداری پروژه خود به صورت همزمان جستجو کنید، قطعات متنی مرجع را بازیابی کرده و پاسخ‌های غنی‌شده را بررسی نمایید."
       : "Query your isolated tenant vector store. Retrieve matching semantic context chunks and inspect synthesized RAG diagnostics.",
     inputPlaceholder: isRtl
-      ? "سوال برندی یا رقابتی خود را وارد کنید (مثال: رقبای ما در بازار مشهد چه کسانی هستند؟)..."
+      ? "پرسش درباره برند یا رقبای خود را وارد کنید (مثال: جایگاه برند ما در مقایسه با رقبا...)"
       : "Ask a brand or competitive question (e.g., 'What are the main criticisms of our pricing?')...",
     searchBtn: isRtl ? "پرس‌وجو" : "Query Engine",
     searchBtnActive: isRtl ? "در حال بازیابی بردارها..." : "Retrieving Vectors...",
@@ -102,7 +102,7 @@ export default function RAGQueryPage() {
     alignment: isRtl ? "میزان انطباق معنایی" : "RAG Alignment Score",
     similarity: isRtl ? "شباهت" : "Similarity",
     sourceChunk: isRtl ? "چانک مرجع" : "Source Chunk",
-    emptyStateTitle: isRtl ? "درگاه آزمایش و تشخیص RAG" : "RAG Diagnostic Sandbox",
+    emptyStateTitle: isRtl ? "کنسول پاسخ و تحلیل هوش مصنوعی" : "RAG Diagnostic Sandbox",
     emptyStateDesc: isRtl
       ? "برای شروع بازیابی معنایی و ارزیابی فرآیند سنتز، پرسش خود را در کادر بالا بنویسید."
       : "Enter a question in the search bar above to trigger multi-tenant semantic retrieval and examine the RAG pipeline output.",
@@ -182,7 +182,7 @@ export default function RAGQueryPage() {
               glass-panel text-[var(--text-primary)]
               focus:border-[var(--color-primary-600)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-primary-600)_25%,transparent)]
               placeholder:text-[var(--text-muted)] leading-normal
-              ${isRtl ? "pr-11 pl-4" : "pl-11 pr-4"}
+              ${isRtl ? "pr-12 pl-4 text-right" : "pl-11 pr-4 text-left"}
             `}
             disabled={isPending}
           />
@@ -280,14 +280,32 @@ export default function RAGQueryPage() {
 
         {/* Content Results Panel */}
         <div className="lg:col-span-3">
-          {!activeResult ? (
-            /* Empty State */
-            <Card className="gradient-border glass-panel p-10 text-center flex flex-col items-center justify-center min-h-[350px]">
-              <div className="p-4 rounded-full bg-[var(--color-info-bg)] border border-[color-mix(in_srgb,var(--color-primary-600)_25%,transparent)] mb-4 animate-pulse-glow">
-                <Sparkles size={36} className="text-[var(--color-primary-600)]" />
+          {isPending ? (
+            /* Loading/Streaming State */
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+              <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg min-h-[380px] p-6 space-y-4 animate-pulse">
+                <div className="h-4 bg-white/10 rounded w-1/3"></div>
+                <div className="h-2 bg-white/5 rounded w-full"></div>
+                <div className="h-12 bg-white/5 rounded w-full"></div>
+                <div className="h-12 bg-white/5 rounded w-full"></div>
+              </Card>
+              <Card className="border border-white/[0.06] bg-white/[0.01] backdrop-blur-md shadow-lg min-h-[380px] p-6 space-y-4 animate-pulse">
+                <div className="h-4 bg-white/10 rounded w-1/2"></div>
+                <div className="h-12 bg-white/5 rounded w-full"></div>
+                <div className="h-24 bg-white/5 rounded w-full"></div>
+              </Card>
+            </div>
+          ) : !activeResult ? (
+            /* Empty State / Active AI Q&A response diagnostics console */
+            <Card className="gradient-border glass-panel p-10 text-center flex flex-col items-center justify-center min-h-[380px]">
+              <div className="p-4 rounded-full bg-gradient-to-br from-[var(--sky-blue-500)]/20 to-[var(--orange-500)]/20 border border-[color-mix(in_srgb,var(--color-primary-600)_25%,transparent)] mb-4 animate-pulse-glow">
+                <Cpu size={36} className="text-[var(--sky-blue-500)] animate-spin-slow" />
               </div>
               <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1.5">{strings.emptyStateTitle}</h3>
-              <p className="text-xs text-[var(--text-secondary)] max-w-md leading-relaxed">{strings.emptyStateDesc}</p>
+              <p className="text-xs text-[var(--text-secondary)] max-w-md leading-relaxed mb-4">{strings.emptyStateDesc}</p>
+              <div className="text-[10px] text-[var(--text-muted)] bg-[var(--muted-surface)] px-3 py-1.5 rounded-full border border-[var(--border)]">
+                {isRtl ? "آماده دریافت دستور و تحلیل معنایی داده‌ها..." : "Ready to accept queries and analyze..."}
+              </div>
             </Card>
           ) : (
             /* Results Grid */
@@ -384,6 +402,71 @@ export default function RAGQueryPage() {
           )}
         </div>
       </div>
+      {/* Comprehensive Usage Guide Section at the Bottom */}
+      <Card className="glass-panel border border-[rgba(148,163,184,0.1)] p-6 mt-8 shadow-xl">
+        <CardHeader className="pb-4 border-b border-[var(--border)] mb-4">
+          <CardTitle className="text-xs font-black uppercase tracking-wider text-[var(--sky-blue-500)] flex items-center gap-2">
+            <BookOpen size={14} className="text-[var(--sky-blue-500)]" />
+            <span>{isRtl ? "راهنمای استفاده از درگاه هوش مصنوعی و RAG" : "AI Portal & RAG Intelligence User Guide"}</span>
+          </CardTitle>
+          <CardDescription className="text-[10px] leading-relaxed">
+            {isRtl
+              ? "مراحل گام‌به‌گام دریافت تحلیل‌های هوشمند و عیب‌یابی مراجع داده‌ای:"
+              : "Step-by-step diagnostic flow of retrieved facts and synthesized AI results:"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-4 rounded-xl bg-white/[0.01] border border-white/5 space-y-2.5">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[var(--sky-blue-500)]/20 text-[var(--sky-blue-500)] text-xs font-black">
+                  ۱
+                </span>
+                <h4 className="text-xs font-bold text-[var(--text-primary)]">
+                  {isRtl ? "ثبت پرسش" : "Submit Query"}
+                </h4>
+              </div>
+              <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+                {isRtl
+                  ? "پرسش خود درباره برند، محصولات یا وضعیت رقبا را در کادر جستجوی بالای صفحه وارد کنید و دکمه پرس‌وجو را بزنید."
+                  : "Enter your custom brand-related or competitor prompt in the search bar above and trigger the search engine."}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white/[0.01] border border-white/5 space-y-2.5">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[var(--orange-500)]/20 text-[var(--orange-500)] text-xs font-black">
+                  ۲
+                </span>
+                <h4 className="text-xs font-bold text-[var(--text-primary)]">
+                  {isRtl ? "ارزیابی بازیابی (RAG)" : "RAG Context Retrieval"}
+                </h4>
+              </div>
+              <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+                {isRtl
+                  ? "سیستم قطعات متنی و فکت‌های مرتبط را از بانک دانش پروژه استخراج کرده و درصد تشابه هر کدام را ارزیابی می‌کند."
+                  : "The system matches and retrieves relevant context chunks from your project's vector store and ranks similarity."}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white/[0.01] border border-white/5 space-y-2.5">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-black">
+                  ۳
+                </span>
+                <h4 className="text-xs font-bold text-[var(--text-primary)]">
+                  {isRtl ? "تحلیل هوش مصنوعی" : "AI Factual Synthesis"}
+                </h4>
+              </div>
+              <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+                {isRtl
+                  ? "پاسخ سنتز شده چت‌بات‌ها و نحوه درک مدل‌های زبانی از برند شما در باکس مرکز صفحه نمایش داده می‌شود."
+                  : "A synthesized, non-hallucinated response maps how top LLMs perceive your brand based on retrieved ground truths."}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
