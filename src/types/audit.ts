@@ -136,3 +136,22 @@ export interface NormalizedAuditFeatures {
     };
   };
 }
+
+export interface ScoreContributor {
+  factor: string;
+  impact: number; // Positive or negative score contribution
+  description: string;
+}
+
+export interface DomainScore {
+  score: number;
+  contributors: ScoreContributor[];
+}
+
+export interface AuditReportScores {
+  technical: DomainScore;
+  content: DomainScore;
+  aeo: DomainScore;
+  llmReadiness: DomainScore;
+  overall: DomainScore;
+}
