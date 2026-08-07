@@ -35,38 +35,38 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   {
     icon: Home,
     labelEn: "Command Center",
-    labelFa: "صفحه نخست",
-    path: "/"
+    labelFa: "میز فرماندهی هوشمند",
+    path: "/dashboard"
   },
   {
     icon: BarChart2,
     labelEn: "GEO Optimization Engine",
     labelFa: "موتور بهینه‌سازی GEO",
-    path: "/solutions/geo"
+    path: "/dashboard/intelligence"
   },
   {
     icon: Globe,
     labelEn: "AEO Optimization Studio",
     labelFa: "استودیو بهینه‌سازی AEO",
-    path: "/solutions/aeo"
+    path: "/dashboard/content"
   },
   {
     icon: Shield,
     labelEn: "Cognitive Brand Protection",
     labelFa: "محافظت از هویت برند",
-    path: "/solutions/protection"
+    path: "/dashboard/brand-monitoring"
   },
   {
     icon: Radar,
     labelEn: "Competitive Intelligence Radar",
     labelFa: "رادار تحلیل رقابتی برند",
-    path: "/solutions/radar"
+    path: "/dashboard/competitive"
   },
   {
     icon: Settings,
     labelEn: "System Configuration",
     labelFa: "پیکربندی سیستم",
-    path: "/settings"
+    path: "/dashboard/settings"
   },
   {
     icon: User,
