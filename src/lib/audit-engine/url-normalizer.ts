@@ -8,8 +8,8 @@ export function normalizeAndValidateUrl(inputUrl: string): string | null {
 
   let trimmed = inputUrl.trim();
 
-  // Default to https if no protocol is defined
-  if (!/^https?:\/\//i.test(trimmed)) {
+  // Prepend https:// only if there is no protocol at all
+  if (!/^[a-zA-Z]+:\/\//i.test(trimmed)) {
     trimmed = "https://" + trimmed;
   }
 
@@ -23,6 +23,11 @@ export function normalizeAndValidateUrl(inputUrl: string): string | null {
 
     // Ensure hostname is present and not empty
     if (!parsed.hostname || parsed.hostname.trim() === "") {
+      return null;
+    }
+
+    // Ensure it contains a dot (unless it's localhost) to represent a valid domain
+    if (parsed.hostname !== "localhost" && !parsed.hostname.includes(".")) {
       return null;
     }
 
