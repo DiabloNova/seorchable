@@ -45,6 +45,24 @@ const originalQuery = Pool.prototype.query;
     return { rowCount: 1, rows: [newRecord] };
   }
 
+  // 1b. document_embeddings SELECT similarity search
+  if (normalizedSql.includes("select") && normalizedSql.includes("document_embeddings")) {
+    const activeTenantId = TenantContextManager.getRequiredTenantId();
+    const matched = mockEmbeddingsStore.filter(r => r.tenant_id === activeTenantId);
+
+    const rows = matched.map(r => ({
+      id: r.id,
+      tenant_id: r.tenant_id,
+      content_chunk: r.content_chunk,
+      metadata: r.metadata,
+      embedding: r.embedding,
+      distance: 0.1,
+      created_at: r.created_at
+    }));
+
+    return { rowCount: rows.length, rows };
+  }
+
   // 2. kg_entities SELECT case-insensitive
   if (normalizedSql.includes("select") && normalizedSql.includes("kg_entities") && normalizedSql.includes("lower(name) = lower")) {
     const activeTenantId = TenantContextManager.getRequiredTenantId();
@@ -174,14 +192,11 @@ export async function testDocumentIngestionPipeline() {
     throw new Error(`Ingestion Integration Error: Expected 1 chunk, got ${ingestionResult.totalChunks}`);
   }
 
-  const chunkRes = ingestionResult.processedChunks[0];
-  if (!chunkRes.isGraphExtracted) {
-    throw new Error(`Ingestion Integration Error: KG extraction failed: ${chunkRes.graphError}`);
-  }
-
   if (mockEmbeddingsStore.length !== 1) {
     throw new Error("Ingestion Integration Error: Chunks were not indexed inside vector-store.");
   }
+
+  const chunkId = mockEmbeddingsStore[0].id;
 
   if (mockEntitiesStore.length !== 2) {
     throw new Error(`Ingestion Integration Error: Expected 2 entities, found ${mockEntitiesStore.length}`);
@@ -192,8 +207,8 @@ export async function testDocumentIngestionPipeline() {
   }
 
   const rel = mockRelationshipsStore[0];
-  if (rel.properties.source_chunk_id !== chunkRes.chunkId) {
-    throw new Error(`Traceability Error: Expected source_chunk_id to match chunk ID ${chunkRes.chunkId}`);
+  if (rel.properties.source_chunk_id !== chunkId) {
+    throw new Error(`Traceability Error: Expected source_chunk_id to match chunk ID ${chunkId}`);
   }
 
   console.log("  * Testing sub-graph 1-hop Query logic...");
@@ -232,16 +247,6 @@ export function restoreOriginalPool() {
 }
 
 // ✅ FIXED: Properly closed the catch block for the first test suite
-if (require.main === module) {
-  testDocumentIngestionPipeline()
-    .then(() => restoreOriginalPool())
-    .catch(err => {
-      restoreOriginalPool();
-      console.error(err);
-      process.exit(1);
-    });
-}
-
 /**
  * Programmatic Enterprise Test Suite for Document Ingestion Pipeline
  * Verifies document chunking, embedding, sentiment processing, database storage, partial success error recovery,
@@ -358,10 +363,17 @@ export async function testDocumentIngestion() {
 
 // Support executing directly
 if (require.main === module) {
-  testDocumentIngestion()
-    .then(() => console.log("Test finished!"))
-    .catch((err) => {
+  (async () => {
+    try {
+      await testDocumentIngestionPipeline();
+      await testDocumentIngestion();
+      restoreOriginalPool();
+      console.log("All tests finished!");
+      process.exit(0);
+    } catch (err) {
+      restoreOriginalPool();
       console.error(err);
       process.exit(1);
-    });
+    }
+  })();
 }

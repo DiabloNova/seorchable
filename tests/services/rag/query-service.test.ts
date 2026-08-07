@@ -32,18 +32,14 @@ function calculateCosineDistance(a: number[], b: number[]): number {
   return 1 - (dotProduct / (Math.sqrt(normA) * Math.sqrt(normB)));
 }
 
-interface MockQueryable {
-  query: (sql: string, params?: unknown[]) => Promise<{ rowCount: number; rows: unknown[] }>;
-}
-
 // Resilient query mocking for standalone execution
 const originalQuery = Pool.prototype.query;
 function setupMockInterceptors() {
-  (Pool.prototype as unknown as MockQueryable).query = async function(sql: string, params: unknown[] = []) {
+  (Pool.prototype as any).query = async function(sql: string, params: any[] = []): Promise<any> {
     const normalizedSql = sql.toLowerCase();
 
     if (normalizedSql.includes("insert into document_embeddings")) {
-      const [id, tenantId, contentChunk, metadataJson, embeddingStr, createdAt] = params as [string, string, string, string | Record<string, unknown>, string, string];
+      const [id, tenantId, contentChunk, metadataJson, embeddingStr, createdAt] = params as [string, string, string, any, string, string];
       const embedding = JSON.parse(embeddingStr) as number[];
       const metadata = typeof metadataJson === "string" ? JSON.parse(metadataJson) as Record<string, unknown> : metadataJson;
 
@@ -91,7 +87,7 @@ function setupMockInterceptors() {
 
     // Call original or fallback
     if (originalQuery) {
-      return originalQuery.apply(this, [sql, params as unknown[]]);
+      return originalQuery.apply(this, [sql, params] as any);
     }
     return { rowCount: 0, rows: [] };
   };

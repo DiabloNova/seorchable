@@ -40,7 +40,7 @@ export async function testLlmAnalytics() {
       throw new Error(`Scenario A Failed: yourBrand SOV percentage out of bounds: ${payloadA.shareOfVoice.yourBrand}`);
     }
 
-    const totalSOV = payloadA.shareOfVoice.yourBrand + payloadA.shareOfVoice.competitors.reduce((acc, c) => acc + c.percentage, 0);
+    const totalSOV = payloadA.shareOfVoice.yourBrand + payloadA.shareOfVoice.competitors.reduce((acc: number, c: { name: string; percentage: number }) => acc + c.percentage, 0);
     if (totalSOV !== 100) {
       throw new Error(`Scenario A Failed: Share of voice percentages do not sum to 100, got total: ${totalSOV}`);
     }
