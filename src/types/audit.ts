@@ -163,3 +163,12 @@ export interface AuditRecommendation {
   action: string;
   impactDescription: string;
 }
+
+export interface UnifiedAuditResponse {
+  url: string;
+  normalizedUrl: string;
+  timestamp: string;
+  features: NormalizedAuditFeatures;
+  scores: AuditReportScores;
+  recommendations: AuditRecommendation[];
+}
