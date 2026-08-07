@@ -6,7 +6,8 @@ import { loginAction, logoutAction } from "@/app/actions/auth";
 
 interface AuthContextType {
   session: Session;
-  login: (email: string) => Promise<void>;
+  login: (email: string, password?: string) => Promise<void>;
+  register: (name: string, email: string, password?: string) => Promise<void>;
   logout: () => Promise<void>;
   hasPermission: (requiredRole: UserRole) => boolean;
 }
@@ -14,9 +15,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // Use a state initialization function to avoid calling setState inside useEffect on mount
   const [session, setSession] = useState<Session>(() => {
-    // Return loading/idle default for SSR or initial client render
     return {
       user: null,
       expiresAt: null,
@@ -25,7 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    // Load and resolve initial session state on the client side
+    // Check for existing session on the client side
     const storedUser = localStorage.getItem("auth_session_user");
     let initialUser: User | null = null;
 
@@ -37,57 +36,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    if (!initialUser) {
-      initialUser = {
-        id: "usr-1001",
-        name: "Seyed Alireza",
-        email: "alireza@brandintel.ai",
-        role: "workspace_admin",
-        workspaceId: "ws-tehran",
-      };
-      localStorage.setItem("auth_session_user", JSON.stringify(initialUser));
-    }
+    if (initialUser) {
+      // Sync session server-side cookies
+      loginAction(initialUser.email, initialUser.workspaceId, initialUser.id).catch((err) => {
+        console.error("Failed to sync initial session cookies:", err);
+      });
 
-    const resolvedUser = initialUser;
-
-    // Sync session server-side cookies
-    loginAction(resolvedUser.email, resolvedUser.workspaceId, resolvedUser.id).catch((err) => {
-      console.error("Failed to sync initial session cookies:", err);
-    });
-
-    // We update state asynchronously or queue it appropriately
-    const timer = setTimeout(() => {
       setSession({
-        user: resolvedUser,
+        user: initialUser,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         status: "authenticated",
       });
-    }, 0);
-
-    return () => clearTimeout(timer);
+    } else {
+      setSession({
+        user: null,
+        expiresAt: null,
+        status: "unauthenticated",
+      });
+    }
   }, []);
 
-  const login = async (email: string) => {
+  const login = async (email: string, password?: string) => {
     setSession((prev) => ({ ...prev, status: "loading" }));
 
-    // Simulate API round-trip delay
+    // Prepare for future backend API integration here
+    // e.g. const res = await fetch("/api/v1/auth/login", { ... })
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    const mockUser: User = {
-      id: "usr-1001",
-      name: "Seyed Alireza",
+    // Extract mock name from email for high-fidelity personalized experience
+    const namePart = email.split("@")[0];
+    const name = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+
+    const authenticatedUser: User = {
+      id: `usr-${Math.random().toString(36).substr(2, 9)}`,
+      name: name || "Enterprise User",
       email,
       role: "workspace_admin",
-      workspaceId: "ws-tehran",
+      workspaceId: "ws-default",
     };
 
-    localStorage.setItem("auth_session_user", JSON.stringify(mockUser));
+    localStorage.setItem("auth_session_user", JSON.stringify(authenticatedUser));
 
     // Secure server-side cookie setting
-    await loginAction(mockUser.email, mockUser.workspaceId, mockUser.id);
+    await loginAction(authenticatedUser.email, authenticatedUser.workspaceId, authenticatedUser.id);
 
     setSession({
-      user: mockUser,
+      user: authenticatedUser,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      status: "authenticated",
+    });
+  };
+
+  const register = async (name: string, email: string, password?: string) => {
+    setSession((prev) => ({ ...prev, status: "loading" }));
+
+    // Prepare for future backend API integration here
+    // e.g. const res = await fetch("/api/v1/auth/register", { ... })
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    const registeredUser: User = {
+      id: `usr-${Math.random().toString(36).substr(2, 9)}`,
+      name,
+      email,
+      role: "workspace_admin",
+      workspaceId: "ws-default",
+    };
+
+    localStorage.setItem("auth_session_user", JSON.stringify(registeredUser));
+
+    // Secure server-side cookie setting
+    await loginAction(registeredUser.email, registeredUser.workspaceId, registeredUser.id);
+
+    setSession({
+      user: registeredUser,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       status: "authenticated",
     });
@@ -125,7 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, login, logout, hasPermission }}>
+    <AuthContext.Provider value={{ session, login, register, logout, hasPermission }}>
       {children}
     </AuthContext.Provider>
   );
