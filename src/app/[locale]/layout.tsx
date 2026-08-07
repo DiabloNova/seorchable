@@ -2,7 +2,7 @@ import React from "react";
 import type { Metadata, Viewport } from "next";
 import { AuthProvider } from "@/components/AuthProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { persianPrimary, persianDisplay, englishTitleFont } from "@/config/fonts";
+import { persianPrimary, persianDisplay } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
 import FloatingSidebar from "../../../components/navigation/FloatingSidebar";
 import GlobalNavigationControls from "@/components/navigation/GlobalNavigationControls";
@@ -48,8 +48,8 @@ interface LayoutProps {
 export default async function RootLayout({ children, params }: LayoutProps) {
   const { locale } = await params;
 
-  // Apply all primary, display, and English title font variable classes to html
-  const fontClasses = `${persianPrimary.variable} ${persianDisplay.variable} ${englishTitleFont.variable}`;
+  // Apply both primary and display font variable classes to html
+  const fontClasses = `${persianPrimary.variable} ${persianDisplay.variable}`;
 
   return (
     <html

@@ -2,59 +2,19 @@
 > ai-branding-platform@0.1.0 dev /app
 > next dev
 
-⚠ Port 3000 is in use by an unknown process, using available port 3003 instead.
 ▲ Next.js 16.2.11 (Turbopack)
-- Local:         http://localhost:3003
-- Network:       http://192.168.0.2:3003
-✓ Ready in 827ms
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+✓ Ready in 515ms
 
-○ Compiling /[locale]/pricing ...
- GET /en/pricing 200 in 6.6s (next.js: 6.1s, application-code: 499ms)
- GET /en/pricing 200 in 131ms (next.js: 29ms, application-code: 102ms)
- POST /en/pricing 200 in 73ms (next.js: 13ms, application-code: 60ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 5ms src/actions/auth.ts
- GET /en/dashboard/audits 200 in 1787ms (next.js: 1682ms, application-code: 106ms)
- POST /en/dashboard/audits 200 in 81ms (next.js: 27ms, application-code: 54ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 2ms src/actions/auth.ts
- GET /en/dashboard/audits/aud-001 200 in 1951ms (next.js: 1849ms, application-code: 101ms)
- POST /en/dashboard/audits/aud-001 200 in 115ms (next.js: 34ms, application-code: 81ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 5ms src/actions/auth.ts
- GET /en/dashboard/brand-monitoring 200 in 1885ms (next.js: 1798ms, application-code: 88ms)
- POST /en/dashboard/brand-monitoring 200 in 91ms (next.js: 36ms, application-code: 56ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 3ms src/actions/auth.ts
- GET /en/dashboard/reports 200 in 1606ms (next.js: 1533ms, application-code: 73ms)
- POST /en/dashboard/reports 200 in 81ms (next.js: 32ms, application-code: 50ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 2ms src/actions/auth.ts
- GET /en/dashboard/settings 200 in 1949ms (next.js: 1766ms, application-code: 183ms)
- POST /en/dashboard/settings 200 in 139ms (next.js: 48ms, application-code: 91ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 5ms src/actions/auth.ts
- GET /en/dashboard/billing 200 in 3.3s (next.js: 3.2s, application-code: 99ms)
- POST /en/dashboard/billing 200 in 96ms (next.js: 44ms, application-code: 51ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 4ms src/actions/auth.ts
- GET /en/pricing 200 in 1479ms (next.js: 758ms, application-code: 721ms)
- GET /en/pricing 200 in 242ms (next.js: 34ms, application-code: 208ms)
- POST /en/pricing 200 in 147ms (next.js: 45ms, application-code: 102ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 4ms src/actions/auth.ts
- GET /en/dashboard/audits 200 in 335ms (next.js: 114ms, application-code: 221ms)
- POST /en/dashboard/audits 200 in 62ms (next.js: 4ms, application-code: 58ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 3ms src/actions/auth.ts
- GET /en/dashboard/audits/aud-001 200 in 192ms (next.js: 70ms, application-code: 122ms)
- POST /en/dashboard/audits/aud-001 200 in 64ms (next.js: 7ms, application-code: 56ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 4ms src/actions/auth.ts
- GET /en/dashboard/brand-monitoring 200 in 186ms (next.js: 72ms, application-code: 114ms)
- POST /en/dashboard/brand-monitoring 200 in 66ms (next.js: 4ms, application-code: 62ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 2ms src/actions/auth.ts
- GET /en/dashboard/reports 200 in 140ms (next.js: 62ms, application-code: 78ms)
- POST /en/dashboard/reports 200 in 56ms (next.js: 4ms, application-code: 51ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 3ms src/actions/auth.ts
- GET /en/dashboard/settings 200 in 126ms (next.js: 57ms, application-code: 69ms)
- POST /en/dashboard/settings 200 in 55ms (next.js: 5ms, application-code: 50ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 2ms src/actions/auth.ts
- GET /en/dashboard/billing 200 in 196ms (next.js: 56ms, application-code: 140ms)
- POST /en/dashboard/billing 200 in 55ms (next.js: 3ms, application-code: 52ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 1ms src/actions/auth.ts
- GET /en/pricing 200 in 178ms (next.js: 35ms, application-code: 143ms)
-○ Compiling /[locale]/solutions/aeo ...
- GET /en/solutions/aeo 200 in 4.4s (next.js: 4.2s, application-code: 149ms)
- GET /en/about 200 in 3.4s (next.js: 3.1s, application-code: 224ms)
- GET /en/contact 200 in 2.1s (next.js: 2.0s, application-code: 111ms)
+○ Compiling /[locale] ...
+ GET /fa 200 in 8.4s (next.js: 7.8s, application-code: 655ms)
+ POST /fa 200 in 201ms (next.js: 51ms, application-code: 150ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 11ms src/actions/auth.ts
+ GET /fa/invoice 200 in 2.1s (next.js: 1997ms, application-code: 110ms)
+ POST /fa/invoice 200 in 89ms (next.js: 36ms, application-code: 53ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 4ms src/actions/auth.ts
+ GET /fa/docs 200 in 1523ms (next.js: 1425ms, application-code: 98ms)
+ POST /fa/docs 200 in 161ms (next.js: 34ms, application-code: 127ms)
+  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 4ms src/actions/auth.ts
+✓ Compiled in 350ms

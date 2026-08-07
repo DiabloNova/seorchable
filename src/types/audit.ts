@@ -1,7 +1,3 @@
-// ==========================================
-// Core Audit Engine Contracts (Foundation)
-// ==========================================
-
 export interface RawCrawlData {
   url: string;
   html?: string;
@@ -101,10 +97,10 @@ export interface NormalizedAuditFeatures {
       hierarchyComplete: boolean;
     };
     readability: {
-      score: number;
+      score: number; // e.g. Flesch-Kincaid equivalent or custom readability proxy
       paragraphCount: number;
       avgParagraphLength: number;
-      density: number;
+      density: number; // Paragraph count to word count ratio
     };
     eeat: {
       hasAuthorInfo: boolean;
@@ -125,15 +121,15 @@ export interface NormalizedAuditFeatures {
     orgSchemaPresent: boolean;
     articleSchemaPresent: boolean;
     productSchemaPresent: boolean;
-    knowledgeGraphReadiness: number;
-    citationReadiness: number;
+    knowledgeGraphReadiness: number; // score 0 to 100
+    citationReadiness: number; // score 0 to 100
   };
 
   llmReadiness: {
-    entityDensity: number;
+    entityDensity: number; // density multiplier
     brandMentionCount: number;
     brandMentionDensity: number;
-    semanticCompletenessScore: number;
+    semanticCompletenessScore: number; // 0 to 100
     topicCoverageMetrics: {
       categories: string[];
       score: number;
@@ -143,7 +139,7 @@ export interface NormalizedAuditFeatures {
 
 export interface ScoreContributor {
   factor: string;
-  impact: number;
+  impact: number; // Positive or negative score contribution
   description: string;
 }
 
@@ -160,99 +156,10 @@ export interface AuditReportScores {
   overall: DomainScore;
 }
 
-export type PlatformModule =
-  | "AEO Insights"
-  | "LLM Analytics"
-  | "Prompt Intelligence"
-  | "Content Studio"
-  | "Technical Optimisation"
-  | "AI Shopping"
-  | "MCP"
-  | "Agent";
-
 export interface AuditRecommendation {
   issue: string;
-  severity: "critical" | "high" | "medium" | "low";
-  module: PlatformModule;
+  severity: "low" | "medium" | "high" | "critical";
+  module: "AEO Insights" | "LLM Analytics" | "Prompt Intelligence" | "Content Studio" | "Technical Optimisation" | "AI Shopping" | "MCP" | "Agent";
   action: string;
-  impactDescription?: string;
-}
-
-export interface UnifiedAuditResponse {
-  auditId: string;
-  url: string;
-  normalizedUrl: string;
-  timestamp: string;
-  data: NormalizedAuditFeatures;
-  scores: AuditReportScores;
-  recommendations: AuditRecommendation[];
-  warnings: string[];
-}
-
-// ==========================================
-// Legacy / UI Integration State Contracts
-// ==========================================
-
-export type AuditStatus =
-  | "idle"
-  | "invalid-url"
-  | "loading"
-  | "auth-required"
-  | "processing"
-  | "completed"
-  | "error";
-
-export interface FirecrawlLog {
-  timestamp: string;
-  level: "info" | "warning" | "error";
-  message: string;
-}
-
-export interface LLMProviderInsight {
-  providerName: string;
-  sentimentScore: number;
-  visibilityIndex: number;
-  recommendation: string;
-}
-
-export interface AIAnalysisResult {
-  geminiScore: number;
-  geminiInsights: string;
-  firecrawlCrawledPagesCount: number;
-  firecrawlLogs: FirecrawlLog[];
-  llmProviderInsights: LLMProviderInsight[];
-}
-
-export interface RecommendationItem {
-  issue: string;
-  recommendation: string;
-  priority: "high" | "medium" | "low";
-}
-
-export interface RecommendationResult {
-  contentGaps: RecommendationItem[];
-  missingEntities: string[];
-  brandPositioningImprovements: string[];
-  aiDiscoverabilityRecommendations: string[];
-}
-
-export interface AuditJob {
-  id: string;
-  url: string;
-  status: AuditStatus;
-  createdAt: string;
-  score: number;
-  grade: "A" | "B" | "C" | "D" | "F";
-  analysis: AIAnalysisResult;
-  recommendations: RecommendationResult;
-}
-
-export interface IAiAuditService {
-  validateUrl: (url: string) => boolean;
-  provisionAuditJob: (url: string) => Promise<AuditJob>;
-  simulateCrawlingAndAnalysis: (
-    job: AuditJob,
-    onProgress: (log: string) => void
-  ) => Promise<AuditJob>;
-} main
+  impactDescription: string;
 }
