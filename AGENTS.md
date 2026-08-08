@@ -1,9 +1,9 @@
 <!-- BEGIN:nextjs-agent-rules -->
-This is NOT the Next.js you know
+## This is NOT the Next.js you know
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in node_modules/next/dist/docs/ before writing any code. Heed deprecation notices.
 
-Repository Agent Instructions
-Purpose
+# Repository Agent Instructions
+### Purpose
 This file defines the permanent working rules for AI coding agents, including Jules, working in this repository.
 The goal is to make changes that are correct, minimal, secure, testable, and consistent with the current repository.
 
@@ -67,8 +67,8 @@ Prefer existing:
 
 over creating parallel implementations.
 
-Do not introduce a new architectural pattern when an existing pattern already solves the problem.
-Do not migrate frameworks, libraries, persistence technologies, or major architectural patterns unless explicitly requested.
+* Do not introduce a new architectural pattern when an existing pattern already solves the problem.
+* Do not migrate frameworks, libraries, persistence technologies, or major architectural patterns unless explicitly requested.
 
 ## 5. Next.js
 This repository uses a Next.js version whose APIs and conventions may differ from general training knowledge.
@@ -79,8 +79,8 @@ Before changing Next.js-specific code:
 - Follow the APIs and conventions supported by the installed version.
 - Check deprecation notices.
 
-Do not rely on assumptions based on older Next.js versions.
-Do not introduce deprecated APIs when the installed version provides a supported alternative.
+* Do not rely on assumptions based on older Next.js versions.
+* Do not introduce deprecated APIs when the installed version provides a supported alternative.
 
 ## 6. Client / Server Boundaries
 Respect Next.js server/client boundaries.
@@ -95,7 +95,7 @@ Never expose:
 
 to client-side code.
 
-Do not add "use client" unless required.
+* Do not add "use client" unless required.
 Before moving logic between server and client, inspect the security, rendering, and data-flow implications.
 
 ## 7. Authentication & Authorization
@@ -103,14 +103,14 @@ Treat authentication and authorization as security boundaries.
 Never bypass authentication or authorization for convenience.
 Protected operations must enforce authorization server-side.
 Preserve the existing authentication/session architecture unless the task explicitly requires changing it.
-Never expose sensitive authentication information.
+* Never expose sensitive authentication information.
 
 ## 8. Multi-Tenancy & Data Isolation
-If functionality operates on tenant-specific data, tenant isolation must be preserved.
-Never trust a client-provided tenant identifier as sufficient authorization.
-Tenant access must be validated through the appropriate server-side/data-access boundary.
-Do not introduce queries or repository operations that can return another tenant's data.
-Do not bypass existing database-level or repository-level isolation mechanisms.
+- If functionality operates on tenant-specific data, tenant isolation must be preserved.
+- Never trust a client-provided tenant identifier as sufficient authorization.
+- Tenant access must be validated through the appropriate server-side/data-access boundary.
+* Do not introduce queries or repository operations that can return another tenant's data.
+* Do not bypass existing database-level or repository-level isolation mechanisms.
 
 ## 9. Database & Persistence
 Do not assume the persistence architecture from documentation.
@@ -124,8 +124,8 @@ Preserve existing guarantees such as:
 - repository boundaries
 - database-level security
 
-Do not replace production persistence with in-memory or mock storage.
-Do not change persistence architecture as part of an unrelated task.
+* Do not replace production persistence with in-memory or mock storage.
+* Do not change persistence architecture as part of an unrelated task.
 
 ## 10. Environment Variables & Secrets
 Never expose secrets or sensitive configuration.
@@ -146,7 +146,7 @@ Do not create or modify production secrets as part of an unrelated task.
 
 ## 11. AI & External Services
 Before modifying AI functionality or external integrations, inspect the actual implementation.
-Do not assume that a provider, model, API, or pipeline exists because it is mentioned in documentation.
+* Do not assume that a provider, model, API, or pipeline exists because it is mentioned in documentation.
 Preserve:
 
 - existing API contracts
@@ -156,12 +156,12 @@ Preserve:
 - server/client boundaries
 - credential security
 
-Do not introduce new external services unless explicitly required.
+* Do not introduce new external services unless explicitly required.
 
 ## 12. URL Fetching & SSRF
 Any server-side fetching of user-provided URLs is security-sensitive.
 Preserve existing SSRF protections.
-Do not introduce unrestricted requests to arbitrary user-supplied URLs.
+* Do not introduce unrestricted requests to arbitrary user-supplied URLs.
 Be careful with:
 
 - localhost
@@ -173,7 +173,7 @@ Be careful with:
 - unexpected protocols
 - DNS-related SSRF risks
 
-Do not replace an existing hardened implementation with an unrestricted fetch.
+* Do not replace an existing hardened implementation with an unrestricted fetch.
 
 ## 13. Localization
 The application contains localized routes including:
@@ -190,8 +190,8 @@ UI changes must consider:
 - text expansion
 - responsive layouts
 
-Do not hard-code user-facing strings when the existing localization system should be used.
-Do not break one locale while implementing another.
+* Do not hard-code user-facing strings when the existing localization system should be used.
+* Do not break one locale while implementing another.
 
 ## 14. UI, Themes & Design System
 The application supports light and dark themes.
@@ -206,7 +206,7 @@ Prefer existing:
 - Tailwind utilities
 - animation conventions
 
-Do not introduce arbitrary visual systems when an existing design system is available.
+* Do not introduce arbitrary visual systems when an existing design system is available.
 UI changes should remain:
 
 - responsive
@@ -218,8 +218,8 @@ Avoid visual redesign when the task only requires functional changes.
 
 ## 15. Dependencies
 Before adding a dependency, verify that the repository does not already provide the required functionality.
-Do not add packages for trivial functionality without a clear reason.
-Do not upgrade dependencies unless required by the task.
+* Do not add packages for trivial functionality without a clear reason.
+* Do not upgrade dependencies unless required by the task.
 Avoid dependency changes that expand the scope of an unrelated task.
 
 ## 16. API Contracts
@@ -234,13 +234,13 @@ Before changing an API, inspect:
 - authorization
 - tests
 
-Do not silently change API contracts.
+* Do not silently change API contracts.
 If a breaking API change is required, clearly identify the affected consumers and implications.
 
 ## 17. Testing & Validation
 Use the repository's actual validation infrastructure.
 Before running validation, inspect `package.json` to discover the exact project scripts (e.g., build, lint, test, typecheck). 
-Do not assume standard script names if `package.json` defines custom equivalents.
+* Do not assume standard script names if `package.json` defines custom equivalents.
 
 When relevant, run the project's actual commands for:
 - TypeScript checks / type-checking
@@ -250,11 +250,11 @@ When relevant, run the project's actual commands for:
 - E2E tests
 - Production build
 
-Do not invent commands when the repository already defines the correct ones.
-Do not claim that a validation step passed unless it was actually executed.
-Do not remove or weaken tests merely to make them pass.
+* Do not invent commands when the repository already defines the correct ones.
+* Do not claim that a validation step passed unless it was actually executed.
+* Do not remove or weaken tests merely to make them pass.
 When fixing a bug, add or update a regression test when appropriate.
-If a required validation cannot be executed, state why.
+- If a required validation cannot be executed, state why.
 Never include secrets or sensitive environment values in validation output or the final report.
 
 ## 18. Change Hygiene
@@ -273,14 +273,14 @@ Keep changes focused and reviewable.
 
 ## 19. Documentation Governance
 Documentation describes the implementation; it does not define it.
-Do not document planned functionality as implemented functionality.
+* Do not document planned functionality as implemented functionality.
 When documentation and implementation disagree:
 - inspect the implementation;
 - identify the actual behavior;
 - report the discrepancy;
 - update documentation only when required by the task.
 
-Do not invent architecture to make documentation appear complete.
+* Do not invent architecture to make documentation appear complete.
 
 ## 20. Task Workflow
 For every task:
@@ -318,7 +318,7 @@ Treat these as high-risk and do not perform them implicitly:
 - environment-variable changes
 - major architectural refactoring
 
-These require explicit task scope.
+* These require explicit task scope.
 
 ## 22. Definition of Done
 A task is complete only when:
