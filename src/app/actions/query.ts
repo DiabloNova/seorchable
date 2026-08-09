@@ -1,9 +1,9 @@
 "use server";
 
 import { z } from "zod";
-import { cookies } from "next/headers";
 import { answerQuestion } from "@/services/rag/query-service";
 import { TenantContextManager } from "@/core/database/tenant-context";
+import { requireSession } from "@/services/auth/session";
 
 const querySchema = z.object({
   question: z.string().min(1, "Question must be provided"),
@@ -19,13 +19,25 @@ export async function queryKnowledgeGraphAction(data: {
     return { success: false, error: "Validation failed", details: parsed.error.format() };
   }
 
-  const cookieStore = await cookies();
-  const tenantId = cookieStore.get("tenant_id")?.value;
-  const userId = cookieStore.get("user_id")?.value;
-
-  if (!tenantId || !userId) {
-    return { success: false, error: "Unauthorized: Missing secure tenant or user credentials on server." };
+  let session;
+  try {
+    session = await requireSession();
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Unauthorized: Missing or invalid secure session on server."
+    };
   }
+
+  if (!session.user) {
+    return {
+      success: false,
+      error: "Unauthorized: Active user not resolved from secure session."
+    };
+  }
+
+  const tenantId = session.user.workspaceId;
+  const userId = session.user.id;
 
   try {
     const requestId = `req-act-query-${Date.now()}`;
