@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { DocumentIngestionService } from "@/services/ingestion/document-ingestion";
 import { TenantContextManager } from "@/core/database/tenant-context";
+import { authorizeApiRequest } from "@/services/auth/authorization";
 
 // Request body validation schema
 const requestSchema = z.object({
@@ -17,20 +18,17 @@ const requestSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Authenticate check: Extract user ID and tenant ID from request headers
-    const userId = req.headers.get("x-user-id");
-    if (!userId || userId.trim() === "") {
+    // 1. Authoritative API identity resolution (session overrides client headers)
+    let userId: string;
+    let tenantId: string;
+    try {
+      const auth = await authorizeApiRequest(req);
+      userId = auth.userId;
+      tenantId = auth.tenantId;
+    } catch (err: any) {
       return NextResponse.json(
-        { error: "Unauthorized", message: "Authentication fails entirely: missing valid user credentials" },
-        { status: 401 }
-      );
-    }
-
-    const tenantId = req.headers.get("x-tenant-id");
-    if (!tenantId || tenantId.trim() === "") {
-      return NextResponse.json(
-        { error: "Bad Request", message: "Missing tenant context" },
-        { status: 400 }
+        { error: "Unauthorized", message: err.message || "Authentication failed" },
+        { status: err.statusCode || 401 }
       );
     }
 

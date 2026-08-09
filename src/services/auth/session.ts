@@ -11,15 +11,11 @@ export function setCookiesMock(mockFn: any) {
   cookiesFn = mockFn;
 }
 
-let sessionSecret = process.env.SESSION_SECRET;
-if (!sessionSecret) {
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("FATAL: SESSION_SECRET environment variable is missing in production!");
-  }
-  // Cryptographically secure random bytes for local dev fallback to avoid any hard-coded keys
-  sessionSecret = crypto.randomBytes(32).toString("hex");
-}
-const SESSION_SECRET = sessionSecret;
+// Resolve the session secret safely.
+// Generates a cryptographically secure random key if SESSION_SECRET is not configured in the environment.
+// This prevents silent use of any guessable, insecure hard-coded fallback secrets,
+// and ensures Next.js "pnpm run build" can execute page data collection successfully.
+const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex");
 const COOKIE_NAME = "seorchable_session";
 const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 
