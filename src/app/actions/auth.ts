@@ -1,35 +1,29 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { User, Session } from "@/types/auth";
+import { createSession, invalidateSession, getSession } from "@/services/auth/session";
 
 /**
- * Sets secure, server-readable httpOnly cookies for the active tenant and user session.
+ * Sets secure, server-readable httpOnly cookies and establishes an authoritative server session.
  */
-export async function loginAction(email: string, workspaceId: string = "ws-tehran", userId: string = "usr-1001") {
-  const cookieStore = await cookies();
-
-  cookieStore.set("tenant_id", workspaceId, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 1 week
-  });
-
-  cookieStore.set("user_id", userId, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 1 week
-  });
+export async function loginAction(user: User) {
+  await createSession(user);
 }
 
 /**
- * Clears secure cookies on logout.
+ * Clears secure cookies and invalidates the session on logout.
  */
 export async function logoutAction() {
-  const cookieStore = await cookies();
-  cookieStore.delete("tenant_id");
-  cookieStore.delete("user_id");
+  await invalidateSession();
+}
+
+/**
+ * Securely verifies and returns the current server-validated session state for client synchronization.
+ */
+export async function getServerSessionAction(): Promise<Session> {
+  const session = await getSession();
+  if (!session) {
+    return { user: null, expiresAt: null, status: "unauthenticated" };
+  }
+  return session;
 }
