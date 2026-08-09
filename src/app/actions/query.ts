@@ -4,6 +4,7 @@ import { z } from "zod";
 import { answerQuestion } from "@/services/rag/query-service";
 import { TenantContextManager } from "@/core/database/tenant-context";
 import { requireSession } from "@/services/auth/session";
+import { requireWorkspaceMembership } from "@/services/auth/authorization";
 
 const querySchema = z.object({
   question: z.string().min(1, "Question must be provided"),
@@ -22,17 +23,15 @@ export async function queryKnowledgeGraphAction(data: {
   let session;
   try {
     session = await requireSession();
+    if (!session.user) {
+      throw new Error("Unauthorized: Active user not resolved from secure session.");
+    }
+    // Validate workspace membership at the server action boundary
+    await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
   } catch (err: unknown) {
     return {
       success: false,
       error: err instanceof Error ? err.message : "Unauthorized: Missing or invalid secure session on server."
-    };
-  }
-
-  if (!session.user) {
-    return {
-      success: false,
-      error: "Unauthorized: Active user not resolved from secure session."
     };
   }
 

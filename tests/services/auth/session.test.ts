@@ -12,6 +12,7 @@ import { User } from "../../../src/types/auth";
 import { TenantContextManager } from "../../../src/core/database/tenant-context";
 import { ingestDocumentAction } from "../../../src/app/actions/ingestion";
 import { queryKnowledgeGraphAction } from "../../../src/app/actions/query";
+import { requireWorkspaceMembership, requireRole } from "../../../src/services/auth/authorization";
 
 // Mock implementation of the cookie store
 const mockCookieStore = {
@@ -178,7 +179,7 @@ export async function runAuthTests() {
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
     })
   ).toString("base64url");
-  mockCookieStore.store.set("seorchable_session", {
+  mockCookieStore.set("seorchable_session", {
     value: `${tamperedPayloadStr}.${originalSig}`, // Payload changed, signature kept original
     httpOnly: true,
     sameSite: "strict",
@@ -365,6 +366,88 @@ export async function runAuthTests() {
     } else {
       throw err;
     }
+  }
+
+  // ----------------------------------------------------
+  // Scenario 11: Workspace Membership & Tenant Isolation Tests
+  // ----------------------------------------------------
+  console.log("  * Testing Workspace Membership Enforcements...");
+  // User is member of ws-test-99
+  await createSession(mockUser);
+
+  // 11.1 Accessing own workspace -> ALLOW
+  try {
+    await requireWorkspaceMembership(mockUser.id, "ws-test-99");
+    console.log("    ✅ Success: Member access to own workspace allowed.");
+  } catch (err) {
+    throw new Error(`Workspace Membership Failed: Member was blocked from own workspace: ${err}`);
+  }
+
+  // 11.2 Accessing another workspace -> DENY
+  try {
+    await requireWorkspaceMembership(mockUser.id, "ws-other-hacker-tenant");
+    throw new Error("Workspace Membership Violation: Non-member was allowed access to another workspace!");
+  } catch (err: any) {
+    if (err.message && err.message.includes("is not a member")) {
+      console.log("    ✅ Success: Non-member access to another workspace correctly denied.");
+    } else {
+      throw err;
+    }
+  }
+
+  // 11.3 Super Admin accessing any workspace -> ALLOW
+  const superAdminUser: User = { ...mockUser, role: "super_admin", workspaceId: "ws-admin-home" };
+  await createSession(superAdminUser);
+  try {
+    await requireWorkspaceMembership(superAdminUser.id, "ws-some-customer-workspace");
+    console.log("    ✅ Success: Super Admin allowed access to any workspace.");
+  } catch (err) {
+    throw new Error(`Workspace Membership Failed: Super admin was blocked from customer workspace: ${err}`);
+  }
+
+  // ----------------------------------------------------
+  // Scenario 12: Role-Based Access Control (RBAC) Hierarchy Tests
+  // ----------------------------------------------------
+  console.log("  * Testing Role-Based Access Control (RBAC) Hierarchies...");
+  // 12.1 Viewer role trying to run admin-only operation -> DENY
+  const viewerUser: User = { ...mockUser, role: "viewer" };
+  await createSession(viewerUser);
+  try {
+    await requireRole("workspace_admin");
+    throw new Error("RBAC Security Violation: Viewer was allowed to perform workspace_admin actions!");
+  } catch (err: any) {
+    if (err.message && err.message.includes("Insufficient privileges")) {
+      console.log("    ✅ Success: Viewer role correctly blocked from workspace_admin actions.");
+    } else {
+      throw err;
+    }
+  }
+
+  // 12.2 Admin role executing admin-only operation -> ALLOW
+  await createSession(mockUser); // role: workspace_admin
+  try {
+    await requireRole("workspace_admin");
+    console.log("    ✅ Success: Admin allowed to perform workspace_admin actions.");
+  } catch (err) {
+    throw new Error(`RBAC Failed: Admin was blocked from admin operation: ${err}`);
+  }
+
+  // 12.3 Admin role executing viewer operation -> ALLOW
+  try {
+    await requireRole("viewer");
+    console.log("    ✅ Success: Admin allowed to perform viewer actions.");
+  } catch (err) {
+    throw new Error(`RBAC Failed: Admin was blocked from viewer operation: ${err}`);
+  }
+
+  // 12.4 Super Admin executing any operation -> ALLOW
+  await createSession(superAdminUser); // role: super_admin
+  try {
+    await requireRole("workspace_admin");
+    await requireRole("super_admin");
+    console.log("    ✅ Success: Super Admin allowed to perform all actions.");
+  } catch (err) {
+    throw new Error(`RBAC Failed: Super Admin was blocked: ${err}`);
   }
 
   console.log("✅ All Server-Side Authentication Foundation & Hardening Tests Passed Successfully!");
