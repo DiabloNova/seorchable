@@ -9,6 +9,9 @@ import {
   setCookiesMock
 } from "../../../src/services/auth/session";
 import { User } from "../../../src/types/auth";
+import { TenantContextManager } from "../../../src/core/database/tenant-context";
+import { ingestDocumentAction } from "../../../src/app/actions/ingestion";
+import { queryKnowledgeGraphAction } from "../../../src/app/actions/query";
 
 // Mock implementation of the cookie store
 const mockCookieStore = {
@@ -30,8 +33,20 @@ const mockCookieStore = {
 // Register our mock cookie function
 setCookiesMock(() => Promise.resolve(mockCookieStore));
 
+// Track intercepted Tenant Context values to verify protected actions resolve session context correctly
+let lastInterceptedTenantId = "";
+let lastInterceptedUserId = "";
+
+// Mock TenantContextManager.runWithTenantContext to avoid hitting database / vector store / AI providers during security boundary testing
+const originalRunWithTenantContext = TenantContextManager.runWithTenantContext;
+TenantContextManager.runWithTenantContext = async function (tenantId, userId, requestId, work, options) {
+  lastInterceptedTenantId = tenantId;
+  lastInterceptedUserId = userId;
+  return { mockResult: "success" } as any;
+};
+
 export async function runAuthTests() {
-  console.log("▶ Running Server-Side Authentication Foundation Tests...");
+  console.log("▶ Running Server-Side Authentication Foundation & Boundary Hardening Tests...");
 
   const mockUser: User = {
     id: "usr-test-123",
@@ -41,7 +56,9 @@ export async function runAuthTests() {
     workspaceId: "ws-test-99"
   };
 
+  // ----------------------------------------------------
   // Scenario 1: Cryptographic signature validation
+  // ----------------------------------------------------
   console.log("  * Testing Cryptographic Integrity Verification...");
   const samplePayload = "my-test-payload-data";
   const signature = signPayload(samplePayload);
@@ -55,7 +72,9 @@ export async function runAuthTests() {
     throw new Error("Integrity Test Failed: Accepted tampered payload");
   }
 
+  // ----------------------------------------------------
   // Scenario 2: Session Creation & Cookie Attributes
+  // ----------------------------------------------------
   console.log("  * Testing Session Creation...");
   mockCookieStore.clear();
   await createSession(mockUser);
@@ -89,7 +108,9 @@ export async function runAuthTests() {
     throw new Error("Session Creation Failed: user_id cookie was not set or mismatched");
   }
 
+  // ----------------------------------------------------
   // Scenario 3: Session Validation (Success Path)
+  // ----------------------------------------------------
   console.log("  * Testing Session Validation & Identity Resolution (Success path)...");
   const parsedSession = await getSession();
   if (!parsedSession) {
@@ -107,7 +128,9 @@ export async function runAuthTests() {
     throw new Error("Identity Resolution Failed: getAuthenticatedUser returned incorrect user");
   }
 
+  // ----------------------------------------------------
   // Scenario 4: requireSession Success & Failure Paths (Fail-Closed)
+  // ----------------------------------------------------
   console.log("  * Testing Fail-Closed Requirements...");
   const validSession = await requireSession();
   if (!validSession || validSession.user?.id !== mockUser.id) {
@@ -185,7 +208,134 @@ export async function runAuthTests() {
     throw new Error("Fail-Closed Security Mismatch: Expired session was accepted!");
   }
 
-  // Scenario 5: Logout & Session Invalidation
+  // ----------------------------------------------------
+  // Scenario 5: Tenant Cookie Tampering Test
+  // ----------------------------------------------------
+  console.log("  * Testing Tenant Cookie Tampering (Spoofing) Resilience...");
+  // Re-establish a valid signed session
+  await createSession(mockUser);
+
+  // Set standard plain cookie to some attacker-controlled forged value
+  mockCookieStore.store.set("tenant_id", {
+    value: "ws-hacker-forged-tenant",
+    httpOnly: true,
+    sameSite: "strict",
+    path: "/"
+  });
+
+  // Verify that requireSession() returns the actual secure tenant and completely ignores the fake plain cookie
+  const activeSessionUnderTenantSpoof = await requireSession();
+  if (activeSessionUnderTenantSpoof.user?.workspaceId !== mockUser.workspaceId) {
+    throw new Error(`Security Boundary Violation: Tampered tenant_id cookie altered the resolved workspace. Expected ${mockUser.workspaceId}, got ${activeSessionUnderTenantSpoof.user?.workspaceId}`);
+  }
+  console.log("    ✅ Success: Tampered tenant cookie was ignored.");
+
+  // ----------------------------------------------------
+  // Scenario 6: User Cookie Tampering Test
+  // ----------------------------------------------------
+  console.log("  * Testing User Cookie Tampering (Spoofing) Resilience...");
+  await createSession(mockUser);
+
+  // Set standard plain cookie to some attacker-controlled forged value
+  mockCookieStore.store.set("user_id", {
+    value: "usr-hacker-forged-id",
+    httpOnly: true,
+    sameSite: "strict",
+    path: "/"
+  });
+
+  // Verify that getAuthenticatedUser() returns the actual secure user and completely ignores the fake plain cookie
+  const activeUserUnderUserSpoof = await getAuthenticatedUser();
+  if (!activeUserUnderUserSpoof || activeUserUnderUserSpoof.id !== mockUser.id) {
+    throw new Error(`Security Boundary Violation: Tampered user_id cookie altered the resolved user. Expected ${mockUser.id}, got ${activeUserUnderUserSpoof?.id}`);
+  }
+  console.log("    ✅ Success: Tampered user cookie was ignored.");
+
+  // ----------------------------------------------------
+  // Scenario 7: Combined Identity Tampering Test
+  // ----------------------------------------------------
+  console.log("  * Testing Combined User + Tenant Cookies Tampering Resilience...");
+  await createSession(mockUser);
+
+  // Set both plain compatibility cookies to hacker values
+  mockCookieStore.store.set("user_id", {
+    value: "usr-hacker-forged-id",
+    httpOnly: true,
+    sameSite: "strict",
+    path: "/"
+  });
+  mockCookieStore.store.set("tenant_id", {
+    value: "ws-hacker-forged-tenant",
+    httpOnly: true,
+    sameSite: "strict",
+    path: "/"
+  });
+
+  const combinedSession = await requireSession();
+  if (combinedSession.user?.id !== mockUser.id || combinedSession.user?.workspaceId !== mockUser.workspaceId) {
+    throw new Error(`Security Boundary Violation: Combined tampering influenced the resolved identity. Resolved: ${combinedSession.user?.id} / ${combinedSession.user?.workspaceId}`);
+  }
+  console.log("    ✅ Success: Combined user + tenant cookie tampering was fully ignored.");
+
+  // ----------------------------------------------------
+  // Scenario 8: Protected Server Actions Forgery & Resolution Tests
+  // ----------------------------------------------------
+  console.log("  * Testing Protected Server Action Identity Resolution under attack...");
+  // Set valid signed session (ws-test-99, usr-test-123) and spoof cookies simultaneously
+  await createSession(mockUser);
+  mockCookieStore.store.set("user_id", { value: "usr-forged-b", httpOnly: true });
+  mockCookieStore.store.set("tenant_id", { value: "ws-forged-b", httpOnly: true });
+
+  // Reset trackers
+  lastInterceptedTenantId = "";
+  lastInterceptedUserId = "";
+
+  // Trigger Ingestion Action
+  const ingestRes = await ingestDocumentAction({ text: "Protected data test." });
+  if (!ingestRes.success) {
+    throw new Error(`Protected Action Failed: ingestDocumentAction rejected request with valid session: ${JSON.stringify(ingestRes)}`);
+  }
+  // Verify that identity passed to tenant context was resolved from the session, NOT the forged cookies!
+  if (lastInterceptedTenantId !== mockUser.workspaceId || lastInterceptedUserId !== mockUser.id) {
+    throw new Error(`Security Boundary Violation: Ingest action trusted client-controlled identity cookies! Tenant: ${lastInterceptedTenantId}, User: ${lastInterceptedUserId}`);
+  }
+
+  // Reset trackers
+  lastInterceptedTenantId = "";
+  lastInterceptedUserId = "";
+
+  // Trigger Query Action
+  const queryRes = await queryKnowledgeGraphAction({ question: "Is this secure?" });
+  if (!queryRes.success) {
+    throw new Error(`Protected Action Failed: queryKnowledgeGraphAction rejected request with valid session: ${JSON.stringify(queryRes)}`);
+  }
+  // Verify again
+  if (lastInterceptedTenantId !== mockUser.workspaceId || lastInterceptedUserId !== mockUser.id) {
+    throw new Error(`Security Boundary Violation: Query action trusted client-controlled identity cookies! Tenant: ${lastInterceptedTenantId}, User: ${lastInterceptedUserId}`);
+  }
+  console.log("    ✅ Success: Protected Server Actions safely executed using server-derived identity and ignored hacker cookies.");
+
+  // ----------------------------------------------------
+  // Scenario 9: Protected Server Actions Fail Closed when Unauthenticated
+  // ----------------------------------------------------
+  console.log("  * Testing Protected Server Actions Fail-Closed design when unauthenticated...");
+  // Clear the active session, but leave hacker cookies set
+  mockCookieStore.delete("seorchable_session");
+
+  const ingestUnauthRes = await ingestDocumentAction({ text: "Should fail." });
+  if (ingestUnauthRes.success || !ingestUnauthRes.error?.includes("Unauthorized")) {
+    throw new Error(`Fail-Closed Violation: ingestDocumentAction succeeded or did not return unauthorized error when session is missing: ${JSON.stringify(ingestUnauthRes)}`);
+  }
+
+  const queryUnauthRes = await queryKnowledgeGraphAction({ question: "Should fail." });
+  if (queryUnauthRes.success || !queryUnauthRes.error?.includes("Unauthorized")) {
+    throw new Error(`Fail-Closed Violation: queryKnowledgeGraphAction succeeded or did not return unauthorized error when session is missing: ${JSON.stringify(queryUnauthRes)}`);
+  }
+  console.log("    ✅ Success: Protected Server Actions failed closed safely when unauthenticated.");
+
+  // ----------------------------------------------------
+  // Scenario 10: Logout & Session Invalidation
+  // ----------------------------------------------------
   console.log("  * Testing Logout & Invalidation...");
   await createSession(mockUser);
   if (!(await getSession())) {
@@ -205,7 +355,19 @@ export async function runAuthTests() {
     throw new Error("Logout Failed: seorchable_session cookie was not deleted/cleared");
   }
 
-  console.log("✅ All Server-Side Authentication Foundation Tests Passed Successfully!");
+  // Attempt to requireSession() after logout -> must throw Unauthorized
+  try {
+    await requireSession();
+    throw new Error("Logout Failure: requireSession did not fail closed on logged out session");
+  } catch (err: any) {
+    if (err.message && err.message.includes("Unauthorized")) {
+      // Correct!
+    } else {
+      throw err;
+    }
+  }
+
+  console.log("✅ All Server-Side Authentication Foundation & Hardening Tests Passed Successfully!");
 }
 
 // Execute tests if run directly
