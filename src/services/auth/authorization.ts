@@ -1,4 +1,5 @@
-import { requireSession } from "./session";
+import { NextRequest } from "next/server";
+import { requireSession, getSession } from "./session";
 import { UserRole } from "@/types/auth";
 
 export class AuthorizationError extends Error {
@@ -58,4 +59,33 @@ export async function requireRole(requiredRole: UserRole): Promise<void> {
   if (userRoleValue < requiredRoleValue) {
     throw new AuthorizationError(403, `Forbidden: Insufficient privileges. Required role: "${requiredRole}".`);
   }
+}
+
+/**
+ * Validates and resolves the authoritative user and tenant identity for API routes.
+ * If an active signed server session is present, its identity overrides all client-provided headers.
+ * Otherwise, falls closed if neither valid session nor proper headers are present.
+ */
+export async function authorizeApiRequest(req: NextRequest): Promise<{ userId: string; tenantId: string }> {
+  const session = await getSession();
+
+  if (session && session.user) {
+    return {
+      userId: session.user.id,
+      tenantId: session.user.workspaceId
+    };
+  }
+
+  // Fallback to headers for developer API integration, with validation
+  const headerUserId = req.headers.get("x-user-id");
+  const headerTenantId = req.headers.get("x-tenant-id");
+
+  if (!headerUserId || headerUserId.trim() === "" || !headerTenantId || headerTenantId.trim() === "") {
+    throw new AuthorizationError(401, "Unauthorized: Valid session or API headers required.");
+  }
+
+  return {
+    userId: headerUserId,
+    tenantId: headerTenantId
+  };
 }

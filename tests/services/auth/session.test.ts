@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import {
   createSession,
   getSession,
@@ -12,7 +13,7 @@ import { User } from "../../../src/types/auth";
 import { TenantContextManager } from "../../../src/core/database/tenant-context";
 import { ingestDocumentAction } from "../../../src/app/actions/ingestion";
 import { queryKnowledgeGraphAction } from "../../../src/app/actions/query";
-import { requireWorkspaceMembership, requireRole } from "../../../src/services/auth/authorization";
+import { requireWorkspaceMembership, requireRole, authorizeApiRequest } from "../../../src/services/auth/authorization";
 
 // Mock implementation of the cookie store
 const mockCookieStore = {
@@ -448,6 +449,61 @@ export async function runAuthTests() {
     console.log("    ✅ Success: Super Admin allowed to perform all actions.");
   } catch (err) {
     throw new Error(`RBAC Failed: Super Admin was blocked: ${err}`);
+  }
+
+  // ----------------------------------------------------
+  // Scenario 13: Protected API Route Authorization & Boundary Tests
+  // ----------------------------------------------------
+  console.log("  * Testing API Route Authorization Boundaries...");
+
+  // Mock standard NextRequest with custom headers
+  function createMockRequest(headers: Record<string, string>): NextRequest {
+    const headerMap = new Map();
+    Object.entries(headers).forEach(([k, v]) => headerMap.set(k.toLowerCase(), v));
+    return {
+      headers: {
+        get: (name: string) => headerMap.get(name.toLowerCase()) || null
+      }
+    } as any;
+  }
+
+  // 13.1 Valid signed session overrides client headers
+  await createSession(mockUser); // ws-test-99 / usr-test-123
+  const forgedHeadersReq = createMockRequest({
+    "x-user-id": "usr-forged-hacker",
+    "x-tenant-id": "ws-forged-hacker"
+  });
+
+  const apiAuthResult = await authorizeApiRequest(forgedHeadersReq);
+  if (apiAuthResult.userId !== mockUser.id || apiAuthResult.tenantId !== mockUser.workspaceId) {
+    throw new Error(`API Security Boundary Violation: Spoofed client headers overrode the active signed session! Resolved user: ${apiAuthResult.userId}, Resolved tenant: ${apiAuthResult.tenantId}`);
+  }
+  console.log("    ✅ Success: API boundary ignored spoofed headers when signed session was active.");
+
+  // 13.2 Missing session falls back to headers (valid developer API integration path)
+  mockCookieStore.delete("seorchable_session");
+  const validHeadersReq = createMockRequest({
+    "x-user-id": "usr-dev-token-abc",
+    "x-tenant-id": "ws-dev-org-xyz"
+  });
+
+  const apiFallbackResult = await authorizeApiRequest(validHeadersReq);
+  if (apiFallbackResult.userId !== "usr-dev-token-abc" || apiFallbackResult.tenantId !== "ws-dev-org-xyz") {
+    throw new Error(`API Security Boundary Violation: Failed to resolve developer identities from valid headers!`);
+  }
+  console.log("    ✅ Success: API boundary accepted developer headers in absence of active session.");
+
+  // 13.3 Missing session and missing headers fails closed
+  const unauthApiReq = createMockRequest({});
+  try {
+    await authorizeApiRequest(unauthApiReq);
+    throw new Error(`API Security Boundary Violation: authorizeApiRequest did not fail closed on empty context!`);
+  } catch (err: any) {
+    if (err.message && err.message.includes("API headers required")) {
+      console.log("    ✅ Success: API boundary failed closed safely on empty request context.");
+    } else {
+      throw err;
+    }
   }
 
   console.log("✅ All Server-Side Authentication Foundation & Hardening Tests Passed Successfully!");
