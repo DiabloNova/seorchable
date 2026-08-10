@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, Session, UserRole } from "@/types/auth";
-import { loginAction, logoutAction, getServerSessionAction } from "@/app/actions/auth";
+import { loginAction, logoutAction, getServerSessionAction, registerAction } from "@/app/actions/auth";
 
 interface AuthContextType {
   session: Session;
@@ -60,25 +60,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // e.g. const res = await fetch("/api/v1/auth/login", { ... })
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    // Extract mock name from email for high-fidelity personalized experience
-    const namePart = email.split("@")[0];
-    const name = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    // Secure server-side login strictly on the server to prevent client-controlled spoofing
+    const user = await loginAction(email);
 
-    const authenticatedUser: User = {
-      id: `usr-${Math.random().toString(36).substring(2, 11)}`,
-      name: name || "Enterprise User",
-      email,
-      role: "workspace_admin",
-      workspaceId: "ws-default",
-    };
-
-    // Secure server-side cookie setting with authoritative signed session
-    await loginAction(authenticatedUser);
-
-    localStorage.setItem("auth_session_user", JSON.stringify(authenticatedUser));
+    localStorage.setItem("auth_session_user", JSON.stringify(user));
 
     setSession({
-      user: authenticatedUser,
+      user,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       status: "authenticated",
     });
@@ -91,21 +79,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // e.g. const res = await fetch("/api/v1/auth/register", { ... })
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    const registeredUser: User = {
-      id: `usr-${Math.random().toString(36).substring(2, 11)}`,
-      name,
-      email,
-      role: "workspace_admin",
-      workspaceId: "ws-default",
-    };
+    // Secure server-side registration strictly on the server to prevent client-controlled spoofing
+    const user = await registerAction(name, email);
 
-    // Secure server-side cookie setting with authoritative signed session
-    await loginAction(registeredUser);
-
-    localStorage.setItem("auth_session_user", JSON.stringify(registeredUser));
+    localStorage.setItem("auth_session_user", JSON.stringify(user));
 
     setSession({
-      user: registeredUser,
+      user,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       status: "authenticated",
     });
