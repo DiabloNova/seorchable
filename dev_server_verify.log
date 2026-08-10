@@ -1,33 +1,31 @@
-
-> ai-branding-platform@0.1.0 dev /app
-> next dev
-
-⚠ Port 3000 is in use by an unknown process, using available port 3003 instead.
 ▲ Next.js 16.2.11 (Turbopack)
-- Local:         http://localhost:3003
-- Network:       http://192.168.0.2:3003
-✓ Ready in 827ms
+- Local:         http://localhost:3005
+- Network:       http://192.168.0.2:3005
+✓ Ready in 601ms
 
-○ Compiling /[locale]/pricing ...
- GET /en/pricing 200 in 6.6s (next.js: 6.1s, application-code: 499ms)
- GET /en/pricing 200 in 131ms (next.js: 29ms, application-code: 102ms)
- POST /en/pricing 200 in 73ms (next.js: 13ms, application-code: 60ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 5ms src/actions/auth.ts
- GET /en/dashboard/audits 200 in 1787ms (next.js: 1682ms, application-code: 106ms)
- POST /en/dashboard/audits 200 in 81ms (next.js: 27ms, application-code: 54ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 2ms src/actions/auth.ts
- GET /en/dashboard/audits/aud-001 200 in 1951ms (next.js: 1849ms, application-code: 101ms)
- POST /en/dashboard/audits/aud-001 200 in 115ms (next.js: 34ms, application-code: 81ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 5ms src/actions/auth.ts
- GET /en/dashboard/brand-monitoring 200 in 1885ms (next.js: 1798ms, application-code: 88ms)
- POST /en/dashboard/brand-monitoring 200 in 91ms (next.js: 36ms, application-code: 56ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 3ms src/actions/auth.ts
- GET /en/dashboard/reports 200 in 1606ms (next.js: 1533ms, application-code: 73ms)
- POST /en/dashboard/reports 200 in 81ms (next.js: 32ms, application-code: 50ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 2ms src/actions/auth.ts
- GET /en/dashboard/settings 200 in 1949ms (next.js: 1766ms, application-code: 183ms)
- POST /en/dashboard/settings 200 in 139ms (next.js: 48ms, application-code: 91ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 5ms src/actions/auth.ts
- GET /en/dashboard/billing 200 in 3.3s (next.js: 3.2s, application-code: 99ms)
- POST /en/dashboard/billing 200 in 96ms (next.js: 44ms, application-code: 51ms)
-  └─ ƒ loginAction("tehran@brandgraph.ai", "ws-tehran", "usr-mocked99") in 4ms src/actions/auth.ts
+○ Compiling /[locale]/login ...
+ GET /fa/login 200 in 5.8s (next.js: 5.3s, application-code: 478ms)
+ POST /fa/login 200 in 184ms (next.js: 77ms, application-code: 107ms)
+  └─ ƒ getServerSessionAction() in 13ms src/actions/auth.ts
+ GET /fa/dashboard/seo/technical 200 in 1795ms (next.js: 1670ms, application-code: 125ms)
+ POST /fa/dashboard/seo/technical 200 in 49ms (next.js: 32ms, application-code: 18ms)
+  └─ ƒ getServerSessionAction() in 1ms src/actions/auth.ts
+ GET /fa 200 in 2.1s (next.js: 2.0s, application-code: 38ms)
+ GET /fa/login 200 in 163ms (next.js: 34ms, application-code: 129ms)
+ POST /fa/login 200 in 86ms (next.js: 31ms, application-code: 55ms)
+  └─ ƒ getServerSessionAction() in 2ms src/actions/auth.ts
+ GET /fa/login 200 in 116ms (next.js: 28ms, application-code: 88ms)
+ POST /fa/login 200 in 66ms (next.js: 33ms, application-code: 33ms)
+  └─ ƒ getServerSessionAction() in 1ms src/actions/auth.ts
+ POST /fa/login 200 in 94ms (next.js: 28ms, application-code: 66ms)
+  └─ ƒ loginAction("faramarz@seorchable.ir") in 6ms src/actions/auth.ts
+○ Compiling /[locale]/dashboard ...
+ GET /fa/dashboard 200 in 5.6s (next.js: 5.6s, application-code: 45ms)
+ GET /fa/dashboard/seo/technical 200 in 197ms (next.js: 72ms, application-code: 125ms)
+ POST /fa/dashboard/seo/technical 200 in 27ms (next.js: 4ms, application-code: 23ms)
+  └─ ƒ getServerSessionAction() in 3ms src/actions/auth.ts
+ GET /en/dashboard/seo/technical 200 in 192ms (next.js: 66ms, application-code: 126ms)
+ POST /en/dashboard/seo/technical 200 in 43ms (next.js: 8ms, application-code: 35ms)
+  └─ ƒ getServerSessionAction() in 6ms src/actions/auth.ts
+ POST /en/dashboard/seo/technical 200 in 44ms (next.js: 9ms, application-code: 35ms)
+  └─ ƒ getServerSessionAction() in 9ms src/actions/auth.ts
