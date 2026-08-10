@@ -5,15 +5,14 @@
 ▲ Next.js 16.2.11 (Turbopack)
 - Local:         http://localhost:3000
 - Network:       http://192.168.0.2:3000
-✓ Ready in 637ms
+✓ Ready in 607ms
+⨯ Another next dev server is already running.
 
-○ Compiling /[locale] ...
- GET /fa 200 in 7.6s (next.js: 6.7s, application-code: 848ms)
- POST /fa 200 in 169ms (next.js: 39ms, application-code: 130ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 21ms src/actions/auth.ts
- GET /fa 200 in 159ms (next.js: 35ms, application-code: 124ms)
- POST /fa 200 in 127ms (next.js: 30ms, application-code: 98ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 11ms src/actions/auth.ts
- GET /fa 200 in 155ms (next.js: 34ms, application-code: 121ms)
- POST /fa 200 in 148ms (next.js: 32ms, application-code: 116ms)
-  └─ ƒ loginAction("alireza@brandintel.ai", "ws-tehran", "usr-1001") in 7ms src/actions/auth.ts
+- Local:        http://localhost:3005
+- PID:          110608
+- Dir:          /app
+- Log:          .next/dev/logs/next-development.log
+
+Run kill 110608 to stop it.
+[?25h
+ ELIFECYCLE  Command failed with exit code 1.
