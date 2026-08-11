@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/Button";
@@ -8,8 +8,7 @@ import { Card } from "@/components/Card";
 import { Badge } from "@/components/Badge";
 import {
   MarketplaceItem,
-  CATEGORIES,
-  getMarketplaceData
+  CATEGORIES
 } from "@/services/dashboard-services";
 import { ServiceCard } from "./ServiceCard";
 import { ServicePreviewModal } from "./ServicePreviewModal";
@@ -30,11 +29,13 @@ interface ServiceMarketplaceClientProps {
     role: string;
     workspaceId: string;
   } | null;
+  activePlan: "free" | "professional" | "enterprise";
 }
 
 export default function ServiceMarketplaceClient({
   initialItems,
-  user
+  user: _user,
+  activePlan
 }: ServiceMarketplaceClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -46,8 +47,8 @@ export default function ServiceMarketplaceClient({
   const [activeCategory, setActiveCategory] = useState<string>(searchParams?.get("category") || "all");
   const [statusFilter, setStatusFilter] = useState<string>(searchParams?.get("status") || "all");
 
-  const [items, setItems] = useState<MarketplaceItem[]>(initialItems);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const isRefreshing = isPending;
 
   // Selected item for preview details
   const [selectedPreviewItem, setSelectedPreviewItem] = useState<MarketplaceItem | null>(null);
@@ -64,23 +65,16 @@ export default function ServiceMarketplaceClient({
     window.history.replaceState(null, "", targetUrl);
   }, [searchQuery, activeCategory, statusFilter, language]);
 
-  // Handle Refreshing/Synchronizing Marketplace data directly from DB/state
-  const handleRefresh = async () => {
-    try {
-      setIsRefreshing(true);
-      const workspaceId = user?.workspaceId || "ws-default";
-      const refreshed = getMarketplaceData(workspaceId);
-      setItems(refreshed);
-    } catch (err) {
-      console.error("Failed to refresh service catalog", err);
-    } finally {
-      setIsRefreshing(false);
-    }
+  // Handle Refreshing/Synchronizing Marketplace data by triggering server-side recalculation
+  const handleRefresh = () => {
+    startTransition(() => {
+      router.refresh();
+    });
   };
 
   // Filter computation - Case insensitive over name, description, category, and features
   const filteredItems = useMemo(() => {
-    return items.filter((item) => {
+    return initialItems.filter((item) => {
       const { service, entitlement } = item;
 
       // 1. Search Query filter
@@ -118,7 +112,7 @@ export default function ServiceMarketplaceClient({
 
       return true;
     });
-  }, [items, searchQuery, activeCategory, statusFilter]);
+  }, [initialItems, searchQuery, activeCategory, statusFilter]);
 
   const handleClearFilters = () => {
     setSearchQuery("");
@@ -160,16 +154,14 @@ export default function ServiceMarketplaceClient({
 
   // Determine current active plan name for display
   const currentPlanName = useMemo(() => {
-    const workspaceId = user?.workspaceId || "ws-default";
-    const normalized = workspaceId.toLowerCase();
-    if (normalized.includes("enterprise") || normalized.includes("ent")) {
+    if (activePlan === "enterprise") {
       return strings.tierEnt;
     }
-    if (normalized.includes("pro") || normalized.includes("tehran") || normalized.includes("active")) {
+    if (activePlan === "professional") {
       return strings.tierPro;
     }
     return strings.tierFree;
-  }, [user, strings.tierEnt, strings.tierPro, strings.tierFree]);
+  }, [activePlan, strings.tierEnt, strings.tierPro, strings.tierFree]);
 
   return (
     <div className="space-y-8 animate-fade-in text-start" dir={direction}>

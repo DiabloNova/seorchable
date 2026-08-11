@@ -40,7 +40,6 @@ export interface ServiceDefinition {
   descFa: string;
   category: ServiceCategory;
   route: string;
-  iconName: "seo" | "aeo" | "content" | "competitors" | "brand" | "entities" | "analytics";
   features: ServiceFeature[];
   pricingTier: "free" | "professional" | "enterprise" | "custom";
 }
@@ -85,7 +84,6 @@ export const SERVICE_CATALOG: ServiceDefinition[] = [
     descFa: "بررسی پارامترهای فنی زیرساختی دامنه، اعتبار گواهی SSL، حجم پاسخ و سلامت Core Web Vitals.",
     category: "seo",
     route: "/dashboard/seo/technical",
-    iconName: "seo",
     pricingTier: "free",
     features: [
       { id: "crawl-depth", nameEn: "Deep URL Normalization", nameFa: "نرمال‌سازی پیشرفته آدرس‌ها" },
@@ -102,7 +100,6 @@ export const SERVICE_CATALOG: ServiceDefinition[] = [
     descFa: "پایش برچسب‌های موتور جستجو، راستی‌آزمایی ساختارهای JSON-LD، تگ‌های OpenGraph و ساختارهای میکرودیتا.",
     category: "seo",
     route: "/dashboard/seo/schema",
-    iconName: "seo",
     pricingTier: "free",
     features: [
       { id: "json-ld", nameEn: "JSON-LD Structuring Validation", nameFa: "تایید ساختار نحوی JSON-LD" },
@@ -118,7 +115,6 @@ export const SERVICE_CATALOG: ServiceDefinition[] = [
     descFa: "ارزیابی سهم رویت‌پذیری برند و شانس معرفی در مدل‌های زبانی بزرگ از جمله جمینای و چت‌جی‌پی‌تی.",
     category: "aeo",
     route: "/dashboard/aeo/audits",
-    iconName: "aeo",
     pricingTier: "professional",
     features: [
       { id: "model-prominence", nameEn: "Multi-Model Prominence Scoring", nameFa: "امتیازدهی سهم حضور چندمدله" },
@@ -134,7 +130,6 @@ export const SERVICE_CATALOG: ServiceDefinition[] = [
     descFa: "محیط زنده ارسال پرامپت و دریافت پاسخ‌های تلفیقی همراه با دیباگ زنجیره استنادی RAG.",
     category: "aeo",
     route: "/dashboard/aeo/playground",
-    iconName: "aeo",
     pricingTier: "professional",
     features: [
       { id: "rag-debugger", nameEn: "RAG Diagnostic Playground", nameFa: "محیط خطایابی پیشرفته زنجیره RAG" },
@@ -150,7 +145,6 @@ export const SERVICE_CATALOG: ServiceDefinition[] = [
     descFa: "ایجاد و بازنویسی محتوای بهینه‌شده معنایی برای افزایش شانس بازیابی توسط پایپ‌لاین‌های هوش مصنوعی.",
     category: "content",
     route: "/dashboard/content/studio",
-    iconName: "content",
     pricingTier: "professional",
     features: [
       { id: "semantic-rewrite", nameEn: "Semantic Copywriting Assistant", nameFa: "دستیار نگارش و بازنویسی معنایی" },
@@ -166,7 +160,6 @@ export const SERVICE_CATALOG: ServiceDefinition[] = [
     descFa: "بارگذاری اسناد متنی و فایل‌های PDF برای قطعه‌بندی خودکار و تبدیل به بردار جهت سیستم RAG.",
     category: "content",
     route: "/dashboard/content/ingestion",
-    iconName: "content",
     pricingTier: "professional",
     features: [
       { id: "pdf-extractor", nameEn: "Intelligent PDF Text Extraction", nameFa: "استخراج هوشمند متن از پی‌دی‌اف" },
@@ -182,7 +175,6 @@ export const SERVICE_CATALOG: ServiceDefinition[] = [
     descFa: "رصد همه‌جانبه رتبه و سهم حضور رقبا در پاسخ‌های هوش مصنوعی و مقایسه ماتریس قوت و ضعف.",
     category: "competitors",
     route: "/dashboard/competitors/radar",
-    iconName: "competitors",
     pricingTier: "professional",
     features: [
       { id: "sov", nameEn: "Competitive Share of Voice", nameFa: "سهم صدای برندها در چت‌بات‌ها" },
@@ -198,7 +190,6 @@ export const SERVICE_CATALOG: ServiceDefinition[] = [
     descFa: "پایش ارجاعات خارجی، منشن‌ها و اعتبار دامنه‌های معرفی‌کننده نام تجاری شما.",
     category: "brand",
     route: "/dashboard/brand/citations",
-    iconName: "brand",
     pricingTier: "professional",
     features: [
       { id: "mention-alert", nameEn: "Real-time Citation Alert Stream", nameFa: "جریان هوشمند اعلام منشن‌های استنادی" },
@@ -214,7 +205,6 @@ export const SERVICE_CATALOG: ServiceDefinition[] = [
     descFa: "نمایش تعاملی پیوند میان موجودیت‌ها، افراد و برند شما بر اساس تحلیل گراف دانش مدل‌های هوشمند.",
     category: "entities",
     route: "/dashboard/entities/graph",
-    iconName: "entities",
     pricingTier: "enterprise",
     features: [
       { id: "entity-extraction", nameEn: "Automatic Entity & Relation Extraction", nameFa: "استخراج خودکار روابط و موجودیت‌ها" },
@@ -230,7 +220,6 @@ export const SERVICE_CATALOG: ServiceDefinition[] = [
     descFa: "تحلیل جهت‌گیری مدل‌ها، گرایش‌های زبانی و انحراف در تحلیل لحن درباره نام تجاری شما.",
     category: "analytics",
     route: "/dashboard/analytics/llm-bias",
-    iconName: "analytics",
     pricingTier: "custom",
     features: [
       { id: "bias-vectors", nameEn: "Bias Vector Coordinate Calculations", nameFa: "محاسبه مختصات جهت‌گیری و ترجیحات" },
@@ -239,15 +228,33 @@ export const SERVICE_CATALOG: ServiceDefinition[] = [
   }
 ];
 
+const workspacePlans = new Map<string, "free" | "professional" | "enterprise">();
+
+// Seed default authoritative workspaces
+workspacePlans.set("ws-tehran", "professional");
+workspacePlans.set("Tehran HQ Workspace", "professional");
+workspacePlans.set("ws-pro-tenant", "professional");
+workspacePlans.set("ws-enterprise", "enterprise");
+workspacePlans.set("ws-enterprise-organization", "enterprise");
+workspacePlans.set("org-enterprise-rag-01", "enterprise");
+
+export function registerWorkspacePlan(workspaceId: string, plan: "free" | "professional" | "enterprise"): void {
+  workspacePlans.set(workspaceId, plan);
+}
+
+export function clearWorkspacePlans(): void {
+  workspacePlans.clear();
+  // Re-seed default authoritative workspaces
+  workspacePlans.set("ws-tehran", "professional");
+  workspacePlans.set("Tehran HQ Workspace", "professional");
+  workspacePlans.set("ws-pro-tenant", "professional");
+  workspacePlans.set("ws-enterprise", "enterprise");
+  workspacePlans.set("ws-enterprise-organization", "enterprise");
+  workspacePlans.set("org-enterprise-rag-01", "enterprise");
+}
+
 export function getWorkspacePlan(workspaceId: string): "free" | "professional" | "enterprise" {
-  const normalized = workspaceId.toLowerCase();
-  if (normalized.includes("enterprise") || normalized.includes("ent")) {
-    return "enterprise";
-  }
-  if (normalized.includes("pro") || normalized.includes("tehran") || normalized.includes("active")) {
-    return "professional";
-  }
-  return "free";
+  return workspacePlans.get(workspaceId) || "free";
 }
 
 export function getWorkspaceEntitlements(workspaceId: string): ServiceEntitlement[] {
@@ -297,7 +304,6 @@ export function getWorkspaceUsage(workspaceId: string): ServiceUsage[] {
       used = service.pricingTier === "free" ? 42 : 15;
       limit = null;
     } else if (plan === "professional") {
-      limit = service.pricingTier === "free" ? 100 : 50;
       if (service.id === "tech-seo") {
         used = 35;
         limit = 100;

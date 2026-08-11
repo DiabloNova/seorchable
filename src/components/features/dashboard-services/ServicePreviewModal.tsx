@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { Dialog } from "@/components/Dialog";
 import { Button } from "@/components/Button";
@@ -24,17 +24,6 @@ export const ServicePreviewModal: React.FC<ServicePreviewModalProps> = ({
 }) => {
   const { language, direction } = useTheme();
   const isRtl = language === "fa";
-
-  // Support Escape key for accessibility closing
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
 
   if (!item) return null;
 
