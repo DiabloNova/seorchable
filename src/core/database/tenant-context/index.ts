@@ -34,7 +34,10 @@ export const TENANT_SCOPED_TABLES = Object.freeze([
   "kg_entities",
   "kg_relationships",
   "premium_audits",
-  "competitive_analyses"
+  "competitive_analyses",
+  "crawl_jobs",
+  "crawl_results",
+  "crawl_cache"
 ]);
 
 /**
@@ -179,7 +182,10 @@ export class TenantContextManager {
     try {
       if (leasedClient) {
         await leasedClient.query("BEGIN");
-        await leasedClient.query(`SET LOCAL app.current_tenant_id = $1`, [tenantId]);
+        await leasedClient.query(
+          "SELECT set_config('app.current_tenant_id', $1, true)",
+          [tenantId]
+        );
       }
 
       const transactedCtx: TenantContext = Object.freeze({
