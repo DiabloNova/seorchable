@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  LayoutGrid,
   Settings,
   Sparkles,
   BookOpen,
@@ -47,6 +48,13 @@ export const dashboardNavigation: NavigationSection[] = [
         labelFa: "نمای کلی",
         href: "/dashboard",
         icon: LayoutDashboard
+      },
+      {
+        id: "services",
+        labelEn: "Service Marketplace",
+        labelFa: "بازارچه خدمات",
+        href: "/dashboard/services",
+        icon: LayoutGrid
       },
       {
         id: "seo",

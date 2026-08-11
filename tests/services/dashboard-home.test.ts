@@ -4,13 +4,13 @@ import { setCookiesMock, createSession, invalidateSession } from "../../src/serv
 import { User } from "../../src/types/auth";
 
 class MockCookieStore {
-  private store: Map<string, any> = new Map();
+  private store: Map<string, unknown> = new Map();
 
   get(name: string) {
     return this.store.get(name);
   }
 
-  set(name: string, value: any, options?: any) {
+  set(name: string, value: unknown, options?: Record<string, unknown>) {
     this.store.set(name, { name, value, ...options });
     return this;
   }
@@ -44,8 +44,9 @@ export async function runDashboardHomeTests() {
   try {
     await dashboardHomeService.getDashboardSummary("en");
     throw new Error("Expected dashboard aggregation to throw Unauthorized error, but it succeeded!");
-  } catch (err: any) {
-    if (!err.message.includes("Unauthorized")) {
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    if (!errorMsg.includes("Unauthorized")) {
       throw err;
     }
     console.log("  ✅ Unauthenticated access successfully rejected (Fail-closed).");
@@ -65,8 +66,8 @@ export async function runDashboardHomeTests() {
 
   // Mock postgres query to return empty list
   const originalQuery = pg.query;
-  pg.query = async (sql: string, params?: unknown[]) => {
-    return { rowCount: 0, rows: [] } as any;
+  pg.query = async () => {
+    return { rowCount: 0, rows: [] } as unknown as ReturnType<typeof pg.query>;
   };
 
   try {
@@ -124,8 +125,8 @@ export async function runDashboardHomeTests() {
     created_at: new Date().toISOString()
   };
 
-  pg.query = async (sql: string, params?: unknown[]) => {
-    return { rowCount: 1, rows: [mockAuditRow] } as any;
+  pg.query = async () => {
+    return { rowCount: 1, rows: [mockAuditRow] } as unknown as ReturnType<typeof pg.query>;
   };
 
   try {
