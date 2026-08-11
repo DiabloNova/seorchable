@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { MarketplaceItem, CATEGORY_ICONS } from "@/services/dashboard-services";
-import { Check, ArrowRight, ArrowLeft, Lock, Info, Eye, Sparkles } from "lucide-react";
+import { Check, ArrowRight, ArrowLeft, Info, Eye, Sparkles } from "lucide-react";
 
 interface ServiceCardProps {
   item: MarketplaceItem;
@@ -21,7 +21,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
   onUpgrade,
   onNavigate
 }) => {
-  const { language, direction } = useTheme();
+  const { language } = useTheme();
   const isRtl = language === "fa";
   const { service, entitlement, usage } = item;
 

@@ -5,7 +5,7 @@ import { useTheme } from "@/components/ThemeProvider";
 import { Dialog } from "@/components/Dialog";
 import { Button } from "@/components/Button";
 import { MarketplaceItem, CATEGORY_ICONS } from "@/services/dashboard-services";
-import { CheckCircle2, Shield, Settings, Sparkles, Terminal, Info, X } from "lucide-react";
+import { CheckCircle2, Sparkles, Terminal, Info } from "lucide-react";
 
 interface ServicePreviewModalProps {
   isOpen: boolean;
@@ -92,11 +92,11 @@ export const ServicePreviewModal: React.FC<ServicePreviewModalProps> = ({
             <span>{strings.demoWorkflow}</span>
           </h4>
           <div className="bg-slate-950/90 dark:bg-slate-950/50 text-slate-300 font-mono text-[10px] p-4 rounded-xl border border-slate-800 space-y-1 overflow-x-auto leading-relaxed shadow-inner">
-            <p className="text-slate-500">// Initialize seorchable API runner</p>
-            <p className="text-emerald-400">import <span className="text-white">{"{ executeEngine }"}</span> from "@seorchable/sdk";</p>
-            <p className="text-slate-400">const runner = await executeEngine.setup({"{ slug: '" + service.slug + "' }"});</p>
-            <p className="text-slate-400">const result = await runner.run({"{ target: 'company.ir', depth: 3 }"});</p>
-            <p className="text-amber-400">console.log(result.score); <span className="text-slate-500">// {"=>"} 94.2% optimized</span></p>
+            <p className="text-slate-500">{"// Initialize seorchable API runner"}</p>
+            <p className="text-emerald-400">import {"{ executeEngine }"} from &quot;@seorchable/sdk&quot;;</p>
+            <p className="text-slate-400">const runner = await executeEngine.setup({"{"} slug: &quot;{service.slug}&quot; {"}"});</p>
+            <p className="text-slate-400">const result = await runner.run({"{"} target: &quot;company.ir&quot;, depth: 3 {"}"});</p>
+            <p className="text-amber-400">console.log(result.score); <span className="text-slate-500">{"// => 94.2% optimized"}</span></p>
           </div>
           <p className="text-[9px] text-[var(--text-muted)] font-semibold italic">
             * {strings.demoNote}

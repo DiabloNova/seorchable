@@ -142,7 +142,8 @@ function runTests() {
 
 try {
   runTests();
-} catch (error: any) {
-  console.error("❌ TEST RUN FAILED:", error.message || error);
+} catch (error: unknown) {
+  const errorMsg = error instanceof Error ? error.message : String(error);
+  console.error("❌ TEST RUN FAILED:", errorMsg);
   process.exit(1);
 }

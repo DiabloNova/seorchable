@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useTransition, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
-import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
-import { Card, CardHeader, CardContent } from "@/components/Card";
+import { Card } from "@/components/Card";
 import { Badge } from "@/components/Badge";
 import {
   MarketplaceItem,
@@ -18,12 +17,8 @@ import {
   Search,
   Filter,
   RefreshCw,
-  Sparkles,
   LayoutGrid,
-  Info,
-  X,
-  Plus,
-  HelpCircle
+  X
 } from "lucide-react";
 
 interface ServiceMarketplaceClientProps {
@@ -299,7 +294,7 @@ export default function ServiceMarketplaceClient({
           <div className="flex flex-wrap items-center gap-1.5 ml-auto rtl:mr-auto rtl:ml-0 pt-1.5 sm:pt-0">
             {searchQuery && (
               <Badge variant="neutral" className="text-[10px] gap-1 px-2 py-0.5">
-                <span>"{searchQuery}"</span>
+                <span>&quot;{searchQuery}&quot;</span>
                 <X size={10} className="cursor-pointer text-[var(--text-muted)]" onClick={() => setSearchQuery("")} />
               </Badge>
             )}
@@ -343,7 +338,6 @@ export default function ServiceMarketplaceClient({
           ))}
         </div>
       ) : (
-        /* Empty State */
         <Card className="min-h-[300px] flex flex-col justify-center items-center p-8 border border-[var(--border)] bg-[var(--card)] text-center space-y-4">
           <div className="p-4 bg-[var(--muted-surface)] text-[var(--text-muted)] rounded-full border border-[var(--border)]">
             <LayoutGrid size={36} />
