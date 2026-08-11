@@ -3,13 +3,26 @@ import {
   getWorkspacePlan,
   getWorkspaceEntitlements,
   getWorkspaceUsage,
-  getMarketplaceData
+  getMarketplaceData,
+  registerWorkspacePlan,
+  clearWorkspacePlans
 } from "../../src/services/dashboard-services";
 
 function runTests() {
   console.log("=========================================================================");
   console.log("SEORCHABLE — SERVICE MARKETPLACE ARCHITECTURE TEST SUITE");
   console.log("=========================================================================");
+
+  // Reset/Clear workspace plans to ensure clean state and register test-specific fixtures
+  clearWorkspacePlans();
+
+  // Register explicit plan fixtures for testing
+  registerWorkspacePlan("ws-test-free", "free");
+  registerWorkspacePlan("Tehran HQ Workspace", "professional");
+  registerWorkspacePlan("ws-pro-tenant", "professional");
+  registerWorkspacePlan("ws-enterprise-organization", "enterprise");
+  registerWorkspacePlan("ws-free", "free");
+  registerWorkspacePlan("ws-enterprise", "enterprise");
 
   // 1. Service Catalog definitions test
   console.log("▶ TEST: Verifying Service Catalog assignment and metadata...");
@@ -134,6 +147,96 @@ function runTests() {
     throw new Error("FAIL: MarketplaceItem is missing core separated domains.");
   }
   console.log("  ✅ Full separation of concern (Service Definition vs. Entitlement vs. Usage) validated.");
+
+  // 6. Security Regression: Misleading Workspace ID substring matching
+  console.log("▶ TEST: Verifying that misleading workspace IDs do not receive paid plans...");
+  const misleadingIds = ["ws-provider", "ws-parent", "ws-entertainment", "agent-ws", "ws-pro", "ws-ent", "my-enterprise-mock"];
+  for (const id of misleadingIds) {
+    const plan = getWorkspacePlan(id);
+    if (plan !== "free") {
+      throw new Error(`FAIL: Misleading workspace ID "${id}" was granted "${plan}" plan instead of defaulting to "free".`);
+    }
+
+    // Verify entitlements for these are free tier entitlements
+    const entitlements = getWorkspaceEntitlements(id);
+    const locked = entitlements.find((e) => e.serviceId === "knowledge-graph")!;
+    if (locked.status !== "LOCKED") {
+      throw new Error(`FAIL: Misleading workspace ID "${id}" got unlocked/premium status for Enterprise service, got status "${locked.status}".`);
+    }
+  }
+  console.log("  ✅ Misleading workspace IDs successfully default to free plan without entitlement escalation.");
+
+  // 7. Explicit Plan Fixtures & Entitlements verify
+  console.log("▶ TEST: Verifying explicit plan fixtures and their exact entitlement sets...");
+  registerWorkspacePlan("ws-temp-free", "free");
+  registerWorkspacePlan("ws-temp-pro", "professional");
+  registerWorkspacePlan("ws-temp-ent", "enterprise");
+
+  // Free Tier Entitlements
+  const freeEntsTemp = getWorkspaceEntitlements("ws-temp-free");
+  const proEntsTemp = getWorkspaceEntitlements("ws-temp-pro");
+  const entEntsTemp = getWorkspaceEntitlements("ws-temp-ent");
+
+  // Verify Free Plan entitlements
+  for (const ent of freeEntsTemp) {
+    const s = SERVICE_CATALOG.find((x) => x.id === ent.serviceId)!;
+    if (s.pricingTier === "free") {
+      if (ent.status !== "AVAILABLE") throw new Error(`FAIL: Free service "${s.id}" should be AVAILABLE on Free plan`);
+    } else if (s.pricingTier === "professional") {
+      if (ent.status !== "PREMIUM") throw new Error(`FAIL: Professional service "${s.id}" should be PREMIUM on Free plan`);
+    } else if (s.pricingTier === "enterprise") {
+      if (ent.status !== "LOCKED") throw new Error(`FAIL: Enterprise service "${s.id}" should be LOCKED on Free plan`);
+    }
+  }
+
+  // Verify Professional Plan entitlements
+  for (const ent of proEntsTemp) {
+    const s = SERVICE_CATALOG.find((x) => x.id === ent.serviceId)!;
+    if (s.pricingTier === "free" || s.pricingTier === "professional") {
+      if (ent.status !== "AVAILABLE") throw new Error(`FAIL: Service "${s.id}" should be AVAILABLE on Professional plan`);
+    } else if (s.pricingTier === "enterprise") {
+      if (ent.status !== "LOCKED") throw new Error(`FAIL: Enterprise service "${s.id}" should be LOCKED on Professional plan`);
+    }
+  }
+
+  // Verify Enterprise Plan entitlements
+  for (const ent of entEntsTemp) {
+    const s = SERVICE_CATALOG.find((x) => x.id === ent.serviceId)!;
+    if (s.pricingTier !== "custom") {
+      if (ent.status !== "AVAILABLE") throw new Error(`FAIL: Service "${s.id}" should be AVAILABLE on Enterprise plan`);
+    }
+  }
+  console.log("  ✅ Explicit plan fixtures verified for free, professional, and enterprise tiers.");
+
+  // 8. Single Source of Truth: Entitlement & Plan resolution sync
+  console.log("▶ TEST: Verifying that plan and entitlement resolution use the same authoritative plan source...");
+  const ssotWorkspaceId = "ws-ssot-test";
+  registerWorkspacePlan(ssotWorkspaceId, "professional");
+
+  const planFromResolution = getWorkspacePlan(ssotWorkspaceId);
+  const entitlementsFromResolution = getWorkspaceEntitlements(ssotWorkspaceId);
+  const proServiceEnt = entitlementsFromResolution.find((e) => e.serviceId === "ai-visibility")!;
+
+  if (planFromResolution !== "professional") {
+    throw new Error(`FAIL: Plan resolved to "${planFromResolution}" instead of "professional".`);
+  }
+  if (proServiceEnt.status !== "AVAILABLE") {
+    throw new Error(`FAIL: Service entitlement and plan mismatch. Pro plan has "${proServiceEnt.status}" instead of AVAILABLE.`);
+  }
+
+  // Change the plan dynamically to free
+  registerWorkspacePlan(ssotWorkspaceId, "free");
+  const planAfterChange = getWorkspacePlan(ssotWorkspaceId);
+  const entitlementsAfterChange = getWorkspaceEntitlements(ssotWorkspaceId);
+  const proServiceEntAfterChange = entitlementsAfterChange.find((e) => e.serviceId === "ai-visibility")!;
+
+  if (planAfterChange !== "free") {
+    throw new Error(`FAIL: Plan after change resolved to "${planAfterChange}" instead of "free".`);
+  }
+  if (proServiceEntAfterChange.status !== "PREMIUM") {
+    throw new Error(`FAIL: Service entitlement and plan mismatch after change. Free plan has "${proServiceEntAfterChange.status}" instead of PREMIUM.`);
+  }
+  console.log("  ✅ Single source of truth verified: dynamically changing workspace plan updates entitlements instantly.");
 
   console.log("=========================================================================");
   console.log("✅ ALL SERVICE MARKETPLACE INTEGRATION TESTS COMPLETED SUCCESSFULLY!");
