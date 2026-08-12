@@ -204,11 +204,7 @@ export interface VisibilityScore {
   audit: AuditMetadata;
 }
 
-export type RecommendationStatus = "proposed" | "accepted" | "in_progress" | "completed" | "rejected" | "deferred" | "blocked" | "pending" | "applied" | "ignored";
-
-export type ImpactLevel = "low" | "medium" | "high" | "critical" | "unknown";
-
-export type EffortLevel = "trivial" | "small" | "medium" | "large" | "very_large" | "unknown";
+export type RecommendationStatus = "pending" | "applied" | "ignored";
 
 /**
  * Entity: Recommendation
@@ -218,41 +214,11 @@ export interface Recommendation {
   id: string;
   organizationId: string; // strict multi-tenant partition key
   brandId: string;
-  websiteId: string; // website context ownership
-  affectedResource: string; // URL path, sitemap path, or brand domain affected
-  sourceFindingIds: string[]; // link back to source diagnostic findings
   category: string;
-  title: string;
-  problemStatement: string;
-  recommendedAction: string;
-  rationale: string;
   priority: PriorityLevel;
-  businessImpact: ImpactLevel;
-  seoImpact: ImpactLevel;
-  aiVisibilityImpact: ImpactLevel;
-  effort: EffortLevel;
-  confidence: "low" | "medium" | "high";
-  impactScore: number; // Predicted composite lift (0-100)
+  impactScore: number; // Predicted lift (0-100)
   description: string;
   status: RecommendationStatus;
-  ruleVersion: string;
-  audit: AuditMetadata;
-}
-
-/**
- * Entity: RecommendationHistory
- * Represents one append-only audit log of recommendation status changes.
- */
-export interface RecommendationHistory {
-  id: string;
-  organizationId: string; // strict multi-tenant partition key
-  recommendationId: string;
-  previousStatus: RecommendationStatus | null;
-  newStatus: RecommendationStatus;
-  timestamp: Date | string;
-  actor: string;
-  reason?: string;
-  metadata: Record<string, unknown>;
   audit: AuditMetadata;
 }
 
@@ -382,6 +348,105 @@ export interface AuditPrompt {
   responseText?: string;
   analysis: Partial<AuditPromptAnalysis>;
   audit: AuditMetadata;
+}
+
+/**
+ * AI Prompt Intelligence Types (Task 5.1)
+ */
+export type PromptCategory =
+  | "Brand Discovery"
+  | "Product/Service Discovery"
+  | "Category"
+  | "Recommendation"
+  | "Comparison"
+  | "Problem/Solution"
+  | "Local/Geographic"
+  | "Entity"
+  | "Informational"
+  | "Transactional"
+  | "Navigational";
+
+export type PromptIntentType = "Discovery" | "Comparison" | "Recommendation" | "Purchase" | "Research" | "Authority" | "Informational" | "Transactional" | "Navigational";
+
+export interface PromptVariable {
+  name: string;
+  defaultValue: string;
+  description?: string;
+}
+
+export interface PromptDefinition {
+  id: string;
+  organizationId: string; // Tenant context
+  brandId: string; // Target brand
+  name: string; // friendly name
+  promptTemplate: string; // parameterized string with {varName} placeholders
+  category: PromptCategory;
+  intent: PromptIntentType;
+  locale: string;
+  isActive: boolean;
+  variables: PromptVariable[];
+  competitors: string[]; // configured target competitors
+  tags: string[];
+  notes?: string;
+  version: number; // Snapshot template version
+  audit: AuditMetadata;
+}
+
+export interface PromptSchedule {
+  id: string;
+  organizationId: string;
+  promptId: string;
+  enabled: boolean;
+  cronExpression: string; // cron syntax
+  timezone: string; // e.g. "Asia/Tehran" or "UTC"
+  nextExecutionAt?: Date | string;
+  lastExecutionAt?: Date | string;
+  status: "IDLE" | "QUEUED" | "RUNNING" | "FAILED";
+  failureReason?: string;
+  scheduleVersion: number;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+export type PromptExecutionStatus = "queued" | "running" | "succeeded" | "failed" | "timed_out" | "cancelled";
+
+export interface PromptExecution {
+  id: string;
+  organizationId: string;
+  promptId: string;
+  promptVersion: number;
+  resolvedPromptText: string;
+  variablesValues: Record<string, string>;
+  status: PromptExecutionStatus;
+  provider: string;
+  model: string;
+  modelVersion?: string;
+  responseText?: string;
+  latencyMs?: number;
+  errorMessage?: string;
+  attempts: number;
+  maxAttempts: number;
+  scheduledFor?: Date | string;
+  executedAt?: Date | string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+export type PositionPresence = "not_present" | "mentioned" | "recommended" | "ranked" | "unknown";
+export type EvidenceStructureType = "numbered_list" | "bullet_list" | "table" | "prose" | "unknown";
+
+export interface PositionObservation {
+  id: string;
+  organizationId: string;
+  sourceExecutionId: string;
+  subjectEntityId: string; // Target brand Name or competitor name
+  presence: PositionPresence;
+  numericPosition?: number; // numbered list index (1-based)
+  evidenceExcerpt: string;
+  evidenceStructure: EvidenceStructureType;
+  confidence: number;
+  analyzerVersion: string;
+  createdAt: Date | string;
 }
 
 /**

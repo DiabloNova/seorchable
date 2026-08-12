@@ -19,9 +19,7 @@ import {
   AuditMetadata,
   ConfidenceVO,
   SentimentVO,
-  TextContextVO,
-  ImpactLevel,
-  EffortLevel
+  TextContextVO
 } from "../types";
 
 export interface ValidationError {
@@ -608,30 +606,7 @@ export const recommendationSchema = {
       return { success: false, errors: [{ field: "root", message: "Invalid data object" }] };
     }
 
-    const {
-      id,
-      organizationId,
-      brandId,
-      websiteId,
-      affectedResource,
-      sourceFindingIds,
-      category,
-      title,
-      problemStatement,
-      recommendedAction,
-      rationale,
-      priority,
-      businessImpact,
-      seoImpact,
-      aiVisibilityImpact,
-      effort,
-      confidence,
-      impactScore,
-      description,
-      status,
-      ruleVersion,
-      audit
-    } = data;
+    const { id, organizationId, brandId, category, priority, impactScore, description, status, audit } = data;
 
     if (typeof id !== "string" || !id.trim()) {
       errors.push({ field: "id", message: "ID is required" });
@@ -658,7 +633,7 @@ export const recommendationSchema = {
       errors.push({ field: "description", message: "description is required" });
     }
 
-    const validStatuses: RecommendationStatus[] = ["proposed", "accepted", "in_progress", "completed", "rejected", "deferred", "blocked", "pending", "applied", "ignored"];
+    const validStatuses: RecommendationStatus[] = ["pending", "applied", "ignored"];
     if (typeof status !== "string" || !validStatuses.includes(status as RecommendationStatus)) {
       errors.push({ field: "status", message: `Status must be one of: ${validStatuses.join(", ")}` });
     }
@@ -671,24 +646,11 @@ export const recommendationSchema = {
         id: id as string,
         organizationId: organizationId as string,
         brandId: brandId as string,
-        websiteId: typeof websiteId === "string" ? websiteId : "web-site-default",
-        affectedResource: typeof affectedResource === "string" ? affectedResource : "my-brand.com",
-        sourceFindingIds: Array.isArray(sourceFindingIds) ? (sourceFindingIds as string[]) : [],
         category: category as string,
-        title: typeof title === "string" ? title : (category as string),
-        problemStatement: typeof problemStatement === "string" ? problemStatement : (description as string),
-        recommendedAction: typeof recommendedAction === "string" ? recommendedAction : (description as string),
-        rationale: typeof rationale === "string" ? rationale : (description as string),
         priority: priority as PriorityLevel,
-        businessImpact: (typeof businessImpact === "string" ? businessImpact : "unknown") as ImpactLevel,
-        seoImpact: (typeof seoImpact === "string" ? seoImpact : "unknown") as ImpactLevel,
-        aiVisibilityImpact: (typeof aiVisibilityImpact === "string" ? aiVisibilityImpact : "unknown") as ImpactLevel,
-        effort: (typeof effort === "string" ? effort : "unknown") as EffortLevel,
-        confidence: (typeof confidence === "string" ? confidence : "high") as "low" | "medium" | "high",
         impactScore: impactScore as number,
         description: description as string,
         status: status as RecommendationStatus,
-        ruleVersion: typeof ruleVersion === "string" ? ruleVersion : "1.0",
         audit: parseAudit(audit)
       }
     };

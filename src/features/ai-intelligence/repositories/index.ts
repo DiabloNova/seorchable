@@ -31,7 +31,12 @@ import {
   FindingRelationshipType,
   AIVisibilityAudit,
   AuditPrompt,
-  RecommendationHistory, main
+  AIVisibilityAuditStatus,
+  AuditPromptStatus,
+  PromptDefinition,
+  PromptSchedule,
+  PromptExecution,
+  PositionObservation
 } from "../domain/types";
 import {
   IOrganizationRepository,
@@ -51,7 +56,8 @@ import {
   ICompetitorRepository,
   IHistoricalMetricRepository,
   IDiagnosticFindingRepository,
-  IAIVisibilityAuditRepository
+  IAIVisibilityAuditRepository,
+  IPromptIntelligenceRepository
 } from "./interfaces";
 
 function createMockAudit(createdBy = "system"): AuditMetadata {
@@ -90,6 +96,10 @@ class InMemoryDatabase {
   public recommendations: Map<string, Recommendation> = new Map();
   public aiVisibilityAudits: Map<string, AIVisibilityAudit> = new Map();
   public auditPrompts: Map<string, AuditPrompt> = new Map();
+  public promptDefinitions: Map<string, PromptDefinition> = new Map();
+  public promptSchedules: Map<string, PromptSchedule> = new Map();
+  public promptExecutions: Map<string, PromptExecution> = new Map();
+  public positionObservations: Map<string, PositionObservation> = new Map();
 
   // Unified Intelligence Data Model stores
   public websites: Map<string, Website> = new Map();
@@ -100,7 +110,6 @@ class InMemoryDatabase {
   public historicalMetrics: Map<string, HistoricalMetric> = new Map();
   public diagnosticFindings: Map<string, DiagnosticFinding> = new Map();
   public diagnosticFindingRelationships: DiagnosticFindingRelationship[] = [];
-  public recommendationHistories: RecommendationHistory[] = [];
 
   // Join table models (Many-to-Many associations)
   public pagesKeywords: Array<{ organizationId: string, pageId: string, keywordId: string }> = [];
@@ -349,24 +358,11 @@ class InMemoryDatabase {
       id: "rec-01",
       organizationId: orgId,
       brandId: brandId,
-      websiteId: "web-site-default",
-      affectedResource: "my-brand.com",
-      sourceFindingIds: [],
       category: "Citation Authority",
-      title: "Citation Authority",
-      problemStatement: "Missing brand website citations back to root website for ecommerce queries.",
-      recommendedAction: "Associate your brand website with key high-intent discovery prompt citations back to the root website for ecommerce queries.",
-      rationale: "Citations from high-intent discovery queries establish domain and brand prominence.",
       priority: "high",
-      businessImpact: "unknown",
-      seoImpact: "unknown",
-      aiVisibilityImpact: "unknown",
-      effort: "unknown",
-      confidence: "high",
       impactScore: 15,
       description: "Associate your brand website with key high-intent discovery prompt citations back to the root website for ecommerce queries.",
       status: "pending",
-      ruleVersion: "1.0",
       audit: createMockAudit()
     });
 
@@ -374,24 +370,11 @@ class InMemoryDatabase {
       id: "rec-02",
       organizationId: orgId,
       brandId: brandId,
-      websiteId: "web-site-default",
-      affectedResource: "my-brand.com",
-      sourceFindingIds: [],
       category: "Entity Linking",
-      title: "Entity Linking",
-      problemStatement: "Missing entity properties on Wikidata.",
-      recommendedAction: "Map and claim missing entity properties on Wikidata to anchor entity recognition models.",
-      rationale: "Structured entity nodes assist AI algorithms in resolving brand identity.",
       priority: "medium",
-      businessImpact: "unknown",
-      seoImpact: "unknown",
-      aiVisibilityImpact: "unknown",
-      effort: "unknown",
-      confidence: "high",
       impactScore: 8,
       description: "Map and claim missing entity properties on Wikidata to anchor entity recognition models.",
       status: "pending",
-      ruleVersion: "1.0",
       audit: createMockAudit()
     });
   }
@@ -790,6 +773,416 @@ export class AIVisibilityAuditRepository implements IAIVisibilityAuditRepository
     }
     db.auditPrompts.set(prompt.id, prompt);
     return prompt;
+  }
+}
+
+export class PromptIntelligenceRepository implements IPromptIntelligenceRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  private mapRowToDefinition(row: any): PromptDefinition {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      brandId: row.brand_id,
+      name: row.name,
+      promptTemplate: row.prompt_template,
+      category: row.category,
+      intent: row.intent,
+      locale: row.locale,
+      isActive: row.is_active,
+      variables: typeof row.variables === "string" ? JSON.parse(row.variables) : (row.variables || []),
+      competitors: row.competitors || [],
+      tags: row.tags || [],
+      notes: row.notes || undefined,
+      version: row.version,
+      audit: {
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        createdBy: row.created_by,
+        updatedBy: row.updated_by,
+        deletedAt: row.deleted_at || undefined,
+        version: row.opt_version
+      }
+    };
+  }
+
+  private mapRowToSchedule(row: any): PromptSchedule {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      promptId: row.prompt_id,
+      enabled: row.enabled,
+      cronExpression: row.cron_expression,
+      timezone: row.timezone,
+      nextExecutionAt: row.next_execution_at || undefined,
+      lastExecutionAt: row.last_execution_at || undefined,
+      status: row.status,
+      failureReason: row.failure_reason || undefined,
+      scheduleVersion: row.schedule_version,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    };
+  }
+
+  private mapRowToExecution(row: any): PromptExecution {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      promptId: row.prompt_id,
+      promptVersion: row.prompt_version,
+      resolvedPromptText: row.resolved_prompt_text,
+      variablesValues: typeof row.variables_values === "string" ? JSON.parse(row.variables_values) : (row.variables_values || {}),
+      status: row.status,
+      provider: row.provider,
+      model: row.model,
+      modelVersion: row.model_version || undefined,
+      responseText: row.response_text || undefined,
+      latencyMs: row.latency_ms || undefined,
+      errorMessage: row.error_message || undefined,
+      attempts: row.attempts,
+      maxAttempts: row.max_attempts,
+      scheduledFor: row.scheduled_for || undefined,
+      executedAt: row.executed_at || undefined,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    };
+  }
+
+  private mapRowToPosition(row: any): PositionObservation {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      sourceExecutionId: row.source_execution_id,
+      subjectEntityId: row.subject_entity_id,
+      presence: row.presence,
+      numericPosition: row.numeric_position || undefined,
+      evidenceExcerpt: row.evidence_excerpt,
+      evidenceStructure: row.evidence_structure,
+      confidence: row.confidence,
+      analyzerVersion: row.analyzer_version,
+      createdAt: row.created_at
+    };
+  }
+
+  // Definitions
+  public async findDefinitionById(organizationId: string, id: string): Promise<PromptDefinition | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM prompt_definitions WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToDefinition(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.findDefinitionById Error]: using memory fallback.", err);
+    }
+    const item = db.promptDefinitions.get(id);
+    if (!item || item.organizationId !== organizationId || item.audit.deletedAt) return null;
+    return item;
+  }
+
+  public async findDefinitionsByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<PromptDefinition>> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM prompt_definitions WHERE brand_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [brandId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        const mapped = res.rows.map(row => this.mapRowToDefinition(row));
+        return paginateArray(mapped, params);
+      }
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.findDefinitionsByBrandId Error]: using memory fallback.", err);
+    }
+    const list = Array.from(db.promptDefinitions.values()).filter(
+      v => v.brandId === brandId && v.organizationId === organizationId && (params?.includeDeleted || !v.audit.deletedAt)
+    ).sort((a, b) => new Date(b.audit.createdAt).getTime() - new Date(a.audit.createdAt).getTime());
+    return paginateArray(list, params);
+  }
+
+  public async saveDefinition(definition: PromptDefinition): Promise<PromptDefinition> {
+    enforceTenantContext(definition.organizationId);
+    try {
+      const sql = `
+        INSERT INTO prompt_definitions (id, organization_id, brand_id, name, prompt_template, category, intent, locale, is_active, variables, competitors, tags, notes, version, created_at, updated_at, created_by, updated_by, opt_version)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+        ON CONFLICT (id) DO UPDATE SET
+          name = EXCLUDED.name,
+          prompt_template = EXCLUDED.prompt_template,
+          category = EXCLUDED.category,
+          intent = EXCLUDED.intent,
+          locale = EXCLUDED.locale,
+          is_active = EXCLUDED.is_active,
+          variables = EXCLUDED.variables,
+          competitors = EXCLUDED.competitors,
+          tags = EXCLUDED.tags,
+          notes = EXCLUDED.notes,
+          version = EXCLUDED.version,
+          updated_at = EXCLUDED.updated_at,
+          updated_by = EXCLUDED.updated_by,
+          opt_version = prompt_definitions.opt_version + 1;
+      `;
+      await this.pg.query(sql, [
+        definition.id,
+        definition.organizationId,
+        definition.brandId,
+        definition.name,
+        definition.promptTemplate,
+        definition.category,
+        definition.intent,
+        definition.locale,
+        definition.isActive,
+        JSON.stringify(definition.variables),
+        definition.competitors,
+        definition.tags,
+        definition.notes || null,
+        definition.version,
+        definition.audit.createdAt,
+        definition.audit.updatedAt,
+        definition.audit.createdBy,
+        definition.audit.updatedBy,
+        definition.audit.version
+      ]);
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.saveDefinition Error]: using memory fallback.", err);
+    }
+    db.promptDefinitions.set(definition.id, definition);
+    return definition;
+  }
+
+  public async deleteDefinitionSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `UPDATE prompt_definitions SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+      const res = await this.pg.query(sql, [deletedBy, id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return true;
+      }
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.deleteDefinitionSoft Error]: using memory fallback.", err);
+    }
+    const item = db.promptDefinitions.get(id);
+    if (!item || item.organizationId !== organizationId) return false;
+    item.audit.deletedAt = new Date().toISOString();
+    item.audit.updatedBy = deletedBy;
+    item.audit.updatedAt = new Date().toISOString();
+    return true;
+  }
+
+  // Schedules
+  public async findScheduleByPromptId(organizationId: string, promptId: string): Promise<PromptSchedule | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM prompt_schedules WHERE prompt_id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      const res = await this.pg.query(sql, [promptId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToSchedule(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.findScheduleByPromptId Error]: using memory fallback.", err);
+    }
+    for (const item of db.promptSchedules.values()) {
+      if (item.promptId === promptId && item.organizationId === organizationId) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  public async findScheduleById(organizationId: string, id: string): Promise<PromptSchedule | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM prompt_schedules WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToSchedule(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.findScheduleById Error]: using memory fallback.", err);
+    }
+    const item = db.promptSchedules.get(id);
+    if (!item || item.organizationId !== organizationId) return null;
+    return item;
+  }
+
+  public async findAllSchedules(organizationId: string): Promise<PromptSchedule[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM prompt_schedules WHERE organization_id = $1 AND deleted_at IS NULL;`;
+      const res = await this.pg.query(sql, [organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToSchedule(row));
+      }
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.findAllSchedules Error]: using memory fallback.", err);
+    }
+    return Array.from(db.promptSchedules.values()).filter(
+      p => p.organizationId === organizationId
+    );
+  }
+
+  public async saveSchedule(schedule: PromptSchedule): Promise<PromptSchedule> {
+    enforceTenantContext(schedule.organizationId);
+    try {
+      const sql = `
+        INSERT INTO prompt_schedules (id, organization_id, prompt_id, enabled, cron_expression, timezone, next_execution_at, last_execution_at, status, failure_reason, schedule_version, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        ON CONFLICT (id) DO UPDATE SET
+          enabled = EXCLUDED.enabled,
+          cron_expression = EXCLUDED.cron_expression,
+          timezone = EXCLUDED.timezone,
+          next_execution_at = EXCLUDED.next_execution_at,
+          last_execution_at = EXCLUDED.last_execution_at,
+          status = EXCLUDED.status,
+          failure_reason = EXCLUDED.failure_reason,
+          schedule_version = EXCLUDED.schedule_version,
+          updated_at = EXCLUDED.updated_at;
+      `;
+      await this.pg.query(sql, [
+        schedule.id,
+        schedule.organizationId,
+        schedule.promptId,
+        schedule.enabled,
+        schedule.cronExpression,
+        schedule.timezone,
+        schedule.nextExecutionAt || null,
+        schedule.lastExecutionAt || null,
+        schedule.status,
+        schedule.failureReason || null,
+        schedule.scheduleVersion,
+        schedule.createdAt,
+        schedule.updatedAt
+      ]);
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.saveSchedule Error]: using memory fallback.", err);
+    }
+    db.promptSchedules.set(schedule.id, schedule);
+    return schedule;
+  }
+
+  // Executions
+  public async findExecutionById(organizationId: string, id: string): Promise<PromptExecution | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM prompt_executions WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToExecution(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.findExecutionById Error]: using memory fallback.", err);
+    }
+    const item = db.promptExecutions.get(id);
+    if (!item || item.organizationId !== organizationId) return null;
+    return item;
+  }
+
+  public async findExecutionsByPromptId(organizationId: string, promptId: string, params?: QueryParams): Promise<PaginatedResult<PromptExecution>> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM prompt_executions WHERE prompt_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [promptId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        const mapped = res.rows.map(row => this.mapRowToExecution(row));
+        return paginateArray(mapped, params);
+      }
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.findExecutionsByPromptId Error]: using memory fallback.", err);
+    }
+    const list = Array.from(db.promptExecutions.values()).filter(
+      v => v.promptId === promptId && v.organizationId === organizationId
+    ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return paginateArray(list, params);
+  }
+
+  public async saveExecution(execution: PromptExecution): Promise<PromptExecution> {
+    enforceTenantContext(execution.organizationId);
+    try {
+      const sql = `
+        INSERT INTO prompt_executions (id, organization_id, prompt_id, prompt_version, resolved_prompt_text, variables_values, status, provider, model, model_version, response_text, latency_ms, error_message, attempts, max_attempts, scheduled_for, executed_at, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+        ON CONFLICT (id) DO UPDATE SET
+          status = EXCLUDED.status,
+          response_text = EXCLUDED.response_text,
+          latency_ms = EXCLUDED.latency_ms,
+          error_message = EXCLUDED.error_message,
+          attempts = EXCLUDED.attempts,
+          executed_at = EXCLUDED.executed_at,
+          updated_at = EXCLUDED.updated_at;
+      `;
+      await this.pg.query(sql, [
+        execution.id,
+        execution.organizationId,
+        execution.promptId,
+        execution.promptVersion,
+        execution.resolvedPromptText,
+        JSON.stringify(execution.variablesValues),
+        execution.status,
+        execution.provider,
+        execution.model,
+        execution.modelVersion || null,
+        execution.responseText || null,
+        execution.latencyMs || null,
+        execution.errorMessage || null,
+        execution.attempts,
+        execution.maxAttempts,
+        execution.scheduledFor || null,
+        execution.executedAt || null,
+        execution.createdAt,
+        execution.updatedAt
+      ]);
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.saveExecution Error]: using memory fallback.", err);
+    }
+    db.promptExecutions.set(execution.id, execution);
+    return execution;
+  }
+
+  // Position Observations
+  public async findPositionsByExecutionId(organizationId: string, executionId: string): Promise<PositionObservation[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM position_observations WHERE source_execution_id = $1 AND organization_id = $2;`;
+      const res = await this.pg.query(sql, [executionId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToPosition(row));
+      }
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.findPositionsByExecutionId Error]: using memory fallback.", err);
+    }
+    return Array.from(db.positionObservations.values()).filter(
+      p => p.sourceExecutionId === executionId && p.organizationId === organizationId
+    );
+  }
+
+  public async savePosition(position: PositionObservation): Promise<PositionObservation> {
+    enforceTenantContext(position.organizationId);
+    try {
+      const sql = `
+        INSERT INTO position_observations (id, organization_id, source_execution_id, subject_entity_id, presence, numeric_position, evidence_excerpt, evidence_structure, confidence, analyzer_version, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        ON CONFLICT (id) DO NOTHING;
+      `;
+      await this.pg.query(sql, [
+        position.id,
+        position.organizationId,
+        position.sourceExecutionId,
+        position.subjectEntityId,
+        position.presence,
+        position.numericPosition || null,
+        position.evidenceExcerpt,
+        position.evidenceStructure,
+        position.confidence,
+        position.analyzerVersion,
+        position.createdAt
+      ]);
+    } catch (err) {
+      console.warn("[PromptIntelligenceRepository.savePosition Error]: using memory fallback.", err);
+    }
+    db.positionObservations.set(position.id, position);
+    return position;
   }
 }
 
@@ -1775,161 +2168,31 @@ export class VisibilityScoreRepository implements IVisibilityScoreRepository {
 }
 
 export class RecommendationRepository implements IRecommendationRepository {
-  private pg: PostgresClient;
-  constructor(pg?: PostgresClient) {
-    this.pg = pg || PostgresClient.getInstance();
-  }
-
-  public async findById(organizationId: string, id: string): Promise<Recommendation | null> {
-    enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM recommendations WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
-    await this.pg.query(sql, [id, organizationId]);
-
-    const rec = db.recommendations.get(id);
-    if (!rec || rec.organizationId !== organizationId || rec.audit.deletedAt) return null;
-    return rec;
-  }
-
   public async findByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<Recommendation>> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM recommendations WHERE brand_id = $1 AND organization_id = $2 AND deleted_at IS NULL;`;
-    await this.pg.query(sql, [brandId, organizationId]);
-
     const list = Array.from(db.recommendations.values()).filter(
       r => r.organizationId === organizationId && r.brandId === brandId && (params?.includeDeleted || !r.audit.deletedAt)
     );
     return paginateArray(list, params);
   }
 
-  public async findByWebsiteId(organizationId: string, websiteId: string, params?: QueryParams): Promise<PaginatedResult<Recommendation>> {
-    enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM recommendations WHERE website_id = $1 AND organization_id = $2 AND deleted_at IS NULL;`;
-    await this.pg.query(sql, [websiteId, organizationId]);
-
-    const list = Array.from(db.recommendations.values()).filter(
-      r => r.organizationId === organizationId && r.websiteId === websiteId && (params?.includeDeleted || !r.audit.deletedAt)
-    );
-    return paginateArray(list, params);
-  }
-
   public async save(rec: Recommendation): Promise<Recommendation> {
     enforceTenantContext(rec.organizationId);
-    const sql = `
-      INSERT INTO recommendations (
-        id, organization_id, brand_id, website_id, affected_resource, source_finding_ids, category, title, problem_statement, recommended_action, rationale, priority, business_impact, seo_impact, ai_visibility_impact, effort, confidence, impact_score, description, status, rule_version, created_at, updated_at, created_by, updated_by, version
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)
-      ON CONFLICT (organization_id, website_id, category, affected_resource, rule_version) DO UPDATE SET
-        brand_id = EXCLUDED.brand_id,
-        source_finding_ids = EXCLUDED.source_finding_ids,
-        title = EXCLUDED.title,
-        problem_statement = EXCLUDED.problem_statement,
-        recommended_action = EXCLUDED.recommended_action,
-        rationale = EXCLUDED.rationale,
-        priority = EXCLUDED.priority,
-        business_impact = EXCLUDED.business_impact,
-        seo_impact = EXCLUDED.seo_impact,
-        ai_visibility_impact = EXCLUDED.ai_visibility_impact,
-        effort = EXCLUDED.effort,
-        confidence = EXCLUDED.confidence,
-        impact_score = EXCLUDED.impact_score,
-        description = EXCLUDED.description,
-        status = EXCLUDED.status,
-        updated_at = EXCLUDED.updated_at,
-        updated_by = EXCLUDED.updated_by,
-        version = recommendations.version + 1;
-    `;
-    await this.pg.query(sql, [
-      rec.id,
-      rec.organizationId,
-      rec.brandId,
-      rec.websiteId,
-      rec.affectedResource,
-      rec.sourceFindingIds || [],
-      rec.category,
-      rec.title || "",
-      rec.problemStatement || "",
-      rec.recommendedAction || "",
-      rec.rationale || "",
-      rec.priority,
-      rec.businessImpact || "unknown",
-      rec.seoImpact || "unknown",
-      rec.aiVisibilityImpact || "unknown",
-      rec.effort || "unknown",
-      rec.confidence || "high",
-      rec.impactScore || 0,
-      rec.description,
-      rec.status,
-      rec.ruleVersion || "1.0",
-      rec.audit.createdAt,
-      rec.audit.updatedAt,
-      rec.audit.createdBy,
-      rec.audit.updatedBy,
-      rec.audit.version
-    ]);
-
-    // Emulate PostgreSQL UNIQUE ON CONFLICT constraint for in-memory database simulation
-    for (const [key, existing] of db.recommendations.entries()) {
-      if (
-        existing.organizationId === rec.organizationId &&
-        existing.websiteId === rec.websiteId &&
-        existing.category === rec.category &&
-        existing.affectedResource === rec.affectedResource &&
-        existing.ruleVersion === rec.ruleVersion
-      ) {
-        db.recommendations.delete(key);
-      }
+    const existing = db.recommendations.get(rec.id);
+    if (existing && existing.organizationId !== rec.organizationId) {
+      throw new Error("Tenant Isolation Exception: Cannot modify or change tenant ownership for existing Recommendation.");
     }
-
     db.recommendations.set(rec.id, rec);
     return rec;
   }
 
   public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
-    const sql = `UPDATE recommendations SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
-    await this.pg.query(sql, [deletedBy, id, organizationId]);
-
     const rec = db.recommendations.get(id);
     if (!rec || rec.organizationId !== organizationId) return false;
     rec.audit.deletedAt = new Date().toISOString();
     rec.audit.updatedBy = deletedBy;
     rec.audit.updatedAt = new Date().toISOString();
     return true;
-  }
-
-  // Append-only history
-  public async saveHistory(entry: RecommendationHistory): Promise<RecommendationHistory> {
-    enforceTenantContext(entry.organizationId);
-    const sql = `
-      INSERT INTO recommendation_histories (id, organization_id, recommendation_id, previous_status, new_status, timestamp, actor, reason, metadata, created_at, updated_at, created_by, updated_by, version)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW(), 'system', 'system', 1);
-    `;
-    await this.pg.query(sql, [
-      entry.id,
-      entry.organizationId,
-      entry.recommendationId,
-      entry.previousStatus,
-      entry.newStatus,
-      entry.timestamp,
-      entry.actor,
-      entry.reason || null,
-      JSON.stringify(entry.metadata),
-      entry.audit.createdAt,
-      entry.audit.updatedAt,
-      entry.audit.createdBy,
-      entry.audit.updatedBy,
-      entry.audit.version
-    ]);
-
-    db.recommendationHistories.push(entry);
-    return entry;
-  }
-
-  public async getHistory(organizationId: string, recommendationId: string): Promise<RecommendationHistory[]> {
-    enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM recommendation_histories WHERE recommendation_id = $1 AND organization_id = $2 ORDER BY timestamp DESC;`;
-    await this.pg.query(sql, [recommendationId, organizationId]);
-
-    return db.recommendationHistories.filter(h => h.recommendationId === recommendationId && h.organizationId === organizationId);
   }
 }

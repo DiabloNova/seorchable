@@ -28,7 +28,10 @@ import {
   FindingRelationshipType,
   AIVisibilityAudit,
   AuditPrompt,
-  RecommendationHistory main
+  PromptDefinition,
+  PromptSchedule,
+  PromptExecution,
+  PositionObservation
 } from "../domain/types";
 
 export interface QueryParams {
@@ -108,15 +111,9 @@ export interface IVisibilityScoreRepository {
 }
 
 export interface IRecommendationRepository {
-  findById(organizationId: string, id: string): Promise<Recommendation | null>;
   findByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<Recommendation>>;
-  findByWebsiteId(organizationId: string, websiteId: string, params?: QueryParams): Promise<PaginatedResult<Recommendation>>;
   save(rec: Recommendation): Promise<Recommendation>;
   deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
-
-  // Append-only history
-  saveHistory(entry: RecommendationHistory): Promise<RecommendationHistory>;
-  getHistory(organizationId: string, recommendationId: string): Promise<RecommendationHistory[]>;
 }
 
 export interface IWebsiteRepository {
@@ -201,4 +198,27 @@ export interface IAIVisibilityAuditRepository {
   findPromptsByAuditId(organizationId: string, auditId: string): Promise<AuditPrompt[]>;
   findPromptById(organizationId: string, id: string): Promise<AuditPrompt | null>;
   savePrompt(prompt: AuditPrompt): Promise<AuditPrompt>;
+}
+
+export interface IPromptIntelligenceRepository {
+  // Definitions (Tenant-scoped)
+  findDefinitionById(organizationId: string, id: string): Promise<PromptDefinition | null>;
+  findDefinitionsByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<PromptDefinition>>;
+  saveDefinition(definition: PromptDefinition): Promise<PromptDefinition>;
+  deleteDefinitionSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
+
+  // Schedules (Tenant-scoped)
+  findScheduleByPromptId(organizationId: string, promptId: string): Promise<PromptSchedule | null>;
+  findScheduleById(organizationId: string, id: string): Promise<PromptSchedule | null>;
+  findAllSchedules(organizationId: string): Promise<PromptSchedule[]>;
+  saveSchedule(schedule: PromptSchedule): Promise<PromptSchedule>;
+
+  // Executions (Tenant-scoped)
+  findExecutionById(organizationId: string, id: string): Promise<PromptExecution | null>;
+  findExecutionsByPromptId(organizationId: string, promptId: string, params?: QueryParams): Promise<PaginatedResult<PromptExecution>>;
+  saveExecution(execution: PromptExecution): Promise<PromptExecution>;
+
+  // Position Observations (Tenant-scoped)
+  findPositionsByExecutionId(organizationId: string, executionId: string): Promise<PositionObservation[]>;
+  savePosition(position: PositionObservation): Promise<PositionObservation>;
 }
