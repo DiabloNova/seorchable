@@ -204,7 +204,11 @@ export interface VisibilityScore {
   audit: AuditMetadata;
 }
 
-export type RecommendationStatus = "pending" | "applied" | "ignored";
+export type RecommendationStatus = "proposed" | "accepted" | "in_progress" | "completed" | "rejected" | "deferred" | "blocked" | "pending" | "applied" | "ignored";
+
+export type ImpactLevel = "low" | "medium" | "high" | "critical" | "unknown";
+
+export type EffortLevel = "trivial" | "small" | "medium" | "large" | "very_large" | "unknown";
 
 /**
  * Entity: Recommendation
@@ -214,11 +218,41 @@ export interface Recommendation {
   id: string;
   organizationId: string; // strict multi-tenant partition key
   brandId: string;
+  websiteId: string; // website context ownership
+  affectedResource: string; // URL path, sitemap path, or brand domain affected
+  sourceFindingIds: string[]; // link back to source diagnostic findings
   category: string;
+  title: string;
+  problemStatement: string;
+  recommendedAction: string;
+  rationale: string;
   priority: PriorityLevel;
-  impactScore: number; // Predicted lift (0-100)
+  businessImpact: ImpactLevel;
+  seoImpact: ImpactLevel;
+  aiVisibilityImpact: ImpactLevel;
+  effort: EffortLevel;
+  confidence: "low" | "medium" | "high";
+  impactScore: number; // Predicted composite lift (0-100)
   description: string;
   status: RecommendationStatus;
+  ruleVersion: string;
+  audit: AuditMetadata;
+}
+
+/**
+ * Entity: RecommendationHistory
+ * Represents one append-only audit log of recommendation status changes.
+ */
+export interface RecommendationHistory {
+  id: string;
+  organizationId: string; // strict multi-tenant partition key
+  recommendationId: string;
+  previousStatus: RecommendationStatus | null;
+  newStatus: RecommendationStatus;
+  timestamp: Date | string;
+  actor: string;
+  reason?: string;
+  metadata: Record<string, unknown>;
   audit: AuditMetadata;
 }
 

@@ -27,7 +27,8 @@ import {
   DiagnosticFindingRelationship,
   FindingRelationshipType,
   AIVisibilityAudit,
-  AuditPrompt
+  AuditPrompt,
+  RecommendationHistory main
 } from "../domain/types";
 
 export interface QueryParams {
@@ -107,9 +108,15 @@ export interface IVisibilityScoreRepository {
 }
 
 export interface IRecommendationRepository {
+  findById(organizationId: string, id: string): Promise<Recommendation | null>;
   findByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<Recommendation>>;
+  findByWebsiteId(organizationId: string, websiteId: string, params?: QueryParams): Promise<PaginatedResult<Recommendation>>;
   save(rec: Recommendation): Promise<Recommendation>;
   deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
+
+  // Append-only history
+  saveHistory(entry: RecommendationHistory): Promise<RecommendationHistory>;
+  getHistory(organizationId: string, recommendationId: string): Promise<RecommendationHistory[]>;
 }
 
 export interface IWebsiteRepository {
