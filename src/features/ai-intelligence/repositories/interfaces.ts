@@ -22,7 +22,10 @@ import {
   Keyword,
   Topic,
   Competitor,
-  HistoricalMetric
+  HistoricalMetric,
+  DiagnosticFinding,
+  DiagnosticFindingRelationship,
+  FindingRelationshipType
 } from "../domain/types";
 
 export interface QueryParams {
@@ -165,4 +168,16 @@ export interface IHistoricalMetricRepository {
     startTime?: Date | string,
     endTime?: Date | string
   ): Promise<HistoricalMetric[]>;
+}
+
+export interface IDiagnosticFindingRepository {
+  findById(organizationId: string, id: string): Promise<DiagnosticFinding | null>;
+  findByWebsiteId(organizationId: string, websiteId: string, params?: QueryParams): Promise<PaginatedResult<DiagnosticFinding>>;
+  findByCodeAndResource(organizationId: string, websiteId: string, code: string, affectedResource: string): Promise<DiagnosticFinding | null>;
+  save(finding: DiagnosticFinding): Promise<DiagnosticFinding>;
+  deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
+
+  // Relationships mapping
+  linkFindings(organizationId: string, sourceId: string, targetId: string, type: FindingRelationshipType): Promise<void>;
+  getLinkedFindings(organizationId: string, findingId: string): Promise<DiagnosticFindingRelationship[]>;
 }

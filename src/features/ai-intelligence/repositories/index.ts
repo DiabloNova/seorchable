@@ -25,7 +25,10 @@ import {
   Keyword,
   Topic,
   Competitor,
-  HistoricalMetric
+  HistoricalMetric,
+  DiagnosticFinding,
+  DiagnosticFindingRelationship,
+  FindingRelationshipType
 } from "../domain/types";
 import {
   IOrganizationRepository,
@@ -43,7 +46,8 @@ import {
   IKeywordRepository,
   ITopicRepository,
   ICompetitorRepository,
-  IHistoricalMetricRepository
+  IHistoricalMetricRepository,
+  IDiagnosticFindingRepository
 } from "./interfaces";
 
 function createMockAudit(createdBy = "system"): AuditMetadata {
@@ -88,6 +92,8 @@ class InMemoryDatabase {
   public topics: Map<string, Topic> = new Map();
   public competitors: Map<string, Competitor> = new Map();
   public historicalMetrics: Map<string, HistoricalMetric> = new Map();
+  public diagnosticFindings: Map<string, DiagnosticFinding> = new Map();
+  public diagnosticFindingRelationships: DiagnosticFindingRelationship[] = [];
 
   // Join table models (Many-to-Many associations)
   public pagesKeywords: Array<{ organizationId: string, pageId: string, keywordId: string }> = [];
@@ -1101,6 +1107,154 @@ export class HistoricalMetricRepository implements IHistoricalMetricRepository {
       if (endTime && new Date(m.timestamp) > new Date(endTime)) return false;
       return true;
     }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }
+}
+
+export class PostgresDiagnosticFindingRepository implements IDiagnosticFindingRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  public async findById(organizationId: string, id: string): Promise<DiagnosticFinding | null> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM diagnostic_findings WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    await this.pg.query(sql, [id, organizationId]);
+
+    const item = db.diagnosticFindings.get(id);
+    if (!item || item.organizationId !== organizationId || item.audit.deletedAt) return null;
+    return item;
+  }
+
+  public async findByWebsiteId(organizationId: string, websiteId: string, params?: QueryParams): Promise<PaginatedResult<DiagnosticFinding>> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM diagnostic_findings WHERE website_id = $1 AND organization_id = $2 AND deleted_at IS NULL;`;
+    await this.pg.query(sql, [websiteId, organizationId]);
+
+    const list = Array.from(db.diagnosticFindings.values()).filter(
+      df => df.websiteId === websiteId && df.organizationId === organizationId && (params?.includeDeleted || !df.audit.deletedAt)
+    );
+    return paginateArray(list, params);
+  }
+
+  public async findByCodeAndResource(organizationId: string, websiteId: string, code: string, affectedResource: string): Promise<DiagnosticFinding | null> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM diagnostic_findings WHERE website_id = $1 AND code = $2 AND affected_resource = $3 AND organization_id = $4 AND deleted_at IS NULL LIMIT 1;`;
+    await this.pg.query(sql, [websiteId, code, affectedResource, organizationId]);
+
+    for (const item of db.diagnosticFindings.values()) {
+      if (item.websiteId === websiteId && item.code === code && item.affectedResource === affectedResource && item.organizationId === organizationId && !item.audit.deletedAt) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  public async save(finding: DiagnosticFinding): Promise<DiagnosticFinding> {
+    enforceTenantContext(finding.organizationId);
+    const sql = `
+      INSERT INTO diagnostic_findings (id, organization_id, website_id, category, code, title, explanation, severity, confidence, status, affected_resource, evidence, created_at, updated_at, created_by, updated_by, version)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+      ON CONFLICT (organization_id, website_id, code, affected_resource) DO UPDATE SET
+        title = EXCLUDED.title,
+        explanation = EXCLUDED.explanation,
+        severity = EXCLUDED.severity,
+        confidence = EXCLUDED.confidence,
+        status = EXCLUDED.status,
+        evidence = EXCLUDED.evidence,
+        updated_at = EXCLUDED.updated_at,
+        updated_by = EXCLUDED.updated_by,
+        version = diagnostic_findings.version + 1;
+    `;
+    await this.pg.query(sql, [
+      finding.id,
+      finding.organizationId,
+      finding.websiteId,
+      finding.category,
+      finding.code,
+      finding.title,
+      finding.explanation,
+      finding.severity,
+      finding.confidence,
+      finding.status,
+      finding.affectedResource,
+      JSON.stringify(finding.evidence),
+      finding.audit.createdAt,
+      finding.audit.updatedAt,
+      finding.audit.createdBy,
+      finding.audit.updatedBy,
+      finding.audit.version
+    ]);
+
+    // Emulate PostgreSQL UNIQUE ON CONFLICT constraint for in-memory database simulation
+    for (const [key, existing] of db.diagnosticFindings.entries()) {
+      if (
+        existing.organizationId === finding.organizationId &&
+        existing.websiteId === finding.websiteId &&
+        existing.code === finding.code &&
+        existing.affectedResource === finding.affectedResource
+      ) {
+        db.diagnosticFindings.delete(key);
+      }
+    }
+
+    db.diagnosticFindings.set(finding.id, finding);
+    return finding;
+  }
+
+  public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
+    enforceTenantContext(organizationId);
+    const sql = `UPDATE diagnostic_findings SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+    await this.pg.query(sql, [deletedBy, id, organizationId]);
+
+    const item = db.diagnosticFindings.get(id);
+    if (!item || item.organizationId !== organizationId) return false;
+    item.audit.deletedAt = new Date().toISOString();
+    item.audit.updatedBy = deletedBy;
+    item.audit.updatedAt = new Date().toISOString();
+    return true;
+  }
+
+  public async linkFindings(organizationId: string, sourceId: string, targetId: string, type: FindingRelationshipType): Promise<void> {
+    enforceTenantContext(organizationId);
+    const sql = `
+      INSERT INTO diagnostic_finding_relationships (organization_id, source_finding_id, target_finding_id, relationship_type, created_at, updated_at, created_by, updated_by, version)
+      VALUES ($1, $2, $3, $4, NOW(), NOW(), 'system', 'system', 1)
+      ON CONFLICT DO NOTHING;
+    `;
+    await this.pg.query(sql, [organizationId, sourceId, targetId, type]);
+
+    const exists = db.diagnosticFindingRelationships.some(
+      r => r.sourceFindingId === sourceId && r.targetFindingId === targetId && r.relationshipType === type
+    );
+    if (!exists) {
+      db.diagnosticFindingRelationships.push({
+        organizationId,
+        sourceFindingId: sourceId,
+        targetFindingId: targetId,
+        relationshipType: type,
+        audit: {
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          createdBy: "system",
+          updatedBy: "system",
+          version: 1
+        }
+      });
+    }
+  }
+
+  public async getLinkedFindings(organizationId: string, findingId: string): Promise<DiagnosticFindingRelationship[]> {
+    enforceTenantContext(organizationId);
+    const sql = `
+      SELECT * FROM diagnostic_finding_relationships
+      WHERE (source_finding_id = $1 OR target_finding_id = $1) AND organization_id = $2 AND deleted_at IS NULL;
+    `;
+    await this.pg.query(sql, [findingId, organizationId]);
+
+    return db.diagnosticFindingRelationships.filter(
+      r => (r.sourceFindingId === findingId || r.targetFindingId === findingId) && r.organizationId === organizationId && !r.audit.deletedAt
+    );
   }
 }
 

@@ -339,6 +339,48 @@ export interface HistoricalMetric {
   audit: AuditMetadata;
 }
 
+export type DiagnosticCategory = "technical" | "content" | "seo" | "aeo" | "entity" | "citation" | "competitive";
+
+export type FindingSeverity = "low" | "medium" | "high" | "critical";
+
+export type FindingConfidence = "low" | "medium" | "high";
+
+export type FindingStatus = "active" | "resolved" | "ignored";
+
+export type FindingRelationshipType = "caused_by" | "contributes_to" | "depends_on" | "duplicate_of" | "related_to" | "affects" | "supported_by";
+
+/**
+ * Entity: DiagnosticFinding
+ * Represents one evidence-backed diagnostic result.
+ */
+export interface DiagnosticFinding {
+  id: string;
+  organizationId: string; // strict multi-tenant partition key
+  websiteId: string; // website context
+  category: DiagnosticCategory;
+  code: string; // machine-readable diagnostic code, e.g. "ERR_DUPLICATE_TITLE", "ERR_AEO_BRAND_ABSENT"
+  title: string;
+  explanation: string;
+  severity: FindingSeverity;
+  confidence: FindingConfidence;
+  status: FindingStatus;
+  affectedResource: string; // affected page URL, sitemap URL, or entity name
+  evidence: Record<string, unknown>; // structured evidence bag
+  audit: AuditMetadata;
+}
+
+/**
+ * Entity: DiagnosticFindingRelationship
+ * Defines directional semantic dependencies between findings (e.g. root cause -> symptom).
+ */
+export interface DiagnosticFindingRelationship {
+  organizationId: string; // strict multi-tenant partition key
+  sourceFindingId: string;
+  targetFindingId: string;
+  relationshipType: FindingRelationshipType;
+  audit: AuditMetadata;
+}
+
 /**
  * Entity: KgRelationship
  * Represents a directed typed semantic relation link mapping between two KG nodes.
