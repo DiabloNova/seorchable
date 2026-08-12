@@ -28,7 +28,8 @@ import {
   HistoricalMetric,
   DiagnosticFinding,
   DiagnosticFindingRelationship,
-  FindingRelationshipType
+  FindingRelationshipType,
+  RecommendationHistory
 } from "../domain/types";
 import {
   IOrganizationRepository,
@@ -94,6 +95,7 @@ class InMemoryDatabase {
   public historicalMetrics: Map<string, HistoricalMetric> = new Map();
   public diagnosticFindings: Map<string, DiagnosticFinding> = new Map();
   public diagnosticFindingRelationships: DiagnosticFindingRelationship[] = [];
+  public recommendationHistories: RecommendationHistory[] = [];
 
   // Join table models (Many-to-Many associations)
   public pagesKeywords: Array<{ organizationId: string, pageId: string, keywordId: string }> = [];
@@ -342,11 +344,24 @@ class InMemoryDatabase {
       id: "rec-01",
       organizationId: orgId,
       brandId: brandId,
+      websiteId: "web-site-default",
+      affectedResource: "my-brand.com",
+      sourceFindingIds: [],
       category: "Citation Authority",
+      title: "Citation Authority",
+      problemStatement: "Missing brand website citations back to root website for ecommerce queries.",
+      recommendedAction: "Associate your brand website with key high-intent discovery prompt citations back to the root website for ecommerce queries.",
+      rationale: "Citations from high-intent discovery queries establish domain and brand prominence.",
       priority: "high",
+      businessImpact: "unknown",
+      seoImpact: "unknown",
+      aiVisibilityImpact: "unknown",
+      effort: "unknown",
+      confidence: "high",
       impactScore: 15,
       description: "Associate your brand website with key high-intent discovery prompt citations back to the root website for ecommerce queries.",
       status: "pending",
+      ruleVersion: "1.0",
       audit: createMockAudit()
     });
 
@@ -354,11 +369,24 @@ class InMemoryDatabase {
       id: "rec-02",
       organizationId: orgId,
       brandId: brandId,
+      websiteId: "web-site-default",
+      affectedResource: "my-brand.com",
+      sourceFindingIds: [],
       category: "Entity Linking",
+      title: "Entity Linking",
+      problemStatement: "Missing entity properties on Wikidata.",
+      recommendedAction: "Map and claim missing entity properties on Wikidata to anchor entity recognition models.",
+      rationale: "Structured entity nodes assist AI algorithms in resolving brand identity.",
       priority: "medium",
+      businessImpact: "unknown",
+      seoImpact: "unknown",
+      aiVisibilityImpact: "unknown",
+      effort: "unknown",
+      confidence: "high",
       impactScore: 8,
       description: "Map and claim missing entity properties on Wikidata to anchor entity recognition models.",
       status: "pending",
+      ruleVersion: "1.0",
       audit: createMockAudit()
     });
   }
@@ -1517,31 +1545,161 @@ export class VisibilityScoreRepository implements IVisibilityScoreRepository {
 }
 
 export class RecommendationRepository implements IRecommendationRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  public async findById(organizationId: string, id: string): Promise<Recommendation | null> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM recommendations WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    await this.pg.query(sql, [id, organizationId]);
+
+    const rec = db.recommendations.get(id);
+    if (!rec || rec.organizationId !== organizationId || rec.audit.deletedAt) return null;
+    return rec;
+  }
+
   public async findByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<Recommendation>> {
     enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM recommendations WHERE brand_id = $1 AND organization_id = $2 AND deleted_at IS NULL;`;
+    await this.pg.query(sql, [brandId, organizationId]);
+
     const list = Array.from(db.recommendations.values()).filter(
       r => r.organizationId === organizationId && r.brandId === brandId && (params?.includeDeleted || !r.audit.deletedAt)
     );
     return paginateArray(list, params);
   }
 
+  public async findByWebsiteId(organizationId: string, websiteId: string, params?: QueryParams): Promise<PaginatedResult<Recommendation>> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM recommendations WHERE website_id = $1 AND organization_id = $2 AND deleted_at IS NULL;`;
+    await this.pg.query(sql, [websiteId, organizationId]);
+
+    const list = Array.from(db.recommendations.values()).filter(
+      r => r.organizationId === organizationId && r.websiteId === websiteId && (params?.includeDeleted || !r.audit.deletedAt)
+    );
+    return paginateArray(list, params);
+  }
+
   public async save(rec: Recommendation): Promise<Recommendation> {
     enforceTenantContext(rec.organizationId);
-    const existing = db.recommendations.get(rec.id);
-    if (existing && existing.organizationId !== rec.organizationId) {
-      throw new Error("Tenant Isolation Exception: Cannot modify or change tenant ownership for existing Recommendation.");
+    const sql = `
+      INSERT INTO recommendations (
+        id, organization_id, brand_id, website_id, affected_resource, source_finding_ids, category, title, problem_statement, recommended_action, rationale, priority, business_impact, seo_impact, ai_visibility_impact, effort, confidence, impact_score, description, status, rule_version, created_at, updated_at, created_by, updated_by, version
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)
+      ON CONFLICT (organization_id, website_id, category, affected_resource, rule_version) DO UPDATE SET
+        brand_id = EXCLUDED.brand_id,
+        source_finding_ids = EXCLUDED.source_finding_ids,
+        title = EXCLUDED.title,
+        problem_statement = EXCLUDED.problem_statement,
+        recommended_action = EXCLUDED.recommended_action,
+        rationale = EXCLUDED.rationale,
+        priority = EXCLUDED.priority,
+        business_impact = EXCLUDED.business_impact,
+        seo_impact = EXCLUDED.seo_impact,
+        ai_visibility_impact = EXCLUDED.ai_visibility_impact,
+        effort = EXCLUDED.effort,
+        confidence = EXCLUDED.confidence,
+        impact_score = EXCLUDED.impact_score,
+        description = EXCLUDED.description,
+        status = EXCLUDED.status,
+        updated_at = EXCLUDED.updated_at,
+        updated_by = EXCLUDED.updated_by,
+        version = recommendations.version + 1;
+    `;
+    await this.pg.query(sql, [
+      rec.id,
+      rec.organizationId,
+      rec.brandId,
+      rec.websiteId,
+      rec.affectedResource,
+      rec.sourceFindingIds || [],
+      rec.category,
+      rec.title || "",
+      rec.problemStatement || "",
+      rec.recommendedAction || "",
+      rec.rationale || "",
+      rec.priority,
+      rec.businessImpact || "unknown",
+      rec.seoImpact || "unknown",
+      rec.aiVisibilityImpact || "unknown",
+      rec.effort || "unknown",
+      rec.confidence || "high",
+      rec.impactScore || 0,
+      rec.description,
+      rec.status,
+      rec.ruleVersion || "1.0",
+      rec.audit.createdAt,
+      rec.audit.updatedAt,
+      rec.audit.createdBy,
+      rec.audit.updatedBy,
+      rec.audit.version
+    ]);
+
+    // Emulate PostgreSQL UNIQUE ON CONFLICT constraint for in-memory database simulation
+    for (const [key, existing] of db.recommendations.entries()) {
+      if (
+        existing.organizationId === rec.organizationId &&
+        existing.websiteId === rec.websiteId &&
+        existing.category === rec.category &&
+        existing.affectedResource === rec.affectedResource &&
+        existing.ruleVersion === rec.ruleVersion
+      ) {
+        db.recommendations.delete(key);
+      }
     }
+
     db.recommendations.set(rec.id, rec);
     return rec;
   }
 
   public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
+    const sql = `UPDATE recommendations SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+    await this.pg.query(sql, [deletedBy, id, organizationId]);
+
     const rec = db.recommendations.get(id);
     if (!rec || rec.organizationId !== organizationId) return false;
     rec.audit.deletedAt = new Date().toISOString();
     rec.audit.updatedBy = deletedBy;
     rec.audit.updatedAt = new Date().toISOString();
     return true;
+  }
+
+  // Append-only history
+  public async saveHistory(entry: RecommendationHistory): Promise<RecommendationHistory> {
+    enforceTenantContext(entry.organizationId);
+    const sql = `
+      INSERT INTO recommendation_histories (id, organization_id, recommendation_id, previous_status, new_status, timestamp, actor, reason, metadata, created_at, updated_at, created_by, updated_by, version)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW(), 'system', 'system', 1);
+    `;
+    await this.pg.query(sql, [
+      entry.id,
+      entry.organizationId,
+      entry.recommendationId,
+      entry.previousStatus,
+      entry.newStatus,
+      entry.timestamp,
+      entry.actor,
+      entry.reason || null,
+      JSON.stringify(entry.metadata),
+      entry.audit.createdAt,
+      entry.audit.updatedAt,
+      entry.audit.createdBy,
+      entry.audit.updatedBy,
+      entry.audit.version
+    ]);
+
+    db.recommendationHistories.push(entry);
+    return entry;
+  }
+
+  public async getHistory(organizationId: string, recommendationId: string): Promise<RecommendationHistory[]> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM recommendation_histories WHERE recommendation_id = $1 AND organization_id = $2 ORDER BY timestamp DESC;`;
+    await this.pg.query(sql, [recommendationId, organizationId]);
+
+    return db.recommendationHistories.filter(h => h.recommendationId === recommendationId && h.organizationId === organizationId);
   }
 }
