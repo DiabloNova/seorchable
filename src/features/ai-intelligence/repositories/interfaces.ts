@@ -25,7 +25,9 @@ import {
   HistoricalMetric,
   DiagnosticFinding,
   DiagnosticFindingRelationship,
-  FindingRelationshipType
+  FindingRelationshipType,
+  AIVisibilityAudit,
+  AuditPrompt
 } from "../domain/types";
 
 export interface QueryParams {
@@ -180,4 +182,16 @@ export interface IDiagnosticFindingRepository {
   // Relationships mapping
   linkFindings(organizationId: string, sourceId: string, targetId: string, type: FindingRelationshipType): Promise<void>;
   getLinkedFindings(organizationId: string, findingId: string): Promise<DiagnosticFindingRelationship[]>;
+}
+
+export interface IAIVisibilityAuditRepository {
+  findById(organizationId: string, id: string): Promise<AIVisibilityAudit | null>;
+  findByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<AIVisibilityAudit>>;
+  save(audit: AIVisibilityAudit): Promise<AIVisibilityAudit>;
+  deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
+
+  // Audit Prompts (Tenant-scoped)
+  findPromptsByAuditId(organizationId: string, auditId: string): Promise<AuditPrompt[]>;
+  findPromptById(organizationId: string, id: string): Promise<AuditPrompt | null>;
+  savePrompt(prompt: AuditPrompt): Promise<AuditPrompt>;
 }

@@ -28,7 +28,9 @@ import {
   HistoricalMetric,
   DiagnosticFinding,
   DiagnosticFindingRelationship,
-  FindingRelationshipType
+  FindingRelationshipType,
+  AIVisibilityAudit,
+  AuditPrompt
 } from "../domain/types";
 import {
   IOrganizationRepository,
@@ -47,7 +49,8 @@ import {
   ITopicRepository,
   ICompetitorRepository,
   IHistoricalMetricRepository,
-  IDiagnosticFindingRepository
+  IDiagnosticFindingRepository,
+  IAIVisibilityAuditRepository
 } from "./interfaces";
 
 function createMockAudit(createdBy = "system"): AuditMetadata {
@@ -84,6 +87,8 @@ class InMemoryDatabase {
   public citations: Map<string, Citation> = new Map();
   public visibilityScores: Map<string, VisibilityScore> = new Map();
   public recommendations: Map<string, Recommendation> = new Map();
+  public aiVisibilityAudits: Map<string, AIVisibilityAudit> = new Map();
+  public auditPrompts: Map<string, AuditPrompt> = new Map();
 
   // Unified Intelligence Data Model stores
   public websites: Map<string, Website> = new Map();
@@ -532,6 +537,231 @@ export class BrandRepository implements IBrandRepository {
     brand.audit.updatedBy = deletedBy;
     brand.audit.updatedAt = new Date().toISOString();
     return true;
+  }
+}
+
+export class AIVisibilityAuditRepository implements IAIVisibilityAuditRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  private mapRowToAudit(row: any): AIVisibilityAudit {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      brandId: row.brand_id,
+      status: row.status as AIVisibilityAuditStatus,
+      overallScore: row.overall_score,
+      metrics: typeof row.metrics === "string" ? JSON.parse(row.metrics) : (row.metrics || {}),
+      promptsCoverage: typeof row.prompts_coverage === "string" ? JSON.parse(row.prompts_coverage) : (row.prompts_coverage || {}),
+      evidenceSummary: typeof row.evidence_summary === "string" ? JSON.parse(row.evidence_summary) : (row.evidence_summary || {}),
+      scoringVersion: row.scoring_version,
+      analyzerVersion: row.analyzer_version,
+      audit: {
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        createdBy: row.created_by,
+        updatedBy: row.updated_by,
+        deletedAt: row.deleted_at || undefined,
+        version: row.version
+      }
+    };
+  }
+
+  private mapRowToPrompt(row: any): AuditPrompt {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      auditId: row.audit_id,
+      promptText: row.prompt_text,
+      category: row.category,
+      targetEntity: row.target_entity,
+      locale: row.locale,
+      status: row.status as AuditPromptStatus,
+      errorMessage: row.error_message || undefined,
+      latencyMs: row.latency_ms || undefined,
+      executedAt: row.executed_at || undefined,
+      responseText: row.response_text || undefined,
+      analysis: typeof row.analysis === "string" ? JSON.parse(row.analysis) : (row.analysis || {}),
+      audit: {
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        createdBy: row.created_by,
+        updatedBy: row.updated_by,
+        deletedAt: row.deleted_at || undefined,
+        version: row.version
+      }
+    };
+  }
+
+  public async findById(organizationId: string, id: string): Promise<AIVisibilityAudit | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM ai_visibility_audits WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToAudit(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[AIVisibilityAuditRepository.findById Error]: Database query skipped or failed, using memory fallback.", err);
+    }
+    const item = db.aiVisibilityAudits.get(id);
+    if (!item || item.organizationId !== organizationId || item.audit.deletedAt) return null;
+    return item;
+  }
+
+  public async findByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<AIVisibilityAudit>> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM ai_visibility_audits WHERE brand_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [brandId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        const mapped = res.rows.map(row => this.mapRowToAudit(row));
+        return paginateArray(mapped, params);
+      }
+    } catch (err) {
+      console.warn("[AIVisibilityAuditRepository.findByBrandId Error]: Database query skipped or failed, using memory fallback.", err);
+    }
+    const list = Array.from(db.aiVisibilityAudits.values()).filter(
+      v => v.brandId === brandId && v.organizationId === organizationId && (params?.includeDeleted || !v.audit.deletedAt)
+    ).sort((a, b) => new Date(b.audit.createdAt).getTime() - new Date(a.audit.createdAt).getTime());
+    return paginateArray(list, params);
+  }
+
+  public async save(audit: AIVisibilityAudit): Promise<AIVisibilityAudit> {
+    enforceTenantContext(audit.organizationId);
+    try {
+      const sql = `
+        INSERT INTO ai_visibility_audits (id, organization_id, brand_id, status, overall_score, metrics, prompts_coverage, evidence_summary, scoring_version, analyzer_version, created_at, updated_at, created_by, updated_by, version)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+        ON CONFLICT (id) DO UPDATE SET
+          status = EXCLUDED.status,
+          overall_score = EXCLUDED.overall_score,
+          metrics = EXCLUDED.metrics,
+          prompts_coverage = EXCLUDED.prompts_coverage,
+          evidence_summary = EXCLUDED.evidence_summary,
+          updated_at = EXCLUDED.updated_at,
+          updated_by = EXCLUDED.updated_by,
+          version = ai_visibility_audits.version + 1;
+      `;
+      await this.pg.query(sql, [
+        audit.id,
+        audit.organizationId,
+        audit.brandId,
+        audit.status,
+        audit.overallScore,
+        JSON.stringify(audit.metrics),
+        JSON.stringify(audit.promptsCoverage),
+        JSON.stringify(audit.evidenceSummary),
+        audit.scoringVersion,
+        audit.analyzerVersion,
+        audit.audit.createdAt,
+        audit.audit.updatedAt,
+        audit.audit.createdBy,
+        audit.audit.updatedBy,
+        audit.audit.version
+      ]);
+    } catch (err) {
+      console.warn("[AIVisibilityAuditRepository.save Error]: Database write skipped or failed, using memory fallback.", err);
+    }
+    db.aiVisibilityAudits.set(audit.id, audit);
+    return audit;
+  }
+
+  public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `UPDATE ai_visibility_audits SET deleted_at = NOW(), updated_by = $1, updated_at = NOW() WHERE id = $2 AND organization_id = $3;`;
+      const res = await this.pg.query(sql, [deletedBy, id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return true;
+      }
+    } catch (err) {
+      console.warn("[AIVisibilityAuditRepository.deleteSoft Error]: Database write skipped or failed, using memory fallback.", err);
+    }
+    const item = db.aiVisibilityAudits.get(id);
+    if (!item || item.organizationId !== organizationId) return false;
+    item.audit.deletedAt = new Date().toISOString();
+    item.audit.updatedBy = deletedBy;
+    item.audit.updatedAt = new Date().toISOString();
+    return true;
+  }
+
+  public async findPromptsByAuditId(organizationId: string, auditId: string): Promise<AuditPrompt[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM audit_prompts WHERE audit_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at ASC;`;
+      const res = await this.pg.query(sql, [auditId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToPrompt(row));
+      }
+    } catch (err) {
+      console.warn("[AIVisibilityAuditRepository.findPromptsByAuditId Error]: Database query skipped or failed, using memory fallback.", err);
+    }
+    return Array.from(db.auditPrompts.values()).filter(
+      p => p.auditId === auditId && p.organizationId === organizationId && !p.audit.deletedAt
+    );
+  }
+
+  public async findPromptById(organizationId: string, id: string): Promise<AuditPrompt | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM audit_prompts WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToPrompt(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[AIVisibilityAuditRepository.findPromptById Error]: Database query skipped or failed, using memory fallback.", err);
+    }
+    const item = db.auditPrompts.get(id);
+    if (!item || item.organizationId !== organizationId || item.audit.deletedAt) return null;
+    return item;
+  }
+
+  public async savePrompt(prompt: AuditPrompt): Promise<AuditPrompt> {
+    enforceTenantContext(prompt.organizationId);
+    try {
+      const sql = `
+        INSERT INTO audit_prompts (id, organization_id, audit_id, prompt_text, category, target_entity, locale, status, error_message, latency_ms, executed_at, response_text, analysis, created_at, updated_at, created_by, updated_by, version)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+        ON CONFLICT (id) DO UPDATE SET
+          status = EXCLUDED.status,
+          error_message = EXCLUDED.error_message,
+          latency_ms = EXCLUDED.latency_ms,
+          executed_at = EXCLUDED.executed_at,
+          response_text = EXCLUDED.response_text,
+          analysis = EXCLUDED.analysis,
+          updated_at = EXCLUDED.updated_at,
+          updated_by = EXCLUDED.updated_by,
+          version = audit_prompts.version + 1;
+      `;
+      await this.pg.query(sql, [
+        prompt.id,
+        prompt.organizationId,
+        prompt.auditId,
+        prompt.promptText,
+        prompt.category,
+        prompt.targetEntity,
+        prompt.locale,
+        prompt.status,
+        prompt.errorMessage || null,
+        prompt.latencyMs || null,
+        prompt.executedAt || null,
+        prompt.responseText || null,
+        JSON.stringify(prompt.analysis),
+        prompt.audit.createdAt,
+        prompt.audit.updatedAt,
+        prompt.audit.createdBy,
+        prompt.audit.updatedBy,
+        prompt.audit.version
+      ]);
+    } catch (err) {
+      console.warn("[AIVisibilityAuditRepository.savePrompt Error]: Database write skipped or failed, using memory fallback.", err);
+    }
+    db.auditPrompts.set(prompt.id, prompt);
+    return prompt;
   }
 }
 

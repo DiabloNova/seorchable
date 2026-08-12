@@ -37,7 +37,9 @@ export const TENANT_SCOPED_TABLES = Object.freeze([
   "competitive_analyses",
   "crawl_jobs",
   "crawl_results",
-  "crawl_cache"
+  "crawl_cache",
+  "ai_visibility_audits",
+  "audit_prompts"
 ]);
 
 /**

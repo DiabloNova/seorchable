@@ -250,6 +250,107 @@ export interface KgEntity {
 }
 
 /**
+ * AI Visibility Audit Types
+ */
+export type AIVisibilityAuditStatus = "PENDING" | "RUNNING" | "ANALYZING" | "COMPLETED" | "FAILED";
+
+export interface AIVisibilityAuditMetrics {
+  answerVisibilityScore: number;
+  brandMentionScore: number;
+  entityRecognitionScore: number;
+  citationPresenceScore: number;
+  sourceAuthorityScore: number;
+  answerInclusionScore: number;
+}
+
+export interface AIVisibilityAudit {
+  id: string;
+  organizationId: string;
+  brandId: string;
+  status: AIVisibilityAuditStatus;
+  overallScore: number | null;
+  metrics: Partial<AIVisibilityAuditMetrics>;
+  promptsCoverage: {
+    total: number;
+    executed: number;
+    analyzed: number;
+    failed: number;
+    skipped: number;
+  };
+  evidenceSummary: {
+    mentions: Array<{ promptId: string; count: number; snippet: string; level: string }>;
+    citations: Array<{ promptId: string; url: string; domain: string; authority: string | number }>;
+    entityRecognition: Array<{ promptId: string; status: string }>;
+    answerInclusion: Array<{ promptId: string; status: string }>;
+  };
+  scoringVersion: string;
+  analyzerVersion: string;
+  audit: AuditMetadata;
+}
+
+export type AuditPromptStatus = "PENDING" | "RUNNING" | "COMPLETED" | "FAILED";
+
+export interface AuditPromptAnalysis {
+  answerVisibility: {
+    level: "not_mentioned" | "indirectly_referenced" | "directly_mentioned" | "prominently_included" | "recommended_preferred";
+    evidence: string;
+    confidence: number;
+  };
+  brandMentions: {
+    detected: boolean;
+    count: number;
+    type: string;
+    evidence: string;
+    confidence: number;
+  };
+  entityRecognition: {
+    status: "not_recognized" | "ambiguously_recognized" | "correctly_recognized" | "strongly_associated";
+    evidence: string;
+    confidence: number;
+  };
+  citationPresence: {
+    present: boolean;
+    count: number;
+    citations: Array<{
+      url: string;
+      domain: string;
+      title: string;
+      isTargetDomain: boolean;
+      authority: string | number; // number or "unknown"
+    }>;
+    confidence: number;
+  };
+  sourceAuthority: {
+    status: "unknown" | "resolved";
+    averageScore?: number;
+    evidence: string;
+  };
+  answerInclusion: {
+    status: "absent" | "mentioned_but_not_included" | "included" | "prominently_included" | "recommended_preferred";
+    evidence: string;
+    confidence: number;
+  };
+  scoreContribution: number;
+}
+
+export interface AuditPrompt {
+  id: string;
+  organizationId: string;
+  auditId: string;
+  promptText: string;
+  category: string;
+  targetEntity: string;
+  locale: string;
+  status: AuditPromptStatus;
+  errorMessage?: string;
+  latencyMs?: number;
+  executedAt?: string;
+  responseText?: string;
+  analysis: Partial<AuditPromptAnalysis>;
+  audit: AuditMetadata;
+}
+
+/**
  * Entity: Website
  * Represents the analyzed/canonical website within a tenant/organization.
  */
