@@ -2,6 +2,7 @@ import { CoreIntelligenceAuditResponse, AuditWarning } from "@/types/audit";
 import { normalizeUrl, isSafeUrl } from "./url-validator";
 import { secureCrawl } from "./crawler";
 import { extractSignals } from "./extractor";
+import { extractSeoSignals } from "./seo-extractor";
 import { normalizeFeatures } from "./normalizer";
 import { calculateScores } from "./scorer";
 import { generateRecommendations, simulateAiVisibility } from "./recommendations";
@@ -48,6 +49,9 @@ export async function executeAudit(
   // 4. Raw Data Extraction
   const rawSignals = await extractSignals(crawlResult, responseTimeMs, logger);
 
+  // Extract production-grade SEO Signals
+  const seoSignals = await extractSeoSignals(crawlResult, { responseTimeMs });
+
   // 5. Feature Normalization
   const normalizedFeatures = normalizeFeatures(rawSignals);
 
@@ -67,6 +71,7 @@ export async function executeAudit(
     url: inputUrl,
     normalizedUrl: crawlResult.url,
     timestamp: new Date().toISOString(),
+    seoSignals,
     data: {
       technicalOptimisation: {
         signals: rawSignals.technical,
