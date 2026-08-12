@@ -250,6 +250,96 @@ export interface KgEntity {
 }
 
 /**
+ * Entity: Website
+ * Represents the analyzed/canonical website within a tenant/organization.
+ */
+export interface Website {
+  id: string;
+  organizationId: string; // strict multi-tenant partition key
+  domain: string; // canonical domain/origin
+  normalizedUrl: string; // standardized URL
+  status: "active" | "archived" | string;
+  lastCrawledAt?: Date | string;
+  lastAnalyzedAt?: Date | string;
+  audit: AuditMetadata;
+}
+
+/**
+ * Entity: Page
+ * Represents a crawlable/indexable website resource.
+ */
+export interface Page {
+  id: string;
+  organizationId: string; // strict multi-tenant partition key
+  websiteId: string; // website container ownership
+  url: string; // original canonical URL
+  normalizedUrl: string; // standardized unique URL
+  path: string; // relative path
+  statusCode?: number;
+  indexability: "indexable" | "noindex" | "blocked_by_robots" | "non_200_status" | "canonical_mismatch" | "undetermined" | string;
+  title?: string;
+  description?: string;
+  audit: AuditMetadata;
+}
+
+/**
+ * Entity: Keyword
+ * Represents a normalized search/query term.
+ */
+export interface Keyword {
+  id: string;
+  organizationId: string; // strict multi-tenant partition key
+  name: string; // normalized lowercased name (uniqueness index key)
+  displayName: string; // original search/query term
+  language: "en" | "fa" | string;
+  intent?: string;
+  audit: AuditMetadata;
+}
+
+/**
+ * Entity: Topic
+ * Represents a semantic/content topic.
+ */
+export interface Topic {
+  id: string;
+  organizationId: string; // strict multi-tenant partition key
+  name: string; // canonical name (uniqueness index key)
+  description?: string;
+  language: "en" | "fa" | string;
+  parentTopicId?: string; // parent relationship
+  audit: AuditMetadata;
+}
+
+/**
+ * Entity: Competitor
+ * Represents a monitored competitive brand/entity.
+ */
+export interface Competitor {
+  id: string;
+  organizationId: string; // strict multi-tenant partition key
+  name: string;
+  domain: string;
+  status: "active" | "archived" | string;
+  audit: AuditMetadata;
+}
+
+/**
+ * Entity: HistoricalMetric
+ * General-purpose time-series log for trend-lines, visibility, and tracking indices.
+ */
+export interface HistoricalMetric {
+  id: string;
+  organizationId: string; // strict multi-tenant partition key
+  targetType: "website" | "page" | "brand" | "competitor" | string;
+  targetId: string;
+  metricName: string; // e.g. "visibility_score", "word_count"
+  metricValue: number;
+  dimensions: Record<string, unknown>;
+  timestamp: Date | string;
+  audit: AuditMetadata;
+}
+
+/**
  * Entity: KgRelationship
  * Represents a directed typed semantic relation link mapping between two KG nodes.
  */

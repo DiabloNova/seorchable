@@ -16,7 +16,13 @@ import {
   Citation,
   VisibilityScore,
   Recommendation,
-  RelationshipType
+  RelationshipType,
+  Website,
+  Page,
+  Keyword,
+  Topic,
+  Competitor,
+  HistoricalMetric
 } from "../domain/types";
 
 export interface QueryParams {
@@ -99,4 +105,64 @@ export interface IRecommendationRepository {
   findByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<Recommendation>>;
   save(rec: Recommendation): Promise<Recommendation>;
   deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
+}
+
+export interface IWebsiteRepository {
+  findById(organizationId: string, id: string): Promise<Website | null>;
+  findByDomain(organizationId: string, domain: string): Promise<Website | null>;
+  save(website: Website): Promise<Website>;
+  deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
+}
+
+export interface IPageRepository {
+  findById(organizationId: string, id: string): Promise<Page | null>;
+  findByWebsiteId(organizationId: string, websiteId: string, params?: QueryParams): Promise<PaginatedResult<Page>>;
+  findByNormalizedUrl(organizationId: string, websiteId: string, normalizedUrl: string): Promise<Page | null>;
+  save(page: Page): Promise<Page>;
+  deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
+
+  // Many-to-many associations
+  linkKeyword(organizationId: string, pageId: string, keywordId: string): Promise<void>;
+  linkTopic(organizationId: string, pageId: string, topicId: string): Promise<void>;
+  linkEntity(organizationId: string, pageId: string, entityId: string): Promise<void>;
+  getLinkedKeywords(organizationId: string, pageId: string): Promise<Keyword[]>;
+  getLinkedTopics(organizationId: string, pageId: string): Promise<Topic[]>;
+  getLinkedEntities(organizationId: string, pageId: string): Promise<Entity[]>;
+}
+
+export interface IKeywordRepository {
+  findById(organizationId: string, id: string): Promise<Keyword | null>;
+  findByName(organizationId: string, name: string): Promise<Keyword | null>;
+  save(keyword: Keyword): Promise<Keyword>;
+  deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
+  linkTopic(organizationId: string, keywordId: string, topicId: string): Promise<void>;
+  getLinkedTopics(organizationId: string, keywordId: string): Promise<Topic[]>;
+}
+
+export interface ITopicRepository {
+  findById(organizationId: string, id: string): Promise<Topic | null>;
+  findByName(organizationId: string, name: string): Promise<Topic | null>;
+  save(topic: Topic): Promise<Topic>;
+  deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
+  linkEntity(organizationId: string, topicId: string, entityId: string): Promise<void>;
+  getLinkedEntities(organizationId: string, topicId: string): Promise<Entity[]>;
+}
+
+export interface ICompetitorRepository {
+  findById(organizationId: string, id: string): Promise<Competitor | null>;
+  findByOrganizationId(organizationId: string, params?: QueryParams): Promise<PaginatedResult<Competitor>>;
+  save(competitor: Competitor): Promise<Competitor>;
+  deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
+}
+
+export interface IHistoricalMetricRepository {
+  save(metric: HistoricalMetric): Promise<HistoricalMetric>;
+  findMetrics(
+    organizationId: string,
+    targetType: string,
+    targetId: string,
+    metricName?: string,
+    startTime?: Date | string,
+    endTime?: Date | string
+  ): Promise<HistoricalMetric[]>;
 }

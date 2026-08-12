@@ -3,7 +3,6 @@
  * Enterprise InMemory Database and Repository Adapters
  */
 
-import { Pool } from "pg";
 import { TenantContextManager, TenantContextViolationException } from "../../../core/database/tenant-context";
 import { PostgresClient } from "../../admin/infrastructure/persistence/postgres";
 import {
@@ -20,7 +19,13 @@ import {
   VisibilityScore,
   Recommendation,
   AuditMetadata,
-  RelationshipType
+  RelationshipType,
+  Website,
+  Page,
+  Keyword,
+  Topic,
+  Competitor,
+  HistoricalMetric
 } from "../domain/types";
 import {
   IOrganizationRepository,
@@ -32,7 +37,13 @@ import {
   IVisibilityScoreRepository,
   IRecommendationRepository,
   QueryParams,
-  PaginatedResult
+  PaginatedResult,
+  IWebsiteRepository,
+  IPageRepository,
+  IKeywordRepository,
+  ITopicRepository,
+  ICompetitorRepository,
+  IHistoricalMetricRepository
 } from "./interfaces";
 
 function createMockAudit(createdBy = "system"): AuditMetadata {
@@ -69,6 +80,21 @@ class InMemoryDatabase {
   public citations: Map<string, Citation> = new Map();
   public visibilityScores: Map<string, VisibilityScore> = new Map();
   public recommendations: Map<string, Recommendation> = new Map();
+
+  // Unified Intelligence Data Model stores
+  public websites: Map<string, Website> = new Map();
+  public pages: Map<string, Page> = new Map();
+  public keywords: Map<string, Keyword> = new Map();
+  public topics: Map<string, Topic> = new Map();
+  public competitors: Map<string, Competitor> = new Map();
+  public historicalMetrics: Map<string, HistoricalMetric> = new Map();
+
+  // Join table models (Many-to-Many associations)
+  public pagesKeywords: Array<{ organizationId: string, pageId: string, keywordId: string }> = [];
+  public pagesTopics: Array<{ organizationId: string, pageId: string, topicId: string }> = [];
+  public pagesEntities: Array<{ organizationId: string, pageId: string, entityId: string }> = [];
+  public keywordsTopics: Array<{ organizationId: string, keywordId: string, topicId: string }> = [];
+  public topicsEntities: Array<{ organizationId: string, topicId: string, entityId: string }> = [];
 
   constructor() {
     this.seed();
@@ -500,6 +526,581 @@ export class BrandRepository implements IBrandRepository {
     brand.audit.updatedBy = deletedBy;
     brand.audit.updatedAt = new Date().toISOString();
     return true;
+  }
+}
+
+export class WebsiteRepository implements IWebsiteRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  public async findById(organizationId: string, id: string): Promise<Website | null> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM websites WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    await this.pg.query(sql, [id, organizationId]);
+
+    const item = db.websites.get(id);
+    if (!item || item.organizationId !== organizationId || item.audit.deletedAt) return null;
+    return item;
+  }
+
+  public async findByDomain(organizationId: string, domain: string): Promise<Website | null> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM websites WHERE domain = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    await this.pg.query(sql, [domain, organizationId]);
+
+    for (const item of db.websites.values()) {
+      if (item.domain === domain && item.organizationId === organizationId && !item.audit.deletedAt) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  public async save(website: Website): Promise<Website> {
+    enforceTenantContext(website.organizationId);
+    const sql = `
+      INSERT INTO websites (id, organization_id, domain, normalized_url, status, last_crawled_at, last_analyzed_at, created_at, updated_at, created_by, updated_by, version)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      ON CONFLICT (organization_id, domain) DO UPDATE SET
+        normalized_url = EXCLUDED.normalized_url,
+        status = EXCLUDED.status,
+        last_crawled_at = EXCLUDED.last_crawled_at,
+        last_analyzed_at = EXCLUDED.last_analyzed_at,
+        updated_at = EXCLUDED.updated_at,
+        updated_by = EXCLUDED.updated_by,
+        version = websites.version + 1;
+    `;
+    await this.pg.query(sql, [
+      website.id,
+      website.organizationId,
+      website.domain,
+      website.normalizedUrl,
+      website.status,
+      website.lastCrawledAt || null,
+      website.lastAnalyzedAt || null,
+      website.audit.createdAt,
+      website.audit.updatedAt,
+      website.audit.createdBy,
+      website.audit.updatedBy,
+      website.audit.version
+    ]);
+
+    db.websites.set(website.id, website);
+    return website;
+  }
+
+  public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
+    enforceTenantContext(organizationId);
+    const sql = `UPDATE websites SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+    await this.pg.query(sql, [deletedBy, id, organizationId]);
+
+    const item = db.websites.get(id);
+    if (!item || item.organizationId !== organizationId) return false;
+    item.audit.deletedAt = new Date().toISOString();
+    item.audit.updatedBy = deletedBy;
+    item.audit.updatedAt = new Date().toISOString();
+    return true;
+  }
+}
+
+export class PageRepository implements IPageRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  public async findById(organizationId: string, id: string): Promise<Page | null> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM pages WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    await this.pg.query(sql, [id, organizationId]);
+
+    const item = db.pages.get(id);
+    if (!item || item.organizationId !== organizationId || item.audit.deletedAt) return null;
+    return item;
+  }
+
+  public async findByWebsiteId(organizationId: string, websiteId: string, params?: QueryParams): Promise<PaginatedResult<Page>> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM pages WHERE website_id = $1 AND organization_id = $2 AND deleted_at IS NULL;`;
+    await this.pg.query(sql, [websiteId, organizationId]);
+
+    const list = Array.from(db.pages.values()).filter(
+      p => p.websiteId === websiteId && p.organizationId === organizationId && (params?.includeDeleted || !p.audit.deletedAt)
+    );
+    return paginateArray(list, params);
+  }
+
+  public async findByNormalizedUrl(organizationId: string, websiteId: string, normalizedUrl: string): Promise<Page | null> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM pages WHERE website_id = $1 AND normalized_url = $2 AND organization_id = $3 AND deleted_at IS NULL LIMIT 1;`;
+    await this.pg.query(sql, [websiteId, normalizedUrl, organizationId]);
+
+    for (const item of db.pages.values()) {
+      if (item.websiteId === websiteId && item.normalizedUrl === normalizedUrl && item.organizationId === organizationId && !item.audit.deletedAt) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  public async save(page: Page): Promise<Page> {
+    enforceTenantContext(page.organizationId);
+    const sql = `
+      INSERT INTO pages (id, organization_id, website_id, url, normalized_url, path, status_code, indexability, title, description, created_at, updated_at, created_by, updated_by, version)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+      ON CONFLICT (website_id, normalized_url) DO UPDATE SET
+        url = EXCLUDED.url,
+        path = EXCLUDED.path,
+        status_code = EXCLUDED.status_code,
+        indexability = EXCLUDED.indexability,
+        title = EXCLUDED.title,
+        description = EXCLUDED.description,
+        updated_at = EXCLUDED.updated_at,
+        updated_by = EXCLUDED.updated_by,
+        version = pages.version + 1;
+    `;
+    await this.pg.query(sql, [
+      page.id,
+      page.organizationId,
+      page.websiteId,
+      page.url,
+      page.normalizedUrl,
+      page.path,
+      page.statusCode || null,
+      page.indexability,
+      page.title || null,
+      page.description || null,
+      page.audit.createdAt,
+      page.audit.updatedAt,
+      page.audit.createdBy,
+      page.audit.updatedBy,
+      page.audit.version
+    ]);
+
+    db.pages.set(page.id, page);
+    return page;
+  }
+
+  public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
+    enforceTenantContext(organizationId);
+    const sql = `UPDATE pages SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+    await this.pg.query(sql, [deletedBy, id, organizationId]);
+
+    const item = db.pages.get(id);
+    if (!item || item.organizationId !== organizationId) return false;
+    item.audit.deletedAt = new Date().toISOString();
+    item.audit.updatedBy = deletedBy;
+    item.audit.updatedAt = new Date().toISOString();
+    return true;
+  }
+
+  // Many-to-many associations
+  public async linkKeyword(organizationId: string, pageId: string, keywordId: string): Promise<void> {
+    enforceTenantContext(organizationId);
+    const sql = `INSERT INTO pages_keywords (organization_id, page_id, keyword_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
+    await this.pg.query(sql, [organizationId, pageId, keywordId]);
+
+    const exists = db.pagesKeywords.some(link => link.pageId === pageId && link.keywordId === keywordId);
+    if (!exists) {
+      db.pagesKeywords.push({ organizationId, pageId, keywordId });
+    }
+  }
+
+  public async linkTopic(organizationId: string, pageId: string, topicId: string): Promise<void> {
+    enforceTenantContext(organizationId);
+    const sql = `INSERT INTO pages_topics (organization_id, page_id, topic_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
+    await this.pg.query(sql, [organizationId, pageId, topicId]);
+
+    const exists = db.pagesTopics.some(link => link.pageId === pageId && link.topicId === topicId);
+    if (!exists) {
+      db.pagesTopics.push({ organizationId, pageId, topicId });
+    }
+  }
+
+  public async linkEntity(organizationId: string, pageId: string, entityId: string): Promise<void> {
+    enforceTenantContext(organizationId);
+    const sql = `INSERT INTO pages_entities (organization_id, page_id, entity_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
+    await this.pg.query(sql, [organizationId, pageId, entityId]);
+
+    const exists = db.pagesEntities.some(link => link.pageId === pageId && link.entityId === entityId);
+    if (!exists) {
+      db.pagesEntities.push({ organizationId, pageId, entityId });
+    }
+  }
+
+  public async getLinkedKeywords(organizationId: string, pageId: string): Promise<Keyword[]> {
+    enforceTenantContext(organizationId);
+    const sql = `
+      SELECT k.* FROM keywords k
+      INNER JOIN pages_keywords pk ON k.id = pk.keyword_id
+      WHERE pk.page_id = $1 AND pk.organization_id = $2 AND k.deleted_at IS NULL;
+    `;
+    await this.pg.query(sql, [pageId, organizationId]);
+
+    const keywordIds = db.pagesKeywords.filter(link => link.pageId === pageId && link.organizationId === organizationId).map(link => link.keywordId);
+    return Array.from(db.keywords.values()).filter(k => keywordIds.includes(k.id) && k.organizationId === organizationId && !k.audit.deletedAt);
+  }
+
+  public async getLinkedTopics(organizationId: string, pageId: string): Promise<Topic[]> {
+    enforceTenantContext(organizationId);
+    const sql = `
+      SELECT t.* FROM topics t
+      INNER JOIN pages_topics pt ON t.id = pt.topic_id
+      WHERE pt.page_id = $1 AND pt.organization_id = $2 AND t.deleted_at IS NULL;
+    `;
+    await this.pg.query(sql, [pageId, organizationId]);
+
+    const topicIds = db.pagesTopics.filter(link => link.pageId === pageId && link.organizationId === organizationId).map(link => link.topicId);
+    return Array.from(db.topics.values()).filter(t => topicIds.includes(t.id) && t.organizationId === organizationId && !t.audit.deletedAt);
+  }
+
+  public async getLinkedEntities(organizationId: string, pageId: string): Promise<Entity[]> {
+    enforceTenantContext(organizationId);
+    const sql = `
+      SELECT e.* FROM entities e
+      INNER JOIN pages_entities pe ON e.id = pe.entity_id
+      WHERE pe.page_id = $1 AND pe.organization_id = $2 AND e.deleted_at IS NULL;
+    `;
+    await this.pg.query(sql, [pageId, organizationId]);
+
+    const entityIds = db.pagesEntities.filter(link => link.pageId === pageId && link.organizationId === organizationId).map(link => link.entityId);
+    return Array.from(db.entities.values()).filter(e => entityIds.includes(e.id) && e.organizationId === organizationId && !e.audit.deletedAt);
+  }
+}
+
+export class KeywordRepository implements IKeywordRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  public async findById(organizationId: string, id: string): Promise<Keyword | null> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM keywords WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    await this.pg.query(sql, [id, organizationId]);
+
+    const item = db.keywords.get(id);
+    if (!item || item.organizationId !== organizationId || item.audit.deletedAt) return null;
+    return item;
+  }
+
+  public async findByName(organizationId: string, name: string): Promise<Keyword | null> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM keywords WHERE name = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    await this.pg.query(sql, [name, organizationId]);
+
+    for (const item of db.keywords.values()) {
+      if (item.name === name && item.organizationId === organizationId && !item.audit.deletedAt) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  public async save(keyword: Keyword): Promise<Keyword> {
+    enforceTenantContext(keyword.organizationId);
+    const sql = `
+      INSERT INTO keywords (id, organization_id, name, display_name, language, intent, created_at, updated_at, created_by, updated_by, version)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      ON CONFLICT (organization_id, name) DO UPDATE SET
+        display_name = EXCLUDED.display_name,
+        intent = EXCLUDED.intent,
+        updated_at = EXCLUDED.updated_at,
+        updated_by = EXCLUDED.updated_by,
+        version = keywords.version + 1;
+    `;
+    await this.pg.query(sql, [
+      keyword.id,
+      keyword.organizationId,
+      keyword.name,
+      keyword.displayName,
+      keyword.language,
+      keyword.intent || null,
+      keyword.audit.createdAt,
+      keyword.audit.updatedAt,
+      keyword.audit.createdBy,
+      keyword.audit.updatedBy,
+      keyword.audit.version
+    ]);
+
+    db.keywords.set(keyword.id, keyword);
+    return keyword;
+  }
+
+  public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
+    enforceTenantContext(organizationId);
+    const sql = `UPDATE keywords SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+    await this.pg.query(sql, [deletedBy, id, organizationId]);
+
+    const item = db.keywords.get(id);
+    if (!item || item.organizationId !== organizationId) return false;
+    item.audit.deletedAt = new Date().toISOString();
+    item.audit.updatedBy = deletedBy;
+    item.audit.updatedAt = new Date().toISOString();
+    return true;
+  }
+
+  public async linkTopic(organizationId: string, keywordId: string, topicId: string): Promise<void> {
+    enforceTenantContext(organizationId);
+    const sql = `INSERT INTO keywords_topics (organization_id, keyword_id, topic_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
+    await this.pg.query(sql, [organizationId, keywordId, topicId]);
+
+    const exists = db.keywordsTopics.some(link => link.keywordId === keywordId && link.topicId === topicId);
+    if (!exists) {
+      db.keywordsTopics.push({ organizationId, keywordId, topicId });
+    }
+  }
+
+  public async getLinkedTopics(organizationId: string, keywordId: string): Promise<Topic[]> {
+    enforceTenantContext(organizationId);
+    const sql = `
+      SELECT t.* FROM topics t
+      INNER JOIN keywords_topics kt ON t.id = kt.topic_id
+      WHERE kt.keyword_id = $1 AND kt.organization_id = $2 AND t.deleted_at IS NULL;
+    `;
+    await this.pg.query(sql, [keywordId, organizationId]);
+
+    const topicIds = db.keywordsTopics.filter(link => link.keywordId === keywordId && link.organizationId === organizationId).map(link => link.topicId);
+    return Array.from(db.topics.values()).filter(t => topicIds.includes(t.id) && t.organizationId === organizationId && !t.audit.deletedAt);
+  }
+}
+
+export class TopicRepository implements ITopicRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  public async findById(organizationId: string, id: string): Promise<Topic | null> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM topics WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    await this.pg.query(sql, [id, organizationId]);
+
+    const item = db.topics.get(id);
+    if (!item || item.organizationId !== organizationId || item.audit.deletedAt) return null;
+    return item;
+  }
+
+  public async findByName(organizationId: string, name: string): Promise<Topic | null> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM topics WHERE name = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    await this.pg.query(sql, [name, organizationId]);
+
+    for (const item of db.topics.values()) {
+      if (item.name === name && item.organizationId === organizationId && !item.audit.deletedAt) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  public async save(topic: Topic): Promise<Topic> {
+    enforceTenantContext(topic.organizationId);
+    const sql = `
+      INSERT INTO topics (id, organization_id, name, description, language, parent_topic_id, created_at, updated_at, created_by, updated_by, version)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      ON CONFLICT (organization_id, name) DO UPDATE SET
+        description = EXCLUDED.description,
+        parent_topic_id = EXCLUDED.parent_topic_id,
+        updated_at = EXCLUDED.updated_at,
+        updated_by = EXCLUDED.updated_by,
+        version = topics.version + 1;
+    `;
+    await this.pg.query(sql, [
+      topic.id,
+      topic.organizationId,
+      topic.name,
+      topic.description || null,
+      topic.language,
+      topic.parentTopicId || null,
+      topic.audit.createdAt,
+      topic.audit.updatedAt,
+      topic.audit.createdBy,
+      topic.audit.updatedBy,
+      topic.audit.version
+    ]);
+
+    db.topics.set(topic.id, topic);
+    return topic;
+  }
+
+  public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
+    enforceTenantContext(organizationId);
+    const sql = `UPDATE topics SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+    await this.pg.query(sql, [deletedBy, id, organizationId]);
+
+    const item = db.topics.get(id);
+    if (!item || item.organizationId !== organizationId) return false;
+    item.audit.deletedAt = new Date().toISOString();
+    item.audit.updatedBy = deletedBy;
+    item.audit.updatedAt = new Date().toISOString();
+    return true;
+  }
+
+  public async linkEntity(organizationId: string, topicId: string, entityId: string): Promise<void> {
+    enforceTenantContext(organizationId);
+    const sql = `INSERT INTO topics_entities (organization_id, topic_id, entity_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
+    await this.pg.query(sql, [organizationId, topicId, entityId]);
+
+    const exists = db.topicsEntities.some(link => link.topicId === topicId && link.entityId === entityId);
+    if (!exists) {
+      db.topicsEntities.push({ organizationId, topicId, entityId });
+    }
+  }
+
+  public async getLinkedEntities(organizationId: string, topicId: string): Promise<Entity[]> {
+    enforceTenantContext(organizationId);
+    const sql = `
+      SELECT e.* FROM entities e
+      INNER JOIN topics_entities te ON e.id = te.entity_id
+      WHERE te.topic_id = $1 AND te.organization_id = $2 AND e.deleted_at IS NULL;
+    `;
+    await this.pg.query(sql, [topicId, organizationId]);
+
+    const entityIds = db.topicsEntities.filter(link => link.topicId === topicId && link.organizationId === organizationId).map(link => link.entityId);
+    return Array.from(db.entities.values()).filter(e => entityIds.includes(e.id) && e.organizationId === organizationId && !e.audit.deletedAt);
+  }
+}
+
+export class CompetitorRepository implements ICompetitorRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  public async findById(organizationId: string, id: string): Promise<Competitor | null> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM competitors WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    await this.pg.query(sql, [id, organizationId]);
+
+    const item = db.competitors.get(id);
+    if (!item || item.organizationId !== organizationId || item.audit.deletedAt) return null;
+    return item;
+  }
+
+  public async findByOrganizationId(organizationId: string, params?: QueryParams): Promise<PaginatedResult<Competitor>> {
+    enforceTenantContext(organizationId);
+    const sql = `SELECT * FROM competitors WHERE organization_id = $1 AND deleted_at IS NULL;`;
+    await this.pg.query(sql, [organizationId]);
+
+    const list = Array.from(db.competitors.values()).filter(
+      c => c.organizationId === organizationId && (params?.includeDeleted || !c.audit.deletedAt)
+    );
+    return paginateArray(list, params);
+  }
+
+  public async save(competitor: Competitor): Promise<Competitor> {
+    enforceTenantContext(competitor.organizationId);
+    const sql = `
+      INSERT INTO competitors (id, organization_id, name, domain, status, created_at, updated_at, created_by, updated_by, version)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      ON CONFLICT (organization_id, domain) DO UPDATE SET
+        name = EXCLUDED.name,
+        status = EXCLUDED.status,
+        updated_at = EXCLUDED.updated_at,
+        updated_by = EXCLUDED.updated_by,
+        version = competitors.version + 1;
+    `;
+    await this.pg.query(sql, [
+      competitor.id,
+      competitor.organizationId,
+      competitor.name,
+      competitor.domain,
+      competitor.status,
+      competitor.audit.createdAt,
+      competitor.audit.updatedAt,
+      competitor.audit.createdBy,
+      competitor.audit.updatedBy,
+      competitor.audit.version
+    ]);
+
+    db.competitors.set(competitor.id, competitor);
+    return competitor;
+  }
+
+  public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
+    enforceTenantContext(organizationId);
+    const sql = `UPDATE competitors SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+    await this.pg.query(sql, [deletedBy, id, organizationId]);
+
+    const item = db.competitors.get(id);
+    if (!item || item.organizationId !== organizationId) return false;
+    item.audit.deletedAt = new Date().toISOString();
+    item.audit.updatedBy = deletedBy;
+    item.audit.updatedAt = new Date().toISOString();
+    return true;
+  }
+}
+
+export class HistoricalMetricRepository implements IHistoricalMetricRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  public async save(metric: HistoricalMetric): Promise<HistoricalMetric> {
+    enforceTenantContext(metric.organizationId);
+    const sql = `
+      INSERT INTO historical_metrics (id, organization_id, target_type, target_id, metric_name, metric_value, dimensions, timestamp, created_at, created_by, version)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
+    `;
+    await this.pg.query(sql, [
+      metric.id,
+      metric.organizationId,
+      metric.targetType,
+      metric.targetId,
+      metric.metricName,
+      metric.metricValue,
+      JSON.stringify(metric.dimensions),
+      metric.timestamp,
+      metric.audit.createdAt,
+      metric.audit.createdBy,
+      metric.audit.version
+    ]);
+
+    db.historicalMetrics.set(metric.id, metric);
+    return metric;
+  }
+
+  public async findMetrics(
+    organizationId: string,
+    targetType: string,
+    targetId: string,
+    metricName?: string,
+    startTime?: Date | string,
+    endTime?: Date | string
+  ): Promise<HistoricalMetric[]> {
+    enforceTenantContext(organizationId);
+    let sql = `SELECT * FROM historical_metrics WHERE organization_id = $1 AND target_type = $2 AND target_id = $3`;
+    const params: unknown[] = [organizationId, targetType, targetId];
+
+    if (metricName) {
+      params.push(metricName);
+      sql += ` AND metric_name = $${params.length}`;
+    }
+    if (startTime) {
+      params.push(startTime);
+      sql += ` AND timestamp >= $${params.length}`;
+    }
+    if (endTime) {
+      params.push(endTime);
+      sql += ` AND timestamp <= $${params.length}`;
+    }
+
+    sql += ` ORDER BY timestamp DESC;`;
+    await this.pg.query(sql, params);
+
+    return Array.from(db.historicalMetrics.values()).filter(m => {
+      if (m.organizationId !== organizationId) return false;
+      if (m.targetType !== targetType) return false;
+      if (m.targetId !== targetId) return false;
+      if (metricName && m.metricName !== metricName) return false;
+      if (startTime && new Date(m.timestamp) < new Date(startTime)) return false;
+      if (endTime && new Date(m.timestamp) > new Date(endTime)) return false;
+      return true;
+    }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }
 }
 
