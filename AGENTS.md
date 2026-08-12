@@ -98,7 +98,7 @@ The assessment MUST identify:
 
 Use the following format:
 
-```text
+```
 COMPONENT:
 <name>
 
@@ -116,37 +116,38 @@ REQUIRED CHANGE:
 
 RISK:
 <risk>
+```
 
 The assessment must be completed BEFORE substantial implementation begins.
 
 
 ---
 
-4. Canonical Architecture Rule
+# 4. Canonical Architecture Rule
 
 The existing architecture is authoritative unless it is demonstrably incorrect, incomplete, or incompatible with the task.
 
 Agents MUST:
 
-reuse existing domain models
+- reuse existing domain models
 
-reuse existing repositories
+- reuse existing repositories
 
-reuse existing provider abstractions
+- reuse existing provider abstractions
 
-reuse existing analyzer abstractions
+- reuse existing analyzer abstractions
 
-reuse existing persistence patterns
+- reuse existing persistence patterns
 
-reuse existing authentication/authorization
+- reuse existing authentication/authorization
 
-reuse existing tenant isolation
+- reuse existing tenant isolation
 
-reuse existing scheduler infrastructure
+- reuse existing scheduler infrastructure
 
-reuse existing CQRS/application patterns
+- reuse existing CQRS/application patterns
 
-reuse existing migration conventions
+- reuse existing migration conventions
 
 
 Do NOT create parallel implementations of an existing capability.
@@ -179,7 +180,7 @@ Do not replace it without evidence.
 
 ---
 
-5. Architectural Blocker Rule
+# 5. Architectural Blocker Rule
 
 If the canonical architecture is:
 
@@ -222,7 +223,7 @@ Never hide an architectural incompatibility behind a local workaround.
 
 ---
 
-6. Scope Discipline
+# 6. Scope Discipline
 
 Implement ONLY the capability requested by the current task.
 
@@ -256,7 +257,7 @@ Do not build the future feature itself.
 
 ---
 
-7. No Mock Production Implementations
+# 7. No Mock Production Implementations
 
 Production code MUST NOT depend on:
 
@@ -292,13 +293,13 @@ A test mock MUST NOT accidentally become a production implementation.
 
 ---
 
-8. No Shortcut Contracts
+# 8. No Shortcut Contracts
 
 Do not weaken domain contracts merely to make TypeScript, tests, or builds pass.
 
 The following are prohibited as shortcuts:
 
-any
+```any
 
 unsafe TypeScript assertions
 
@@ -319,6 +320,7 @@ disabling strict validation
 weakening database constraints
 
 weakening tenant checks
+```
 
 
 If the domain object is incomplete, implement the missing contract correctly.
@@ -326,7 +328,7 @@ If the domain object is incomplete, implement the missing contract correctly.
 
 ---
 
-9. Domain-First Implementation
+# 9. Domain-First Implementation
 
 Domain semantics must be established before UI implementation.
 
