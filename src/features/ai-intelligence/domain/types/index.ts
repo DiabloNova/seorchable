@@ -250,6 +250,188 @@ export interface KgEntity {
 }
 
 /**
+ * AEO Content Intelligence Types (Task 5.4)
+ */
+export type AnswerabilityLevel =
+  | "directly_answerable"
+  | "partially_answerable"
+  | "indirectly_answerable"
+  | "not_answerable"
+  | "insufficient_evidence";
+
+export type EntityCoverageStatus =
+  | "covered"
+  | "partially_covered"
+  | "mentioned_only"
+  | "not_covered"
+  | "unresolved"
+  | "ambiguous";
+
+export type QuestionCoverageStatus =
+  | "answered"
+  | "partially_answered"
+  | "indirectly_answered"
+  | "unanswered"
+  | "not_applicable"
+  | "insufficient_evidence";
+
+export type CitationReadinessLevel =
+  | "high"
+  | "medium"
+  | "low"
+  | "insufficient_evidence";
+
+export type KgAlignmentStatus =
+  | "aligned"
+  | "missing_entity"
+  | "missing_relationship"
+  | "unresolved_entity"
+  | "ambiguous_entity"
+  | "potential_contradiction"
+  | "conflicting_evidence";
+
+export interface AnswerabilityAnalysis {
+  level: AnswerabilityLevel;
+  evidence: string;
+  coveredDimensions: string[];
+  missingDimensions: string[];
+  confidence: number;
+}
+
+export interface EntityCoverageItem {
+  entityId?: string;
+  name: string;
+  type: string;
+  status: EntityCoverageStatus;
+  evidence: string;
+  confidence: number;
+}
+
+export interface SemanticCoverageAnalysis {
+  score: number; // 0-100
+  conceptsCovered: string[];
+  conceptsMissing: string[];
+  gapsIdentified: string[];
+}
+
+export interface QuestionCoverageItem {
+  question: string;
+  status: QuestionCoverageStatus;
+  evidence: string;
+}
+
+export interface QuestionCoverageAnalysis {
+  score: number; // 0-100
+  questionUniverseType: string;
+  totalQuestions: number;
+  answeredCount: number;
+  unansweredCount: number;
+  items: QuestionCoverageItem[];
+}
+
+export interface CitationReadinessAnalysis {
+  level: CitationReadinessLevel;
+  score: number; // 0-100
+  hasFactualClaims: boolean;
+  hasConciseAnswerBlock: boolean;
+  hasSourceAttribution: boolean;
+  hasAuthorInfo: boolean;
+  hasPublicationDate: boolean;
+  hasCanonicalUrl: boolean;
+  evidence: string;
+  confidence: number;
+}
+
+export interface StructuredAnswerQualityAnalysis {
+  score: number; // 0-100
+  headingHierarchyOk: boolean;
+  hasDirectAnswerParagraphs: boolean;
+  hasLists: boolean;
+  hasTables: boolean;
+  hasDefinitions: boolean;
+  hasFAQStructure: boolean;
+  sectionClarityOk: boolean;
+  findings: {
+    headingStructure: string;
+    answerDirectness: string;
+    questionAnswerPairing: string;
+    listQuality: string;
+    tableQuality: string;
+    definitionQuality: string;
+    sectionClarity: string;
+    semanticStructure: string;
+  };
+}
+
+export interface KgAlignmentItem {
+  alignmentType: "kg_to_content" | "content_to_kg";
+  entityName: string;
+  propertyName?: string;
+  expectedValue?: string;
+  actualValue?: string;
+  status: KgAlignmentStatus;
+  evidence: string;
+}
+
+export interface KgAlignmentAnalysis {
+  score: number; // 0-100
+  alignedCount: number;
+  mismatchedCount: number;
+  items: KgAlignmentItem[];
+}
+
+export interface AeoAnalysis {
+  id: string;
+  organizationId: string;
+  pageId: string;
+  overallScore: number;
+  answerability: AnswerabilityAnalysis;
+  entityCoverage: EntityCoverageItem[];
+  semanticCoverage: SemanticCoverageAnalysis;
+  questionCoverage: QuestionCoverageAnalysis;
+  citationReadiness: CitationReadinessAnalysis;
+  structuredAnswerQuality: StructuredAnswerQualityAnalysis;
+  kgAlignment: KgAlignmentAnalysis;
+  scoringVersion: string;
+  analyzerVersion: string;
+  provenance: {
+    provider: string;
+    model: string;
+    modelVersion?: string;
+    timestamp: string;
+    latencyMs?: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FaqOpportunity {
+  id: string;
+  organizationId: string;
+  pageId: string;
+  question: string;
+  sourceType: string; // e.g. "ai_visibility_prompt" or "unanswered_question"
+  evidenceSourceId?: string; // links to prompt or other source
+  priority: PriorityLevel;
+  impactScore: number; // 0-100
+  status: "active" | "implemented" | "ignored";
+  createdAt: string;
+}
+
+export interface KgAlignment {
+  id: string;
+  organizationId: string;
+  pageId: string;
+  alignmentType: "kg_to_content" | "content_to_kg";
+  entityName: string;
+  propertyName?: string;
+  expectedValue?: string;
+  actualValue?: string;
+  status: KgAlignmentStatus;
+  createdAt: string;
+}
+
+/**
  * AI Visibility Audit Types
  */
 export type AIVisibilityAuditStatus = "PENDING" | "RUNNING" | "ANALYZING" | "COMPLETED" | "FAILED";

@@ -93,6 +93,12 @@ export const dashboardNavigation: NavigationSection[] = [
             labelEn: "AI Playground",
             labelFa: "محیط اجرای هوش مصنوعی",
             href: "/dashboard/aeo/playground"
+          },
+          {
+            id: "aeo-content",
+            labelEn: "AEO Content Intelligence",
+            labelFa: "هوشمندی محتوای AEO",
+            href: "/dashboard/aeo/content"
           }
         ]
       },
