@@ -37,8 +37,72 @@ export const competitorsTable: TableDefinition = {
       name: "status",
       type: "TEXT",
       nullable: false,
-      default: "'active'",
-      description: "Competitor monitoring status flag"
+      default: "'candidate'",
+      description: "Competitor lifecycle status flag ('candidate', 'active', 'inactive', 'rejected')"
+    },
+    {
+      name: "brand_name",
+      type: "TEXT",
+      nullable: true,
+      description: "Competitor brand/entity name if available"
+    },
+    {
+      name: "classification",
+      type: "TEXT",
+      nullable: false,
+      default: "'unknown'",
+      description: "Competitor classification ('direct', 'indirect', 'marketplace_aggregator', 'content_authority', 'unknown')"
+    },
+    {
+      name: "discovery_source",
+      type: "TEXT",
+      nullable: true,
+      description: "Discovery source description"
+    },
+    {
+      name: "discovery_evidence",
+      type: "JSONB",
+      nullable: true,
+      description: "Structured evidence tracing candidates"
+    },
+    {
+      name: "confidence",
+      type: "DOUBLE PRECISION",
+      nullable: true,
+      description: "Detection confidence (0.0 to 1.0)"
+    },
+    {
+      name: "first_discovered_at",
+      type: "TIMESTAMP",
+      nullable: false,
+      default: "NOW()",
+      description: "Timestamp when the candidate was first identified"
+    },
+    {
+      name: "last_observed_at",
+      type: "TIMESTAMP",
+      nullable: false,
+      default: "NOW()",
+      description: "Timestamp when the competitor was last observed"
+    },
+    {
+      name: "last_monitored_at",
+      type: "TIMESTAMP",
+      nullable: true,
+      description: "Timestamp when the competitor was last monitored"
+    },
+    {
+      name: "monitoring_status",
+      type: "TEXT",
+      nullable: false,
+      default: "'idle'",
+      description: "Active monitoring status code ('idle', 'enabled', 'disabled', 'failed')"
+    },
+    {
+      name: "notes_metadata",
+      type: "JSONB",
+      nullable: true,
+      description: "Notes or auxiliary metadata"
     },
     {
       name: "created_at",
@@ -92,7 +156,17 @@ CREATE TABLE IF NOT EXISTS competitors (
   organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   domain TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'active',
+  status TEXT NOT NULL DEFAULT 'candidate',
+  brand_name TEXT,
+  classification TEXT NOT NULL DEFAULT 'unknown',
+  discovery_source TEXT,
+  discovery_evidence JSONB,
+  confidence DOUBLE PRECISION,
+  first_discovered_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  last_observed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  last_monitored_at TIMESTAMP WITH TIME ZONE,
+  monitoring_status TEXT NOT NULL DEFAULT 'idle',
+  notes_metadata JSONB,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   created_by TEXT NOT NULL DEFAULT 'system',

@@ -22,6 +22,7 @@ import {
   Keyword,
   Topic,
   Competitor,
+  CompetitorChange,
   HistoricalMetric,
   DiagnosticFinding,
   DiagnosticFindingRelationship,
@@ -167,8 +168,13 @@ export interface ITopicRepository {
 export interface ICompetitorRepository {
   findById(organizationId: string, id: string): Promise<Competitor | null>;
   findByOrganizationId(organizationId: string, params?: QueryParams): Promise<PaginatedResult<Competitor>>;
+  findByDomain(organizationId: string, domain: string): Promise<Competitor | null>;
   save(competitor: Competitor): Promise<Competitor>;
   deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
+
+  // Competitor Changes
+  saveChange(change: CompetitorChange): Promise<CompetitorChange>;
+  findChangesByCompetitorId(organizationId: string, competitorId: string): Promise<CompetitorChange[]>;
 }
 
 export interface IHistoricalMetricRepository {

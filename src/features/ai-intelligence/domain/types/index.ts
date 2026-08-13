@@ -780,6 +780,10 @@ export interface Topic {
   audit: AuditMetadata;
 }
 
+export type CompetitorStatusType = "candidate" | "active" | "inactive" | "rejected";
+
+export type CompetitorClassificationType = "direct" | "indirect" | "marketplace_aggregator" | "content_authority" | "unknown";
+
 /**
  * Entity: Competitor
  * Represents a monitored competitive brand/entity.
@@ -787,10 +791,36 @@ export interface Topic {
 export interface Competitor {
   id: string;
   organizationId: string; // strict multi-tenant partition key
-  name: string;
-  domain: string;
-  status: "active" | "archived" | string;
+  name: string; // Display Name
+  domain: string; // Canonical Domain
+  status: CompetitorStatusType;
+  brandName?: string;
+  classification: CompetitorClassificationType;
+  discoverySource?: string;
+  discoveryEvidence?: Record<string, unknown>;
+  confidence?: number;
+  firstDiscoveredAt?: Date | string;
+  lastObservedAt?: Date | string;
+  lastMonitoredAt?: Date | string;
+  monitoringStatus: "idle" | "enabled" | "disabled" | "failed" | string;
+  notesMetadata?: Record<string, unknown>;
   audit: AuditMetadata;
+}
+
+/**
+ * Entity: CompetitorChange
+ * Tracks historical competitor monitoring state transitions and changes.
+ */
+export interface CompetitorChange {
+  id: string;
+  organizationId: string;
+  competitorId: string;
+  changedField: string;
+  previousValue: string | null;
+  newValue: string | null;
+  changeType: string; // status, classification, name, domain
+  observedAt: Date | string;
+  createdAt: Date | string;
 }
 
 /**
