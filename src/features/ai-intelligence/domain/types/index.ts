@@ -450,6 +450,56 @@ export interface PositionObservation {
 }
 
 /**
+ * AI Citation Intelligence Types (Task 5.2)
+ */
+export type CitationSourceClassification =
+  | "owned"
+  | "competitor"
+  | "third_party"
+  | "publisher_media"
+  | "government"
+  | "academic_research"
+  | "directory"
+  | "marketplace"
+  | "social"
+  | "forum_community"
+  | "documentation"
+  | "reference_encyclopedia"
+  | "other"
+  | "unknown";
+
+export interface CitationSource {
+  id: string;
+  organizationId: string;
+  domain: string; // unique normalized lowercased domain (e.g. "wikipedia.org")
+  canonicalUrl?: string;
+  classification: CitationSourceClassification;
+  qualityScore: number; // calculated deterministic quality
+  authorityScore: number; // calculated independently evaluated authority
+  firstSeenAt: Date | string;
+  lastSeenAt: Date | string;
+  occurrenceCount: number;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+export interface CitationOccurrence {
+  id: string;
+  organizationId: string;
+  sourceId: string; // links to citation_sources
+  auditId?: string; // links to ai_visibility_audits (nullable)
+  executionId?: string; // links to prompt_executions (nullable)
+  promptId?: string; // links to prompts (nullable)
+  observationId?: string; // links to ai_observations (nullable)
+  url: string; // exact matched raw URL
+  title?: string;
+  snippet?: string; // surrounding text context excerpt
+  position?: number; // list index position of this citation in the response
+  confidence: number; // extraction confidence (0.0 to 1.0)
+  createdAt: Date | string;
+}
+
+/**
  * Entity: Website
  * Represents the analyzed/canonical website within a tenant/organization.
  */

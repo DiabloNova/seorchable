@@ -31,7 +31,9 @@ import {
   PromptDefinition,
   PromptSchedule,
   PromptExecution,
-  PositionObservation
+  PositionObservation,
+  CitationSource,
+  CitationOccurrence
 } from "../domain/types";
 
 export interface QueryParams {
@@ -221,4 +223,19 @@ export interface IPromptIntelligenceRepository {
   // Position Observations (Tenant-scoped)
   findPositionsByExecutionId(organizationId: string, executionId: string): Promise<PositionObservation[]>;
   savePosition(position: PositionObservation): Promise<PositionObservation>;
+}
+
+export interface ICitationIntelligenceRepository {
+  // Sources (Tenant-scoped)
+  findSourceById(organizationId: string, id: string): Promise<CitationSource | null>;
+  findSourceByDomain(organizationId: string, domain: string): Promise<CitationSource | null>;
+  findSources(organizationId: string, params?: QueryParams): Promise<PaginatedResult<CitationSource>>;
+  saveSource(source: CitationSource): Promise<CitationSource>;
+
+  // Occurrences (Tenant-scoped)
+  findOccurrencesBySourceId(organizationId: string, sourceId: string): Promise<CitationOccurrence[]>;
+  findOccurrencesByAuditId(organizationId: string, auditId: string): Promise<CitationOccurrence[]>;
+  findOccurrencesByExecutionId(organizationId: string, executionId: string): Promise<CitationOccurrence[]>;
+  findAllOccurrences(organizationId: string): Promise<CitationOccurrence[]>;
+  saveOccurrence(occurrence: CitationOccurrence): Promise<CitationOccurrence>;
 }

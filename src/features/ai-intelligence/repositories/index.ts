@@ -36,7 +36,9 @@ import {
   PromptDefinition,
   PromptSchedule,
   PromptExecution,
-  PositionObservation
+  PositionObservation,
+  CitationSource,
+  CitationOccurrence
 } from "../domain/types";
 import {
   IOrganizationRepository,
@@ -57,7 +59,8 @@ import {
   IHistoricalMetricRepository,
   IDiagnosticFindingRepository,
   IAIVisibilityAuditRepository,
-  IPromptIntelligenceRepository
+  IPromptIntelligenceRepository,
+  ICitationIntelligenceRepository
 } from "./interfaces";
 
 function createMockAudit(createdBy = "system"): AuditMetadata {
@@ -100,6 +103,8 @@ class InMemoryDatabase {
   public promptSchedules: Map<string, PromptSchedule> = new Map();
   public promptExecutions: Map<string, PromptExecution> = new Map();
   public positionObservations: Map<string, PositionObservation> = new Map();
+  public citationSources: Map<string, CitationSource> = new Map();
+  public citationOccurrences: Map<string, CitationOccurrence> = new Map();
 
   // Unified Intelligence Data Model stores
   public websites: Map<string, Website> = new Map();
@@ -1183,6 +1188,239 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
     }
     db.positionObservations.set(position.id, position);
     return position;
+  }
+}
+
+export class CitationIntelligenceRepository implements ICitationIntelligenceRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  private mapRowToSource(row: any): CitationSource {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      domain: row.domain,
+      canonicalUrl: row.canonical_url || undefined,
+      classification: row.classification,
+      qualityScore: row.quality_score,
+      authorityScore: row.authority_score,
+      firstSeenAt: row.first_seen_at,
+      lastSeenAt: row.last_seen_at,
+      occurrenceCount: row.occurrence_count,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    };
+  }
+
+  private mapRowToOccurrence(row: any): CitationOccurrence {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      sourceId: row.source_id,
+      auditId: row.audit_id || undefined,
+      executionId: row.execution_id || undefined,
+      promptId: row.prompt_id || undefined,
+      observationId: row.observation_id || undefined,
+      url: row.url,
+      title: row.title || undefined,
+      snippet: row.snippet || undefined,
+      position: row.position || undefined,
+      confidence: row.confidence,
+      createdAt: row.created_at
+    };
+  }
+
+  public async findSourceById(organizationId: string, id: string): Promise<CitationSource | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM citation_sources WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToSource(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[CitationIntelligenceRepository.findSourceById Error]: using memory fallback.", err);
+    }
+    const item = db.citationSources.get(id);
+    if (!item || item.organizationId !== organizationId) return null;
+    return item;
+  }
+
+  public async findSourceByDomain(organizationId: string, domain: string): Promise<CitationSource | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM citation_sources WHERE LOWER(domain) = LOWER($1) AND organization_id = $2 LIMIT 1;`;
+      const res = await this.pg.query(sql, [domain, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToSource(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[CitationIntelligenceRepository.findSourceByDomain Error]: using memory fallback.", err);
+    }
+    for (const item of db.citationSources.values()) {
+      if (item.domain.toLowerCase() === domain.toLowerCase() && item.organizationId === organizationId) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  public async findSources(organizationId: string, params?: QueryParams): Promise<PaginatedResult<CitationSource>> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM citation_sources WHERE organization_id = $1 ORDER BY occurrence_count DESC;`;
+      const res = await this.pg.query(sql, [organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        const mapped = res.rows.map(row => this.mapRowToSource(row));
+        return paginateArray(mapped, params);
+      }
+    } catch (err) {
+      console.warn("[CitationIntelligenceRepository.findSources Error]: using memory fallback.", err);
+    }
+    const list = Array.from(db.citationSources.values()).filter(
+      v => v.organizationId === organizationId
+    ).sort((a, b) => b.occurrenceCount - a.occurrenceCount);
+    return paginateArray(list, params);
+  }
+
+  public async saveSource(source: CitationSource): Promise<CitationSource> {
+    enforceTenantContext(source.organizationId);
+    try {
+      const sql = `
+        INSERT INTO citation_sources (id, organization_id, domain, canonical_url, classification, quality_score, authority_score, first_seen_at, last_seen_at, occurrence_count, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        ON CONFLICT (organization_id, domain) DO UPDATE SET
+          canonical_url = EXCLUDED.canonical_url,
+          classification = EXCLUDED.classification,
+          quality_score = EXCLUDED.quality_score,
+          authority_score = EXCLUDED.authority_score,
+          last_seen_at = EXCLUDED.last_seen_at,
+          occurrence_count = EXCLUDED.occurrence_count,
+          updated_at = EXCLUDED.updated_at;
+      `;
+      await this.pg.query(sql, [
+        source.id,
+        source.organizationId,
+        source.domain,
+        source.canonicalUrl || null,
+        source.classification,
+        source.qualityScore,
+        source.authorityScore,
+        source.firstSeenAt,
+        source.lastSeenAt,
+        source.occurrenceCount,
+        source.createdAt,
+        source.updatedAt
+      ]);
+    } catch (err) {
+      console.warn("[CitationIntelligenceRepository.saveSource Error]: using memory fallback.", err);
+    }
+    db.citationSources.set(source.id, source);
+    return source;
+  }
+
+  public async findOccurrencesBySourceId(organizationId: string, sourceId: string): Promise<CitationOccurrence[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM citation_occurrences WHERE source_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [sourceId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToOccurrence(row));
+      }
+    } catch (err) {
+      console.warn("[CitationIntelligenceRepository.findOccurrencesBySourceId Error]: using memory fallback.", err);
+    }
+    return Array.from(db.citationOccurrences.values()).filter(
+      p => p.sourceId === sourceId && p.organizationId === organizationId
+    ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  public async findOccurrencesByAuditId(organizationId: string, auditId: string): Promise<CitationOccurrence[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM citation_occurrences WHERE audit_id = $1 AND organization_id = $2;`;
+      const res = await this.pg.query(sql, [auditId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToOccurrence(row));
+      }
+    } catch (err) {
+      console.warn("[CitationIntelligenceRepository.findOccurrencesByAuditId Error]: using memory fallback.", err);
+    }
+    return Array.from(db.citationOccurrences.values()).filter(
+      p => p.auditId === auditId && p.organizationId === organizationId
+    );
+  }
+
+  public async findOccurrencesByExecutionId(organizationId: string, executionId: string): Promise<CitationOccurrence[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM citation_occurrences WHERE execution_id = $1 AND organization_id = $2;`;
+      const res = await this.pg.query(sql, [executionId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToOccurrence(row));
+      }
+    } catch (err) {
+      console.warn("[CitationIntelligenceRepository.findOccurrencesByExecutionId Error]: using memory fallback.", err);
+    }
+    return Array.from(db.citationOccurrences.values()).filter(
+      p => p.executionId === executionId && p.organizationId === organizationId
+    );
+  }
+
+  public async findAllOccurrences(organizationId: string): Promise<CitationOccurrence[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM citation_occurrences WHERE organization_id = $1 ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToOccurrence(row));
+      }
+    } catch (err) {
+      console.warn("[CitationIntelligenceRepository.findAllOccurrences Error]: using memory fallback.", err);
+    }
+    return Array.from(db.citationOccurrences.values()).filter(
+      p => p.organizationId === organizationId
+    ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  public async saveOccurrence(occurrence: CitationOccurrence): Promise<CitationOccurrence> {
+    enforceTenantContext(occurrence.organizationId);
+    try {
+      const sql = `
+        INSERT INTO citation_occurrences (id, organization_id, source_id, audit_id, execution_id, prompt_id, observation_id, url, title, snippet, position, confidence, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        ON CONFLICT (organization_id, source_id, observation_id, url) DO NOTHING;
+      `;
+      await this.pg.query(sql, [
+        occurrence.id,
+        occurrence.organizationId,
+        occurrence.sourceId,
+        occurrence.auditId || null,
+        occurrence.executionId || null,
+        occurrence.promptId || null,
+        occurrence.observationId || null,
+        occurrence.url,
+        occurrence.title || null,
+        occurrence.snippet || null,
+        occurrence.position || null,
+        occurrence.confidence,
+        occurrence.createdAt
+      ]);
+    } catch (err) {
+      console.warn("[CitationIntelligenceRepository.saveOccurrence Error]: using memory fallback.", err);
+    }
+    const exists = Array.from(db.citationOccurrences.values()).some(
+      o => o.organizationId === occurrence.organizationId &&
+           o.sourceId === occurrence.sourceId &&
+           o.observationId === occurrence.observationId &&
+           o.url === occurrence.url
+    );
+    if (!exists) {
+      db.citationOccurrences.set(occurrence.id, occurrence);
+    }
+    return occurrence;
   }
 }
 
