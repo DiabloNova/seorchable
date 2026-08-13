@@ -500,6 +500,44 @@ export interface CitationOccurrence {
 }
 
 /**
+ * AI Brand Intelligence Types (Task 5.3)
+ */
+export type RecommendationStatusType =
+  | "mention"
+  | "consideration"
+  | "recommendation"
+  | "strong_recommendation"
+  | "negative_recommendation";
+
+export interface BrandAssociation {
+  id: string;
+  organizationId: string;
+  brandId: string;
+  entityName: string; // extracted associated entity/concept (product, location, competitor)
+  relationshipType: string; // e.g. "product_of", "industry_category", "compares_with", "mentioned_with"
+  occurrenceCount: number;
+  firstSeenAt: Date | string;
+  lastSeenAt: Date | string;
+  supportingContext: string;
+  confidence: number; // (0.0 to 1.0)
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+export interface RecommendationObservation {
+  id: string;
+  organizationId: string;
+  brandId: string;
+  executionId?: string; // links to prompt_executions (nullable)
+  promptId?: string; // links to prompts (nullable)
+  observationId: string; // links to raw AI observation response
+  recommendationStatus: RecommendationStatusType;
+  position?: number; // list ranking position if present
+  evidenceExcerpt: string; // verbatim phrased endorsement
+  createdAt: Date | string;
+}
+
+/**
  * Entity: Website
  * Represents the analyzed/canonical website within a tenant/organization.
  */

@@ -38,7 +38,9 @@ import {
   PromptExecution,
   PositionObservation,
   CitationSource,
-  CitationOccurrence
+  CitationOccurrence,
+  BrandAssociation,
+  RecommendationObservation
 } from "../domain/types";
 import {
   IOrganizationRepository,
@@ -60,7 +62,8 @@ import {
   IDiagnosticFindingRepository,
   IAIVisibilityAuditRepository,
   IPromptIntelligenceRepository,
-  ICitationIntelligenceRepository
+  ICitationIntelligenceRepository,
+  IBrandIntelligenceRepository
 } from "./interfaces";
 
 function createMockAudit(createdBy = "system"): AuditMetadata {
@@ -105,6 +108,8 @@ class InMemoryDatabase {
   public positionObservations: Map<string, PositionObservation> = new Map();
   public citationSources: Map<string, CitationSource> = new Map();
   public citationOccurrences: Map<string, CitationOccurrence> = new Map();
+  public brandAssociations: Map<string, BrandAssociation> = new Map();
+  public recommendationObservations: Map<string, RecommendationObservation> = new Map();
 
   // Unified Intelligence Data Model stores
   public websites: Map<string, Website> = new Map();
@@ -1421,6 +1426,201 @@ export class CitationIntelligenceRepository implements ICitationIntelligenceRepo
       db.citationOccurrences.set(occurrence.id, occurrence);
     }
     return occurrence;
+  }
+}
+
+export class BrandIntelligenceRepository implements IBrandIntelligenceRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  private mapRowToAssociation(row: any): BrandAssociation {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      brandId: row.brand_id,
+      entityName: row.entity_name,
+      relationshipType: row.relationship_type,
+      occurrenceCount: row.occurrence_count,
+      firstSeenAt: row.first_seen_at,
+      lastSeenAt: row.last_seen_at,
+      supportingContext: row.supporting_context,
+      confidence: row.confidence,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    };
+  }
+
+  private mapRowToRecommendation(row: any): RecommendationObservation {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      brandId: row.brand_id,
+      executionId: row.execution_id || undefined,
+      promptId: row.prompt_id || undefined,
+      observationId: row.observation_id,
+      recommendationStatus: row.recommendation_status,
+      position: row.position || undefined,
+      evidenceExcerpt: row.evidence_excerpt,
+      createdAt: row.created_at
+    };
+  }
+
+  public async findAssociationById(organizationId: string, id: string): Promise<BrandAssociation | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM brand_associations WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToAssociation(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[BrandIntelligenceRepository.findAssociationById Error]: using memory fallback.", err);
+    }
+    const item = db.brandAssociations.get(id);
+    if (!item || item.organizationId !== organizationId) return null;
+    return item;
+  }
+
+  public async findAssociationByEntity(organizationId: string, brandId: string, entityName: string, relType: string): Promise<BrandAssociation | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM brand_associations WHERE LOWER(entity_name) = LOWER($1) AND relationship_type = $2 AND brand_id = $3 AND organization_id = $4 LIMIT 1;`;
+      const res = await this.pg.query(sql, [entityName, relType, brandId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToAssociation(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[BrandIntelligenceRepository.findAssociationByEntity Error]: using memory fallback.", err);
+    }
+    for (const item of db.brandAssociations.values()) {
+      if (
+        item.entityName.toLowerCase() === entityName.toLowerCase() &&
+        item.relationshipType === relType &&
+        item.brandId === brandId &&
+        item.organizationId === organizationId
+      ) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  public async findAssociationsByBrandId(organizationId: string, brandId: string): Promise<BrandAssociation[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM brand_associations WHERE brand_id = $1 AND organization_id = $2 ORDER BY occurrence_count DESC;`;
+      const res = await this.pg.query(sql, [brandId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToAssociation(row));
+      }
+    } catch (err) {
+      console.warn("[BrandIntelligenceRepository.findAssociationsByBrandId Error]: using memory fallback.", err);
+    }
+    return Array.from(db.brandAssociations.values()).filter(
+      p => p.brandId === brandId && p.organizationId === organizationId
+    ).sort((a, b) => b.occurrenceCount - a.occurrenceCount);
+  }
+
+  public async saveAssociation(association: BrandAssociation): Promise<BrandAssociation> {
+    enforceTenantContext(association.organizationId);
+    try {
+      const sql = `
+        INSERT INTO brand_associations (id, organization_id, brand_id, entity_name, relationship_type, occurrence_count, first_seen_at, last_seen_at, supporting_context, confidence, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        ON CONFLICT (organization_id, brand_id, entity_name, relationship_type) DO UPDATE SET
+          occurrence_count = EXCLUDED.occurrence_count,
+          last_seen_at = EXCLUDED.last_seen_at,
+          supporting_context = EXCLUDED.supporting_context,
+          confidence = EXCLUDED.confidence,
+          updated_at = EXCLUDED.updated_at;
+      `;
+      await this.pg.query(sql, [
+        association.id,
+        association.organizationId,
+        association.brandId,
+        association.entityName,
+        association.relationshipType,
+        association.occurrenceCount,
+        association.firstSeenAt,
+        association.lastSeenAt,
+        association.supportingContext,
+        association.confidence,
+        association.createdAt,
+        association.updatedAt
+      ]);
+    } catch (err) {
+      console.warn("[BrandIntelligenceRepository.saveAssociation Error]: using memory fallback.", err);
+    }
+    db.brandAssociations.set(association.id, association);
+    return association;
+  }
+
+  // Recommendations
+  public async findRecommendationByObservationId(organizationId: string, brandId: string, observationId: string): Promise<RecommendationObservation | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM recommendation_observations WHERE observation_id = $1 AND brand_id = $2 AND organization_id = $3 LIMIT 1;`;
+      const res = await this.pg.query(sql, [observationId, brandId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToRecommendation(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[BrandIntelligenceRepository.findRecommendationByObservationId Error]: using memory fallback.", err);
+    }
+    for (const item of db.recommendationObservations.values()) {
+      if (item.observationId === observationId && item.brandId === brandId && item.organizationId === organizationId) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  public async findRecommendationsByBrandId(organizationId: string, brandId: string): Promise<RecommendationObservation[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM recommendation_observations WHERE brand_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [brandId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToRecommendation(row));
+      }
+    } catch (err) {
+      console.warn("[BrandIntelligenceRepository.findRecommendationsByBrandId Error]: using memory fallback.", err);
+    }
+    return Array.from(db.recommendationObservations.values()).filter(
+      p => p.brandId === brandId && p.organizationId === organizationId
+    ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  public async saveRecommendationObservation(rec: RecommendationObservation): Promise<RecommendationObservation> {
+    enforceTenantContext(rec.organizationId);
+    try {
+      const sql = `
+        INSERT INTO recommendation_observations (id, organization_id, brand_id, execution_id, prompt_id, observation_id, recommendation_status, position, evidence_excerpt, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        ON CONFLICT (organization_id, brand_id, observation_id) DO UPDATE SET
+          recommendation_status = EXCLUDED.recommendation_status,
+          position = EXCLUDED.position,
+          evidence_excerpt = EXCLUDED.evidence_excerpt;
+      `;
+      await this.pg.query(sql, [
+        rec.id,
+        rec.organizationId,
+        rec.brandId,
+        rec.executionId || null,
+        rec.promptId || null,
+        rec.observationId,
+        rec.recommendationStatus,
+        rec.position || null,
+        rec.evidenceExcerpt,
+        rec.createdAt
+      ]);
+    } catch (err) {
+      console.warn("[BrandIntelligenceRepository.saveRecommendationObservation Error]: using memory fallback.", err);
+    }
+    db.recommendationObservations.set(rec.id, rec);
+    return rec;
   }
 }
 

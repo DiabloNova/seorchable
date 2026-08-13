@@ -45,7 +45,9 @@ export const TENANT_SCOPED_TABLES = Object.freeze([
   "prompt_executions",
   "position_observations",
   "citation_sources",
-  "citation_occurrences"
+  "citation_occurrences",
+  "brand_associations",
+  "recommendation_observations"
 ]);
 
 /**
