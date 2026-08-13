@@ -40,7 +40,10 @@ import {
   CitationSource,
   CitationOccurrence,
   BrandAssociation,
-  RecommendationObservation
+  RecommendationObservation,
+  AeoAnalysis,
+  FaqOpportunity,
+  KgAlignment
 } from "../domain/types";
 import {
   IOrganizationRepository,
@@ -63,7 +66,8 @@ import {
   IAIVisibilityAuditRepository,
   IPromptIntelligenceRepository,
   ICitationIntelligenceRepository,
-  IBrandIntelligenceRepository
+  IBrandIntelligenceRepository,
+  IAeoContentIntelligenceRepository
 } from "./interfaces";
 
 function createMockAudit(createdBy = "system"): AuditMetadata {
@@ -110,6 +114,9 @@ class InMemoryDatabase {
   public citationOccurrences: Map<string, CitationOccurrence> = new Map();
   public brandAssociations: Map<string, BrandAssociation> = new Map();
   public recommendationObservations: Map<string, RecommendationObservation> = new Map();
+  public aeoAnalyses: Map<string, AeoAnalysis> = new Map();
+  public faqOpportunities: Map<string, FaqOpportunity> = new Map();
+  public kgAlignments: Map<string, KgAlignment> = new Map();
 
   // Unified Intelligence Data Model stores
   public websites: Map<string, Website> = new Map();
@@ -558,6 +565,365 @@ export class BrandRepository implements IBrandRepository {
     brand.audit.updatedBy = deletedBy;
     brand.audit.updatedAt = new Date().toISOString();
     return true;
+  }
+}
+
+export class AeoContentIntelligenceRepository implements IAeoContentIntelligenceRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  private mapRowToAnalysis(row: any): AeoAnalysis {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      pageId: row.page_id,
+      overallScore: row.overall_score,
+      answerability: typeof row.answerability === "string" ? JSON.parse(row.answerability) : (row.answerability || {}),
+      entityCoverage: typeof row.entity_coverage === "string" ? JSON.parse(row.entity_coverage) : (row.entity_coverage || []),
+      semanticCoverage: typeof row.semantic_coverage === "string" ? JSON.parse(row.semantic_coverage) : (row.semantic_coverage || {}),
+      questionCoverage: typeof row.question_coverage === "string" ? JSON.parse(row.question_coverage) : (row.question_coverage || {}),
+      citationReadiness: typeof row.citation_readiness === "string" ? JSON.parse(row.citation_readiness) : (row.citation_readiness || {}),
+      structuredAnswerQuality: typeof row.structured_answer_quality === "string" ? JSON.parse(row.structured_answer_quality) : (row.structured_answer_quality || {}),
+      kgAlignment: typeof row.kg_alignment === "string" ? JSON.parse(row.kg_alignment) : (row.kg_alignment || {}),
+      scoringVersion: row.scoring_version,
+      analyzerVersion: row.analyzer_version,
+      provenance: typeof row.provenance === "string" ? JSON.parse(row.provenance) : (row.provenance || {}),
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    };
+  }
+
+  private mapRowToFaqOpportunity(row: any): FaqOpportunity {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      pageId: row.page_id,
+      question: row.question,
+      sourceType: row.source_type,
+      evidenceSourceId: row.evidence_source_id || undefined,
+      priority: row.priority as any,
+      impactScore: row.impact_score,
+      status: row.status as any,
+      createdAt: row.created_at
+    };
+  }
+
+  private mapRowToKgAlignment(row: any): KgAlignment {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      pageId: row.page_id,
+      alignmentType: row.alignment_type as any,
+      entityName: row.entity_name,
+      propertyName: row.property_name || undefined,
+      expectedValue: row.expected_value || undefined,
+      actualValue: row.actual_value || undefined,
+      status: row.status as any,
+      createdAt: row.created_at
+    };
+  }
+
+  // AEO Analyses
+  public async findAnalysisById(organizationId: string, id: string): Promise<AeoAnalysis | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM aeo_analyses WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToAnalysis(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.findAnalysisById Error]: skipping DB.", err);
+    }
+    const item = db.aeoAnalyses.get(id);
+    if (!item || item.organizationId !== organizationId) return null;
+    return item;
+  }
+
+  public async findAnalysisByPageId(organizationId: string, pageId: string): Promise<AeoAnalysis | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM aeo_analyses WHERE page_id = $1 AND organization_id = $2 ORDER BY created_at DESC LIMIT 1;`;
+      const res = await this.pg.query(sql, [pageId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToAnalysis(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.findAnalysisByPageId Error]: skipping DB.", err);
+    }
+    for (const item of db.aeoAnalyses.values()) {
+      if (item.pageId === pageId && item.organizationId === organizationId) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  public async findAnalysesByPageId(organizationId: string, pageId: string, params?: QueryParams): Promise<PaginatedResult<AeoAnalysis>> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM aeo_analyses WHERE page_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [pageId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        const mapped = res.rows.map(row => this.mapRowToAnalysis(row));
+        return paginateArray(mapped, params);
+      }
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.findAnalysesByPageId Error]: skipping DB.", err);
+    }
+    const list = Array.from(db.aeoAnalyses.values()).filter(
+      v => v.pageId === pageId && v.organizationId === organizationId
+    ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return paginateArray(list, params);
+  }
+
+  public async saveAnalysis(analysis: AeoAnalysis): Promise<AeoAnalysis> {
+    enforceTenantContext(analysis.organizationId);
+    try {
+      const sql = `
+        INSERT INTO aeo_analyses (id, organization_id, page_id, overall_score, answerability, entity_coverage, semantic_coverage, question_coverage, citation_readiness, structured_answer_quality, kg_alignment, scoring_version, analyzer_version, provenance, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+        ON CONFLICT (page_id, analyzer_version, scoring_version) DO UPDATE SET
+          overall_score = EXCLUDED.overall_score,
+          answerability = EXCLUDED.answerability,
+          entity_coverage = EXCLUDED.entity_coverage,
+          semantic_coverage = EXCLUDED.semantic_coverage,
+          question_coverage = EXCLUDED.question_coverage,
+          citation_readiness = EXCLUDED.citation_readiness,
+          structured_answer_quality = EXCLUDED.structured_answer_quality,
+          kg_alignment = EXCLUDED.kg_alignment,
+          provenance = EXCLUDED.provenance,
+          updated_at = EXCLUDED.updated_at;
+      `;
+      await this.pg.query(sql, [
+        analysis.id,
+        analysis.organizationId,
+        analysis.pageId,
+        analysis.overallScore,
+        JSON.stringify(analysis.answerability),
+        JSON.stringify(analysis.entityCoverage),
+        JSON.stringify(analysis.semanticCoverage),
+        JSON.stringify(analysis.questionCoverage),
+        JSON.stringify(analysis.citationReadiness),
+        JSON.stringify(analysis.structuredAnswerQuality),
+        JSON.stringify(analysis.kgAlignment),
+        analysis.scoringVersion,
+        analysis.analyzerVersion,
+        JSON.stringify(analysis.provenance),
+        analysis.createdAt,
+        analysis.updatedAt
+      ]);
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.saveAnalysis Error]: skipping DB.", err);
+    }
+    db.aeoAnalyses.set(analysis.id, analysis);
+    return analysis;
+  }
+
+  public async deleteAnalysisSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `DELETE FROM aeo_analyses WHERE id = $1 AND organization_id = $2;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        db.aeoAnalyses.delete(id);
+        return true;
+      }
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.deleteAnalysisSoft Error]: skipping DB.", err);
+    }
+    if (db.aeoAnalyses.has(id)) {
+      const item = db.aeoAnalyses.get(id);
+      if (item && item.organizationId === organizationId) {
+        db.aeoAnalyses.delete(id);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // FAQ Opportunities
+  public async findFaqOpportunityById(organizationId: string, id: string): Promise<FaqOpportunity | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM faq_opportunities WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToFaqOpportunity(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.findFaqOpportunityById Error]: skipping DB.", err);
+    }
+    const item = db.faqOpportunities.get(id);
+    if (!item || item.organizationId !== organizationId) return null;
+    return item;
+  }
+
+  public async findFaqOpportunitiesByPageId(organizationId: string, pageId: string): Promise<FaqOpportunity[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM faq_opportunities WHERE page_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [pageId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToFaqOpportunity(row));
+      }
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.findFaqOpportunitiesByPageId Error]: skipping DB.", err);
+    }
+    return Array.from(db.faqOpportunities.values()).filter(
+      p => p.pageId === pageId && p.organizationId === organizationId
+    );
+  }
+
+  public async findAllFaqOpportunities(organizationId: string): Promise<FaqOpportunity[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM faq_opportunities WHERE organization_id = $1 ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToFaqOpportunity(row));
+      }
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.findAllFaqOpportunities Error]: skipping DB.", err);
+    }
+    return Array.from(db.faqOpportunities.values()).filter(
+      p => p.organizationId === organizationId
+    );
+  }
+
+  public async saveFaqOpportunity(opportunity: FaqOpportunity): Promise<FaqOpportunity> {
+    enforceTenantContext(opportunity.organizationId);
+    try {
+      const sql = `
+        INSERT INTO faq_opportunities (id, organization_id, page_id, question, source_type, evidence_source_id, priority, impact_score, status, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        ON CONFLICT (page_id, question) DO UPDATE SET
+          priority = EXCLUDED.priority,
+          impact_score = EXCLUDED.impact_score,
+          status = EXCLUDED.status;
+      `;
+      await this.pg.query(sql, [
+        opportunity.id,
+        opportunity.organizationId,
+        opportunity.pageId,
+        opportunity.question,
+        opportunity.sourceType,
+        opportunity.evidenceSourceId || null,
+        opportunity.priority,
+        opportunity.impactScore,
+        opportunity.status,
+        opportunity.createdAt
+      ]);
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.saveFaqOpportunity Error]: skipping DB.", err);
+    }
+
+    // Deduplicate in memory based on page_id and question to mirror PG constraint
+    let existingId = opportunity.id;
+    for (const [key, existing] of db.faqOpportunities.entries()) {
+      if (existing.pageId === opportunity.pageId && existing.question === opportunity.question && existing.organizationId === opportunity.organizationId) {
+        existingId = key;
+        break;
+      }
+    }
+    db.faqOpportunities.set(existingId, { ...opportunity, id: existingId });
+    return opportunity;
+  }
+
+  // KG Alignments
+  public async findKgAlignmentById(organizationId: string, id: string): Promise<KgAlignment | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM kg_alignments WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToKgAlignment(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.findKgAlignmentById Error]: skipping DB.", err);
+    }
+    const item = db.kgAlignments.get(id);
+    if (!item || item.organizationId !== organizationId) return null;
+    return item;
+  }
+
+  public async findKgAlignmentsByPageId(organizationId: string, pageId: string): Promise<KgAlignment[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM kg_alignments WHERE page_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [pageId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToKgAlignment(row));
+      }
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.findKgAlignmentsByPageId Error]: skipping DB.", err);
+    }
+    return Array.from(db.kgAlignments.values()).filter(
+      p => p.pageId === pageId && p.organizationId === organizationId
+    );
+  }
+
+  public async findAllKgAlignments(organizationId: string): Promise<KgAlignment[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM kg_alignments WHERE organization_id = $1 ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToKgAlignment(row));
+      }
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.findAllKgAlignments Error]: skipping DB.", err);
+    }
+    return Array.from(db.kgAlignments.values()).filter(
+      p => p.organizationId === organizationId
+    );
+  }
+
+  public async saveKgAlignment(alignment: KgAlignment): Promise<KgAlignment> {
+    enforceTenantContext(alignment.organizationId);
+    try {
+      const sql = `
+        INSERT INTO kg_alignments (id, organization_id, page_id, alignment_type, entity_name, property_name, expected_value, actual_value, status, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        ON CONFLICT (page_id, alignment_type, entity_name, COALESCE(property_name, '')) DO UPDATE SET
+          expected_value = EXCLUDED.expected_value,
+          actual_value = EXCLUDED.actual_value,
+          status = EXCLUDED.status;
+      `;
+      await this.pg.query(sql, [
+        alignment.id,
+        alignment.organizationId,
+        alignment.pageId,
+        alignment.alignmentType,
+        alignment.entityName,
+        alignment.propertyName || null,
+        alignment.expectedValue || null,
+        alignment.actualValue || null,
+        alignment.status,
+        alignment.createdAt
+      ]);
+    } catch (err) {
+      console.warn("[AeoContentIntelligenceRepository.saveKgAlignment Error]: skipping DB.", err);
+    }
+
+    // Deduplicate in memory to mirror PG constraint
+    let existingId = alignment.id;
+    for (const [key, existing] of db.kgAlignments.entries()) {
+      if (
+        existing.pageId === alignment.pageId &&
+        existing.alignmentType === alignment.alignmentType &&
+        existing.entityName === alignment.entityName &&
+        (existing.propertyName || "") === (alignment.propertyName || "") &&
+        existing.organizationId === alignment.organizationId
+      ) {
+        existingId = key;
+        break;
+      }
+    }
+    db.kgAlignments.set(existingId, { ...alignment, id: existingId });
+    return alignment;
   }
 }
 

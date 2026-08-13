@@ -35,7 +35,10 @@ import {
   CitationSource,
   CitationOccurrence,
   BrandAssociation,
-  RecommendationObservation
+  RecommendationObservation,
+  AeoAnalysis,
+  FaqOpportunity,
+  KgAlignment
 } from "../domain/types";
 
 export interface QueryParams {
@@ -253,4 +256,25 @@ export interface IBrandIntelligenceRepository {
   findRecommendationByObservationId(organizationId: string, brandId: string, observationId: string): Promise<RecommendationObservation | null>;
   findRecommendationsByBrandId(organizationId: string, brandId: string): Promise<RecommendationObservation[]>;
   saveRecommendationObservation(rec: RecommendationObservation): Promise<RecommendationObservation>;
+}
+
+export interface IAeoContentIntelligenceRepository {
+  // AEO Analyses (Tenant-scoped)
+  findAnalysisById(organizationId: string, id: string): Promise<AeoAnalysis | null>;
+  findAnalysisByPageId(organizationId: string, pageId: string): Promise<AeoAnalysis | null>;
+  findAnalysesByPageId(organizationId: string, pageId: string, params?: QueryParams): Promise<PaginatedResult<AeoAnalysis>>;
+  saveAnalysis(analysis: AeoAnalysis): Promise<AeoAnalysis>;
+  deleteAnalysisSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
+
+  // FAQ Opportunities (Tenant-scoped)
+  findFaqOpportunityById(organizationId: string, id: string): Promise<FaqOpportunity | null>;
+  findFaqOpportunitiesByPageId(organizationId: string, pageId: string): Promise<FaqOpportunity[]>;
+  findAllFaqOpportunities(organizationId: string): Promise<FaqOpportunity[]>;
+  saveFaqOpportunity(opportunity: FaqOpportunity): Promise<FaqOpportunity>;
+
+  // KG Alignments (Tenant-scoped)
+  findKgAlignmentById(organizationId: string, id: string): Promise<KgAlignment | null>;
+  findKgAlignmentsByPageId(organizationId: string, pageId: string): Promise<KgAlignment[]>;
+  findAllKgAlignments(organizationId: string): Promise<KgAlignment[]>;
+  saveKgAlignment(alignment: KgAlignment): Promise<KgAlignment>;
 }
