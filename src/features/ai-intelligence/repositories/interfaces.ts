@@ -33,7 +33,9 @@ import {
   PromptExecution,
   PositionObservation,
   CitationSource,
-  CitationOccurrence
+  CitationOccurrence,
+  BrandAssociation,
+  RecommendationObservation
 } from "../domain/types";
 
 export interface QueryParams {
@@ -238,4 +240,17 @@ export interface ICitationIntelligenceRepository {
   findOccurrencesByExecutionId(organizationId: string, executionId: string): Promise<CitationOccurrence[]>;
   findAllOccurrences(organizationId: string): Promise<CitationOccurrence[]>;
   saveOccurrence(occurrence: CitationOccurrence): Promise<CitationOccurrence>;
+}
+
+export interface IBrandIntelligenceRepository {
+  // Associations (Tenant-scoped)
+  findAssociationById(organizationId: string, id: string): Promise<BrandAssociation | null>;
+  findAssociationByEntity(organizationId: string, brandId: string, entityName: string, relType: string): Promise<BrandAssociation | null>;
+  findAssociationsByBrandId(organizationId: string, brandId: string): Promise<BrandAssociation[]>;
+  saveAssociation(association: BrandAssociation): Promise<BrandAssociation>;
+
+  // Recommendations (Tenant-scoped)
+  findRecommendationByObservationId(organizationId: string, brandId: string, observationId: string): Promise<RecommendationObservation | null>;
+  findRecommendationsByBrandId(organizationId: string, brandId: string): Promise<RecommendationObservation[]>;
+  saveRecommendationObservation(rec: RecommendationObservation): Promise<RecommendationObservation>;
 }
