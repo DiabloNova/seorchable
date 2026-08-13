@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:acquisition": "tsx tests/features/acquisition/run-all.ts",
-    "test:all-engines": "tsx tests/services/audit-engine/seo-extractor.test.ts && tsx tests/services/audit-engine/intelligence-model.test.ts && tsx tests/services/audit-engine/diagnostic-engine.test.ts && tsx tests/services/audit-engine/recommendation-engine.test.ts"
+    "test:acquisition": "tsx tests/features/acquisition/run-all.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.24",
