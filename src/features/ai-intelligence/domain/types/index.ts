@@ -249,6 +249,51 @@ export interface KgEntity {
   updatedAt: Date | string;
 }
 
+/**
+ * Competitive Radar (Task 6.3) Type Definitions
+ */
+export type DataAvailabilityStatus = "available" | "partial" | "missing" | "unavailable" | "not_applicable" | "incompatible";
+
+export interface RadarDimension {
+  name: string; // e.g. "Technical SEO", "AI Visibility"
+  definition: string;
+  rawValue: string | number | null;
+  normalizedValue: number | null; // 0 to 100
+  scale: string; // e.g. "0-100", "words", "count", "levels"
+  measurementPeriod: string;
+  comparisonContext: string;
+  status: DataAvailabilityStatus;
+  provenance: string; // source reference/service/audit identifier
+}
+
+export interface TenantRadarData {
+  tenantId: string;
+  dimensions: Record<string, RadarDimension>;
+}
+
+export interface CompetitorRadarData {
+  competitorId: string;
+  competitorName: string;
+  dimensions: Record<string, RadarDimension>;
+}
+
+export interface CompetitiveRadarSnapshot {
+  tenantData: TenantRadarData;
+  competitorData: CompetitorRadarData[];
+}
+
+export interface CompetitiveInsight {
+  type: "strength" | "weakness" | "opportunity";
+  dimension: string;
+  tenantValue: string | number | null;
+  competitiveReference: string | number | null;
+  competitiveGap: string | number | null;
+  severity: "low" | "medium" | "high" | "critical" | null;
+  measurementPeriod: string;
+  comparisonContext: string;
+  evidence: Record<string, unknown>;
+}
+
 export type CompetitiveFindingType = "technical_gap" | "content_gap" | "keyword_gap" | "topic_gap" | "structural_difference";
 export type CompetitivePositionType = "advantage" | "disadvantage" | "neutral";
 export type DifferenceDirectionType = "positive" | "negative" | "none";

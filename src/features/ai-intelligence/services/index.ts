@@ -11,3 +11,4 @@ export { CompetitorDiscoveryService } from "./competitor-discovery-service";
 export { CompetitorClassificationService } from "./competitor-classification-service";
 export { CompetitorMonitoringService } from "./competitor-monitoring-service";
 export { CompetitiveSeoService } from "./competitive-seo-service";
+export { CompetitiveRadarService } from "./competitive-radar-service";
