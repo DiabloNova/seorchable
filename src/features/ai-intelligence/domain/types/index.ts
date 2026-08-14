@@ -252,18 +252,24 @@ export interface KgEntity {
 /**
  * Competitive Radar (Task 6.3) Type Definitions
  */
-export type DataAvailabilityStatus = "available" | "partial" | "missing" | "unavailable" | "not_applicable" | "incompatible";
+export type DataAvailabilityStatus =
+  | "available"
+  | "partial"
+  | "missing"
+  | "unavailable"
+  | "not_applicable"
+  | "incompatible";
 
 export interface RadarDimension {
-  name: string; // e.g. "Technical SEO", "AI Visibility"
+  name: string;
   definition: string;
   rawValue: string | number | null;
-  normalizedValue: number | null; // 0 to 100
-  scale: string; // e.g. "0-100", "words", "count", "levels"
+  normalizedValue: number | null;
+  scale: string;
   measurementPeriod: string;
   comparisonContext: string;
   status: DataAvailabilityStatus;
-  provenance: string; // source reference/service/audit identifier
+  provenance: string;
 }
 
 export interface TenantRadarData {
@@ -294,7 +300,18 @@ export interface CompetitiveInsight {
   evidence: Record<string, unknown>;
 }
 
-export type CompetitiveFindingType = "technical_gap" | "content_gap" | "keyword_gap" | "topic_gap" | "structural_difference";
+export type CompetitiveFindingType =
+  | "technical_gap"
+  | "content_gap"
+  | "keyword_gap"
+  | "topic_gap"
+  | "structural_difference"
+  | "ai_visibility_gap"
+  | "citation_gap"
+  | "prompt_gap"
+  | "brand_mention_gap"
+  | "ai_recommendation_gap"
+  | "citation_overlap"; main
 export type CompetitivePositionType = "advantage" | "disadvantage" | "neutral";
 export type DifferenceDirectionType = "positive" | "negative" | "none";
 
