@@ -249,7 +249,18 @@ export interface KgEntity {
   updatedAt: Date | string;
 }
 
-export type CompetitiveFindingType = "technical_gap" | "content_gap" | "keyword_gap" | "topic_gap" | "structural_difference";
+export type CompetitiveFindingType =
+  | "technical_gap"
+  | "content_gap"
+  | "keyword_gap"
+  | "topic_gap"
+  | "structural_difference"
+  | "ai_visibility_gap"
+  | "citation_gap"
+  | "prompt_gap"
+  | "brand_mention_gap"
+  | "ai_recommendation_gap"
+  | "citation_overlap";
 export type CompetitivePositionType = "advantage" | "disadvantage" | "neutral";
 export type DifferenceDirectionType = "positive" | "negative" | "none";
 
