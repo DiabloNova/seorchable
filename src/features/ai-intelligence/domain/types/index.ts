@@ -848,6 +848,7 @@ export interface Page {
   indexability: "indexable" | "noindex" | "blocked_by_robots" | "non_200_status" | "canonical_mismatch" | "undetermined" | string;
   title?: string;
   description?: string;
+  contentDraft?: string; // Content Studio Foundation Draft/Body text container
   audit: AuditMetadata;
 }
 
