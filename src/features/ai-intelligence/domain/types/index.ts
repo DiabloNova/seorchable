@@ -79,12 +79,6 @@ export interface Entity {
   wikidataId?: string;
   wikipediaUrl?: string;
   confidence: ConfidenceVO; // Rich Value Object
-  aliases?: string[];
-  description?: string;
-  provenance?: Record<string, unknown>;
-  authorityScore?: number;
-  completenessScore?: number;
-  status?: string;
   audit: AuditMetadata;
 }
 
@@ -100,9 +94,6 @@ export interface EntityRelationship {
   targetEntityId: string;
   relationshipType: RelationshipType;
   confidence: ConfidenceVO; // Rich Value Object
-  direction?: "directed" | "undirected" | string;
-  provenance?: Record<string, unknown>;
-  metadata?: Record<string, unknown>;
   audit: AuditMetadata;
 }
 
@@ -305,6 +296,55 @@ export interface ContentBriefInputs {
   faqOpportunities?: FaqOpportunity[];
   competitors?: Competitor[];
   competitiveFindings?: CompetitiveSeoFinding[];
+}
+
+/**
+ * Content Gap Domain Models (Task 7.2)
+ */
+export type ContentGapType =
+  | "competitor"
+  | "topic"
+  | "entity"
+  | "keyword"
+  | "ai-answer"
+  | "citation";
+
+export interface ContentGapEvidence {
+  source: "project" | "competitor" | "seo" | "ai" | "citation";
+  signal: string;
+  value?: unknown;
+  comparator?: string;
+  reference?: string;
+}
+
+export interface ContentGapResult {
+  id: string;
+  organizationId: string;
+  type: ContentGapType;
+  target: string; // Canonical Target Name or Identifier
+  evidence: ContentGapEvidence[];
+  confidence: number; // 0.0 to 1.0
+  gapMagnitude: number; // 0.0 to 1.0
+  opportunityScore: number; // 0 to 100
+  severity: FindingSeverity; // "low" | "medium" | "high" | "critical"
+  rationale: string;
+}
+
+export interface ContentGapInputs {
+  organizationId: string;
+  projectPages?: Page[];
+  projectTopics?: Topic[];
+  projectEntities?: Entity[];
+  projectKeywords?: Keyword[];
+  competitors?: Competitor[];
+  competitorPages?: Page[];
+  competitorTopics?: Topic[];
+  competitorEntities?: Entity[];
+  competitorKeywords?: Keyword[];
+  aeoAnalysis?: AeoAnalysis;
+  faqOpportunities?: FaqOpportunity[];
+  citations?: CitationSource[];
+  citationOccurrences?: CitationOccurrence[];
 }
 
 /**
