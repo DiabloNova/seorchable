@@ -36,7 +36,7 @@ export const competitiveSeoFindingsTable: TableDefinition = {
       name: "finding_type",
       type: "TEXT",
       nullable: false,
-      description: "Finding type category (technical_gap, content_gap, keyword_gap, topic_gap, structural_difference)"
+      description: "Finding type category (technical_gap, content_gap, keyword_gap, topic_gap, structural_difference, ai_visibility_gap, citation_gap, prompt_gap, brand_mention_gap, ai_recommendation_gap, citation_overlap)"
     },
     {
       name: "comparison_scope",
@@ -132,7 +132,10 @@ CREATE TABLE IF NOT EXISTS competitive_seo_findings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   competitor_id UUID NOT NULL REFERENCES competitors(id) ON DELETE CASCADE,
-  finding_type TEXT NOT NULL CHECK (finding_type IN ('technical_gap', 'content_gap', 'keyword_gap', 'topic_gap', 'structural_difference')),
+  finding_type TEXT NOT NULL CHECK (finding_type IN (
+    'technical_gap', 'content_gap', 'keyword_gap', 'topic_gap', 'structural_difference',
+    'ai_visibility_gap', 'citation_gap', 'prompt_gap', 'brand_mention_gap', 'ai_recommendation_gap', 'citation_overlap'
+  )),
   comparison_scope TEXT NOT NULL,
   competitive_position TEXT NOT NULL CHECK (competitive_position IN ('advantage', 'disadvantage', 'neutral')),
   tenant_value TEXT,
