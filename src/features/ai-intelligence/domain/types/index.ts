@@ -249,6 +249,34 @@ export interface KgEntity {
   updatedAt: Date | string;
 }
 
+export type CompetitiveFindingType = "technical_gap" | "content_gap" | "keyword_gap" | "topic_gap" | "structural_difference";
+export type CompetitivePositionType = "advantage" | "disadvantage" | "neutral";
+export type DifferenceDirectionType = "positive" | "negative" | "none";
+
+/**
+ * Entity: CompetitiveSeoFinding
+ * Represents one structured competitive gap or advantage find between tenant and competitor.
+ */
+export interface CompetitiveSeoFinding {
+  id: string;
+  organizationId: string; // Tenant context
+  competitorId: string; // Competitor identity link
+  findingType: CompetitiveFindingType;
+  comparisonScope: string; // e.g. 'canonical_coverage'
+  competitivePosition: CompetitivePositionType;
+  tenantValue?: string;
+  competitorValue?: string;
+  difference?: number;
+  differenceDirection: DifferenceDirectionType;
+  severity: "low" | "medium" | "high" | "critical";
+  evidence: Record<string, unknown>; // supporting telemetry traces
+  sourceReference?: string; // target URLs evaluated
+  calculationMetadata: Record<string, unknown>; // intermediate values
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  version: number;
+}
+
 /**
  * AEO Content Intelligence Types (Task 5.4)
  */
