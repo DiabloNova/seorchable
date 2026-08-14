@@ -77,6 +77,12 @@ export interface Entity {
   wikidataId?: string;
   wikipediaUrl?: string;
   confidence: ConfidenceVO; // Rich Value Object
+  aliases?: string[];
+  description?: string;
+  provenance?: Record<string, unknown>;
+  authorityScore?: number;
+  completenessScore?: number;
+  status?: string;
   audit: AuditMetadata;
 }
 
@@ -92,6 +98,9 @@ export interface EntityRelationship {
   targetEntityId: string;
   relationshipType: RelationshipType;
   confidence: ConfidenceVO; // Rich Value Object
+  direction?: "directed" | "undirected" | string;
+  provenance?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
   audit: AuditMetadata;
 }
 
@@ -839,6 +848,7 @@ export interface Page {
   indexability: "indexable" | "noindex" | "blocked_by_robots" | "non_200_status" | "canonical_mismatch" | "undetermined" | string;
   title?: string;
   description?: string;
+  contentDraft?: string; // Content Studio Foundation Draft/Body text container
   audit: AuditMetadata;
 }
 
