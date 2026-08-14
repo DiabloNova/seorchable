@@ -311,7 +311,7 @@ export type CompetitiveFindingType =
   | "prompt_gap"
   | "brand_mention_gap"
   | "ai_recommendation_gap"
-  | "citation_overlap"; main
+  | "citation_overlap";
 export type CompetitivePositionType = "advantage" | "disadvantage" | "neutral";
 export type DifferenceDirectionType = "positive" | "negative" | "none";
 
