@@ -7,3 +7,6 @@ export { BrandIntelligenceService } from "./brand-intelligence-service";
 export { CitationIntelligenceService } from "./citation-intelligence-service";
 export { PromptIntelligenceService } from "./prompt-intelligence-service";
 export { AIVisibilityAuditEngine } from "./ai-visibility-audit-engine";
+export { CompetitorDiscoveryService } from "./competitor-discovery-service";
+export { CompetitorClassificationService } from "./competitor-classification-service";
+export { CompetitorMonitoringService } from "./competitor-monitoring-service";

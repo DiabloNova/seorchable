@@ -25,6 +25,7 @@ import {
   Keyword,
   Topic,
   Competitor,
+  CompetitorChange,
   HistoricalMetric,
   DiagnosticFinding,
   DiagnosticFindingRelationship,
@@ -124,6 +125,7 @@ class InMemoryDatabase {
   public keywords: Map<string, Keyword> = new Map();
   public topics: Map<string, Topic> = new Map();
   public competitors: Map<string, Competitor> = new Map();
+  public competitorChanges: Map<string, CompetitorChange> = new Map();
   public historicalMetrics: Map<string, HistoricalMetric> = new Map();
   public diagnosticFindings: Map<string, DiagnosticFinding> = new Map();
   public diagnosticFindingRelationships: DiagnosticFindingRelationship[] = [];
@@ -2431,10 +2433,59 @@ export class CompetitorRepository implements ICompetitorRepository {
     this.pg = pg || PostgresClient.getInstance();
   }
 
+  private mapRowToCompetitor(row: any): Competitor {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      name: row.name,
+      domain: row.domain,
+      status: row.status as any,
+      brandName: row.brand_name || undefined,
+      classification: row.classification as any,
+      discoverySource: row.discovery_source || undefined,
+      discoveryEvidence: typeof row.discovery_evidence === "string" ? JSON.parse(row.discovery_evidence) : (row.discovery_evidence || undefined),
+      confidence: row.confidence !== null && row.confidence !== undefined ? Number(row.confidence) : undefined,
+      firstDiscoveredAt: row.first_discovered_at,
+      lastObservedAt: row.last_observed_at,
+      lastMonitoredAt: row.last_monitored_at || undefined,
+      monitoringStatus: row.monitoring_status,
+      notesMetadata: typeof row.notes_metadata === "string" ? JSON.parse(row.notes_metadata) : (row.notes_metadata || undefined),
+      audit: {
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        createdBy: row.created_by,
+        updatedBy: row.updated_by,
+        deletedAt: row.deleted_at || undefined,
+        version: row.version
+      }
+    };
+  }
+
+  private mapRowToCompetitorChange(row: any): CompetitorChange {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      competitorId: row.competitor_id,
+      changedField: row.changed_field,
+      previousValue: row.previous_value,
+      newValue: row.new_value,
+      changeType: row.change_type,
+      observedAt: row.observed_at,
+      createdAt: row.created_at
+    };
+  }
+
   public async findById(organizationId: string, id: string): Promise<Competitor | null> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM competitors WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
-    await this.pg.query(sql, [id, organizationId]);
+    try {
+      const sql = `SELECT * FROM competitors WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToCompetitor(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[CompetitorRepository.findById Error]: fallback to memory", err);
+    }
 
     const item = db.competitors.get(id);
     if (!item || item.organizationId !== organizationId || item.audit.deletedAt) return null;
@@ -2443,8 +2494,16 @@ export class CompetitorRepository implements ICompetitorRepository {
 
   public async findByOrganizationId(organizationId: string, params?: QueryParams): Promise<PaginatedResult<Competitor>> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM competitors WHERE organization_id = $1 AND deleted_at IS NULL;`;
-    await this.pg.query(sql, [organizationId]);
+    try {
+      const sql = `SELECT * FROM competitors WHERE organization_id = $1 AND deleted_at IS NULL;`;
+      const res = await this.pg.query(sql, [organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        const mapped = res.rows.map(row => this.mapRowToCompetitor(row));
+        return paginateArray(mapped, params);
+      }
+    } catch (err) {
+      console.warn("[CompetitorRepository.findByOrganizationId Error]: fallback to memory", err);
+    }
 
     const list = Array.from(db.competitors.values()).filter(
       c => c.organizationId === organizationId && (params?.includeDeleted || !c.audit.deletedAt)
@@ -2452,30 +2511,77 @@ export class CompetitorRepository implements ICompetitorRepository {
     return paginateArray(list, params);
   }
 
+  public async findByDomain(organizationId: string, domain: string): Promise<Competitor | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM competitors WHERE LOWER(domain) = LOWER($1) AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      const res = await this.pg.query(sql, [domain, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToCompetitor(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[CompetitorRepository.findByDomain Error]: fallback to memory", err);
+    }
+
+    for (const item of db.competitors.values()) {
+      if (item.domain.toLowerCase() === domain.toLowerCase() && item.organizationId === organizationId && !item.audit.deletedAt) {
+        return item;
+      }
+    }
+    return null;
+  }
+
   public async save(competitor: Competitor): Promise<Competitor> {
     enforceTenantContext(competitor.organizationId);
-    const sql = `
-      INSERT INTO competitors (id, organization_id, name, domain, status, created_at, updated_at, created_by, updated_by, version)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-      ON CONFLICT (organization_id, domain) DO UPDATE SET
-        name = EXCLUDED.name,
-        status = EXCLUDED.status,
-        updated_at = EXCLUDED.updated_at,
-        updated_by = EXCLUDED.updated_by,
-        version = competitors.version + 1;
-    `;
-    await this.pg.query(sql, [
-      competitor.id,
-      competitor.organizationId,
-      competitor.name,
-      competitor.domain,
-      competitor.status,
-      competitor.audit.createdAt,
-      competitor.audit.updatedAt,
-      competitor.audit.createdBy,
-      competitor.audit.updatedBy,
-      competitor.audit.version
-    ]);
+    try {
+      const sql = `
+        INSERT INTO competitors (
+          id, organization_id, name, domain, status, brand_name, classification,
+          discovery_source, discovery_evidence, confidence, first_discovered_at,
+          last_observed_at, last_monitored_at, monitoring_status, notes_metadata,
+          created_at, updated_at, created_by, updated_by, version
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+        ON CONFLICT (organization_id, domain) DO UPDATE SET
+          name = EXCLUDED.name,
+          status = EXCLUDED.status,
+          brand_name = EXCLUDED.brand_name,
+          classification = EXCLUDED.classification,
+          discovery_source = EXCLUDED.discovery_source,
+          discovery_evidence = EXCLUDED.discovery_evidence,
+          confidence = EXCLUDED.confidence,
+          last_observed_at = EXCLUDED.last_observed_at,
+          last_monitored_at = EXCLUDED.last_monitored_at,
+          monitoring_status = EXCLUDED.monitoring_status,
+          notes_metadata = EXCLUDED.notes_metadata,
+          updated_at = EXCLUDED.updated_at,
+          updated_by = EXCLUDED.updated_by,
+          version = competitors.version + 1;
+      `;
+      await this.pg.query(sql, [
+        competitor.id,
+        competitor.organizationId,
+        competitor.name,
+        competitor.domain,
+        competitor.status,
+        competitor.brandName || null,
+        competitor.classification,
+        competitor.discoverySource || null,
+        competitor.discoveryEvidence ? JSON.stringify(competitor.discoveryEvidence) : null,
+        competitor.confidence !== undefined ? competitor.confidence : null,
+        competitor.firstDiscoveredAt || new Date().toISOString(),
+        competitor.lastObservedAt || new Date().toISOString(),
+        competitor.lastMonitoredAt || null,
+        competitor.monitoringStatus,
+        competitor.notesMetadata ? JSON.stringify(competitor.notesMetadata) : null,
+        competitor.audit.createdAt,
+        competitor.audit.updatedAt,
+        competitor.audit.createdBy,
+        competitor.audit.updatedBy,
+        competitor.audit.version
+      ]);
+    } catch (err) {
+      console.warn("[CompetitorRepository.save Error]: fallback to memory", err);
+    }
 
     db.competitors.set(competitor.id, competitor);
     return competitor;
@@ -2483,8 +2589,12 @@ export class CompetitorRepository implements ICompetitorRepository {
 
   public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
-    const sql = `UPDATE competitors SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
-    await this.pg.query(sql, [deletedBy, id, organizationId]);
+    try {
+      const sql = `UPDATE competitors SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+      await this.pg.query(sql, [deletedBy, id, organizationId]);
+    } catch (err) {
+      console.warn("[CompetitorRepository.deleteSoft Error]: fallback to memory", err);
+    }
 
     const item = db.competitors.get(id);
     if (!item || item.organizationId !== organizationId) return false;
@@ -2492,6 +2602,50 @@ export class CompetitorRepository implements ICompetitorRepository {
     item.audit.updatedBy = deletedBy;
     item.audit.updatedAt = new Date().toISOString();
     return true;
+  }
+
+  public async saveChange(change: CompetitorChange): Promise<CompetitorChange> {
+    enforceTenantContext(change.organizationId);
+    try {
+      const sql = `
+        INSERT INTO competitor_changes (
+          id, organization_id, competitor_id, changed_field, previous_value, new_value, change_type, observed_at, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+      `;
+      await this.pg.query(sql, [
+        change.id,
+        change.organizationId,
+        change.competitorId,
+        change.changedField,
+        change.previousValue,
+        change.newValue,
+        change.changeType,
+        change.observedAt,
+        change.createdAt
+      ]);
+    } catch (err) {
+      console.warn("[CompetitorRepository.saveChange Error]: fallback to memory", err);
+    }
+
+    db.competitorChanges.set(change.id, change);
+    return change;
+  }
+
+  public async findChangesByCompetitorId(organizationId: string, competitorId: string): Promise<CompetitorChange[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM competitor_changes WHERE competitor_id = $1 AND organization_id = $2 ORDER BY observed_at DESC;`;
+      const res = await this.pg.query(sql, [competitorId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToCompetitorChange(row));
+      }
+    } catch (err) {
+      console.warn("[CompetitorRepository.findChangesByCompetitorId Error]: fallback to memory", err);
+    }
+
+    return Array.from(db.competitorChanges.values())
+      .filter(c => c.competitorId === competitorId && c.organizationId === organizationId)
+      .sort((a, b) => new Date(b.observedAt).getTime() - new Date(a.observedAt).getTime());
   }
 }
 
