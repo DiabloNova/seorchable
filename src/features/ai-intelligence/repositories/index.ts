@@ -26,6 +26,7 @@ import {
   Topic,
   Competitor,
   CompetitorChange,
+  CompetitiveSeoFinding,
   HistoricalMetric,
   DiagnosticFinding,
   DiagnosticFindingRelationship,
@@ -62,6 +63,7 @@ import {
   IKeywordRepository,
   ITopicRepository,
   ICompetitorRepository,
+  ICompetitiveSeoFindingRepository,
   IHistoricalMetricRepository,
   IDiagnosticFindingRepository,
   IAIVisibilityAuditRepository,
@@ -126,6 +128,7 @@ class InMemoryDatabase {
   public topics: Map<string, Topic> = new Map();
   public competitors: Map<string, Competitor> = new Map();
   public competitorChanges: Map<string, CompetitorChange> = new Map();
+  public competitiveSeoFindings: Map<string, CompetitiveSeoFinding> = new Map();
   public historicalMetrics: Map<string, HistoricalMetric> = new Map();
   public diagnosticFindings: Map<string, DiagnosticFinding> = new Map();
   public diagnosticFindingRelationships: DiagnosticFindingRelationship[] = [];
@@ -2646,6 +2649,162 @@ export class CompetitorRepository implements ICompetitorRepository {
     return Array.from(db.competitorChanges.values())
       .filter(c => c.competitorId === competitorId && c.organizationId === organizationId)
       .sort((a, b) => new Date(b.observedAt).getTime() - new Date(a.observedAt).getTime());
+  }
+}
+
+export class CompetitiveSeoFindingRepository implements ICompetitiveSeoFindingRepository {
+  private pg: PostgresClient;
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  private mapRowToFinding(row: any): CompetitiveSeoFinding {
+    return {
+      id: row.id,
+      organizationId: row.organization_id,
+      competitorId: row.competitor_id,
+      findingType: row.finding_type as any,
+      comparisonScope: row.comparison_scope,
+      competitivePosition: row.competitive_position as any,
+      tenantValue: row.tenant_value || undefined,
+      competitorValue: row.competitor_value || undefined,
+      difference: row.difference !== null && row.difference !== undefined ? Number(row.difference) : undefined,
+      differenceDirection: row.difference_direction as any,
+      severity: row.severity as any,
+      evidence: typeof row.evidence === "string" ? JSON.parse(row.evidence) : (row.evidence || {}),
+      sourceReference: row.source_reference || undefined,
+      calculationMetadata: typeof row.calculation_metadata === "string" ? JSON.parse(row.calculation_metadata) : (row.calculation_metadata || {}),
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      version: row.version
+    };
+  }
+
+  public async findById(organizationId: string, id: string): Promise<CompetitiveSeoFinding | null> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM competitive_seo_findings WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return this.mapRowToFinding(res.rows[0]);
+      }
+    } catch (err) {
+      console.warn("[CompetitiveSeoFindingRepository.findById Error]: fallback to memory", err);
+    }
+
+    const item = db.competitiveSeoFindings.get(id);
+    if (!item || item.organizationId !== organizationId) return null;
+    return item;
+  }
+
+  public async findByCompetitorId(organizationId: string, competitorId: string): Promise<CompetitiveSeoFinding[]> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM competitive_seo_findings WHERE competitor_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [competitorId, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToFinding(row));
+      }
+    } catch (err) {
+      console.warn("[CompetitiveSeoFindingRepository.findByCompetitorId Error]: fallback to memory", err);
+    }
+
+    return Array.from(db.competitiveSeoFindings.values())
+      .filter(f => f.competitorId === competitorId && f.organizationId === organizationId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  public async findByOrganizationId(organizationId: string, params?: QueryParams): Promise<PaginatedResult<CompetitiveSeoFinding>> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `SELECT * FROM competitive_seo_findings WHERE organization_id = $1 ORDER BY created_at DESC;`;
+      const res = await this.pg.query(sql, [organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        const mapped = res.rows.map(row => this.mapRowToFinding(row));
+        return paginateArray(mapped, params);
+      }
+    } catch (err) {
+      console.warn("[CompetitiveSeoFindingRepository.findByOrganizationId Error]: fallback to memory", err);
+    }
+
+    const list = Array.from(db.competitiveSeoFindings.values()).filter(
+      f => f.organizationId === organizationId
+    ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return paginateArray(list, params);
+  }
+
+  public async save(finding: CompetitiveSeoFinding): Promise<CompetitiveSeoFinding> {
+    enforceTenantContext(finding.organizationId);
+    try {
+      const sql = `
+        INSERT INTO competitive_seo_findings (
+          id, organization_id, competitor_id, finding_type, comparison_scope, competitive_position,
+          tenant_value, competitor_value, difference, difference_direction, severity,
+          evidence, source_reference, calculation_metadata, created_at, updated_at, version
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+        ON CONFLICT (id) DO UPDATE SET
+          finding_type = EXCLUDED.finding_type,
+          comparison_scope = EXCLUDED.comparison_scope,
+          competitive_position = EXCLUDED.competitive_position,
+          tenant_value = EXCLUDED.tenant_value,
+          competitor_value = EXCLUDED.competitor_value,
+          difference = EXCLUDED.difference,
+          difference_direction = EXCLUDED.difference_direction,
+          severity = EXCLUDED.severity,
+          evidence = EXCLUDED.evidence,
+          source_reference = EXCLUDED.source_reference,
+          calculation_metadata = EXCLUDED.calculation_metadata,
+          updated_at = EXCLUDED.updated_at,
+          version = competitive_seo_findings.version + 1;
+      `;
+      await this.pg.query(sql, [
+        finding.id,
+        finding.organizationId,
+        finding.competitorId,
+        finding.findingType,
+        finding.comparisonScope,
+        finding.competitivePosition,
+        finding.tenantValue || null,
+        finding.competitorValue || null,
+        finding.difference !== undefined ? finding.difference : null,
+        finding.differenceDirection,
+        finding.severity,
+        JSON.stringify(finding.evidence),
+        finding.sourceReference || null,
+        JSON.stringify(finding.calculationMetadata),
+        finding.createdAt,
+        finding.updatedAt,
+        finding.version
+      ]);
+    } catch (err) {
+      console.warn("[CompetitiveSeoFindingRepository.save Error]: fallback to memory", err);
+    }
+
+    db.competitiveSeoFindings.set(finding.id, finding);
+    return finding;
+  }
+
+  public async deleteSoft(organizationId: string, id: string): Promise<boolean> {
+    enforceTenantContext(organizationId);
+    try {
+      const sql = `DELETE FROM competitive_seo_findings WHERE id = $1 AND organization_id = $2;`;
+      const res = await this.pg.query(sql, [id, organizationId]);
+      if (res.rowCount && res.rowCount > 0) {
+        db.competitiveSeoFindings.delete(id);
+        return true;
+      }
+    } catch (err) {
+      console.warn("[CompetitiveSeoFindingRepository.deleteSoft Error]: fallback to memory", err);
+    }
+
+    if (db.competitiveSeoFindings.has(id)) {
+      const item = db.competitiveSeoFindings.get(id);
+      if (item && item.organizationId === organizationId) {
+        db.competitiveSeoFindings.delete(id);
+        return true;
+      }
+    }
+    return false;
   }
 }
 

@@ -23,6 +23,7 @@ import {
   Topic,
   Competitor,
   CompetitorChange,
+  CompetitiveSeoFinding,
   HistoricalMetric,
   DiagnosticFinding,
   DiagnosticFindingRelationship,
@@ -175,6 +176,14 @@ export interface ICompetitorRepository {
   // Competitor Changes
   saveChange(change: CompetitorChange): Promise<CompetitorChange>;
   findChangesByCompetitorId(organizationId: string, competitorId: string): Promise<CompetitorChange[]>;
+}
+
+export interface ICompetitiveSeoFindingRepository {
+  findById(organizationId: string, id: string): Promise<CompetitiveSeoFinding | null>;
+  findByCompetitorId(organizationId: string, competitorId: string): Promise<CompetitiveSeoFinding[]>;
+  findByOrganizationId(organizationId: string, params?: QueryParams): Promise<PaginatedResult<CompetitiveSeoFinding>>;
+  save(finding: CompetitiveSeoFinding): Promise<CompetitiveSeoFinding>;
+  deleteSoft(organizationId: string, id: string): Promise<boolean>;
 }
 
 export interface IHistoricalMetricRepository {
