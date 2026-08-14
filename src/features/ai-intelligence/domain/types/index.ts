@@ -311,7 +311,7 @@ export type CompetitiveFindingType =
   | "prompt_gap"
   | "brand_mention_gap"
   | "ai_recommendation_gap"
-  | "citation_overlap"; main
+  | "citation_overlap";
 export type CompetitivePositionType = "advantage" | "disadvantage" | "neutral";
 export type DifferenceDirectionType = "positive" | "negative" | "none";
 
@@ -839,6 +839,7 @@ export interface Page {
   indexability: "indexable" | "noindex" | "blocked_by_robots" | "non_200_status" | "canonical_mismatch" | "undetermined" | string;
   title?: string;
   description?: string;
+  contentDraft?: string; // Content Studio Foundation Draft/Body text container
   audit: AuditMetadata;
 }
 
