@@ -62,7 +62,7 @@ ALTER TABLE entities ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'acti
 
 CREATE INDEX IF NOT EXISTS idx_entities_organization ON entities(organization_id);
 CREATE INDEX IF NOT EXISTS idx_entities_brand ON entities(brand_id);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_entities_wikidata ON entities(wikidata_id) WHERE wikidata_id IS NOT NULL AND deleted_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_entities_wikidata ON entities(organization_id, wikidata_id) WHERE wikidata_id IS NOT NULL AND deleted_at IS NULL;
 
 -- Enable Row Level Security (RLS) for zero-trust tenant isolation
 ALTER TABLE entities ENABLE ROW LEVEL SECURITY;
