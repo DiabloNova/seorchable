@@ -1,12 +1,11 @@
 /**
  * Optimus AI — RAG Query Service
  * Orchestrates query embedding, multi-tenant context retrieval, prompt construction, and LLM query answering.
- * Delegated to RAGIntelligenceService for Phase 8 Task 8.2 with full backward compatibility.
  */
 
+import { getLLMClient } from "../ai/llm-client";
 import { embedQuery } from "../ai/query-embedding";
 import { retrieveRelevantContext, RetrievedChunk } from "./context-retrieval";
-import { RAGIntelligenceService } from "./rag-intelligence-service";
 
 export interface RAGResponse {
   answer: string;
@@ -45,20 +44,37 @@ export async function answerQuestion(
     throw new Error("Tenant context violation: organizationId must be provided for RAG Query Service");
   }
 
-  const ragService = new RAGIntelligenceService();
-  const result = await ragService.executeRAGQuery({
-    query: question,
-    options: { topK: limit }
-  });
-
-  // Calculate top similarity confidence
+  // 1. Convert question to vector embedding (768 dimensions)
   const queryEmbedding = await embedQuery(question);
+
+  // 2. Retrieve top-K relevant chunks under strict tenant isolation
   const sources = await retrieveRelevantContext(queryEmbedding, organizationId, limit);
+
+  // 3. Compute overall confidence score based on the highest similarity score (Top 1)
   const confidence = sources.length > 0 ? Math.max(0, Math.min(1, sources[0].similarityScore)) : 0;
 
+  // 4. Construct context text
+  let contextText = "No relevant context found in brand intelligence data.";
+  if (sources.length > 0) {
+    contextText = sources
+      .map((source, index) => `[Source ${index + 1}] ID: ${source.id}\nContent: ${source.content}`)
+      .join("\n\n");
+  }
+
+  // 5. Construct the prompt
+  const finalPrompt = RAG_SYSTEM_PROMPT
+    .replace("{context}", contextText)
+    .replace("{question}", question);
+
+  // 6. Execute LLM Call using abstract client
+  const llm = getLLMClient();
+  const answer = await llm.generateText(finalPrompt, {
+    temperature: 0.1, // Low temperature for factual RAG responses and minimal hallucination
+  });
+
   return {
-    answer: result.answer || "I don't have enough information to answer this question based on the available data.",
+    answer,
     sources,
-    confidence
+    confidence,
   };
 }

@@ -250,6 +250,70 @@ export interface KgEntity {
 }
 
 /**
+ * Task 9.2 — Site Architecture Intelligence Domain Types
+ */
+export interface SiteArchitectureInput {
+  pages: Page[];
+  links: Array<{
+    sourceUrl: string;
+    targetUrl: string;
+    normalizedTargetUrl: string;
+    anchorText?: string;
+    rel?: string | null;
+  }>;
+  seoSignalsMap?: Record<string, unknown>; // URL -> SeoSignals
+  rootUrl?: string; // Optional entry root URL override
+}
+
+export type SiteArchitectureCategory =
+  | "site-structure"
+  | "crawl-depth"
+  | "internal-linking"
+  | "orphan-page"
+  | "content-hierarchy"
+  | "architecture";
+
+export interface CrawlDepthResult {
+  url: string;
+  crawlDepth: number; // 0 for root
+  pathFromRoot: string[];
+  isReachableFromRoot: boolean;
+}
+
+export interface SiteArchitectureFinding {
+  id: string;
+  organizationId: string;
+  websiteId: string;
+  category: SiteArchitectureCategory;
+  code: string;
+  title: string;
+  explanation: string;
+  severity: FindingSeverity;
+  confidence: FindingConfidence;
+  affectedResource: string;
+  evidence: Record<string, unknown>;
+  recommendation: {
+    action: string;
+    description: string;
+    impact: string;
+  };
+}
+
+export interface SiteArchitectureAnalysisResult {
+  findings: SiteArchitectureFinding[];
+  crawlDepths: CrawlDepthResult[];
+  orphanCandidates: string[];
+  metrics: {
+    totalPagesAnalyzed: number;
+    totalInternalLinks: number;
+    maxCrawlDepth: number;
+    avgCrawlDepth: number;
+    orphanPageCount: number;
+    deepPagesCount: number; // Depth > 3
+  };
+}
+
+/**
  * Task 9.1 — Keyword Intelligence Domain Types
  */
 export type KeywordSource = "content" | "title" | "heading" | "competitor" | "prompt" | "entity" | "topic";
@@ -326,101 +390,6 @@ export interface KeywordIntelligenceResult {
 }
 
 /**
-/**
- * Content Brief Domain Models (Task 7.1)
- */
-export interface ContentBriefSection {
-  sectionHeading: string;
-  sectionPurpose: string;
-  targetTopics: string[];
-  targetEntities: string[];
-  targetKeywords: string[];
-  targetQuestions: string[];
-}
-
-export interface ContentBrief {
-  id: string;
-  organizationId: string;
-  targetTopic: string;
-  primaryIntent: PromptIntentType | string;
-  secondaryIntents: (PromptIntentType | string)[];
-  primaryTopic: Topic | null;
-  supportingTopics: Topic[];
-  entities: Entity[];
-  primaryKeywords: Keyword[];
-  secondaryKeywords: Keyword[];
-  questions: string[];
-  competitors: Competitor[];
-  recommendedStructure: ContentBriefSection[];
-  provenance: {
-    engineVersion: string;
-    deterministicRulesApplied: string[];
-  };
-}
-
-export interface ContentBriefInputs {
-  organizationId: string;
-  targetTopic: string;
-  primaryIntent?: PromptIntentType | string;
-  secondaryIntents?: (PromptIntentType | string)[];
-  seoSignals?: SeoSignals;
-  aeoAnalysis?: AeoAnalysis;
-  topics?: Topic[];
-  entities?: Entity[];
-  keywords?: Keyword[];
-  faqOpportunities?: FaqOpportunity[];
-  competitors?: Competitor[];
-  competitiveFindings?: CompetitiveSeoFinding[];
-}
-
-/**
- * Content Gap Domain Models (Task 7.2)
- */
-export type ContentGapType =
-  | "competitor"
-  | "topic"
-  | "entity"
-  | "keyword"
-  | "ai-answer"
-  | "citation";
-
-export interface ContentGapEvidence {
-  source: "project" | "competitor" | "seo" | "ai" | "citation";
-  signal: string;
-  value?: unknown;
-  comparator?: string;
-  reference?: string;
-}
-
-export interface ContentGapResult {
-  id: string;
-  organizationId: string;
-  type: ContentGapType;
-  target: string;
-  evidence: ContentGapEvidence[];
-  confidence: number;
-  gapMagnitude: number;
-  opportunityScore: number;
-  severity: FindingSeverity;
-  rationale: string;
-}
-
-export interface ContentGapInputs {
-  organizationId: string;
-  projectPages?: Page[];
-  projectTopics?: Topic[];
-  projectEntities?: Entity[];
-  projectKeywords?: Keyword[];
-  competitors?: Competitor[];
-  competitorPages?: Page[];
-  competitorTopics?: Topic[];
-  competitorEntities?: Entity[];
-  competitorKeywords?: Keyword[];
-  aeoAnalysis?: AeoAnalysis;
-  faqOpportunities?: FaqOpportunity[];
-  citations?: CitationSource[];
-  citationOccurrences?: CitationOccurrence[];
-} main
  * Competitive Radar (Task 6.3) Type Definitions
  */
 export type DataAvailabilityStatus =
