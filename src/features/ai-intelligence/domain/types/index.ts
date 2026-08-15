@@ -257,7 +257,69 @@ export interface KgEntity {
   createdAt: Date | string;
   updatedAt: Date | string;
 }
+/**
+ * Task 9.2 — Site Architecture Intelligence Domain Types
+ */
+export interface SiteArchitectureInput {
+  pages: Page[];
+  links: Array<{
+    sourceUrl: string;
+    targetUrl: string;
+    normalizedTargetUrl: string;
+    anchorText?: string;
+    rel?: string | null;
+  }>;
+  seoSignalsMap?: Record<string, unknown>; // URL -> SeoSignals
+  rootUrl?: string; // Optional entry root URL override
+}
 
+export type SiteArchitectureCategory =
+  | "site-structure"
+  | "crawl-depth"
+  | "internal-linking"
+  | "orphan-page"
+  | "content-hierarchy"
+  | "architecture";
+
+export interface CrawlDepthResult {
+  url: string;
+  crawlDepth: number; // 0 for root
+  pathFromRoot: string[];
+  isReachableFromRoot: boolean;
+}
+
+export interface SiteArchitectureFinding {
+  id: string;
+  organizationId: string;
+  websiteId: string;
+  category: SiteArchitectureCategory;
+  code: string;
+  title: string;
+  explanation: string;
+  severity: FindingSeverity;
+  confidence: FindingConfidence;
+  affectedResource: string;
+  evidence: Record<string, unknown>;
+  recommendation: {
+    action: string;
+    description: string;
+    impact: string;
+  };
+}
+
+export interface SiteArchitectureAnalysisResult {
+  findings: SiteArchitectureFinding[];
+  crawlDepths: CrawlDepthResult[];
+  orphanCandidates: string[];
+  metrics: {
+    totalPagesAnalyzed: number;
+    totalInternalLinks: number;
+    maxCrawlDepth: number;
+    avgCrawlDepth: number;
+    orphanPageCount: number;
+    deepPagesCount: number; // Depth > 3
+  };
+}
 /**
  * LLM Analytics Domain Interfaces (Task 8.3)
  * Task 9.1 — Keyword Intelligence Domain Types

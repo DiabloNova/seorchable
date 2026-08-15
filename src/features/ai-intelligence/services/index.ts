@@ -15,6 +15,4 @@ export { CompetitiveAiService } from "./competitive-ai-service";
 export { CompetitiveRadarService } from "./competitive-radar-service";
 export { LLMAnalyticsService } from "./llm-analytics-service";
 export { KeywordIntelligenceService, normalizeKeyword, classifySearchIntent, calculateOpportunityScore } from "./keyword-intelligence-service";
-
-export { ContentBriefEngine } from "./content-brief-engine";
-export { ContentGapEngine } from "./content-gap-engine";
+export { SiteArchitectureAnalyzerService, normalizeGraphUrl } from "./site-architecture-analyzer-service";
