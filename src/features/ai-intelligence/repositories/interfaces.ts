@@ -73,7 +73,6 @@ export interface IBrandRepository {
 
 export interface IEntityRepository {
   findById(organizationId: string, id: string): Promise<Entity | null>;
-  findByName(organizationId: string, name: string): Promise<Entity | null>;
   findByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<Entity>>;
   save(entity: Entity): Promise<Entity>;
   deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;

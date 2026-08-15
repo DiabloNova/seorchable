@@ -3027,78 +3027,8 @@ export class PostgresDiagnosticFindingRepository implements IDiagnosticFindingRe
 }
 
 export class EntityRepository implements IEntityRepository {
-  private pg: PostgresClient;
-
-  constructor(pg?: PostgresClient) {
-    this.pg = pg || PostgresClient.getInstance();
-  }
-
-  private mapRowToEntity(row: any): Entity {
-    return {
-      id: row.id,
-      organizationId: row.organization_id,
-      brandId: row.brand_id,
-      name: row.name,
-      type: row.type,
-      wikidataId: row.wikidata_id || undefined,
-      wikipediaUrl: row.wikipedia_url || undefined,
-      aliases: row.aliases || undefined,
-      description: row.description || undefined,
-      provenance: typeof row.provenance === "string" ? JSON.parse(row.provenance) : (row.provenance || undefined),
-      authorityScore: row.authority_score !== null && row.authority_score !== undefined ? Number(row.authority_score) : undefined,
-      completenessScore: row.completeness_score !== null && row.completeness_score !== undefined ? Number(row.completeness_score) : undefined,
-      status: row.status || undefined,
-      confidence: {
-        score: Number(row.confidence_score),
-        rating: row.confidence_rating as "high" | "medium" | "low"
-      },
-      audit: {
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-        createdBy: row.created_by,
-        updatedBy: row.updated_by,
-        deletedAt: row.deleted_at || undefined,
-        version: row.version
-      }
-    };
-  }
-
-  private mapRowToRelationship(row: any): EntityRelationship {
-    return {
-      organizationId: row.organization_id,
-      sourceEntityId: row.source_entity_id,
-      targetEntityId: row.target_entity_id,
-      relationshipType: row.relationship_type as RelationshipType,
-      direction: row.direction || undefined,
-      provenance: typeof row.provenance === "string" ? JSON.parse(row.provenance) : (row.provenance || undefined),
-      metadata: typeof row.metadata === "string" ? JSON.parse(row.metadata) : (row.metadata || undefined),
-      confidence: {
-        score: Number(row.confidence_score),
-        rating: row.confidence_rating as "high" | "medium" | "low"
-      },
-      audit: {
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-        createdBy: row.created_by,
-        updatedBy: row.updated_by,
-        deletedAt: row.deleted_at || undefined,
-        version: row.version
-      }
-    };
-  }
-
   public async findById(organizationId: string, id: string): Promise<Entity | null> {
     enforceTenantContext(organizationId);
-    try {
-      const sql = `SELECT * FROM entities WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
-      const res = await this.pg.query(sql, [id, organizationId]);
-      if (res.rowCount && res.rowCount > 0) {
-        return this.mapRowToEntity(res.rows[0]);
-      }
-    } catch (err) {
-      console.warn("[EntityRepository.findById] falling back to memory store.", err);
-    }
-
     const entity = db.entities.get(id);
     if (!entity || entity.organizationId !== organizationId || entity.audit.deletedAt) {
       return null;
@@ -3106,43 +3036,8 @@ export class EntityRepository implements IEntityRepository {
     return entity;
   }
 
-  public async findByName(organizationId: string, name: string): Promise<Entity | null> {
-    enforceTenantContext(organizationId);
-    try {
-      const sql = `SELECT * FROM entities WHERE LOWER(name) = LOWER($1) AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
-      const res = await this.pg.query(sql, [name.trim(), organizationId]);
-      if (res.rowCount && res.rowCount > 0) {
-        return this.mapRowToEntity(res.rows[0]);
-      }
-    } catch (err) {
-      console.warn("[EntityRepository.findByName] falling back to memory store.", err);
-    }
-
-    for (const entity of db.entities.values()) {
-      if (
-        entity.name.toLowerCase().trim() === name.trim().toLowerCase() &&
-        entity.organizationId === organizationId &&
-        !entity.audit.deletedAt
-      ) {
-        return entity;
-      }
-    }
-    return null;
-  }
-
   public async findByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<Entity>> {
     enforceTenantContext(organizationId);
-    try {
-      const sql = `SELECT * FROM entities WHERE brand_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at DESC;`;
-      const res = await this.pg.query(sql, [brandId, organizationId]);
-      if (res.rowCount && res.rowCount > 0) {
-        const mapped = res.rows.map(row => this.mapRowToEntity(row));
-        return paginateArray(mapped, params);
-      }
-    } catch (err) {
-      console.warn("[EntityRepository.findByBrandId] falling back to memory store.", err);
-    }
-
     const list = Array.from(db.entities.values()).filter(
       e => e.organizationId === organizationId && e.brandId === brandId && (params?.includeDeleted || !e.audit.deletedAt)
     );
@@ -3151,56 +3046,6 @@ export class EntityRepository implements IEntityRepository {
 
   public async save(entity: Entity): Promise<Entity> {
     enforceTenantContext(entity.organizationId);
-    try {
-      const sql = `
-        INSERT INTO entities (
-          id, organization_id, brand_id, name, type, wikidata_id, wikipedia_url,
-          aliases, description, provenance, authority_score, completeness_score, status,
-          confidence_score, confidence_rating, created_at, updated_at, created_by, updated_by, version
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
-        ON CONFLICT (id) DO UPDATE SET
-          name = EXCLUDED.name,
-          type = EXCLUDED.type,
-          wikidata_id = EXCLUDED.wikidata_id,
-          wikipedia_url = EXCLUDED.wikipedia_url,
-          aliases = EXCLUDED.aliases,
-          description = EXCLUDED.description,
-          provenance = EXCLUDED.provenance,
-          authority_score = EXCLUDED.authority_score,
-          completeness_score = EXCLUDED.completeness_score,
-          status = EXCLUDED.status,
-          confidence_score = EXCLUDED.confidence_score,
-          confidence_rating = EXCLUDED.confidence_rating,
-          updated_at = EXCLUDED.updated_at,
-          updated_by = EXCLUDED.updated_by,
-          version = EXCLUDED.version;
-      `;
-      await this.pg.query(sql, [
-        entity.id,
-        entity.organizationId,
-        entity.brandId,
-        entity.name,
-        entity.type,
-        entity.wikidataId || null,
-        entity.wikipediaUrl || null,
-        entity.aliases || null,
-        entity.description || null,
-        entity.provenance ? JSON.stringify(entity.provenance) : null,
-        entity.authorityScore !== undefined ? entity.authorityScore : 0.0,
-        entity.completenessScore !== undefined ? entity.completenessScore : 0.0,
-        entity.status || "active",
-        entity.confidence.score,
-        entity.confidence.rating,
-        entity.audit.createdAt,
-        entity.audit.updatedAt,
-        entity.audit.createdBy,
-        entity.audit.updatedBy,
-        entity.audit.version
-      ]);
-    } catch (err) {
-      console.warn("[EntityRepository.save] falling back to memory store.", err);
-    }
-
     const existing = db.entities.get(entity.id);
     if (existing && existing.organizationId !== entity.organizationId) {
       throw new Error("Tenant Isolation Exception: Cannot modify or change tenant ownership for existing Entity.");
@@ -3211,22 +3056,6 @@ export class EntityRepository implements IEntityRepository {
 
   public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
-    try {
-      const sql = `UPDATE entities SET deleted_at = NOW(), updated_by = $1, updated_at = NOW() WHERE id = $2 AND organization_id = $3;`;
-      const res = await this.pg.query(sql, [deletedBy, id, organizationId]);
-      if (res.rowCount && res.rowCount > 0) {
-        const item = db.entities.get(id);
-        if (item) {
-          item.audit.deletedAt = new Date().toISOString();
-          item.audit.updatedBy = deletedBy;
-          item.audit.updatedAt = new Date().toISOString();
-        }
-        return true;
-      }
-    } catch (err) {
-      console.warn("[EntityRepository.deleteSoft] falling back to memory store.", err);
-    }
-
     const entity = db.entities.get(id);
     if (!entity || entity.organizationId !== organizationId) return false;
     entity.audit.deletedAt = new Date().toISOString();
@@ -3237,16 +3066,6 @@ export class EntityRepository implements IEntityRepository {
 
   public async getRelationships(organizationId: string): Promise<EntityRelationship[]> {
     enforceTenantContext(organizationId);
-    try {
-      const sql = `SELECT * FROM entity_relationships WHERE organization_id = $1 AND deleted_at IS NULL;`;
-      const res = await this.pg.query(sql, [organizationId]);
-      if (res.rowCount && res.rowCount > 0) {
-        return res.rows.map(row => this.mapRowToRelationship(row));
-      }
-    } catch (err) {
-      console.warn("[EntityRepository.getRelationships] falling back to memory store.", err);
-    }
-
     return db.relationships.filter(
       r => r.organizationId === organizationId && !r.audit.deletedAt
     );
@@ -3254,43 +3073,6 @@ export class EntityRepository implements IEntityRepository {
 
   public async saveRelationship(relationship: EntityRelationship): Promise<EntityRelationship> {
     enforceTenantContext(relationship.organizationId);
-    try {
-      const sql = `
-        INSERT INTO entity_relationships (
-          organization_id, source_entity_id, target_entity_id, relationship_type,
-          direction, provenance, metadata, confidence_score, confidence_rating,
-          created_at, updated_at, created_by, updated_by, version
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-        ON CONFLICT (source_entity_id, target_entity_id, relationship_type) DO UPDATE SET
-          direction = EXCLUDED.direction,
-          provenance = EXCLUDED.provenance,
-          metadata = EXCLUDED.metadata,
-          confidence_score = EXCLUDED.confidence_score,
-          confidence_rating = EXCLUDED.confidence_rating,
-          updated_at = EXCLUDED.updated_at,
-          updated_by = EXCLUDED.updated_by,
-          version = EXCLUDED.version;
-      `;
-      await this.pg.query(sql, [
-        relationship.organizationId,
-        relationship.sourceEntityId,
-        relationship.targetEntityId,
-        relationship.relationshipType,
-        relationship.direction || "directed",
-        relationship.provenance ? JSON.stringify(relationship.provenance) : null,
-        relationship.metadata ? JSON.stringify(relationship.metadata) : null,
-        relationship.confidence.score,
-        relationship.confidence.rating,
-        relationship.audit.createdAt,
-        relationship.audit.updatedAt,
-        relationship.audit.createdBy,
-        relationship.audit.updatedBy,
-        relationship.audit.version
-      ]);
-    } catch (err) {
-      console.warn("[EntityRepository.saveRelationship] falling back to memory store.", err);
-    }
-
     const existing = db.relationships.find(
       r => r.sourceEntityId === relationship.sourceEntityId &&
            r.targetEntityId === relationship.targetEntityId &&
@@ -3310,22 +3092,6 @@ export class EntityRepository implements IEntityRepository {
 
   public async deleteRelationship(organizationId: string, sourceId: string, targetId: string, type: RelationshipType): Promise<boolean> {
     enforceTenantContext(organizationId);
-    try {
-      const sql = `DELETE FROM entity_relationships WHERE organization_id = $1 AND source_entity_id = $2 AND target_entity_id = $3 AND relationship_type = $4;`;
-      const res = await this.pg.query(sql, [organizationId, sourceId, targetId, type]);
-      if (res.rowCount && res.rowCount > 0) {
-        db.relationships = db.relationships.filter(
-          r => !(r.organizationId === organizationId &&
-                 r.sourceEntityId === sourceId &&
-                 r.targetEntityId === targetId &&
-                 r.relationshipType === type)
-        );
-        return true;
-      }
-    } catch (err) {
-      console.warn("[EntityRepository.deleteRelationship] falling back to memory store.", err);
-    }
-
     const origLength = db.relationships.length;
     db.relationships = db.relationships.filter(
       r => !(r.organizationId === organizationId &&
