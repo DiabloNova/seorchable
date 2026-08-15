@@ -56,45 +56,6 @@ export const entitiesTable: TableDefinition = {
       nullable: true,
       description: "Wikipedia page link"
     },
-    {
-      name: "aliases",
-      type: "TEXT[]",
-      nullable: true,
-      description: "Alternative names or acronyms"
-    },
-    {
-      name: "description",
-      type: "TEXT",
-      nullable: true,
-      description: "A summary description of the semantic entity"
-    },
-    {
-      name: "provenance",
-      type: "JSONB",
-      nullable: true,
-      description: "Traceability source information and evidence context"
-    },
-    {
-      name: "authority_score",
-      type: "DOUBLE PRECISION",
-      nullable: false,
-      default: "0.0",
-      description: "Calculated semantic domain authority score (0.0 to 100.0)"
-    },
-    {
-      name: "completeness_score",
-      type: "DOUBLE PRECISION",
-      nullable: false,
-      default: "0.0",
-      description: "Calculated metadata profile completeness score (0.0 to 100.0)"
-    },
-    {
-      name: "status",
-      type: "TEXT",
-      nullable: false,
-      default: "'active'",
-      description: "Operational state: active, archived, merged"
-    },
     // Value Object: Confidence
     {
       name: "confidence_score",
@@ -167,12 +128,6 @@ CREATE TABLE IF NOT EXISTS entities (
   type TEXT NOT NULL,
   wikidata_id TEXT,
   wikipedia_url TEXT,
-  aliases TEXT[],
-  description TEXT,
-  provenance JSONB,
-  authority_score DOUBLE PRECISION NOT NULL DEFAULT 0.0,
-  completeness_score DOUBLE PRECISION NOT NULL DEFAULT 0.0,
-  status TEXT NOT NULL DEFAULT 'active',
   confidence_score DOUBLE PRECISION NOT NULL DEFAULT 1.0,
   confidence_rating TEXT NOT NULL DEFAULT 'high',
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -258,25 +213,6 @@ export const entityRelationshipsTable: TableDefinition = {
       nullable: false,
       description: "Semantic link predicate (owns, creates, competes_with, related_to, mentioned_with)"
     },
-    {
-      name: "direction",
-      type: "TEXT",
-      nullable: false,
-      default: "'directed'",
-      description: "Link directionality: directed, undirected"
-    },
-    {
-      name: "provenance",
-      type: "JSONB",
-      nullable: true,
-      description: "Traceability source information and evidence context"
-    },
-    {
-      name: "metadata",
-      type: "JSONB",
-      nullable: true,
-      description: "Custom metadata properties associated with the relationship"
-    },
     // Value Object: Confidence
     {
       name: "confidence_score",
@@ -346,9 +282,6 @@ CREATE TABLE IF NOT EXISTS entity_relationships (
   source_entity_id UUID NOT NULL REFERENCES entities(id) ON DELETE CASCADE,
   target_entity_id UUID NOT NULL REFERENCES entities(id) ON DELETE CASCADE,
   relationship_type TEXT NOT NULL,
-  direction TEXT NOT NULL DEFAULT 'directed',
-  provenance JSONB,
-  metadata JSONB,
   confidence_score DOUBLE PRECISION NOT NULL DEFAULT 1.0,
   confidence_rating TEXT NOT NULL DEFAULT 'high',
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
