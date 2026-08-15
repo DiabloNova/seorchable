@@ -260,6 +260,84 @@ export interface KgEntity {
 
 /**
  * LLM Analytics Domain Interfaces (Task 8.3)
+ * Task 9.1 — Keyword Intelligence Domain Types
+ */
+export type KeywordSource = "content" | "title" | "heading" | "competitor" | "prompt" | "entity" | "topic";
+
+export type SearchIntent = "informational" | "commercial" | "transactional" | "navigational" | "unknown";
+
+export interface DiscoveredKeyword {
+  term: string;
+  normalizedTerm: string;
+  source: KeywordSource;
+  evidence: {
+    sourceType: KeywordSource;
+    sourceReference: string;
+    description: string;
+    rawExcerpt?: string;
+  };
+  intent: SearchIntent;
+  intentConfidence: number; // 0.0 - 1.0
+  opportunityScore?: number; // 0 - 100 or undefined if data unavailable
+  language: string;
+  discoveredAt: Date | string;
+}
+
+export interface KeywordCluster {
+  id: string;
+  clusterName: string;
+  primaryKeyword: DiscoveredKeyword;
+  memberKeywords: DiscoveredKeyword[];
+  theme: string;
+  size: number;
+}
+
+export interface KeywordGap {
+  id: string;
+  organizationId: string;
+  keyword: string;
+  normalizedKeyword: string;
+  sourceCompetitorId?: string;
+  sourceCompetitorDomain?: string;
+  tenantCoverageStatus: "absent" | "semantic_coverage" | "partial_coverage" | "covered";
+  evidence: {
+    competitorPresence: string;
+    tenantExistingPageUrl?: string;
+    tenantExistingCoverageSummary?: string;
+    reasoning: string;
+  };
+  searchIntent: SearchIntent;
+  recommendedAction: string;
+}
+
+export interface KeywordIntelligenceResult {
+  discoveredKeywords: DiscoveredKeyword[];
+  clusters: KeywordCluster[];
+  gaps: KeywordGap[];
+  semanticKeywords: Array<{
+    primaryTerm: string;
+    relatedTerm: string;
+    relationshipType: string;
+    evidence: string;
+  }>;
+  longTailKeywords: Array<{
+    seedTerm: string;
+    variant: string;
+    intent: SearchIntent;
+    evidence: string;
+  }>;
+  summary: {
+    discoveredCount: number;
+    clusterCount: number;
+    gapCount: number;
+    semanticCount: number;
+    longTailCount: number;
+  };
+}
+
+/**
+/**
+ * Content Brief Domain Models (Task 7.1)
  */
 
 export interface LLMEvaluationRecord {
