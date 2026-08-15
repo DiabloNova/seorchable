@@ -77,6 +77,12 @@ export interface Entity {
   wikidataId?: string;
   wikipediaUrl?: string;
   confidence: ConfidenceVO; // Rich Value Object
+  aliases?: string[];
+  description?: string;
+  provenance?: Record<string, unknown>;
+  authorityScore?: number;
+  completenessScore?: number;
+  status?: string;
   audit: AuditMetadata;
 }
 
@@ -92,6 +98,9 @@ export interface EntityRelationship {
   targetEntityId: string;
   relationshipType: RelationshipType;
   confidence: ConfidenceVO; // Rich Value Object
+  direction?: "directed" | "undirected" | string;
+  provenance?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
   audit: AuditMetadata;
 }
 
@@ -248,7 +257,6 @@ export interface KgEntity {
   createdAt: Date | string;
   updatedAt: Date | string;
 }
-
 /**
  * Task 9.2 — Site Architecture Intelligence Domain Types
  */
@@ -312,8 +320,8 @@ export interface SiteArchitectureAnalysisResult {
     deepPagesCount: number; // Depth > 3
   };
 }
-
 /**
+ * LLM Analytics Domain Interfaces (Task 8.3)
  * Task 9.1 — Keyword Intelligence Domain Types
  */
 export type KeywordSource = "content" | "title" | "heading" | "competitor" | "prompt" | "entity" | "topic";
@@ -387,6 +395,122 @@ export interface KeywordIntelligenceResult {
     semanticCount: number;
     longTailCount: number;
   };
+}
+
+/**
+/**
+ * Content Brief Domain Models (Task 7.1)
+ */
+
+export interface LLMEvaluationRecord {
+  id: string;
+  organizationId: string; // Tenant partition key
+  model: string; // e.g. "gemini-1.5-pro", "gpt-4o", "claude-3.5-sonnet"
+  provider?: string; // e.g. "Google", "OpenAI", "Anthropic"
+  evaluatedAt: Date | string;
+  promptText?: string;
+  responseText?: string;
+
+  // Quality signals (0-100)
+  correctness?: number;
+  relevance?: number;
+  completeness?: number;
+  factuality?: number;
+  citationQuality?: number;
+  answerability?: number;
+  overallAnswerQuality?: number;
+
+  // Sentiment signal
+  sentiment?: "positive" | "neutral" | "negative";
+  sentimentScore?: number; // 0-100
+
+  // Bias signals
+  biasDetected?: boolean;
+  biasScore?: number; // 0-100 where 100 = completely unbiased
+  biasCategory?: string; // e.g. "framing", "omission", "favoritism"
+
+  // Operational signals
+  latencyMs?: number;
+  inputTokens?: number;
+  outputTokens?: number;
+  totalTokens?: number;
+  cost?: number; // USD
+}
+
+export interface LLMSentimentAnalytics {
+  positive: number;
+  neutral: number;
+  negative: number;
+  positiveRatio: number;
+  neutralRatio: number;
+  negativeRatio: number;
+  aggregateSentimentScore: number | null;
+}
+
+export interface LLMBiasAnalytics {
+  biasScore: number | null; // 0-100
+  biasedAnswers: number;
+  unbiasedAnswers: number;
+  biasRate: number; // 0.0 to 1.0
+  categories: Array<{ category: string; occurrences: number }>;
+}
+
+export interface LLMAnswerQualityAnalytics {
+  answerQualityScore: number | null; // 0-100
+  correctness: number | null;
+  relevance: number | null;
+  completeness: number | null;
+  factuality: number | null;
+  citationQuality: number | null;
+}
+
+export interface LLMTokenUsageAnalytics {
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+  averageInputTokens: number;
+  averageOutputTokens: number;
+  averageTotalTokens: number;
+}
+
+export interface LLMLatencyAnalytics {
+  averageLatencyMs: number | null;
+  minLatencyMs: number | null;
+  maxLatencyMs: number | null;
+}
+
+export interface LLMCostAnalytics {
+  totalCost: number | null;
+  averageCost: number | null;
+  costPer1kTokens: number | null;
+}
+
+export interface LLMModelSummary {
+  model: string;
+  provider?: string;
+  evaluationsCount: number;
+  performanceScore: number;
+  answerQuality: number | null;
+  sentimentScore: number | null;
+  biasScore: number | null;
+  averageLatencyMs: number | null;
+  averageInputTokens: number;
+  averageOutputTokens: number;
+  averageTotalTokens: number;
+  averageCost: number | null;
+  sentiment: LLMSentimentAnalytics;
+  bias: LLMBiasAnalytics;
+  qualityBreakdown: LLMAnswerQualityAnalytics;
+  tokenUsage: LLMTokenUsageAnalytics;
+  latency: LLMLatencyAnalytics;
+  cost: LLMCostAnalytics;
+}
+
+export interface LLMAnalyticsComparisonResult {
+  organizationId: string;
+  totalEvaluations: number;
+  models: LLMModelSummary[];
+  ranking: string[]; // Model identifiers ordered by performanceScore DESC, then model ASC
 }
 
 /**

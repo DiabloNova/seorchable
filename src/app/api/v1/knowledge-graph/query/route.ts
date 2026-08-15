@@ -1,26 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { TenantContextManager } from '@/core/database/tenant-context';
-import { PostgresClient } from '@/features/admin/infrastructure/persistence/postgres';
+import { requireSession } from '@/services/auth/session';
+import { requireWorkspaceMembership } from '@/services/auth/authorization';
+import { EntityService, projectNeighborhoodForVisualization } from '@/features/ai-intelligence/services/entity-service';
 
 // Validation schema with Persian error message
 const querySchema = z.object({
   entityName: z.string().min(1, 'نام موجودیت باید ارسال شود'),
 });
-
-interface QueryRelationRow {
-  id: string;
-  relationship_type: string;
-  properties: string | Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
-  source_entity_id: string;
-  source_name: string;
-  source_type: string;
-  target_entity_id: string;
-  target_name: string;
-  target_type: string;
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,169 +24,130 @@ export async function POST(req: NextRequest) {
 
     const { entityName } = parsed.data;
 
-    // Secure multi-tenant context extraction
-    const organizationId = req.headers.get("x-tenant-id") || "tenant-pipeline-a";
-    const userId = req.headers.get("x-user-id") || "usr-1001";
-    const requestId = req.headers.get("x-request-id") || `req-kg-${Date.now()}`;
+    // 1. Secure Server-Side Session and Workspace Membership validation
+    const session = await requireSession();
+    if (!session.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: 'Active user not resolved from secure session.' },
+        { status: 401 }
+      );
+    }
 
-    const subGraph = await TenantContextManager.runWithTenantContext(
+    const organizationId = session.user.workspaceId;
+    const userId = session.user.id;
+    const requestId = req.headers.get("x-request-id") || `req-kg-api-${Date.now()}`;
+
+    // 2. Wrap executing DB lookups strictly under RLS tenant isolation context
+    const result = await TenantContextManager.runWithTenantContext(
       organizationId,
       userId,
       requestId,
       async () => {
-        // Prepare DB client
-        const pg = PostgresClient.getInstance();
+        // Enforce workspace membership validation inside context
+        await requireWorkspaceMembership(userId, organizationId);
 
-        try {
-          // 1. Look up the central entity by name (case-insensitive) for the active tenant
-          const centralEntityQuery = `
-            SELECT id, name, type, properties
-            FROM kg_entities
-            WHERE organization_id = $1 AND LOWER(name) = LOWER($2)
-            LIMIT 1;
-          `;
+        const entityService = new EntityService();
 
-          const centralRes = await pg.query(centralEntityQuery, [organizationId, entityName]);
+        // Query canonical database entities and relationships via EntityService
+        const centralEntity = await entityService.getEntityByName(organizationId, entityName);
 
-          if (centralRes.rowCount && centralRes.rowCount > 0) {
-            const centralEntity = centralRes.rows[0];
-            const centralId = centralEntity.id;
-
-            // 2. Query 1-hop relationships
-            const relationshipsQuery = `
-              SELECT id, source_entity_id, target_entity_id, relationship_type, properties
-              FROM kg_relationships
-              WHERE organization_id = $1 AND (source_entity_id = $2 OR target_entity_id = $2);
-            `;
-
-            const relsRes = await pg.query(relationshipsQuery, [organizationId, centralId]);
-            const dbRels = relsRes.rows || [];
-
-            // 3. Gather all distinct node IDs (including the central entity and adjacent ones)
-            const nodeIdsSet = new Set<string>();
-            nodeIdsSet.add(centralId);
-            dbRels.forEach((rel) => {
-              nodeIdsSet.add(rel.source_entity_id);
-              nodeIdsSet.add(rel.target_entity_id);
-            });
-
-            const uniqueNodeIds = Array.from(nodeIdsSet);
-
-            // 4. Fetch all adjacent entities
-            const nodesQuery = `
-              SELECT id, name, type, properties
-              FROM kg_entities
-              WHERE organization_id = $1 AND id = ANY($2::uuid[]);
-            `;
-            const nodesRes = await pg.query(nodesQuery, [organizationId, uniqueNodeIds]);
-            const dbNodes = nodesRes.rows || [];
-
-            // Transform into ReactFlow / frontend compatible format
-            const nodes = dbNodes.map((n) => ({
-              id: n.id,
-              name: n.name,
-              type: n.type,
-              properties: typeof n.properties === "string" ? JSON.parse(n.properties) : (n.properties || {}),
-            }));
-
-            const edges = dbRels.map((r) => ({
-              id: r.id,
-              source: r.source_entity_id,
-              target: r.target_entity_id,
-              type: r.relationship_type,
-              properties: typeof r.properties === "string" ? JSON.parse(r.properties) : (r.properties || {}),
-            }));
-
-            return { nodes, edges };
-          }
-        } catch (dbError) {
-          // Log DB queries gracefully and fall back to high-fidelity mock
-          console.warn("[KG API] Real DB query failed or table not found, fallback to Mock:", dbError);
+        if (centralEntity) {
+          // Bounded BFS Graph traversal limit to depth=2 and maxNodes=100
+          const { nodes, edges } = await entityService.getNeighborhood(organizationId, centralEntity.id, 2, 100);
+          return projectNeighborhoodForVisualization(nodes, edges);
         }
 
-        // --- High-Fidelity Mock Fallback Mode ---
-        const normalizedQuery = entityName.trim().toLowerCase();
-
-        // Check if the user specifically searches for something empty or unknown to test the empty state
-        if (["empty", "خالی", "unknown", "نامعلوم", "none"].includes(normalizedQuery)) {
-          return { nodes: [], edges: [] };
-        }
-
-        // Standard mock entities and relations centered around searched terms
-        const centralNodeId = "node-central";
-        const isFarsi = /[\u0600-\u06FF]/.test(entityName);
-
-        const centralLabel = entityName;
-        const centralType = (normalizedQuery.includes("digikala") || normalizedQuery.includes("دیجی") || normalizedQuery.includes("snapp") || normalizedQuery.includes("اسنپ"))
-          ? "competitor"
-          : "brand";
-
-        const nodes: Array<{
-          id: string;
-          name: string;
-          type: string;
-          properties?: { wikidataId?: string; [key: string]: unknown };
-        }> = [
-          { id: centralNodeId, name: centralLabel, type: centralType, properties: { wikidataId: "Q123456" } },
-        ];
-        const edges: Array<{ id: string; source: string; target: string; type: string; properties: unknown }> = [];
-
-        // Connect standard surrounding nodes
-        if (isFarsi) {
-          const mockPeers = [
-            { id: "node-gpt4", name: "جی‌پی‌تی-۴", type: "model", rel: "تحلیل_شده_توسط" },
-            { id: "node-claude", name: "کلود ۳.۵", type: "model", rel: "پایش_شده_توسط" },
-            { id: "node-gemini", name: "جمینای پرو", type: "model", rel: "ارزیابی_شده_توسط" },
-            { id: "node-competitor1", name: "دیجی‌کالا", type: "competitor", rel: "رقابت_با" },
-            { id: "node-competitor2", name: "اسنپ", type: "competitor", rel: "رقابت_با" },
-          ];
-
-          mockPeers.forEach((peer, idx) => {
-            // Avoid adding same node if search itself matches it
-            if (peer.name.toLowerCase() !== normalizedQuery) {
-              nodes.push({ id: peer.id, name: peer.name, type: peer.type, properties: {} });
-              edges.push({
-                id: `edge-${idx}`,
-                source: centralNodeId,
-                target: peer.id,
-                type: peer.rel,
-                properties: { confidence: 0.95 },
-              });
-            }
-          });
-        } else {
-          const mockPeers = [
-            { id: "node-gpt4", name: "GPT-4o", type: "model", rel: "analyzed_by" },
-            { id: "node-claude", name: "Claude 3.5", type: "model", rel: "scraped_by" },
-            { id: "node-gemini", name: "Gemini 1.5", type: "model", rel: "evaluated_by" },
-            { id: "node-competitor1", name: "Digikala", type: "competitor", rel: "competes_with" },
-            { id: "node-competitor2", name: "Snapp", type: "competitor", rel: "competes_with" },
-          ];
-
-          mockPeers.forEach((peer, idx) => {
-            if (peer.name.toLowerCase() !== normalizedQuery) {
-              nodes.push({ id: peer.id, name: peer.name, type: peer.type, properties: {} });
-              edges.push({
-                id: `edge-${idx}`,
-                source: centralNodeId,
-                target: peer.id,
-                type: peer.rel,
-                properties: { confidence: 0.95 },
-              });
-            }
-          });
-        }
-
-        return { nodes, edges };
+        return null;
       }
     );
 
-    return NextResponse.json(subGraph);
+    if (result) {
+      return NextResponse.json(result);
+    }
+
+    // --- High-Fidelity Mock Fallback Mode (Demo / Development Only) ---
+    // Preserved for backward compatibility, clearly distinguishable as mock/demo data
+    const normalizedQuery = entityName.trim().toLowerCase();
+
+    if (["empty", "خالی", "unknown", "نامعلوم", "none"].includes(normalizedQuery)) {
+      return NextResponse.json({ nodes: [], edges: [] });
+    }
+
+    const centralNodeId = "node-central-mock";
+    const isFarsi = /[\u0600-\u06FF]/.test(entityName);
+
+    const centralLabel = `${entityName} (دمو / پیش‌فرض)`;
+    const centralType = (normalizedQuery.includes("digikala") || normalizedQuery.includes("دیجی") || normalizedQuery.includes("snapp") || normalizedQuery.includes("اسنپ"))
+      ? "competitor"
+      : "brand";
+
+    const nodes: Array<{
+      id: string;
+      name: string;
+      type: string;
+      properties?: { wikidataId?: string; is_mock: boolean; source: string; [key: string]: unknown };
+    }> = [
+      {
+        id: centralNodeId,
+        name: centralLabel,
+        type: centralType,
+        properties: { wikidataId: "Q123456", is_mock: true, source: "mock-demo-fallback" }
+      },
+    ];
+    const edges: Array<{ id: string; source: string; target: string; type: string; properties: unknown }> = [];
+
+    if (isFarsi) {
+      const mockPeers = [
+        { id: "node-gpt4-mock", name: "جی‌پی‌تی-۴ (آزمایشی)", type: "model", rel: "تحلیل_شده_توسط" },
+        { id: "node-claude-mock", name: "کلود ۳.۵ (آزمایشی)", type: "model", rel: "پایش_شده_توسط" },
+        { id: "node-gemini-mock", name: "جمینای پرو (آزمایشی)", type: "model", rel: "ارزیابی_شده_توسط" },
+        { id: "node-competitor1-mock", name: "دیجی‌کالا (آزمایشی)", type: "competitor", rel: "رقابت_با" },
+        { id: "node-competitor2-mock", name: "اسنپ (آزمایشی)", type: "competitor", rel: "رقابت_با" },
+      ];
+
+      mockPeers.forEach((peer, idx) => {
+        if (peer.name.toLowerCase() !== normalizedQuery) {
+          nodes.push({ id: peer.id, name: peer.name, type: peer.type, properties: { is_mock: true, source: "mock-demo-fallback" } });
+          edges.push({
+            id: `edge-${idx}-mock`,
+            source: centralNodeId,
+            target: peer.id,
+            type: peer.rel,
+            properties: { confidence: 0.95, is_mock: true, source: "mock-demo-fallback" },
+          });
+        }
+      });
+    } else {
+      const mockPeers = [
+        { id: "node-gpt4-mock", name: "GPT-4o (Demo)", type: "model", rel: "analyzed_by" },
+        { id: "node-claude-mock", name: "Claude 3.5 (Demo)", type: "model", rel: "scraped_by" },
+        { id: "node-gemini-mock", name: "Gemini 1.5 (Demo)", type: "model", rel: "evaluated_by" },
+        { id: "node-competitor1-mock", name: "Digikala (Demo)", type: "competitor", rel: "competes_with" },
+        { id: "node-competitor2-mock", name: "Snapp (Demo)", type: "competitor", rel: "competes_with" },
+      ];
+
+      mockPeers.forEach((peer, idx) => {
+        if (peer.name.toLowerCase() !== normalizedQuery) {
+          nodes.push({ id: peer.id, name: peer.name, type: peer.type, properties: { is_mock: true, source: "mock-demo-fallback" } });
+          edges.push({
+            id: `edge-${idx}-mock`,
+            source: centralNodeId,
+            target: peer.id,
+            type: peer.rel,
+            properties: { confidence: 0.95, is_mock: true, source: "mock-demo-fallback" },
+          });
+        }
+      });
+    }
+
+    return NextResponse.json({ nodes, edges });
+
   } catch (error: unknown) {
     console.error("[API KG Query Route Error]:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Internal Server Error", message },      { status: 500 }
+      { error: "Internal Server Error", message },
+      { status: 500 }
     );
   }
 }
