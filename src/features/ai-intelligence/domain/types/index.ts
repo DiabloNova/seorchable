@@ -3,8 +3,6 @@
  * Enterprise SaaS Multi-Tenant Domain Type Definitions & Value Objects
  */
 
-import { SeoSignals } from "@/types/seo-signals";
-
 export type SubscriptionPlan = "free" | "growth" | "enterprise";
 
 /**
@@ -258,53 +256,6 @@ export interface KgEntity {
   properties: Record<string, unknown>;
   createdAt: Date | string;
   updatedAt: Date | string;
-}
-
-/**
- * Content Brief Domain Models (Task 7.1)
- */
-export interface ContentBriefSection {
-  sectionHeading: string;
-  sectionPurpose: string;
-  targetTopics: string[];
-  targetEntities: string[];
-  targetKeywords: string[];
-  targetQuestions: string[];
-}
-
-export interface ContentBrief {
-  id: string;
-  organizationId: string;
-  targetTopic: string;
-  primaryIntent: PromptIntentType | string;
-  secondaryIntents: (PromptIntentType | string)[];
-  primaryTopic: Topic | null;
-  supportingTopics: Topic[];
-  entities: Entity[];
-  primaryKeywords: Keyword[];
-  secondaryKeywords: Keyword[];
-  questions: string[];
-  competitors: Competitor[];
-  recommendedStructure: ContentBriefSection[];
-  provenance: {
-    engineVersion: string;
-    deterministicRulesApplied: string[];
-  };
-}
-
-export interface ContentBriefInputs {
-  organizationId: string;
-  targetTopic: string;
-  primaryIntent?: PromptIntentType | string;
-  secondaryIntents?: (PromptIntentType | string)[];
-  seoSignals?: SeoSignals;
-  aeoAnalysis?: AeoAnalysis;
-  topics?: Topic[];
-  entities?: Entity[];
-  keywords?: Keyword[];
-  faqOpportunities?: FaqOpportunity[];
-  competitors?: Competitor[];
-  competitiveFindings?: CompetitiveSeoFinding[];
 }
 
 /**
