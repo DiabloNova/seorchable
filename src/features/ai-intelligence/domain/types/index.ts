@@ -3,8 +3,6 @@
  * Enterprise SaaS Multi-Tenant Domain Type Definitions & Value Objects
  */
 
-import { SeoSignals } from "@/types/seo-signals";
-
 export type SubscriptionPlan = "free" | "growth" | "enterprise";
 
 /**
@@ -252,6 +250,7 @@ export interface KgEntity {
 }
 
 /**
+/**
  * Content Brief Domain Models (Task 7.1)
  */
 export interface ContentBriefSection {
@@ -321,12 +320,12 @@ export interface ContentGapResult {
   id: string;
   organizationId: string;
   type: ContentGapType;
-  target: string; // Canonical Target Name or Identifier
+  target: string;
   evidence: ContentGapEvidence[];
-  confidence: number; // 0.0 to 1.0
-  gapMagnitude: number; // 0.0 to 1.0
-  opportunityScore: number; // 0 to 100
-  severity: FindingSeverity; // "low" | "medium" | "high" | "critical"
+  confidence: number;
+  gapMagnitude: number;
+  opportunityScore: number;
+  severity: FindingSeverity;
   rationale: string;
 }
 
@@ -345,9 +344,7 @@ export interface ContentGapInputs {
   faqOpportunities?: FaqOpportunity[];
   citations?: CitationSource[];
   citationOccurrences?: CitationOccurrence[];
-}
-
-/**
+} main
  * Competitive Radar (Task 6.3) Type Definitions
  */
 export type DataAvailabilityStatus =
