@@ -31,7 +31,6 @@ import {
   Compass,
   Link,
   HelpCircle,
-  HelpCircle as QuestionIcon,
   MessageSquare
 } from "lucide-react";
 
