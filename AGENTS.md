@@ -1,4 +1,15 @@
 <!-- BEGIN:nextjs-agent-rules -->
+## Database Environment Rules
+
+- `DATABASE_URL` is the application runtime connection for the isolated `jules-dev` branch.
+- `MIGRATION_DATABASE_URL` is only for running database migrations.
+- Never use `MIGRATION_DATABASE_URL` in application runtime code, API routes, tests that simulate runtime, Vercel, or client-side code.
+- Never log, print, expose, commit, or include either connection string in reports or pull requests.
+- Run migrations only through the dedicated migration script.
+- Never run migrations automatically during `next build`, Vercel deployment, or application startup.
+- Use `DATABASE_URL` for normal queries and tenant-scoped application tests.
+- Use `MIGRATION_DATABASE_URL` only when explicitly executing migration commands.
+- 
 ## This is NOT the Next.js you know
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in node_modules/next/dist/docs/ before writing any code. Heed deprecation notices.
 
