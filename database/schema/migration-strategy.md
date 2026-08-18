@@ -1,92 +1,76 @@
 # Relational Database Migration Strategy
 
-This specification details the migration, execution, and zero-downtime deployment strategy for the AI Visibility Intelligence relational schema.
+This specification details the canonical schema modeling, migration execution, and deployment strategy for the AI Visibility Intelligence relational schema.
 
 ---
 
 ## 1. Migration Tech Stack
 
-We utilize **Drizzle ORM** paired with **Drizzle Kit** to handle schema modeling, SQL generation, and schema diffing.
+We utilize **Drizzle ORM** paired with **Drizzle Kit** for schema modeling, SQL generation, schema diffing, and programmatic migration execution.
 
 ```
- [TypeScript Schemas] (database/schema/*.ts)
+ [Canonical Drizzle Schema] (database/schema/index.ts)
          │
-         ▼  (npx drizzle-kit generate:pg)
- [SQL Migration Files] (database/migrations/*.sql)
+         ▼  (pnpm run db:generate / drizzle-kit generate)
+ [SQL Migration Artifacts] (database/drizzle/*.sql)
          │
-         ▼  (npx drizzle-kit migrate:pg)
- [Target PostgreSQL Cluster]
+         ▼  (pnpm run db:migrate / src/core/database/migrator.ts)
+ [Target PostgreSQL / Neon Cluster]
 ```
 
-- **ORM Client**: Drizzle ORM
-- **Migration Engine**: Drizzle Kit CLI
-- **Target database**: PostgreSQL (v16+)
+- **ORM Client**: Drizzle ORM (`drizzle-orm`)
+- **Migration CLI & Diff Engine**: Drizzle Kit (`drizzle-kit`)
+- **Programmatic Runner**: `src/core/database/migrator.ts`
+- **Target database**: PostgreSQL (v16+) / Neon Serverless PostgreSQL
 
 ---
 
 ## 2. Directory Hierarchy
 
-All migrations are persisted within the repository root to ensure version control auditability:
+All database definitions and generated migration scripts are version-controlled within the repository:
 
 ```
 database/
   schema/
-    types.ts             # Metadata TS definitions
-    organization.ts      # Tenants schema definition
-    brand.ts             # Monitored brands schema definition
-    entity.ts            # Knowledge Graph entities schema definition
-    prompt.ts            # Query prompts & AI engines schemas
-    observation.ts       # LLM observations & mentions schemas
-    citation.ts          # Extracted URL reference links schema
-    visibility.ts        # Historical metrics schema
-    recommendation.ts    # Suggested recovery tasks schema
+    index.ts             # Unified canonical Drizzle ORM pgTable schema definitions (57 tables)
+    organization.ts      # Legacy TableDefinition metadata file (retained for reference)
+    ...                  # Domain schema metadata files
+  drizzle/
+    meta/                # Drizzle Kit snapshot and migration metadata records
+    0000_*.sql           # Auto-generated Drizzle migration scripts
   migrations/
-    meta/                # Drizzle metadata records
-    0000_init_schemas.sql# Auto-generated incremental SQL scripts
+    0001-0014_*.sql      # Historical hand-rolled SQL migrations (archived artifacts)
 ```
 
 ---
 
-## 3. Migration Operations Routine
+## 3. Operations & Package Scripts
 
-### Step 3.1: Schema Drift diffing
-When modifying a TypeScript schema file, run Drizzle Kit to analyze modifications against the current baseline and generate incremental SQL scripts:
+The repository enforces a single migration mechanism with standard `package.json` scripts:
+
+### Step 3.1: Schema Generation
+When modifying TypeScript table definitions in `database/schema/index.ts`, generate incremental SQL migration scripts:
 ```bash
-npx drizzle-kit generate:pg --schema=./database/schema/index.ts --out=./database/migrations/
+pnpm run db:generate
 ```
 
-### Step 3.2: Local Sandbox Execution
-Run migrations locally against docker postgres using the connection string:
+### Step 3.2: Database Migration Execution
+Apply pending migration scripts programmatically against the configured `DATABASE_URL`:
 ```bash
-npx drizzle-kit push:pg
+pnpm run db:migrate
 ```
 
-### Step 3.3: Production Deployment
-During CI/CD pipelines, execute the migration script programmatically prior to compiling and launching Next.js:
-```typescript
-import { migrate } from "drizzle-orm/postgres-js/migrator";
-import { db } from "../src/lib/db";
-
-async function main() {
-  console.log("Applying database migrations...");
-  await migrate(db, { migrationsFolder: "./database/migrations" });
-  console.log("Database up to date.");
-}
+### Step 3.3: Local Sandbox Schema Push (Dev Only)
+Directly push schema changes to a local disposable development database without generating migration files:
+```bash
+pnpm run db:push
 ```
 
 ---
 
-## 4. Zero-Downtime Migration Pattern (Expand/Contract)
+## 4. Architectural Rules & Guardrails
 
-To execute schema schema migrations without any SaaS service degradation (0 downtime), we implement the **Expand and Contract** pattern:
-
-1. **Phase 1: Expand (Non-breaking)**
-   - Add new columns as nullable.
-   - Deploy new columns or tables.
-   - Existing codebase remains completely healthy, ignoring the new fields.
-2. **Phase 2: Migrate (Sync)**
-   - Deploy background workers to copy/translate data from deprecated columns to new structures (if modifying structures).
-   - Write dual-writing logic in services if necessary.
-3. **Phase 3: Contract (Cleanup)**
-   - Deploy code that strictly uses the new columns.
-   - Run a final cleanup SQL script to drop old, unused columns or tables.
+1. **Single Source of Truth**: All database tables, indexes, constraints, and relations must be defined in `database/schema/index.ts`.
+2. **Deterministic Execution**: Foreign key creation and table references are strictly dependency-ordered. Core tables (`organizations`, `brands`, `entities`) are bootstrapped before dependent foreign keys.
+3. **Multi-Tenant Isolation**: Tenant-scoped tables enforce PostgreSQL Row Level Security (RLS) policies tied to `app.current_tenant_id` transaction settings via `TenantContextManager`.
+4. **Disposable Verification**: Schema migrations are validated against empty disposable PostgreSQL instances prior to production deployments.
