@@ -18,7 +18,6 @@ export class TenantContextViolationException extends Error {
 }
 
 export const TENANT_SCOPED_TABLES = Object.freeze([
-  "organizations",
   "brands",
   "entities",
   "entity_relationships",

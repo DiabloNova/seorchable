@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:acquisition": "tsx tests/features/acquisition/run-all.ts"
+    "test:acquisition": "tsx tests/features/acquisition/run-all.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/core/database/migrator.ts",
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.24",
@@ -19,6 +22,7 @@
     "cheerio": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.2",
     "framer-motion": "^12.42.2",
     "html-to-text": "^10.0.0",
     "lucide-react": "^1.26.0",
@@ -37,6 +41,7 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.11",
     "tailwindcss": "^4",
