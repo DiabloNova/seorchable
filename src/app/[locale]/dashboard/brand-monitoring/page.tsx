@@ -1,155 +1,247 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
-import { Button } from "@/components/Button";
 import {
-  Activity, MessageSquare, AlertCircle, Sparkles, RefreshCw, BarChart3, TrendingUp, Shield
+  Sparkles,
+  TrendingUp,
+  Award,
+  AlertTriangle,
+  CheckCircle,
+  HelpCircle,
+  ShieldCheck,
+  Percent,
+  Layers,
+  Tag,
+  Clock,
+  Compass,
+  Link2,
+  ArrowUpRight,
+  BookOpen,
+  Eye,
+  CheckSquare
 } from "lucide-react";
+import { getBrandIntelligenceOverviewAction } from "@/app/actions/brand-intelligence";
+import { Brand, BrandAssociation } from "@/features/ai-intelligence/domain/types";
 
 export default function BrandMonitoringPage() {
-  const { language, direction } = useTheme();
+  const { language } = useTheme();
   const isRtl = language === "fa";
 
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [brand, setBrand] = useState<Brand | null>(null);
+  const [metrics, setMetrics] = useState<any | null>(null);
+  const [associations, setAssociations] = useState<BrandAssociation[]>([]);
+  const [alerts, setAlerts] = useState<any[]>([]);
 
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 1200);
+  const [isPending, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Load brand intelligence data
+  useEffect(() => {
+    async function loadData() {
+      setIsLoading(true);
+      setErrorMsg(null);
+
+      const res = await getBrandIntelligenceOverviewAction();
+      if (res.success && (res as any).result) {
+        setBrand((res as any).result.brand);
+        setMetrics((res as any).result.authorityMetrics);
+        setAssociations((res as any).result.associations);
+        setAlerts((res as any).result.alerts);
+      } else {
+        setErrorMsg(isRtl ? "خطا در بارگذاری دیتابیس پایش برند." : "Failed to load brand monitoring intelligence.");
+      }
+      setIsLoading(false);
+    }
+    loadData();
+  }, [isRtl]);
+
+  const getAssociationBadgeColor = (type: string): string => {
+    switch (type) {
+      case "industry_category":
+        return "text-[var(--sky-blue-500)] bg-[var(--sky-blue-500)]/10 border-[var(--sky-blue-500)]/30";
+      case "product":
+        return "text-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200";
+      case "location":
+        return "text-indigo-500 bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200";
+      default:
+        return "text-[var(--text-muted)] bg-[var(--border)] border-[var(--border)]";
+    }
   };
 
-  // Mocked localized telemetry feed of LLM mentions
-  const telemetryFeed = [
-    {
-      id: "tel-1",
-      source: "ChatGPT-4o",
-      text: isRtl
-        ? "«سئورچبل به عنوان پلتفرم تخصصی بهینه‌سازی موتورهای هوش مصنوعی شناخته می‌شود...»"
-        : "\"seorchable.ir is recognized as a leader in Conversational Search Engine Optimization (GEO)...\"",
-      sentiment: "positive",
-      timestamp: isRtl ? "۲ دقیقه پیش" : "2m ago"
-    },
-    {
-      id: "tel-2",
-      source: "Claude 3.5 Sonnet",
-      text: isRtl
-        ? "«یکی از ابزارهای معتبر برای پایش سهم صدای برند، سرویس هوشمند برندگراف است...»"
-        : "\"A reliable service to monitor brand voice share inside modern LLMs is BrandGraph...\"",
-      sentiment: "positive",
-      timestamp: isRtl ? "۱۵ دقیقه پیش" : "15m ago"
-    },
-    {
-      id: "tel-3",
-      source: "Perplexity AI",
-      text: isRtl
-        ? "«با وجود قابلیت‌های سئو فنی، این پلتفرم راهکارهای دقیقی برای رفع هالوسینیشن ارائه می‌دهد.»"
-        : "\"Alongside technical SEO components, this platform provides clear mitigation strategies for LLM hallucinations.\"",
-      sentiment: "neutral",
-      timestamp: isRtl ? "۱ ساعت پیش" : "1h ago"
+  const getAssociationLabel = (type: string): string => {
+    if (isRtl) {
+      switch (type) {
+        case "industry_category": return "رده صنعت / حوزه";
+        case "product": return "محصول متصل";
+        case "location": return "موقعیت جغرافیایی";
+        default: return "مفهوم مرتبط";
+      }
     }
-  ];
+    return type.replace("_", " ");
+  };
 
   return (
-    <div className="space-y-6 animate-fade-in" dir={direction}>
+    <div className="space-y-6 animate-fade-in text-start pb-10">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="text-start">
-          <h1 className="text-2xl font-black text-[var(--text-primary)] font-display">
-            {isRtl ? "پایش هوشمند برند" : "AI Brand Monitoring"}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-[var(--border)] pb-5">
+        <div>
+          <h1 className="text-2xl font-black text-[var(--text-primary)] font-display flex items-center gap-2.5">
+            <Award className="text-[var(--sky-blue-500)] animate-pulse" size={24} />
+            <span>{isRtl ? "مرکز هوشمندی برند (AI Brand Intelligence)" : "AI Brand Intelligence Center"}</span>
           </h1>
-          <p className="text-xs text-[var(--text-secondary)] mt-1">
+          <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-2xl leading-relaxed">
             {isRtl
-              ? "پایش زمان‌واقعی مکالمات، استنادها و سهم صدای معنایی سازمان شما در پایگاه‌داده مدل‌های هوش مصنوعی."
-              : "Real-time stream of your brand references, sentiment ratios, and indexing status inside conversational architectures."}
+              ? "پلتفرم سنجش و ارزیابی عمیق نحوه معرفی هویت برند، ردیابی پایداری شناخت در موتورهای پاسخ‌گو، پایش میزان رضایت و شناخت مفاهیم مرتبط."
+              : "Enterprise brand intelligence suite designed to monitor, track, and score brand reputation, semantic associations, and endorsement rates."}
           </p>
         </div>
-
-        <Button onClick={handleRefresh} disabled={isRefreshing} className="flex items-center gap-2 self-start sm:self-auto">
-          <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
-          <span>{isRtl ? "به‌روزرسانی جریان" : "Refresh Telemetry"}</span>
-        </Button>
       </div>
 
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <Card className="border border-[var(--border)] bg-[var(--card)] p-4 text-start">
-          <div className="flex justify-between items-start">
-            <div className="space-y-1">
-              <span className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-widest">{isRtl ? "مجموع استنادهای معتبر" : "TOTAL COGNITIVE CITATIONS"}</span>
-              <p className="text-2xl font-black text-[var(--text-primary)] font-display">۱,۴۸۲</p>
-            </div>
-            <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-400 border border-emerald-500/20">
-              <TrendingUp size={16} />
-            </div>
-          </div>
-          <span className="text-[10px] text-emerald-400 font-bold mt-2 inline-block">+14.2% {isRtl ? "رشد نسبت به ماه گذشته" : "vs last month"}</span>
-        </Card>
+      {errorMsg && (
+        <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-lg text-xs text-red-600 flex items-center gap-2 font-semibold">
+          <AlertTriangle size={16} />
+          <span>{errorMsg}</span>
+        </div>
+      )}
 
-        <Card className="border border-[var(--border)] bg-[var(--card)] p-4 text-start">
-          <div className="flex justify-between items-start">
-            <div className="space-y-1">
-              <span className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-widest">{isRtl ? "نرخ پاسخ‌های مثبت" : "SENTIMENT RATIO"}</span>
-              <p className="text-2xl font-black text-[var(--text-primary)] font-display">۹۴.۲٪</p>
-            </div>
-            <div className="p-2 bg-indigo-500/10 rounded-xl text-indigo-400 border border-indigo-500/20">
-              <MessageSquare size={16} />
-            </div>
-          </div>
-          <span className="text-[10px] text-indigo-400 font-bold mt-2 inline-block">0.0% {isRtl ? "بدون انحراف معنایی" : "No hallucination claims"}</span>
-        </Card>
+      {isLoading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-pulse">
+          <div className="h-60 bg-[var(--border)]/30 rounded-xl"></div>
+          <div className="lg:col-span-2 h-60 bg-[var(--border)]/30 rounded-xl"></div>
+        </div>
+      ) : (
+        <div className="space-y-6">
 
-        <Card className="border border-[var(--border)] bg-[var(--card)] p-4 text-start">
-          <div className="flex justify-between items-start">
-            <div className="space-y-1">
-              <span className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-widest">{isRtl ? "شاخص امنیت و بهداشت" : "BRAND SAFETY SCORE"}</span>
-              <p className="text-2xl font-black text-[var(--text-primary)] font-display">۹۸.۱٪</p>
-            </div>
-            <div className="p-2 bg-amber-500/10 rounded-xl text-amber-400 border border-amber-500/20">
-              <Shield size={16} />
-            </div>
-          </div>
-          <span className="text-[10px] text-amber-400 font-bold mt-2 inline-block">{isRtl ? "وضعیت عالی" : "Excellent safety level"}</span>
-        </Card>
-      </div>
+          {/* Top Panel: Brand Authority & Recommendations Integration */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      {/* Mention Stream */}
-      <Card className="border border-[var(--border)] bg-[var(--card)]">
-        <CardHeader className="border-b border-[var(--border)] pb-3 text-start">
-          <CardTitle className="text-sm font-black flex items-center gap-2 text-[var(--sky-blue-500)]">
-            <Activity size={16} />
-            <span>{isRtl ? "جریان پایش زمان‌واقعی" : "Live Conversational Mentions Feed"}</span>
-          </CardTitle>
-          <CardDescription className="text-xs">
-            {isRtl ? "آخرین پاسخ‌های ثبت شده در چت‌بات‌ها که به نام یا دامنه برند ارجاع داده‌اند." : "Recent outbound citation blocks generated by conversational chat agents."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4 space-y-4">
-          {telemetryFeed.map((item) => (
-            <div key={item.id} className="p-4 rounded-2xl border border-[var(--border)] bg-[var(--muted-surface)]/40 flex flex-col sm:flex-row justify-between sm:items-center gap-4 text-start">
-              <div className="space-y-1.5 flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded bg-[var(--sky-blue-500)]/15 text-[var(--sky-blue-500)] text-[10px] font-black uppercase border border-[var(--sky-blue-500)]/25">
-                    {item.source}
+            {/* AI Brand Authority Score */}
+            <Card className="border border-[var(--border)] bg-[var(--card)] rounded-xl flex flex-col justify-between overflow-hidden">
+              <CardHeader className="border-b border-[var(--border)]/50 pb-3 bg-[var(--border)]/10">
+                <CardTitle className="text-xs font-black text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
+                  <ShieldCheck size={14} className="text-[var(--sky-blue-500)]" />
+                  <span>{isRtl ? "نشان اعتبار برند (AI Brand Authority)" : "AI Brand Authority"}</span>
+                </CardTitle>
+                <CardDescription className="text-[10px]">
+                  {isRtl ? "شاخص کلی اعتبار برند بر اساس شواهد مدل‌ها" : "Composite reputation signal evaluated across search answers"}
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="py-6 flex flex-col items-center justify-center flex-grow space-y-4">
+                {metrics && (
+                  <div className="text-center space-y-3 w-full">
+                    <div className="relative w-28 h-28 flex items-center justify-center rounded-full border-4 border-[var(--border)] mx-auto">
+                      <div className="text-center">
+                        <span className="text-3xl font-black text-[var(--text-primary)]">
+                          {metrics.overallAuthorityScore}%
+                        </span>
+                        <div className="text-[8px] uppercase font-bold tracking-wider text-[var(--text-muted)] mt-0.5">
+                          {isRtl ? "شاخص اعتبار" : "Rep Score"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 max-w-xs mx-auto text-xs">
+                      {[
+                        { label: isRtl ? "پوشش ذکر نام (Prompts Coverage)" : "Mention Coverage", val: metrics.mentionCoverage },
+                        { label: isRtl ? "انضمام در مراجع (Citation Backing)" : "Citation Backing", val: metrics.citationSupportScore },
+                        { label: isRtl ? "پایداری پیشنهادها (Recommendations)" : "Recommendation Rate", val: metrics.recommendationPresenceScore }
+                      ].map((sub, sIdx) => (
+                        <div key={sIdx} className="space-y-1">
+                          <div className="flex justify-between text-[10px] font-semibold text-[var(--text-secondary)]">
+                            <span>{sub.label}</span>
+                            <span className="font-bold">{sub.val}%</span>
+                          </div>
+                          <div className="w-full bg-[var(--border)]/50 rounded-full h-1 overflow-hidden">
+                            <div className="bg-[var(--sky-blue-500)] h-1 rounded-full" style={{ width: `${sub.val}%` }}></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Action Alert Center (Task 4.4 Recommendations mapping) */}
+            <Card className="lg:col-span-2 border border-[var(--border)] bg-[var(--card)] rounded-xl flex flex-col justify-between">
+              <CardHeader className="border-b border-[var(--border)]/50 pb-3">
+                <CardTitle className="text-xs font-black text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2 text-amber-500">
+                  <AlertTriangle size={14} />
+                  <span>{isRtl ? "سیگنال‌های اقدام و بهبود رتبه (Task 4.4 Alerts)" : "Actionable Reputation Signals"}</span>
+                </CardTitle>
+                <CardDescription className="text-[10px]">
+                  {isRtl ? "پیشنهادهای استخراج شده برای موتور تصمیم‌گیری خودکار" : "Reputation gaps and boosting opportunities actively dispatched to Action Engine"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="py-4 flex-grow text-xs space-y-3 overflow-y-auto max-h-60 text-start">
+                {alerts.length === 0 ? (
+                  <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 rounded-lg font-semibold">
+                    <CheckCircle size={16} />
+                    <span>{isRtl ? "عالی! وضعیت پایداری و شهرت برند در بالاترین سطح بهینگی قرار دارد." : "Great! All brand authority indicators are stable."}</span>
+                  </div>
+                ) : (
+                  alerts.map((alert, aIdx) => (
+                    <div key={aIdx} className="p-3 bg-amber-50 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900 rounded-xl flex items-start gap-3">
+                      <Sparkles className="text-amber-500 shrink-0 mt-0.5" size={16} />
+                      <div className="space-y-1">
+                        <span className="font-bold text-[var(--text-primary)] block">
+                          {alert.code === "ALERT_BRAND_AUTHORITY_DECLINE" ? (isRtl ? "سقوط شاخص اعتبار کلامی" : "Authority Decline Warning") : (isRtl ? "فرصت ارتقای کلامی" : "Optimization Opportunity")}
+                        </span>
+                        <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed">
+                          {alert.message}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+
+                <div className="p-2.5 bg-[var(--border)]/20 rounded-lg flex items-center justify-between text-[10px] font-semibold text-[var(--text-secondary)]">
+                  <span>
+                    {isRtl ? "سیگنال‌های فوق به عنوان مراجع تغذیه تسک ۴.۴ موتور تصمیم‌گیری صادر می‌شوند." : "These metrics are actively integrated with Task 4.4 Decision Engine."}
                   </span>
-                  <span className="text-[10px] text-[var(--text-muted)] font-medium">{item.timestamp}</span>
+                  <ArrowUpRight size={14} className="text-[var(--text-muted)]" />
                 </div>
-                <p className="text-xs font-semibold text-[var(--text-primary)] leading-relaxed italic">
-                  {item.text}
-                </p>
-              </div>
+              </CardContent>
+            </Card>
 
-              <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black border self-start sm:self-auto uppercase ${
-                item.sentiment === "positive" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-slate-500/10 text-slate-400 border-slate-500/20"
-              }`}>
-                {isRtl ? (item.sentiment === "positive" ? "مثبت" : "خنثی") : item.sentiment}
-              </span>
+          </div>
+
+          {/* Semantic Brand Associations Grid */}
+          <div className="space-y-4 text-start">
+            <h3 className="text-sm font-black text-[var(--text-primary)] flex items-center gap-2">
+              <Layers size={16} className="text-[var(--sky-blue-500)]" />
+              <span>{isRtl ? "گراف مفاهیم و موجودیت‌های متصل برند" : "Semantic Brand Associations Matrix"}</span>
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {associations.map((assoc) => (
+                <Card key={assoc.id} className="border border-[var(--border)] bg-[var(--card)] rounded-xl overflow-hidden hover:border-[var(--sky-blue-500)]/40 transition-all duration-300">
+                  <div className="p-4 border-b border-[var(--border)]/50 bg-[var(--border)]/10 flex justify-between items-center text-xs font-black">
+                    <span className="text-[var(--text-primary)] line-clamp-1">{assoc.entityName}</span>
+                    <span className={`px-2 py-0.5 rounded text-[8px] font-black border ${getAssociationBadgeColor(assoc.relationshipType)}`}>
+                      {getAssociationLabel(assoc.relationshipType)}
+                    </span>
+                  </div>
+                  <CardContent className="p-4 space-y-3 text-xs">
+                    <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed italic font-mono bg-[var(--border)]/10 p-2 rounded">
+                      "{assoc.supportingContext}"
+                    </p>
+                    <div className="flex justify-between items-center text-[10px] text-[var(--text-muted)] font-mono">
+                      <span>{isRtl ? "تکرار مراجع: " : "Appearances: "}<strong className="text-[var(--sky-blue-500)] font-black">{assoc.occurrenceCount}</strong></span>
+                      <span>{isRtl ? "اعتماد: " : "Confidence: "}{assoc.confidence * 100}%</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          ))}
-        </CardContent>
-      </Card>
+          </div>
+
+        </div>
+      )}
     </div>
   );
 }

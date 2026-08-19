@@ -18,7 +18,6 @@ export class TenantContextViolationException extends Error {
 }
 
 export const TENANT_SCOPED_TABLES = Object.freeze([
-  "organizations",
   "brands",
   "entities",
   "entity_relationships",
@@ -34,7 +33,23 @@ export const TENANT_SCOPED_TABLES = Object.freeze([
   "kg_entities",
   "kg_relationships",
   "premium_audits",
-  "competitive_analyses"
+  "competitive_analyses",
+  "crawl_jobs",
+  "crawl_results",
+  "crawl_cache",
+  "ai_visibility_audits",
+  "audit_prompts",
+  "prompt_definitions",
+  "prompt_schedules",
+  "prompt_executions",
+  "position_observations",
+  "citation_sources",
+  "citation_occurrences",
+  "brand_associations",
+  "recommendation_observations",
+  "aeo_analyses",
+  "faq_opportunities",
+  "kg_alignments"
 ]);
 
 /**
@@ -179,7 +194,10 @@ export class TenantContextManager {
     try {
       if (leasedClient) {
         await leasedClient.query("BEGIN");
-        await leasedClient.query(`SET LOCAL app.current_tenant_id = $1`, [tenantId]);
+        await leasedClient.query(
+          "SELECT set_config('app.current_tenant_id', $1, true)",
+          [tenantId]
+        );
       }
 
       const transactedCtx: TenantContext = Object.freeze({

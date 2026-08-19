@@ -4,6 +4,18 @@ import { firecrawlApp } from "@/lib/firecrawl";
 import { getLLMClient } from "@/services/ai/llm-client";
 import { TenantContextManager } from "@/core/database/tenant-context";
 import { PostgresClient } from "@/features/admin/infrastructure/persistence/postgres";
+import {
+  CompetitorRepository,
+  CompetitiveSeoFindingRepository,
+  VisibilityScoreRepository,
+  CitationIntelligenceRepository,
+  PromptIntelligenceRepository,
+  BrandIntelligenceRepository,
+  HistoricalMetricRepository,
+  BrandRepository
+} from "@/features/ai-intelligence/repositories";
+import { CompetitiveRadarService } from "@/features/ai-intelligence/services";
+import { CompetitiveRadarSnapshot, CompetitiveInsight } from "@/features/ai-intelligence/domain/types";
 
 // Validate request schema
 const competitiveRequestSchema = z.object({
@@ -53,6 +65,13 @@ export interface CompetitiveAnalysisResponse {
     avgIndustryScore: number;
     userRanking: number;
     topIndustryTrends: string[];
+  };
+  radar?: {
+    snapshot: CompetitiveRadarSnapshot;
+    benchmarks: any;
+    insights: CompetitiveInsight[];
+    score: any;
+    historical?: any;
   };
 }
 
@@ -298,6 +317,79 @@ export async function POST(req: NextRequest) {
           ];
         }
 
+        // Integrate with CompetitiveRadarService for Task 6.3
+        let radarData: CompetitiveAnalysisResponse["radar"] | undefined = undefined;
+        try {
+          const brandRepo = new BrandRepository();
+          const brandsRes = await brandRepo.findByOrganizationId(tenantId);
+          let brandId = brandsRes.data[0]?.id;
+          if (!brandId) {
+            brandId = "brand-acme-01";
+          }
+
+          const compRepo = new CompetitorRepository();
+          const competitorIds: string[] = [];
+          for (const compUrl of competitorUrls) {
+            try {
+              const hostname = new URL(compUrl).hostname.replace("www.", "");
+              const competitor = await compRepo.findByDomain(tenantId, hostname);
+              if (competitor) {
+                competitorIds.push(competitor.id);
+              } else {
+                const id = `comp-${Math.random().toString(36).substr(2, 9)}`;
+                const name = hostname.split(".")[0];
+                const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+                const newComp = await compRepo.save({
+                  id,
+                  organizationId: tenantId,
+                  name: displayName,
+                  domain: hostname,
+                  status: "candidate",
+                  classification: "unknown",
+                  monitoringStatus: "idle",
+                  audit: {
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    createdBy: userId,
+                    updatedBy: userId,
+                    version: 1
+                  }
+                });
+                competitorIds.push(newComp.id);
+              }
+            } catch {
+              // ignore invalid URLs
+            }
+          }
+
+          const radarService = new CompetitiveRadarService(
+            compRepo,
+            new CompetitiveSeoFindingRepository(),
+            new VisibilityScoreRepository(),
+            new CitationIntelligenceRepository(),
+            new PromptIntelligenceRepository(),
+            new BrandIntelligenceRepository(),
+            new HistoricalMetricRepository(),
+            brandRepo
+          );
+
+          const snapshot = await radarService.generateRadarSnapshot(tenantId, brandId, competitorIds);
+          const benchmarks = await radarService.benchmark(tenantId, brandId, competitorIds);
+          const radarInsights = await radarService.generateInsights(tenantId, brandId, competitorIds);
+          const radarScore = await radarService.getCompetitiveScore(tenantId, brandId, competitorIds);
+          const historical = await radarService.compareHistorical(tenantId, brandId, competitorIds, competitorIds);
+
+          radarData = {
+            snapshot,
+            benchmarks: benchmarks.benchmarks,
+            insights: radarInsights,
+            score: radarScore,
+            historical
+          };
+        } catch (radarErr) {
+          console.warn("[Competitive API] Radar calculation skipped or failed.", radarErr);
+        }
+
         const responsePayload: CompetitiveAnalysisResponse = {
           overallScore,
           marketPosition,
@@ -314,7 +406,8 @@ export async function POST(req: NextRequest) {
               "رشد اهمیت فاکتورهای تعاملی کاربر (Core Web Vitals - INP)",
               "بکارگیری اسکیماهای تخصصی محصولات و سؤالات متداول"
             ]
-          }
+          },
+          radar: radarData
         };
 
         // 4. Save to Database for audit trail/historical comparison

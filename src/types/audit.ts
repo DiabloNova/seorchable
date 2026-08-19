@@ -177,11 +177,14 @@ export interface AuditError {
   details?: string;
 }
 
+import { SeoSignals } from "./seo-signals";
+
 export interface CoreIntelligenceAuditResponse {
   auditId: string;
   url: string;
   normalizedUrl: string;
   timestamp: string;
+  seoSignals?: SeoSignals;
   data: {
     technicalOptimisation: {
       signals: TechnicalSignals;
