@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Database, Search,
   BarChart3, Settings, User, X, Menu,
   LogOut, Sun, Moon, Languages, Receipt,
-  BookOpen, Shield, HelpCircle, Briefcase, Mail, Info, FileText, Sparkles, MessageSquare
+  BookOpen, Shield, HelpCircle, Briefcase, Mail, Info, FileText, Sparkles, MessageSquare, Activity
 } from "lucide-react";
 import { SeorchableLogo } from "../marketing/SeorchableLogo";
 
@@ -105,11 +105,21 @@ export default function AppSidebar({
       ]
     },
     {
+      titleEn: "Platform",
+      titleFa: "پلتفرم",
+      items: [
+        { href: "/features", icon: Sparkles, labelEn: "Features", labelFa: "قابلیت‌ها" },
+        { href: "/industries", icon: Info, labelEn: "Industries", labelFa: "صنایع هدف" },
+        { href: "/solutions", icon: Activity, labelEn: "Solutions", labelFa: "راهکارها" },
+        { href: "/resources", icon: BookOpen, labelEn: "Resources", labelFa: "منابع" },
+      ]
+    },
+    {
       titleEn: "Users",
       titleFa: "کاربران",
       items: [
         { href: "/#free-audit", icon: Sparkles, labelEn: "Free Tools", labelFa: "ابزارهای رایگان" },
-        { href: "/#pricing", icon: Receipt, labelEn: "Pricing", labelFa: "تعرفه خدمات" },
+        { href: "/pricing", icon: Receipt, labelEn: "Pricing", labelFa: "تعرفه خدمات" },
         { href: "/contact", icon: Info, labelEn: "Enterprise Solutions", labelFa: "خدمات سازمانی" }
       ]
     },
