@@ -251,6 +251,34 @@ export const creditTransactions = pgTable("credit_transactions", {
   ...tenantPolicy("tenant_id")
 ]);
 
+export const invoices = pgTable("invoices", {
+  id: uuid("id").primaryKey().default(defaultUuid),
+  tenantId: uuid("tenant_id").notNull(),
+  amount: integer("amount").notNull(),
+  currency: text("currency").notNull().default("USD"),
+  status: text("status").notNull(), // paid, open, void, uncollectible
+  pdfUrl: text("pdf_url"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
+  paidAt: timestamp("paid_at", { withTimezone: true }),
+}, (table) => [
+  index("idx_invoices_tenant").on(table.tenantId),
+  ...tenantPolicy("tenant_id")
+]);
+
+export const payments = pgTable("payments", {
+  id: uuid("id").primaryKey().default(defaultUuid),
+  tenantId: uuid("tenant_id").notNull(),
+  invoiceId: uuid("invoice_id").references(() => invoices.id),
+  amount: integer("amount").notNull(),
+  currency: text("currency").notNull().default("USD"),
+  status: text("status").notNull(), // succeeded, failed, pending
+  providerId: text("provider_id"), // External stripe/zarinpal reference
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
+}, (table) => [
+  index("idx_payments_tenant").on(table.tenantId),
+  ...tenantPolicy("tenant_id")
+]);
+
 export const tenantSubscriptions = pgTable("tenant_subscriptions", {
   id: uuid("id").primaryKey().default(defaultUuid),
   tenantId: uuid("tenant_id").notNull(),
