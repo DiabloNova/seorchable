@@ -230,10 +230,24 @@ export const tenantQuotas = pgTable("tenant_quotas", {
   usedObservationsThisMonth: integer("used_observations_this_month").notNull().default(0),
   usedTokensThisMonth: integer("used_tokens_this_month").notNull().default(0),
   usedCrawlJobsToday: integer("used_crawl_jobs_today").notNull().default(0),
+  creditsBalance: integer("credits_balance").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
 }, (table) => [
   index("idx_tenant_quotas_tenant").on(table.tenantId),
+  ...tenantPolicy("tenant_id")
+]);
+
+export const creditTransactions = pgTable("credit_transactions", {
+  id: uuid("id").primaryKey().default(defaultUuid),
+  tenantId: uuid("tenant_id").notNull(),
+  amount: integer("amount").notNull(),
+  transactionType: text("transaction_type").notNull(), // allocation, consumption, refund
+  description: text("description"),
+  referenceId: text("reference_id"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
+}, (table) => [
+  index("idx_credit_transactions_tenant").on(table.tenantId),
   ...tenantPolicy("tenant_id")
 ]);
 
