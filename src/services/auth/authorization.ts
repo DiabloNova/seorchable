@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { requireSession, getSession } from "./session";
 import { UserRole } from "@/types/auth";
+import { TenantContextManager } from "@/core/database/tenant-context";
 
 export class AuthorizationError extends Error {
   constructor(public statusCode: number, message: string) {
@@ -11,9 +12,8 @@ export class AuthorizationError extends Error {
 
 /**
  * Asserts that the authenticated user has workspace membership access for the target workspaceId.
- * Under Task 2.1 specifications:
  * - A super_admin can access any workspace.
- * - Other roles are strictly restricted to their own session workspaceId.
+ * - Otherwise, queries the database authoritatively to verify that the user is a member of the given workspace.
  * - This prevents any cross-tenant workspace membership bypass.
  */
 export async function requireWorkspaceMembership(userId: string, workspaceId: string): Promise<void> {
@@ -23,13 +23,29 @@ export async function requireWorkspaceMembership(userId: string, workspaceId: st
     throw new AuthorizationError(401, "Unauthorized: No active session user.");
   }
 
+  if (session.user!.id !== userId) {
+      throw new AuthorizationError(403, "Forbidden: User ID mismatch.");
+  }
+
   // A super_admin has access to all tenants/workspaces
   if (session.user.role === "super_admin") {
     return;
   }
 
-  // Cross-tenant protection: If user's workspaceId doesn't match the requested workspaceId, deny access (IDOR / Spoof prevention)
-  if (session.user.workspaceId !== workspaceId) {
+  // Authoritatively verify membership against the database using system context
+  const hasAccess = await TenantContextManager.runWithSystemContext(session.user!.id, "sys-auth-check", async () => {
+      const client = TenantContextManager.getDbClient();
+      if (!client) {
+          throw new Error("Failed to get DB client in system context");
+      }
+      const { rows } = await client.query(
+          "SELECT 1 FROM organization_members m JOIN organizations o ON m.organization_id = o.id WHERE m.user_id = $1 AND m.organization_id = $2 AND o.deleted_at IS NULL",
+          [userId, workspaceId]
+      );
+      return rows.length > 0;
+  });
+
+  if (!hasAccess) {
     throw new AuthorizationError(403, "Forbidden: User is not a member of the requested workspace.");
   }
 }
@@ -41,10 +57,32 @@ export async function requireWorkspaceMembership(userId: string, workspaceId: st
  * - workspace_admin = 2
  * - viewer = 1
  */
-export async function requireRole(requiredRole: UserRole): Promise<void> {
+export async function requireRole(requiredRole: UserRole, targetWorkspaceId?: string): Promise<void> {
   const session = await requireSession();
   if (!session.user) {
     throw new AuthorizationError(401, "Unauthorized: No active session user.");
+  }
+
+  let activeRole = session.user.role;
+
+  // If a specific workspace is targeted, authoritatively fetch their role in that workspace
+  if (targetWorkspaceId && session.user.role !== "super_admin") {
+      const role = await TenantContextManager.runWithSystemContext(session.user!.id, "sys-auth-role-check", async () => {
+          const client = TenantContextManager.getDbClient();
+          if (!client) {
+              throw new Error("Failed to get DB client in system context");
+          }
+          const { rows } = await client.query(
+              "SELECT m.role FROM organization_members m JOIN organizations o ON m.organization_id = o.id WHERE m.user_id = $1 AND m.organization_id = $2 AND o.deleted_at IS NULL",
+              [session.user!.id, targetWorkspaceId]
+          );
+          return rows.length > 0 ? rows[0].role : null;
+      });
+
+      if (!role) {
+          throw new AuthorizationError(403, "Forbidden: User is not a member of the requested workspace.");
+      }
+      activeRole = role as UserRole;
   }
 
   const roleHierarchy: Record<UserRole, number> = {
@@ -53,7 +91,7 @@ export async function requireRole(requiredRole: UserRole): Promise<void> {
     viewer: 1,
   };
 
-  const userRoleValue = roleHierarchy[session.user.role] || 0;
+  const userRoleValue = roleHierarchy[activeRole] || 0;
   const requiredRoleValue = roleHierarchy[requiredRole] || 0;
 
   if (userRoleValue < requiredRoleValue) {
@@ -71,7 +109,7 @@ export async function authorizeApiRequest(req: NextRequest): Promise<{ userId: s
 
   if (session && session.user) {
     return {
-      userId: session.user.id,
+      userId: session.user!.id,
       tenantId: session.user.workspaceId
     };
   }
@@ -82,6 +120,23 @@ export async function authorizeApiRequest(req: NextRequest): Promise<{ userId: s
 
   if (!headerUserId || headerUserId.trim() === "" || !headerTenantId || headerTenantId.trim() === "") {
     throw new AuthorizationError(401, "Unauthorized: Valid session or API headers required.");
+  }
+
+  // To keep developer API integrations secure, we verify the user belongs to the requested header tenant
+  const hasAccess = await TenantContextManager.runWithSystemContext(headerUserId, "sys-auth-api-check", async () => {
+      const client = TenantContextManager.getDbClient();
+      if (!client) {
+          throw new Error("Failed to get DB client in system context");
+      }
+      const { rows } = await client.query(
+          "SELECT 1 FROM organization_members m JOIN organizations o ON m.organization_id = o.id WHERE m.user_id = $1 AND m.organization_id = $2 AND o.deleted_at IS NULL",
+          [headerUserId, headerTenantId]
+      );
+      return rows.length > 0;
+  });
+
+  if (!hasAccess) {
+      throw new AuthorizationError(403, "Forbidden: User is not a member of the requested workspace.");
   }
 
   return {
