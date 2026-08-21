@@ -106,68 +106,25 @@ export async function POST(req: NextRequest) {
         console.error("[LLM Analytics Model Error]:", llmErr);
       }
 
+      let cleanJson = rawLlmOutput.trim();
+      if (cleanJson.startsWith("```json")) {
+        cleanJson = cleanJson.substring(7, cleanJson.length - 3).trim();
+      } else if (cleanJson.startsWith("```")) {
+        cleanJson = cleanJson.substring(3, cleanJson.length - 3).trim();
+      }
+
       let parsedAnalytics: LlmAnalyticsResponse;
       try {
-        let cleanJson = rawLlmOutput.trim();
-        if (cleanJson.startsWith("```json")) {
-          cleanJson = cleanJson.substring(7, cleanJson.length - 3).trim();
-        } else if (cleanJson.startsWith("```")) {
-          cleanJson = cleanJson.substring(3, cleanJson.length - 3).trim();
-        }
         parsedAnalytics = JSON.parse(cleanJson);
-
-        // Verify that the parsed object actually matches our expected structure
         if (!parsedAnalytics || typeof parsedAnalytics !== "object" || !parsedAnalytics.shareOfVoice) {
           throw new Error("Parsed JSON is not a valid LlmAnalyticsResponse structure.");
         }
-      } catch {
-        // Fallback dynamic high-fidelity simulation in case LLM fails or MockClient is active
-        const mockQueryResults = queries.map((query) => {
-          const brandMentioned = Math.random() > 0.3;
-          const sentiment = brandMentioned ? (Math.random() > 0.4 ? "positive" : "neutral") : "neutral";
-          const hallucinationRisk = Math.random() > 0.75 ? "medium" : "low";
-
-          let simulatedResponse = "";
-          if (query.includes("جایگزین") || query.includes("مقایسه")) {
-            simulatedResponse = `در بررسی سرویس‌های هوشمند، برند ${brandName} به همراه رقبایی چون ${competitorNames.join(" و ")} مطرح هستند. برند ${brandName} با تکیه بر تحلیل‌های معنایی بومی عملکرد خوبی دارد، هرچند برخی رقبا در مقیاس بین‌المللی با سابقه‌تر هستند. پیشنهاد می‌شود بر اساس نیاز فنی خود انتخاب کنید.`;
-          } else if (query.includes("نظرات") || query.includes("نقاط قوت")) {
-            simulatedResponse = `بازخوردهای کاربران درباره ${brandName} نشان‌دهنده رضایت بالا از پشتیبانی و دقت مدل‌های گراف دانش بومی است. با این حال، برخی کاربران به لزوم ارتقای مستندات اشاره کرده‌اند. در مقابل، رقبایی مانند ${competitorNames[0] || "دیگر رقبا"} مستندات قوی‌تری دارند.`;
-          } else {
-            simulatedResponse = `با توجه به آخرین داده‌های پایش شده، برند ${brandName} در بازار داخلی جایگاه مناسبی دارد و نوآوری‌های زیادی ارائه کرده است. رقبایی نظیر ${competitorNames.join(", ")} نیز خدمات مشابهی با تفاوت‌های جزئی در قیمت و پایداری ارائه می‌دهند.`;
-          }
-
-          return {
-            query,
-            simulatedResponse,
-            brandMentioned,
-            sentiment: sentiment as "positive" | "neutral" | "negative",
-            hallucinationRisk: hallucinationRisk as "low" | "medium" | "high",
-          };
-        });
-
-        const yourBrandPct = Math.round(45 + Math.random() * 15); // 45-60%
-        const remaining = 100 - yourBrandPct;
-        const competitorPcts = competitorNames.map((comp, idx) => {
-          if (idx === competitorNames.length - 1) {
-            const sumPctsSoFar = competitorNames.slice(0, idx).reduce((acc, _, cIdx) => acc + Math.round(remaining / competitorNames.length), 0);
-            return { name: comp, percentage: remaining - sumPctsSoFar };
-          }
-          return { name: comp, percentage: Math.round(remaining / competitorNames.length) };
-        });
-
-        parsedAnalytics = {
-          shareOfVoice: {
-            yourBrand: yourBrandPct,
-            competitors: competitorPcts,
-          },
-          sentimentScore: Math.round(78 + Math.random() * 12),
-          queryResults: mockQueryResults,
-          actionableInsights: [
-            `در پاسخ به سوالات مقایسه‌ای، نام رقیب ${competitorNames[0] || "اصلی"} بیشتر از برند شما ذکر می‌شود. پیشنهاد: محتوای مقایسه‌ای عمیق‌تر در استودیو محتوا تولید کنید.`,
-            `برند ${brandName} در پرس‌وجوهای مربوط به رضایت کاربری بازخورد مثبتی دارد، اما ریسک توهم کلامی (Hallucination) مدل‌ها در قبال ویژگی‌های تخصصی متوسط است.`,
-            `ارتقای گراف دانش برند به مدل‌های پاسخ‌گو کمک می‌کند ارجاعات مستقیم و استنادات دقیق‌تری به وب‌سایت شما داشته باشند.`
-          ],
-        };
+      } catch (parseErr: unknown) {
+        console.error("[LLM Analytics JSON Parse Error]:", parseErr);
+        return NextResponse.json(
+          { error: "Internal Server Error", message: "پاسخ مدل زبانی قابل تحلیل نیست. لطفاً مجدداً تلاش کنید." },
+          { status: 500 }
+        );
       }
 
       return NextResponse.json(parsedAnalytics);

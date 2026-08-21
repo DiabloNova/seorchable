@@ -9,6 +9,269 @@
 - Never run migrations automatically during `next build`, Vercel deployment, or application startup.
 - Use `DATABASE_URL` for normal queries and tenant-scoped application tests.
 - Use `MIGRATION_DATABASE_URL` only when explicitly executing migration commands.
+
+# Mandatory Engineering Rules
+
+## Evidence-First Development
+
+The repository is governed by an evidence-first, no-guessing policy.
+
+## Absolute Rule
+
+Never guess. Never invent. Never fabricate missing implementation details.
+
+## An AI agent MUST NOT:
+
+- invent a **database table**
+- invent a **column**
+- invent a **repository**
+- invent a **repository method**
+- invent a **service**
+- invent an **API contract**
+- invent **tenant behavior**
+- invent **authorization behavior**
+- invent **migration behavior**
+- invent **schema relationships**
+- invent **configuration**
+- invent **environment variables**
+- invent **production infrastructure**
+- invent a **fallback data source**
+- invent a **mock implementation** to make a task appear complete
+- **replace missing evidence with assumptions**
+
+If the required implementation detail cannot be verified from the repository, approved documentation, or explicitly provided task context:
+
+**STOP and report "BLOCKED".**
+
+**Do not continue by making an assumption**.
+
+---
+
+**No Fabricated Data**
+
+Production application code MUST NOT fabricate data.
+
+## Forbidden patterns include:
+
+**`Math.random()`**
+
+used as a substitute for persisted application data.
+
+## Also forbidden:
+
+**`return mockData;`**
+**`return demoData;`**
+**``return fakeData;`**
+**``return fallbackData;`**
+
+when these values substitute for unavailable persistence or external data.
+
+## Also forbidden:
+
+**`databaseResult ?? fakeData`**
+
+and:
+
+**`try {
+  return await repository.getData();
+} catch {
+  return mockData;
+}`**
+
+unless the fallback is explicitly verified as intentional static behavior.
+
+---
+
+## Mock Data Policy
+
+Mocks are allowed **only when they are explicitly required for**:
+
+- unit-test isolation
+- integration-test fixtures
+- deterministic test data
+- development tooling explicitly designed around mocks
+
+Mocks **MUST NOT** be introduced into production application paths merely because:
+
+- a repository is missing
+- a table is unclear
+- an API is unavailable
+- a test is difficult to write
+- existing implementation is incomplete
+- the agent does not understand the architecture
+
+If a production path requires persistence that cannot be verified:
+
+ **BLOCK the task.**
+
+---
+
+## Database Evidence Rule
+
+Before changing database-backed code, the agent **MUST** be able to identify all of the following from existing evidence:
+
+1. Canonical table
+2. Relevant columns
+3. Existing repository or approved query
+4. Repository behavior
+5. Tenant boundary
+6. Authorization boundary
+7. Expected error behavior
+
+If any one of these cannot be established:
+
+**DO NOT IMPLEMENT.**
+
+Report:
+
+**`BLOCKED — INSUFFICIENT EVIDENCE`**
+
+and identify exactly what evidence is missing.
+
+---
+
+## Schema and Migration Protection
+
+AI agents MUST NOT create or modify schema/migration infrastructure simply to unblock an application task unless the task explicitly authorizes it.
+
+In particular, an agent MUST NOT:
+
+- create a guessed table
+- add a guessed column
+- create a guessed relation
+- create a migration based on assumptions
+- modify RLS policies based on assumptions
+- change tenant isolation behavior without explicit evidence
+
+Database architecture must be established before application code is connected to it.
+
+---
+
+## Tenant Isolation
+
+Tenant isolation MUST NEVER be inferred.
+
+Before modifying tenant-scoped functionality, verify the existing mechanism for:
+
+- tenant identification
+- tenant context propagation
+- repository scoping
+- PostgreSQL RLS
+- authorization
+
+If the boundary cannot be demonstrated:
+
+**BLOCK.**
+
+Never bypass tenant isolation to make a feature work.
+
+---
+
+## Authorization
+
+Authorization behavior MUST be preserved.
+
+An agent MUST NOT:
+
+- weaken an authorization check
+- remove an authorization check
+- bypass an existing policy
+- expose data because a repository method is easier to call directly
+- assume that authentication implies authorization
+
+If authorization behavior is unclear:
+
+**BLOCK.**
+
+---
+
+## Fail-Closed Requirement
+
+Application code MUST fail closed when a required dependency fails.
+
+Database failures, authorization failures, tenant-context failures, and required external-service failures MUST NOT silently become:
+
+- mock data
+- random data
+- demo data
+- stale data
+- fabricated success responses
+
+A legitimate empty result MUST remain distinguishable from an infrastructure failure whenever the existing architecture provides that distinction.
+
+---
+
+## Change Scope
+
+Agents MUST modify only files explicitly permitted by the current task.
+
+Do not expand scope because an unrelated problem is discovered.
+
+If another change is required to complete the task but is outside the allowed scope:
+
+STOP and report the dependency as BLOCKED.
+
+Do not modify the unrelated file.
+
+---
+
+## Verification Before Completion
+
+An agent **MUST NOT** claim a task is complete merely because:
+
+- the code compiles
+- TypeScript passes
+- a test passes
+- a mock was replaced
+- an endpoint returns a response
+
+Completion requires evidence that the implementation respects:
+
+- canonical architecture
+- persistence
+- authorization
+- tenant isolation
+- error semantics
+- approved file scope
+
+---
+
+## Required Reporting
+
+For every implementation involving previously mocked, random, fallback, or in-memory data, report:
+
+- Previous data source
+- New data source
+- Canonical repository
+- Canonical table
+- Tenant boundary
+- Authorization behavior
+- Error behavior
+- Tests executed
+- Test exit status
+- Remaining limitations
+
+For blocked work, report:
+
+- Exact file/path
+- Exact dependency that is missing
+- Evidence that was searched
+- Why implementation would require guessing
+- What evidence would unblock the work
+
+---
+
+## Prime Directive
+
+«Repository evidence is authoritative.
+
+Approved documentation is supporting evidence.
+
+Task instructions define scope.
+
+Assumptions are not evidence.
+
+When evidence is missing, STOP — do not guess, do not fabricate, and do not create a mock to hide the gap.»
 - 
 ## This is NOT the Next.js you know
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in node_modules/next/dist/docs/ before writing any code. Heed deprecation notices.
