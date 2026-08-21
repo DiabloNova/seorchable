@@ -15,6 +15,13 @@
       "when": 1787289552926,
       "tag": "0001_illegal_grey_gargoyle",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787298574291,
+      "tag": "0002_soft_jimmy_woo",
+      "breakpoints": true
     }
   ]
 }
