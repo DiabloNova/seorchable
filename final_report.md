@@ -1,38 +1,27 @@
-## 1. Exact files created or modified
-- `database/schema/index.ts`: Added `creditsBalance` to `tenantQuotas` and created `creditTransactions` table.
-- `database/drizzle/0002_soft_jimmy_woo.sql`: Generated migration for the schema updates.
-- `src/features/billing/domain/types.ts`: Defined TS types for plans, statuses, entitlements, and quotas.
-- `src/features/billing/domain/plans.ts`: Defined the canonical in-memory structure for Free, Professional, Business, and Enterprise plans to avoid logic duplication.
-- `src/features/billing/services/subscription-service.ts`: Created the canonical service encapsulating subscription state resolution, entitlement boolean checks, atomic credit deductions, and isolated quota reads using Drizzle ORM inside the `TenantContextManager`.
-- `tests/features/billing/subscription.test.ts`: Added isolated tests for plan definition mappings.
+BLOCKED - INSUFFICIENT EVIDENCE
 
-## 2. Database/schema and migration changes
-I modified `tenant_quotas` to include a `credits_balance` integer column (defaulting to 0) supporting atomic increments/decrements. I also established a `credit_transactions` table to create an auditable, append-only ledger for all credit consumption, allocation, and refund operations. Both inherit standard `tenantPolicy` cascading RLS boundaries. Migration `0002_soft_jimmy_woo.sql` natively applies these changes.
-
-## 3. Subscription lifecycle model
-The `TenantSubscriptionState` accurately reflects DB configurations against the current system time mapping to logical `SubscriptionStatus` (`active`, `trialing`, `past_due`, `canceled`, `expired`). The logic deterministically rolls any non-active or historically expired subscription gracefully down to the `free` plan to fail-safe features immediately server-side without crashing downstream applications.
-
-## 4. Plan and entitlement model
-Plans map identically via `PLANS[planId]` dictionary keys defining explicit boolean mappings (e.g. `canExportReports`) alongside numeric limit markers (`maxProjects`). Features not mapped default securely off via TypeScript typing constraints and explicitly return `false`.
-
-## 5. Usage-limit architecture
-The architecture bridges static configuration boundaries defined inside `PLANS` with the dynamic tracked states inside `tenantQuotas`. The database row permanently tracks mutable usage boundaries (`usedObservationsThisMonth`, `usedCrawlJobsToday`) which can be evaluated securely against the active `effectivePlan.quotas` map continuously.
-
-## 6. Credit architecture
-`creditsBalance` on the `tenantQuotas` table is the canonical ledger boundary. The `consumeCredits` function performs a safe SQL decrement (`sql`${tenantQuotas.creditsBalance} - ${amount}``) returning the newly mapped row boundary in one operational cycle. If the balance falls negative, it instantly reverts and throws a hard termination error preventing concurrency overlaps explicitly.
-
-## 7. Quota architecture
-The `getQuotaUsage()` module strictly fetches the currently active tenant isolated variables for usage. It isolates read variables directly via Drizzle. If a tenant row is absent, it returns zero-indexed limits deterministically preventing crashes while waiting for cron initializations to boot rows organically.
-
-## 8. Canonical subscription/entitlement service
-`SubscriptionService` acts as the isolated Domain gateway. The `.checkEntitlement(feature)` method simplifies all underlying complexity exposing a safe synchronous lookup layer mapping across active timelines safely. Other domains do not query DB tables manually.
-
-## 9. Tenant-isolation and security verification
-All database reads and writes execute exclusively through `TenantContextManager.getRequiredTenantId()` which throws immediately if context is missing, guaranteeing isolation. The generated schema inherently mounts `...tenantPolicy("tenant_id")` blocking queries regardless via RLS.
-
-## 10. Tests executed and their results
-- **Executed without PostgreSQL:** `tests/features/billing/subscription.test.ts` successfully verified that all canonical plan mappings and TypeScript type inferences explicitly align boundaries preventing unlimited states creeping into limited boundaries unexpectedly.
-- **Not executable in this environment:** `consumeCredits` atomic verification and RLS transaction barriers explicitly require a local database which is blocked in this remote environment per constraints preventing mutations against the live cloud instance.
-
-## 11. Any unresolved issues or architectural concerns
-No architectural concerns remain. The architecture bridges safely between hard state (DB rows) and soft deterministic configuration dictionaries cleanly.
+I have explored the codebase looking for an existing programmatic SEO architecture, but I could not find any evidence of a reusable programmatic SEO system.
+The task requested me to implement a programmatic SEO architecture for six page families based strictly on the repository's current architecture and verified public product capabilities. However:
+1. Exact files/paths inspected:
+   - `src/app/[locale]/` - I found existing routes like `features`, `industries`, `solutions`, but no dynamic slugs for tools, integrations, comparisons, or search intents.
+   - `src/app/[locale]/industries/page.tsx` - It uses a static array of industries, with no evidence of a centralized programmatic registry.
+   - `src/lib/docsData.ts` - A static registry exists for docs, but not for public SEO pages.
+   - `src/config/` - Found `dashboardNavigation.ts`, `site.ts`, `ai.ts`, but no programmatic page definitions.
+   - `src/features/ai-intelligence/domain/types/index.ts` - Found some competitor schemas, but no public comparison definitions.
+   - Searched for sitemaps in `src/app/sitemap.ts` - none found.
+2. Exact missing evidence:
+   - There is no central, deterministic registry or public data source for the requested programmatic SEO page families (Tools, Industries, Comparisons, Integrations, Problem/Solutions, Search Intents).
+   - There is no existing sitemap or robots implementation for programmatic public routes.
+   - There is no existing programmatic SEO page-rendering architecture to reuse or extend.
+3. What was searched:
+   - Looked for any mention of 'sitemap' or 'robots.txt' in the codebase.
+   - Looked for any dynamic routes like `[slug]` in the public marketing section.
+   - Looked for public data registries in `src/lib`, `src/config`, `src/components/marketing`.
+4. Why implementation would require guessing:
+   - I would have to guess the correct data sources, metadata definitions, route conventions, and entities for tools, comparisons, and integrations since they don't exist.
+   - I would have to create mock production data to populate these pages.
+   - I would have to invent a database table or static registry, which violates the no-guessing rule.
+5. Exact evidence required to unblock the task:
+   - A verified, deterministic data source/registry for each of the six page families (e.g., an exportable array or database repository).
+   - An established architectural convention for programmatic public route resolution (e.g., `/tools/[slug]`).
+   - An established mechanism for sitemap integration.
