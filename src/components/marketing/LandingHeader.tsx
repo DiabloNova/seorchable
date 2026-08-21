@@ -31,15 +31,13 @@ export function LandingHeader() {
     { label: isFa ? "بهینه‌سازی پاسخ‌ها AEO" : "AEO Optimization", value: "aeo", href: `/${language}/solutions/aeo` },
     { label: isFa ? "محافظت از برند" : "Brand Protection", value: "protection", href: `/${language}/solutions/protection` },
     { label: isFa ? "رادار تحلیل رقابتی" : "Competitive Radar", value: "radar", href: `/${language}/solutions/radar` },
-    { label: isFa ? "همه راهکارها" : "All Solutions", value: "solutions", href: `/${language}/solutions` },
   ];
 
   const platformItems = [
-    { label: isFa ? "قابلیت‌های پلتفرم" : "Features", value: "features", href: `/${language}/features` },
-    { label: isFa ? "صنایع هدف" : "Industries", value: "industries", href: `/${language}/industries` },
     { label: isFa ? "معماری اکوسیستم" : "Ecosystem Architecture", value: "ecosystem", href: `/${language}/#ecosystem` },
     { label: isFa ? "بررسی کلان پلتفرم" : "Platform Overview", value: "overview", href: `/${language}/#overview` },
     { label: isFa ? "داستان چرخه محصول" : "Product Lifecycle Story", value: "story", href: `/${language}/#story` },
+    { label: isFa ? "پیش‌نمایش داشبوردها" : "Interactive Dashboard Sim", value: "dashboards", href: `/${language}/#dashboards` },
   ];
 
   return (
@@ -138,7 +136,7 @@ export function LandingHeader() {
 
             {/* Resources */}
             <Link
-              href={`/${language}/resources`}
+              href={`/${language}/#resources`}
               className="px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-[var(--radius-md)] transition-colors"
             >
               {isFa ? "منابع" : "Resources"}
@@ -150,14 +148,6 @@ export function LandingHeader() {
               className="px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-[var(--radius-md)] transition-colors"
             >
               {isFa ? "درباره ما" : "About"}
-            </Link>
-
-            {/* Contact */}
-            <Link
-              href={`/${language}/contact`}
-              className="px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-[var(--radius-md)] transition-colors"
-            >
-              {isFa ? "تماس با ما" : "Contact"}
             </Link>
           </nav>
 

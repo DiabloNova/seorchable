@@ -51,7 +51,6 @@ export function LandingFooter() {
     {
       heading: isFa ? "منابع" : "Resources",
       links: [
-        { label: isFa ? "مرکز منابع" : "All Resources", href: `/${language}/resources` },
         { label: isFa ? "ابزارهای رایگان سنجش" : "Free Tools", href: `/${language}/#free-audit` },
         { label: isFa ? "وبلاگ مهندسی" : "Corporate Blog", href: `/${language}/blog` },
         { label: isFa ? "مطالعات موردی موفقیت" : "Case Studies", href: `/${language}/blog` },
@@ -63,9 +62,6 @@ export function LandingFooter() {
     {
       heading: isFa ? "شرکت" : "Company",
       links: [
-        { label: isFa ? "قابلیت‌ها" : "Features", href: `/${language}/features` },
-        { label: isFa ? "صنایع هدف" : "Industries", href: `/${language}/industries` },
-        { label: isFa ? "راهکارها" : "Solutions", href: `/${language}/solutions` },
         { label: isFa ? "درباره ما" : "About Us", href: `/${language}/about` },
         { label: isFa ? "همکاری با ما" : "Careers", href: `/${language}/about` },
         { label: isFa ? "تماس با ما" : "Contact Us", href: `/${language}/contact` },
