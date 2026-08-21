@@ -1133,3 +1133,4 @@ export const crawlCache = pgTable("crawl_cache", {
   check("crawl_cache_scope_check", sql`cache_scope = 'tenant'`),
   ...textTenantPolicy()
 ]);
+export * from "./auth";

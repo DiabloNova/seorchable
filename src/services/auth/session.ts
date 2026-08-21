@@ -19,7 +19,10 @@ const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toSt
 const COOKIE_NAME = "seorchable_session";
 const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 
+import { revokeSessionToken, isSessionRevoked } from "./revocation";
+
 interface SessionPayload {
+  jti: string;
   user: User;
   expiresAt: string;
 }
@@ -46,6 +49,7 @@ export function verifyPayload(payloadStr: string, signature: string): boolean {
 export async function createSession(user: User): Promise<void> {
   const expiresAt = new Date(Date.now() + SESSION_EXPIRY_MS);
   const payload: SessionPayload = {
+    jti: crypto.randomUUID(),
     user,
     expiresAt: expiresAt.toISOString(),
   };
@@ -109,6 +113,10 @@ export async function getSession(): Promise<Session | null> {
       return null; // Expired
     }
 
+    if (payload.jti && await isSessionRevoked(payload.jti)) {
+      return null; // Revoked
+    }
+
     return {
       user: payload.user,
       expiresAt: payload.expiresAt,
@@ -142,6 +150,26 @@ export async function getAuthenticatedUser(): Promise<User | null> {
  * Invalidates the authoritative session on the server and expires the cookies.
  */
 export async function invalidateSession(): Promise<void> {
+  try {
+    const cookieStore = await cookiesFn();
+    const cookie = cookieStore.get(COOKIE_NAME);
+    if (cookie && cookie.value) {
+      const parts = cookie.value.split(".");
+      if (parts.length === 2) {
+        const [payloadBase64, signature] = parts;
+        if (verifyPayload(payloadBase64, signature)) {
+          const payloadStr = Buffer.from(payloadBase64, "base64url").toString("utf8");
+          const payload = JSON.parse(payloadStr) as SessionPayload;
+          if (payload.jti && payload.expiresAt) {
+            await revokeSessionToken(payload.jti, new Date(payload.expiresAt));
+          }
+        }
+      }
+    }
+  } catch (err) {
+    // Ignore errors during revocation attempt to guarantee cookie deletion
+  }
+
   const cookieStore = await cookiesFn();
   cookieStore.delete(COOKIE_NAME);
   cookieStore.delete("tenant_id");

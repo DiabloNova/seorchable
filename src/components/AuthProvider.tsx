@@ -60,16 +60,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // e.g. const res = await fetch("/api/v1/auth/login", { ... })
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    // Secure server-side login strictly on the server to prevent client-controlled spoofing
-    const user = await loginAction(email);
+    try {
+      // Secure server-side login strictly on the server to prevent client-controlled spoofing
+      const user = await loginAction(email, password);
 
-    localStorage.setItem("auth_session_user", JSON.stringify(user));
+      localStorage.setItem("auth_session_user", JSON.stringify(user));
 
-    setSession({
-      user,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      status: "authenticated",
-    });
+      setSession({
+        user,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        status: "authenticated",
+      });
+    } catch (err) {
+      setSession((prev) => ({ ...prev, status: "unauthenticated" }));
+      throw err;
+    }
   };
 
   const register = async (name: string, email: string, password?: string) => {
@@ -79,16 +84,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // e.g. const res = await fetch("/api/v1/auth/register", { ... })
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    // Secure server-side registration strictly on the server to prevent client-controlled spoofing
-    const user = await registerAction(name, email);
+    try {
+      // Secure server-side registration strictly on the server to prevent client-controlled spoofing
+      const user = await registerAction(name, email, password);
 
-    localStorage.setItem("auth_session_user", JSON.stringify(user));
+      localStorage.setItem("auth_session_user", JSON.stringify(user));
 
-    setSession({
-      user,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      status: "authenticated",
-    });
+      setSession({
+        user,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        status: "authenticated",
+      });
+    } catch (err) {
+      setSession((prev) => ({ ...prev, status: "unauthenticated" }));
+      throw err;
+    }
   };
 
   const logout = async () => {
