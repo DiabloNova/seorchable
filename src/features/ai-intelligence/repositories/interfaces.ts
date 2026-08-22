@@ -126,6 +126,21 @@ export interface IRecommendationRepository {
   deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean>;
 }
 
+export interface WebsiteMonitoringSnapshot {
+  id: string;
+  organizationId: string;
+  websiteId: string;
+  jobId?: string;
+  status: "valid" | "failed";
+  snapshotData: Record<string, any>;
+  createdAt: Date | string;
+}
+
+export interface IWebsiteMonitoringSnapshotRepository {
+  save(snapshot: WebsiteMonitoringSnapshot): Promise<WebsiteMonitoringSnapshot>;
+  getLatestValidSnapshot(organizationId: string, websiteId: string): Promise<WebsiteMonitoringSnapshot | null>;
+}
+
 export interface IWebsiteRepository {
   findById(organizationId: string, id: string): Promise<Website | null>;
   findByDomain(organizationId: string, domain: string): Promise<Website | null>;

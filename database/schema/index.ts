@@ -294,6 +294,7 @@ export const entityRelationships = pgTable("entity_relationships", {
 // 4. UNIFIED INTELLIGENCE & WEBSITE DOMAIN
 // ==========================================
 export const websites = pgTable("websites", {
+  monitoringConfig: jsonb("monitoring_config"),
   id: uuid("id").primaryKey().default(defaultUuid),
   organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   domain: text("domain").notNull(),
@@ -1132,4 +1133,19 @@ export const crawlCache = pgTable("crawl_cache", {
   uniqueIndex("idx_crawl_cache_key").on(table.tenantId, table.cacheScope, table.cacheKey),
   check("crawl_cache_scope_check", sql`cache_scope = 'tenant'`),
   ...textTenantPolicy()
+]);
+
+export const websiteMonitoringSnapshots = pgTable("website_monitoring_snapshots", {
+  id: uuid("id").primaryKey().default(defaultUuid),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  websiteId: uuid("website_id").notNull().references(() => websites.id, { onDelete: "cascade" }),
+  jobId: text("job_id"),
+  status: text("status").notNull().default("valid"),
+  snapshotData: jsonb("snapshot_data").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
+}, (table) => [
+  index("idx_website_monitoring_snapshots_organization").on(table.organizationId),
+  index("idx_website_monitoring_snapshots_website").on(table.websiteId),
+  index("idx_website_monitoring_snapshots_created_at").on(table.createdAt),
+  ...tenantPolicy("organization_id")
 ]);

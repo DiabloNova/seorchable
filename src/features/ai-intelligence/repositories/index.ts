@@ -70,7 +70,9 @@ import {
   IPromptIntelligenceRepository,
   ICitationIntelligenceRepository,
   IBrandIntelligenceRepository,
-  IAeoContentIntelligenceRepository
+  IAeoContentIntelligenceRepository,
+  IWebsiteMonitoringSnapshotRepository,
+  WebsiteMonitoringSnapshot
 } from "./interfaces";
 
 function createMockAudit(createdBy = "system"): AuditMetadata {
@@ -2006,6 +2008,28 @@ export class WebsiteRepository implements IWebsiteRepository {
     const sql = `SELECT * FROM websites WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
     await this.pg.query(sql, [id, organizationId]);
 
+    const res = await this.pg.query(sql, [id, organizationId]);
+    if (res && res.rows && res.rows.length > 0) {
+      const row = res.rows[0];
+      return {
+        id: row.id || id,
+        organizationId: row.organization_id || organizationId,
+        domain: row.domain,
+        normalizedUrl: row.normalized_url,
+        status: row.status,
+        lastCrawledAt: row.last_crawled_at,
+        lastAnalyzedAt: row.last_analyzed_at,
+        monitoringConfig: row.monitoring_config,
+        audit: {
+          createdAt: row.created_at,
+          updatedAt: row.updated_at,
+          createdBy: row.created_by,
+          updatedBy: row.updated_by,
+          deletedAt: row.deleted_at,
+          version: row.version
+        }
+      };
+    }
     const item = db.websites.get(id);
     if (!item || item.organizationId !== organizationId || item.audit.deletedAt) return null;
     return item;
@@ -2027,13 +2051,14 @@ export class WebsiteRepository implements IWebsiteRepository {
   public async save(website: Website): Promise<Website> {
     enforceTenantContext(website.organizationId);
     const sql = `
-      INSERT INTO websites (id, organization_id, domain, normalized_url, status, last_crawled_at, last_analyzed_at, created_at, updated_at, created_by, updated_by, version)
+      INSERT INTO websites (id, organization_id, domain, normalized_url, status, last_crawled_at, last_analyzed_at, monitoring_config, created_at, updated_at, created_by, updated_by, version)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       ON CONFLICT (organization_id, domain) DO UPDATE SET
         normalized_url = EXCLUDED.normalized_url,
         status = EXCLUDED.status,
         last_crawled_at = EXCLUDED.last_crawled_at,
         last_analyzed_at = EXCLUDED.last_analyzed_at,
+        monitoring_config = EXCLUDED.monitoring_config,
         updated_at = EXCLUDED.updated_at,
         updated_by = EXCLUDED.updated_by,
         version = websites.version + 1;
@@ -3545,5 +3570,74 @@ export class RecommendationRepository implements IRecommendationRepository {
     rec.audit.updatedBy = deletedBy;
     rec.audit.updatedAt = new Date().toISOString();
     return true;
+  }
+}
+
+
+export class WebsiteMonitoringSnapshotRepository implements IWebsiteMonitoringSnapshotRepository {
+  private pg: PostgresClient;
+  private memoryMap = new Map<string, WebsiteMonitoringSnapshot>();
+
+  constructor(pg?: PostgresClient) {
+    this.pg = pg || PostgresClient.getInstance();
+  }
+
+  public async save(snapshot: WebsiteMonitoringSnapshot): Promise<WebsiteMonitoringSnapshot> {
+    enforceTenantContext(snapshot.organizationId);
+
+    if (!snapshot.id) snapshot.id = "snap-" + Math.random().toString(36).substr(2, 9);
+
+    const sql = `
+      INSERT INTO website_monitoring_snapshots (id, organization_id, website_id, job_id, status, snapshot_data, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *;
+    `;
+    await this.pg.query(sql, [
+      snapshot.id,
+      snapshot.organizationId,
+      snapshot.websiteId,
+      snapshot.jobId || null,
+      snapshot.status,
+      JSON.stringify(snapshot.snapshotData),
+      snapshot.createdAt
+    ]);
+
+    this.memoryMap.set(snapshot.id, snapshot);
+    return snapshot;
+  }
+
+  public async getLatestValidSnapshot(organizationId: string, websiteId: string): Promise<WebsiteMonitoringSnapshot | null> {
+    enforceTenantContext(organizationId);
+
+    const sql = `
+      SELECT * FROM website_monitoring_snapshots
+      WHERE organization_id = $1 AND website_id = $2 AND status = 'valid'
+      ORDER BY created_at DESC
+      LIMIT 1;
+    `;
+    const res = await this.pg.query(sql, [organizationId, websiteId]);
+
+    if (res && res.rows && res.rows.length > 0) {
+      const row = res.rows[0];
+      return {
+        id: row.id,
+        organizationId: row.organization_id,
+        websiteId: row.website_id,
+        jobId: row.job_id,
+        status: row.status,
+        snapshotData: row.snapshot_data,
+        createdAt: row.created_at
+      };
+    }
+
+    let latest = null;
+    for (const snap of this.memoryMap.values()) {
+      if (snap.organizationId === organizationId && snap.websiteId === websiteId && snap.status === "valid") {
+        if (!latest || new Date(snap.createdAt).getTime() > new Date(latest.createdAt).getTime()) {
+          latest = snap;
+        }
+      }
+    }
+    return latest;
   }
 }

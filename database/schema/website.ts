@@ -4,6 +4,12 @@ export const websitesTable: TableDefinition = {
   tableName: "websites",
   columns: [
     {
+      name: "monitoring_config",
+      type: "JSONB",
+      nullable: true,
+      description: "Monitoring configuration (enabled, frequency, scope, etc.)"
+    },
+    {
       name: "id",
       type: "UUID",
       nullable: false,
@@ -112,7 +118,8 @@ CREATE TABLE IF NOT EXISTS websites (
   created_by TEXT NOT NULL DEFAULT 'system',
   updated_by TEXT NOT NULL DEFAULT 'system',
   deleted_at TIMESTAMP WITH TIME ZONE,
-  version INTEGER NOT NULL DEFAULT 1
+  version INTEGER NOT NULL DEFAULT 1,
+  monitoring_config JSONB
 );
 
 CREATE INDEX IF NOT EXISTS idx_websites_organization ON websites(organization_id);

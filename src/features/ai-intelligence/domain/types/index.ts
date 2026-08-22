@@ -1077,6 +1077,15 @@ export interface RecommendationObservation {
  * Entity: Website
  * Represents the analyzed/canonical website within a tenant/organization.
  */
+export interface WebsiteMonitoringConfig {
+  enabled: boolean;
+  frequency: "daily" | "weekly" | "monthly";
+  scope: "technical" | "seo" | "content" | "all";
+  lastSuccessfulRun?: Date | string;
+  lastFailedRun?: Date | string;
+  nextScheduledRun?: Date | string;
+}
+
 export interface Website {
   id: string;
   organizationId: string; // strict multi-tenant partition key
@@ -1085,6 +1094,7 @@ export interface Website {
   status: "active" | "archived" | string;
   lastCrawledAt?: Date | string;
   lastAnalyzedAt?: Date | string;
+  monitoringConfig?: WebsiteMonitoringConfig;
   audit: AuditMetadata;
 }
 

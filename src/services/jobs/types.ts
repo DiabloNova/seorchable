@@ -13,7 +13,8 @@ export type JobType =
   | "seo_audit"
   | "ai_analysis"
   | "document_ingestion"
-  | "scheduled";
+  | "scheduled"
+  | "website_monitoring";
 
 export interface JobError {
   code: string;
