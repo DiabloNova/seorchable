@@ -1,44 +1,21 @@
--- Migration: Add website monitoring configuration and snapshots
-
--- Add monitoring_config to websites table
-ALTER TABLE websites ADD COLUMN IF NOT EXISTS monitoring_config JSONB;
-
--- Create website_monitoring_snapshots table
-CREATE TABLE IF NOT EXISTS website_monitoring_snapshots (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-  website_id UUID NOT NULL REFERENCES websites(id) ON DELETE CASCADE,
-  job_id TEXT,
-  status TEXT NOT NULL DEFAULT 'valid',
-  snapshot_data JSONB NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+CREATE TABLE "website_monitoring_snapshots" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"organization_id" uuid NOT NULL,
+	"website_id" uuid NOT NULL,
+	"job_id" text,
+	"status" text DEFAULT 'valid' NOT NULL,
+	"snapshot_data" jsonb NOT NULL,
+	"created_at" timestamp with time zone DEFAULT NOW() NOT NULL
 );
-
-CREATE INDEX IF NOT EXISTS idx_website_monitoring_snapshots_organization ON website_monitoring_snapshots(organization_id);
-CREATE INDEX IF NOT EXISTS idx_website_monitoring_snapshots_website ON website_monitoring_snapshots(website_id);
-CREATE INDEX IF NOT EXISTS idx_website_monitoring_snapshots_created_at ON website_monitoring_snapshots(created_at DESC);
-
--- Enable PostgreSQL Row Level Security (RLS) for zero-trust tenant isolation
-ALTER TABLE website_monitoring_snapshots ENABLE ROW LEVEL SECURITY;
-ALTER TABLE website_monitoring_snapshots FORCE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS select_tenant_isolation_policy ON website_monitoring_snapshots;
-CREATE POLICY select_tenant_isolation_policy ON website_monitoring_snapshots
-  FOR SELECT
-  USING (organization_id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid);
-
-DROP POLICY IF EXISTS insert_tenant_isolation_policy ON website_monitoring_snapshots;
-CREATE POLICY insert_tenant_isolation_policy ON website_monitoring_snapshots
-  FOR INSERT
-  WITH CHECK (organization_id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid);
-
-DROP POLICY IF EXISTS update_tenant_isolation_policy ON website_monitoring_snapshots;
-CREATE POLICY update_tenant_isolation_policy ON website_monitoring_snapshots
-  FOR UPDATE
-  USING (organization_id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid)
-  WITH CHECK (organization_id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid);
-
-DROP POLICY IF EXISTS delete_tenant_isolation_policy ON website_monitoring_snapshots;
-CREATE POLICY delete_tenant_isolation_policy ON website_monitoring_snapshots
-  FOR DELETE
-  USING (organization_id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid);
+--> statement-breakpoint
+ALTER TABLE "website_monitoring_snapshots" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE "websites" ADD COLUMN "monitoring_config" jsonb;--> statement-breakpoint
+ALTER TABLE "website_monitoring_snapshots" ADD CONSTRAINT "website_monitoring_snapshots_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "website_monitoring_snapshots" ADD CONSTRAINT "website_monitoring_snapshots_website_id_websites_id_fk" FOREIGN KEY ("website_id") REFERENCES "public"."websites"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "idx_website_monitoring_snapshots_organization" ON "website_monitoring_snapshots" USING btree ("organization_id");--> statement-breakpoint
+CREATE INDEX "idx_website_monitoring_snapshots_website" ON "website_monitoring_snapshots" USING btree ("website_id");--> statement-breakpoint
+CREATE INDEX "idx_website_monitoring_snapshots_created_at" ON "website_monitoring_snapshots" USING btree ("created_at");--> statement-breakpoint
+CREATE POLICY "select_organization_id_isolation_policy" ON "website_monitoring_snapshots" AS PERMISSIVE FOR SELECT TO public USING ("organization_id" = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid);--> statement-breakpoint
+CREATE POLICY "insert_organization_id_isolation_policy" ON "website_monitoring_snapshots" AS PERMISSIVE FOR INSERT TO public WITH CHECK ("organization_id" = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid);--> statement-breakpoint
+CREATE POLICY "update_organization_id_isolation_policy" ON "website_monitoring_snapshots" AS PERMISSIVE FOR UPDATE TO public USING ("organization_id" = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid) WITH CHECK ("organization_id" = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid);--> statement-breakpoint
+CREATE POLICY "delete_organization_id_isolation_policy" ON "website_monitoring_snapshots" AS PERMISSIVE FOR DELETE TO public USING ("organization_id" = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid);
