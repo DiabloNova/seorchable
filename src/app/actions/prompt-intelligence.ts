@@ -5,8 +5,13 @@ import { TenantContextManager } from "@/core/database/tenant-context";
 import { requireSession } from "@/services/auth/session";
 import { requireWorkspaceMembership } from "@/services/auth/authorization";
 import { PromptIntelligenceService } from "@/features/ai-intelligence/services/prompt-intelligence-service";
-import { PromptIntelligenceRepository, BrandRepository, CompetitorRepository } from "@/features/ai-intelligence/repositories";
-import { PromptCategory, PromptIntentType, PromptVariable } from "@/features/ai-intelligence/domain/types";
+import { PromptIntelligenceRepository } from "@/features/ai-intelligence/repositories";
+import {
+  PromptCategory,
+  PromptIntentType,
+  PromptVariable,
+  PositionObservation,
+} from "@/features/ai-intelligence/domain/types";
 
 // Schema validations
 const createDefSchema = z.object({
@@ -16,14 +21,16 @@ const createDefSchema = z.object({
   category: z.string().min(1, "دسته‌بندی الزامی است"),
   intent: z.string().min(1, "هدف الزامی است"),
   locale: z.string().min(1, "زبان الزامی است"),
-  variables: z.array(z.object({
-    name: z.string(),
-    defaultValue: z.string(),
-    description: z.string().optional()
-  })),
+  variables: z.array(
+    z.object({
+      name: z.string(),
+      defaultValue: z.string(),
+      description: z.string().optional(),
+    }),
+  ),
   competitors: z.array(z.string()),
   tags: z.array(z.string()),
-  notes: z.string().optional()
+  notes: z.string().optional(),
 });
 
 const updateDefSchema = z.object({
@@ -33,50 +40,56 @@ const updateDefSchema = z.object({
   category: z.string().optional(),
   intent: z.string().optional(),
   locale: z.string().optional(),
-  variables: z.array(z.object({
-    name: z.string(),
-    defaultValue: z.string(),
-    description: z.string().optional()
-  })).optional(),
+  variables: z
+    .array(
+      z.object({
+        name: z.string(),
+        defaultValue: z.string(),
+        description: z.string().optional(),
+      }),
+    )
+    .optional(),
   competitors: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),
   notes: z.string().optional(),
-  isActive: z.boolean().optional()
+  isActive: z.boolean().optional(),
 });
 
 const executeSchema = z.object({
   promptId: z.string().uuid(),
   variablesValues: z.record(z.string(), z.string()),
-  modelName: z.string()
+  modelName: z.string(),
 });
 
 const compareSchema = z.object({
   promptId: z.string().uuid(),
   variablesValues: z.record(z.string(), z.string()),
-  models: z.array(z.string())
+  models: z.array(z.string()),
 });
 
 const scheduleSchema = z.object({
   promptId: z.string().uuid(),
   cronExpression: z.string(),
-  timezone: z.string().default("UTC")
+  timezone: z.string().default("UTC"),
 });
 
 const idSchema = z.object({
-  promptId: z.string().uuid()
-});
-
-const getAuditSchema = z.object({
-  id: z.string().uuid()
+  promptId: z.string().uuid(),
 });
 
 /**
  * Creates a new prompt definition.
  */
-export async function createPromptDefinitionAction(data: any) {
+export async function updatePromptDefinitionAction(
+  data: z.infer<typeof updateDefSchema>,
+) { main
   const parsed = createDefSchema.safeParse(data);
   if (!parsed.success) {
-    return { success: false, error: "Validation failed", details: parsed.error.format() };
+    return {
+      success: false,
+      error: "Validation failed",
+      details: parsed.error.format(),
+    };
   }
 
   let session;
@@ -84,44 +97,55 @@ export async function createPromptDefinitionAction(data: any) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
   const userId = session.user.id;
 
   try {
-    return await TenantContextManager.runWithTenantContext(tenantId, userId, "ctx-create-prompt", async () => {
-      const service = new PromptIntelligenceService();
-      const res = await service.createPromptDefinition(
-        tenantId,
-        parsed.data.brandId,
-        parsed.data.name,
-        parsed.data.promptTemplate,
-        parsed.data.category as PromptCategory,
-        parsed.data.intent as PromptIntentType,
-        parsed.data.locale,
-        parsed.data.variables as PromptVariable[],
-        parsed.data.competitors,
-        parsed.data.tags,
-        parsed.data.notes,
-        userId
-      );
-      return { success: true, result: res };
-    });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      "ctx-create-prompt",
+      async () => {
+        const service = new PromptIntelligenceService();
+        const res = await service.createPromptDefinition(
+          tenantId,
+          parsed.data.brandId,
+          parsed.data.name,
+          parsed.data.promptTemplate,
+          parsed.data.category as PromptCategory,
+          parsed.data.intent as PromptIntentType,
+          parsed.data.locale,
+          parsed.data.variables as PromptVariable[],
+          parsed.data.competitors,
+          parsed.data.tags,
+          parsed.data.notes,
+          userId,
+        );
+        return { success: true, result: res };
+      },
+    );
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
 /**
  * Updates a prompt definition.
  */
-export async function updatePromptDefinitionAction(data: any) {
+export async function updatePromptDefinitionAction(
+  data: z.infer<typeof updateDefSchema>,
+) { main
   const parsed = updateDefSchema.safeParse(data);
   if (!parsed.success) {
-    return { success: false, error: "Validation failed", details: parsed.error.format() };
+    return {
+      success: false,
+      error: "Validation failed",
+      details: parsed.error.format(),
+    };
   }
 
   let session;
@@ -129,31 +153,36 @@ export async function updatePromptDefinitionAction(data: any) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
   const userId = session.user.id;
 
   try {
-    return await TenantContextManager.runWithTenantContext(tenantId, userId, "ctx-update-prompt", async () => {
-      const service = new PromptIntelligenceService();
-      const res = await service.updatePromptDefinition(
-        tenantId,
-        parsed.data.id,
-        {
-          ...parsed.data,
-          category: parsed.data.category as PromptCategory | undefined,
-          intent: parsed.data.intent as PromptIntentType | undefined,
-          variables: parsed.data.variables as PromptVariable[] | undefined
-        },
-        userId
-      );
-      return { success: true, result: res };
-    });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      "ctx-update-prompt",
+      async () => {
+        const service = new PromptIntelligenceService();
+        const res = await service.updatePromptDefinition(
+          tenantId,
+          parsed.data.id,
+          {
+            ...parsed.data,
+            category: parsed.data.category as PromptCategory | undefined,
+            intent: parsed.data.intent as PromptIntentType | undefined,
+            variables: parsed.data.variables as PromptVariable[] | undefined,
+          },
+          userId,
+        );
+        return { success: true, result: res };
+      },
+    );
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
@@ -166,42 +195,56 @@ export async function getPromptDefinitionsAction(brandId: string) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
   const userId = session.user.id;
 
   try {
-    return await TenantContextManager.runWithTenantContext(tenantId, userId, "ctx-get-prompts", async () => {
-      const repo = new PromptIntelligenceRepository();
-      const paginated = await repo.findDefinitionsByBrandId(tenantId, brandId);
-
-      // Seed default/baseline prompts if empty to ensure rich dashboard onboarding
-      if (paginated.data.length === 0) {
-        const service = new PromptIntelligenceService();
-        const seeded = await service.createPromptDefinition(
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      "ctx-get-prompts",
+      async () => {
+        const repo = new PromptIntelligenceRepository();
+        const paginated = await repo.findDefinitionsByBrandId(
           tenantId,
           brandId,
-          "سهم صدای برند کلی (Brand Discovery)",
-          "معرفی کامل برند {brand} به زبان فارسی چیست و چه مزیتی نسبت به رقبای سنتی دارد؟",
-          "Brand Discovery",
-          "Discovery",
-          "fa",
-          [{ name: "brand", defaultValue: "رشا گستر", description: "نام برند تجاری" }],
-          ["CompetitorX"],
-          ["discovery", "brand"],
-          "پایش سهم صدای هویت برند به صورت پایه‌ای",
-          userId
         );
-        return { success: true, result: [seeded] };
-      }
 
-      return { success: true, result: paginated.data };
-    });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+        // Seed default/baseline prompts if empty to ensure rich dashboard onboarding
+        if (paginated.data.length === 0) {
+          const service = new PromptIntelligenceService();
+          const seeded = await service.createPromptDefinition(
+            tenantId,
+            brandId,
+            "سهم صدای برند کلی (Brand Discovery)",
+            "معرفی کامل برند {brand} به زبان فارسی چیست و چه مزیتی نسبت به رقبای سنتی دارد؟",
+            "Brand Discovery",
+            "Discovery",
+            "fa",
+            [
+              {
+                name: "brand",
+                defaultValue: "رشا گستر",
+                description: "نام برند تجاری",
+              },
+            ],
+            ["CompetitorX"],
+            ["discovery", "brand"],
+            "پایش سهم صدای هویت برند به صورت پایه‌ای",
+            userId,
+          );
+          return { success: true, result: [seeded] };
+        }
+
+        return { success: true, result: paginated.data };
+      },
+    );
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
@@ -219,53 +262,74 @@ export async function getPromptDetailsAction(promptId: string) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
   const userId = session.user.id;
 
   try {
-    return await TenantContextManager.runWithTenantContext(tenantId, userId, "ctx-get-prompt-details", async () => {
-      const repo = new PromptIntelligenceRepository();
-      const prompt = await repo.findDefinitionById(tenantId, parsed.data.promptId);
-      if (!prompt) {
-        throw new Error("Prompt definition not found");
-      }
-
-      const schedule = await repo.findScheduleByPromptId(tenantId, parsed.data.promptId);
-      const executionsPaginated = await repo.findExecutionsByPromptId(tenantId, parsed.data.promptId);
-
-      // Load position observations for the last execution if exists
-      let positions: any[] = [];
-      const latestExec = executionsPaginated.data[0];
-      if (latestExec) {
-        positions = await repo.findPositionsByExecutionId(tenantId, latestExec.id);
-      }
-
-      return {
-        success: true,
-        result: {
-          prompt,
-          schedule,
-          executions: executionsPaginated.data,
-          positions
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      "ctx-get-prompt-details",
+      async () => {
+        const repo = new PromptIntelligenceRepository();
+        const prompt = await repo.findDefinitionById(
+          tenantId,
+          parsed.data.promptId,
+        );
+        if (!prompt) {
+          throw new Error("Prompt definition not found");
         }
-      };
-    });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+
+        const schedule = await repo.findScheduleByPromptId(
+          tenantId,
+          parsed.data.promptId,
+        );
+        const executionsPaginated = await repo.findExecutionsByPromptId(
+          tenantId,
+          parsed.data.promptId,
+        );
+
+        // Load position observations for the last execution if exists
+        let positions: PositionObservation[] = [];
+        const latestExec = executionsPaginated.data[0];
+        if (latestExec) {
+          positions = await repo.findPositionsByExecutionId(
+            tenantId,
+            latestExec.id,
+          );
+        }
+
+        return {
+          success: true,
+          result: {
+            prompt,
+            schedule,
+            executions: executionsPaginated.data,
+            positions,
+          },
+        };
+      },
+    );
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
 /**
  * Executes a single prompt template against a specific AI model.
  */
-export async function executePromptAction(data: any) {
+export async function executePromptAction(data: z.infer<typeof executeSchema>) {
   const parsed = executeSchema.safeParse(data);
   if (!parsed.success) {
-    return { success: false, error: "Validation failed", details: parsed.error.format() };
+    return {
+      success: false,
+      error: "Validation failed",
+      details: parsed.error.format(),
+    };
   }
 
   let session;
@@ -273,41 +337,55 @@ export async function executePromptAction(data: any) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
   const userId = session.user.id;
 
   try {
-    return await TenantContextManager.runWithTenantContext(tenantId, userId, "ctx-exec-prompt", async () => {
-      const service = new PromptIntelligenceService();
-      const exec = await service.executePrompt(
-        tenantId,
-        parsed.data.promptId,
-        parsed.data.variablesValues as Record<string, string>,
-        parsed.data.modelName,
-        userId
-      );
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      "ctx-exec-prompt",
+      async () => {
+        const service = new PromptIntelligenceService();
+        const exec = await service.executePrompt(
+          tenantId,
+          parsed.data.promptId,
+          parsed.data.variablesValues as Record<string, string>,
+          parsed.data.modelName,
+          userId,
+        );
 
-      const repo = new PromptIntelligenceRepository();
-      const positions = await repo.findPositionsByExecutionId(tenantId, exec.id);
+        const repo = new PromptIntelligenceRepository();
+        const positions = await repo.findPositionsByExecutionId(
+          tenantId,
+          exec.id,
+        );
 
-      return { success: true, result: { execution: exec, positions } };
-    });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+        return { success: true, result: { execution: exec, positions } };
+      },
+    );
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
 /**
  * Compares model answers side-by-side for a specific parameterized prompt run.
  */
-export async function executeModelComparisonAction(data: any) {
+export async function executeModelComparisonAction(
+  data: z.infer<typeof compareSchema>,
+) { main
   const parsed = compareSchema.safeParse(data);
   if (!parsed.success) {
-    return { success: false, error: "Validation failed", details: parsed.error.format() };
+    return {
+      success: false,
+      error: "Validation failed",
+      details: parsed.error.format(),
+    };
   }
 
   let session;
@@ -315,45 +393,62 @@ export async function executeModelComparisonAction(data: any) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
   const userId = session.user.id;
 
   try {
-    return await TenantContextManager.runWithTenantContext(tenantId, userId, "ctx-exec-compare", async () => {
-      const service = new PromptIntelligenceService();
-      const repo = new PromptIntelligenceRepository();
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      "ctx-exec-compare",
+      async () => {
+        const service = new PromptIntelligenceService();
+        const repo = new PromptIntelligenceRepository();
 
-      const executions = await service.executeComparison(
-        tenantId,
-        parsed.data.promptId,
-        parsed.data.variablesValues as Record<string, string>,
-        parsed.data.models,
-        userId
-      );
+        const executions = await service.executeComparison(
+          tenantId,
+          parsed.data.promptId,
+          parsed.data.variablesValues as Record<string, string>,
+          parsed.data.models,
+          userId,
+        );
 
-      const mappedPositions: Record<string, any[]> = {};
-      for (const exec of executions) {
-        mappedPositions[exec.id] = await repo.findPositionsByExecutionId(tenantId, exec.id);
-      }
+        const mappedPositions: Record<string, PositionObservation[]> = {};
+        for (const exec of executions) {
+          mappedPositions[exec.id] = await repo.findPositionsByExecutionId(
+            tenantId,
+            exec.id,
+          );
+        }
 
-      return { success: true, result: { executions, positions: mappedPositions } };
-    });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+        return {
+          success: true,
+          result: { executions, positions: mappedPositions },
+        };
+      },
+    );
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
 /**
  * Enables and configures a schedule for the prompt.
  */
-export async function schedulePromptAction(data: any) {
+export async function schedulePromptAction(
+  data: z.infer<typeof scheduleSchema>,
+) { main
   const parsed = scheduleSchema.safeParse(data);
   if (!parsed.success) {
-    return { success: false, error: "Validation failed", details: parsed.error.format() };
+    return {
+      success: false,
+      error: "Validation failed",
+      details: parsed.error.format(),
+    };
   }
 
   let session;
@@ -361,34 +456,39 @@ export async function schedulePromptAction(data: any) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
   const userId = session.user.id;
 
   try {
-    return await TenantContextManager.runWithTenantContext(tenantId, userId, "ctx-schedule-prompt", async () => {
-      const service = new PromptIntelligenceService();
-      const res = await service.schedulePrompt(
-        tenantId,
-        parsed.data.promptId,
-        parsed.data.cronExpression,
-        parsed.data.timezone,
-        userId
-      );
-      return { success: true, result: res };
-    });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      "ctx-schedule-prompt",
+      async () => {
+        const service = new PromptIntelligenceService();
+        const res = await service.schedulePrompt(
+          tenantId,
+          parsed.data.promptId,
+          parsed.data.cronExpression,
+          parsed.data.timezone,
+          userId,
+        );
+        return { success: true, result: res };
+      },
+    );
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
 /**
  * Disables an existing prompt schedule.
  */
-export async function unschedulePromptAction(data: any) {
+export async function unschedulePromptAction(data: z.infer<typeof idSchema>) {
   const parsed = idSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed" };
@@ -399,20 +499,28 @@ export async function unschedulePromptAction(data: any) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
   const userId = session.user.id;
 
   try {
-    return await TenantContextManager.runWithTenantContext(tenantId, userId, "ctx-unschedule-prompt", async () => {
-      const service = new PromptIntelligenceService();
-      const success = await service.unschedulePrompt(tenantId, parsed.data.promptId);
-      return { success };
-    });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      "ctx-unschedule-prompt",
+      async () => {
+        const service = new PromptIntelligenceService();
+        const success = await service.unschedulePrompt(
+          tenantId,
+          parsed.data.promptId,
+        );
+        return { success };
+      },
+    );
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
