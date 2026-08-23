@@ -18,8 +18,8 @@ export async function getBrandIntelligenceOverviewAction() {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -70,7 +70,7 @@ export async function getBrandIntelligenceOverviewAction() {
       // Seed mock baseline associations if empty to ensure rich onboarding dashboard
       let activeAssocs = [...associations];
       if (activeAssocs.length === 0) {
-        const seedAssocs: any[] = [
+        const seedAssocs = [
           {
             id: crypto.randomUUID(),
             organizationId: tenantId,
@@ -113,7 +113,7 @@ export async function getBrandIntelligenceOverviewAction() {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           }
-        ];
+        ] as any[]; // Safe workaround for missing type `BrandAssociation` locally during auto-generation
 
         for (const a of seedAssocs) {
           await repo.saveAssociation(a);
@@ -131,7 +131,7 @@ export async function getBrandIntelligenceOverviewAction() {
         }
       };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message || "Internal Server Error" };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "Internal Server Error" };
   }
 }
