@@ -80,9 +80,9 @@ const idSchema = z.object({
 /**
  * Creates a new prompt definition.
  */
-export async function updatePromptDefinitionAction(
-  data: z.infer<typeof updateDefSchema>,
-) { main
+export async function createPromptDefinitionAction(
+  data: z.infer<typeof createDefSchema>,
+) {
   const parsed = createDefSchema.safeParse(data);
   if (!parsed.success) {
     return {
@@ -138,7 +138,7 @@ export async function updatePromptDefinitionAction(
  */
 export async function updatePromptDefinitionAction(
   data: z.infer<typeof updateDefSchema>,
-) { main
+) {
   const parsed = updateDefSchema.safeParse(data);
   if (!parsed.success) {
     return {
@@ -378,7 +378,7 @@ export async function executePromptAction(data: z.infer<typeof executeSchema>) {
  */
 export async function executeModelComparisonAction(
   data: z.infer<typeof compareSchema>,
-) { main
+) {
   const parsed = compareSchema.safeParse(data);
   if (!parsed.success) {
     return {
@@ -441,7 +441,7 @@ export async function executeModelComparisonAction(
  */
 export async function schedulePromptAction(
   data: z.infer<typeof scheduleSchema>,
-) { main
+) {
   const parsed = scheduleSchema.safeParse(data);
   if (!parsed.success) {
     return {
