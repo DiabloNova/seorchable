@@ -30,8 +30,8 @@ export async function testTenantIsolationBehaviors() {
   let throwsWithoutTenant = false;
   try {
       TenantContextManager.getRequiredTenantId();
-  } catch (e: any) {
-      if (e.message.includes("No active tenant context found")) {
+  } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes("No active tenant context found")) {
           throwsWithoutTenant = true;
       }
   }
