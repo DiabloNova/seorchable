@@ -17,8 +17,8 @@ export async function getAeoContentDashboardDataAction() {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -135,8 +135,8 @@ export async function getAeoContentDashboardDataAction() {
         }
       };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message || "Internal Server Error" };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "Internal Server Error" };
   }
 }
 
@@ -149,8 +149,8 @@ export async function runAeoAnalysisForPageAction(pageId: string) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -164,7 +164,7 @@ export async function runAeoAnalysisForPageAction(pageId: string) {
       const analysis = await service.executeAnalysis(tenantId, pageId);
       return { success: true, result: analysis };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message || "Internal Server Error" };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "Internal Server Error" };
   }
 }
