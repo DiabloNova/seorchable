@@ -1,12 +1,11 @@
 "use server";
 
-import { z } from "zod";
 import { TenantContextManager } from "@/core/database/tenant-context";
 import { requireSession } from "@/services/auth/session";
 import { requireWorkspaceMembership } from "@/services/auth/authorization";
 import { BrandIntelligenceService } from "@/features/ai-intelligence/services/brand-intelligence-service";
-import { BrandIntelligenceRepository, BrandRepository, db } from "@/features/ai-intelligence/repositories";
-import { Brand } from "@/features/ai-intelligence/domain/types";
+import { BrandIntelligenceRepository, BrandRepository } from "@/features/ai-intelligence/repositories";
+import { BrandAssociation } from "@/features/ai-intelligence/domain/types";
 
 /**
  * Exposes brand intelligence telemetry, associations, and recommendation metrics.
