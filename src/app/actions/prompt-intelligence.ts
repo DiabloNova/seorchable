@@ -5,8 +5,8 @@ import { TenantContextManager } from "@/core/database/tenant-context";
 import { requireSession } from "@/services/auth/session";
 import { requireWorkspaceMembership } from "@/services/auth/authorization";
 import { PromptIntelligenceService } from "@/features/ai-intelligence/services/prompt-intelligence-service";
-import { PromptIntelligenceRepository, BrandRepository, CompetitorRepository } from "@/features/ai-intelligence/repositories";
-import { PromptCategory, PromptIntentType, PromptVariable } from "@/features/ai-intelligence/domain/types";
+import { PromptIntelligenceRepository } from "@/features/ai-intelligence/repositories";
+import { PromptCategory, PromptIntentType, PromptVariable, PositionObservation } from "@/features/ai-intelligence/domain/types";
 
 // Schema validations
 const createDefSchema = z.object({
@@ -66,14 +66,10 @@ const idSchema = z.object({
   promptId: z.string().uuid()
 });
 
-const getAuditSchema = z.object({
-  id: z.string().uuid()
-});
-
 /**
  * Creates a new prompt definition.
  */
-export async function createPromptDefinitionAction(data: any) {
+export async function createPromptDefinitionAction(data: z.infer<typeof createDefSchema>) {
   const parsed = createDefSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed", details: parsed.error.format() };
@@ -84,8 +80,8 @@ export async function createPromptDefinitionAction(data: any) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -110,15 +106,15 @@ export async function createPromptDefinitionAction(data: any) {
       );
       return { success: true, result: res };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
 /**
  * Updates a prompt definition.
  */
-export async function updatePromptDefinitionAction(data: any) {
+export async function updatePromptDefinitionAction(data: z.infer<typeof updateDefSchema>) {
   const parsed = updateDefSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed", details: parsed.error.format() };
@@ -129,8 +125,8 @@ export async function updatePromptDefinitionAction(data: any) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -152,8 +148,8 @@ export async function updatePromptDefinitionAction(data: any) {
       );
       return { success: true, result: res };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
@@ -166,8 +162,8 @@ export async function getPromptDefinitionsAction(brandId: string) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -200,8 +196,8 @@ export async function getPromptDefinitionsAction(brandId: string) {
 
       return { success: true, result: paginated.data };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
@@ -219,8 +215,8 @@ export async function getPromptDetailsAction(promptId: string) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -238,7 +234,7 @@ export async function getPromptDetailsAction(promptId: string) {
       const executionsPaginated = await repo.findExecutionsByPromptId(tenantId, parsed.data.promptId);
 
       // Load position observations for the last execution if exists
-      let positions: any[] = [];
+      let positions: PositionObservation[] = [];
       const latestExec = executionsPaginated.data[0];
       if (latestExec) {
         positions = await repo.findPositionsByExecutionId(tenantId, latestExec.id);
@@ -254,15 +250,15 @@ export async function getPromptDetailsAction(promptId: string) {
         }
       };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
 /**
  * Executes a single prompt template against a specific AI model.
  */
-export async function executePromptAction(data: any) {
+export async function executePromptAction(data: z.infer<typeof executeSchema>) {
   const parsed = executeSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed", details: parsed.error.format() };
@@ -273,8 +269,8 @@ export async function executePromptAction(data: any) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -296,15 +292,15 @@ export async function executePromptAction(data: any) {
 
       return { success: true, result: { execution: exec, positions } };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
 /**
  * Compares model answers side-by-side for a specific parameterized prompt run.
  */
-export async function executeModelComparisonAction(data: any) {
+export async function executeModelComparisonAction(data: z.infer<typeof compareSchema>) {
   const parsed = compareSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed", details: parsed.error.format() };
@@ -315,8 +311,8 @@ export async function executeModelComparisonAction(data: any) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -335,22 +331,22 @@ export async function executeModelComparisonAction(data: any) {
         userId
       );
 
-      const mappedPositions: Record<string, any[]> = {};
+      const mappedPositions: Record<string, PositionObservation[]> = {};
       for (const exec of executions) {
         mappedPositions[exec.id] = await repo.findPositionsByExecutionId(tenantId, exec.id);
       }
 
       return { success: true, result: { executions, positions: mappedPositions } };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
 /**
  * Enables and configures a schedule for the prompt.
  */
-export async function schedulePromptAction(data: any) {
+export async function schedulePromptAction(data: z.infer<typeof scheduleSchema>) {
   const parsed = scheduleSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed", details: parsed.error.format() };
@@ -361,8 +357,8 @@ export async function schedulePromptAction(data: any) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -380,15 +376,15 @@ export async function schedulePromptAction(data: any) {
       );
       return { success: true, result: res };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
 
 /**
  * Disables an existing prompt schedule.
  */
-export async function unschedulePromptAction(data: any) {
+export async function unschedulePromptAction(data: z.infer<typeof idSchema>) {
   const parsed = idSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed" };
@@ -399,8 +395,8 @@ export async function unschedulePromptAction(data: any) {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -412,7 +408,7 @@ export async function unschedulePromptAction(data: any) {
       const success = await service.unschedulePrompt(tenantId, parsed.data.promptId);
       return { success };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message };
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
   }
 }
