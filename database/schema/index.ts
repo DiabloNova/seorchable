@@ -1186,3 +1186,59 @@ export const crawlCache = pgTable("crawl_cache", {
   check("crawl_cache_scope_check", sql`cache_scope = 'tenant'`),
   ...textTenantPolicy()
 ]);
+
+// Website Monitoring additions
+export const monitoringConfigs = pgTable("monitoring_configs", {
+  id: uuid("id").default(defaultUuid).primaryKey(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  websiteId: uuid("website_id").notNull().references(() => websites.id, { onDelete: "cascade" }),
+  targetUrl: text("target_url").notNull(),
+  enabled: boolean("enabled").notNull().default(true),
+  crawlPolicy: jsonb("crawl_policy").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow)
+}, (table) => {
+  return [
+    index("idx_monitoring_configs_org").on(table.organizationId),
+    index("idx_monitoring_configs_website").on(table.websiteId),
+    ...tenantPolicy("organization_id")
+  ];
+});
+
+export const crawlSnapshots = pgTable("crawl_snapshots", {
+  id: uuid("id").default(defaultUuid).primaryKey(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  monitoringConfigId: uuid("monitoring_config_id").notNull().references(() => monitoringConfigs.id, { onDelete: "cascade" }),
+  crawlJobId: uuid("crawl_job_id").notNull().references(() => crawlJobs.id, { onDelete: "cascade" }),
+  capturedAt: timestamp("captured_at", { withTimezone: true }).notNull().default(defaultNow),
+  contentHash: text("content_hash"),
+  extractedContent: text("extracted_content"),
+  snapshotMetadata: jsonb("snapshot_metadata").notNull().default({})
+}, (table) => {
+  return [
+    index("idx_crawl_snapshots_org").on(table.organizationId),
+    index("idx_crawl_snapshots_config").on(table.monitoringConfigId),
+    index("idx_crawl_snapshots_captured").on(table.capturedAt),
+    ...tenantPolicy("organization_id")
+  ];
+});
+
+export const monitoringAlerts = pgTable("monitoring_alerts", {
+  id: uuid("id").default(defaultUuid).primaryKey(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  monitoringConfigId: uuid("monitoring_config_id").notNull().references(() => monitoringConfigs.id, { onDelete: "cascade" }),
+  crawlSnapshotId: uuid("crawl_snapshot_id").references(() => crawlSnapshots.id, { onDelete: "cascade" }),
+  alertType: text("alert_type").notNull(),
+  severity: text("severity").notNull(),
+  message: text("message").notNull(),
+  eventMetadata: jsonb("event_metadata").notNull().default({}),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
+  dedupKey: text("dedup_key").notNull()
+}, (table) => {
+  return [
+    index("idx_monitoring_alerts_org").on(table.organizationId),
+    index("idx_monitoring_alerts_config").on(table.monitoringConfigId),
+    uniqueIndex("idx_monitoring_alerts_dedup").on(table.organizationId, table.dedupKey),
+    ...tenantPolicy("organization_id")
+  ];
+});
