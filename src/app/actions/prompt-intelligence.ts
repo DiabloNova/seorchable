@@ -73,7 +73,7 @@ const getAuditSchema = z.object({
 /**
  * Creates a new prompt definition.
  */
-export async function createPromptDefinitionAction(data: any) {
+export async function createPromptDefinitionAction(data: z.infer<typeof createDefSchema>) {
   const parsed = createDefSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed", details: parsed.error.format() };
@@ -118,7 +118,7 @@ export async function createPromptDefinitionAction(data: any) {
 /**
  * Updates a prompt definition.
  */
-export async function updatePromptDefinitionAction(data: any) {
+export async function updatePromptDefinitionAction(data: z.infer<typeof updateDefSchema>) {
   const parsed = updateDefSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed", details: parsed.error.format() };
@@ -262,7 +262,7 @@ export async function getPromptDetailsAction(promptId: string) {
 /**
  * Executes a single prompt template against a specific AI model.
  */
-export async function executePromptAction(data: any) {
+export async function executePromptAction(data: z.infer<typeof executeSchema>) {
   const parsed = executeSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed", details: parsed.error.format() };
@@ -304,7 +304,7 @@ export async function executePromptAction(data: any) {
 /**
  * Compares model answers side-by-side for a specific parameterized prompt run.
  */
-export async function executeModelComparisonAction(data: any) {
+export async function executeModelComparisonAction(data: z.infer<typeof compareSchema>) {
   const parsed = compareSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed", details: parsed.error.format() };
@@ -350,7 +350,7 @@ export async function executeModelComparisonAction(data: any) {
 /**
  * Enables and configures a schedule for the prompt.
  */
-export async function schedulePromptAction(data: any) {
+export async function schedulePromptAction(data: z.infer<typeof scheduleSchema>) {
   const parsed = scheduleSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed", details: parsed.error.format() };
@@ -388,7 +388,7 @@ export async function schedulePromptAction(data: any) {
 /**
  * Disables an existing prompt schedule.
  */
-export async function unschedulePromptAction(data: any) {
+export async function unschedulePromptAction(data: z.infer<typeof idSchema>) {
   const parsed = idSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed" };
