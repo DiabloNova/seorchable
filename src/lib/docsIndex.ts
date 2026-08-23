@@ -15,7 +15,7 @@ export const DOCS_INDEX: DocMeta[] = [
     titleFa: "Seorchable Documentation Architecture",
     category: "product",
     categoryFa: "Product",
-    snippet: `# Seorchable Documentation Architecture  Welcome to the Seorchable documentation. This documentation accurately reflects the implemented state of the repository, separating currently available capabilities from future plans.   ## Documentation Domains  To find what you are looking for, navigate to one of our six documentation domains:  ### 1. [Product Documentation](./product/README.md) Explains what Seorchable is and what capabilities it provides. Useful for understanding core features like AI `
+    snippet: `# Seorchable Documentation Architecture  Welcome to the Seorchable documentation. This documentation accurately reflects the implemented state of the repository, separating currently available capabilities from future plans.  ## Documentation Domains  To find what you are looking for, navigate to one of our six documentation domains:  ### 1. [Product Documentation](./product/README.md) Explains what Seorchable is and what capabilities it provides. Useful for understanding core features like AI V`
   },
   {
     slug: "api",
