@@ -6,20 +6,42 @@ import { requireSession } from "@/services/auth/session";
 import { requireWorkspaceMembership } from "@/services/auth/authorization";
 import { PromptIntelligenceService } from "@/features/ai-intelligence/services/prompt-intelligence-service";
 import { PromptIntelligenceRepository } from "@/features/ai-intelligence/repositories";
-import {
-  PromptCategory,
-  PromptIntentType,
-  PromptVariable,
-  PositionObservation,
-} from "@/features/ai-intelligence/domain/types";
+import { PositionObservation } from "@/features/ai-intelligence/domain/types";
+
+// Zod Enums based on your domain types to ensure runtime type-safety
+const PromptCategoryEnum = z.enum([
+  "Brand Discovery",
+  "Product/Service Discovery",
+  "Category",
+  "Recommendation",
+  "Comparison",
+  "Problem/Solution",
+  "Local/Geographic",
+  "Entity",
+  "Informational",
+  "Transactional",
+  "Navigational",
+]);
+
+const PromptIntentTypeEnum = z.enum([
+  "Discovery",
+  "Comparison",
+  "Recommendation",
+  "Purchase",
+  "Research",
+  "Authority",
+  "Informational",
+  "Transactional",
+  "Navigational",
+]);
 
 // Schema validations
 const createDefSchema = z.object({
   brandId: z.string().uuid("شناسه برند معتبر نیست"),
   name: z.string().min(1, "نام الگو الزامی است"),
   promptTemplate: z.string().min(1, "متن قالب الزامی است"),
-  category: z.string().min(1, "دسته‌بندی الزامی است"),
-  intent: z.string().min(1, "هدف الزامی است"),
+  category: PromptCategoryEnum,
+  intent: PromptIntentTypeEnum,
   locale: z.string().min(1, "زبان الزامی است"),
   variables: z.array(
     z.object({
@@ -37,8 +59,8 @@ const updateDefSchema = z.object({
   id: z.string().uuid(),
   name: z.string().optional(),
   promptTemplate: z.string().optional(),
-  category: z.string().optional(),
-  intent: z.string().optional(),
+  category: PromptCategoryEnum.optional(),
+  intent: PromptIntentTypeEnum.optional(),
   locale: z.string().optional(),
   variables: z
     .array(
@@ -80,9 +102,9 @@ const idSchema = z.object({
 /**
  * Creates a new prompt definition.
  */
-export async function updatePromptDefinitionAction(
-  data: z.infer<typeof updateDefSchema>,
-) { main
+export async function createPromptDefinitionAction(
+  data: z.infer<typeof createDefSchema>,
+) {
   const parsed = createDefSchema.safeParse(data);
   if (!parsed.success) {
     return {
@@ -116,10 +138,10 @@ export async function updatePromptDefinitionAction(
           parsed.data.brandId,
           parsed.data.name,
           parsed.data.promptTemplate,
-          parsed.data.category as PromptCategory,
-          parsed.data.intent as PromptIntentType,
+          parsed.data.category, // No 'as' needed anymore, natively typed by Zod
+          parsed.data.intent,   // No 'as' needed anymore
           parsed.data.locale,
-          parsed.data.variables as PromptVariable[],
+          parsed.data.variables, // Structurally matches PromptVariable[] natively
           parsed.data.competitors,
           parsed.data.tags,
           parsed.data.notes,
@@ -138,7 +160,7 @@ export async function updatePromptDefinitionAction(
  */
 export async function updatePromptDefinitionAction(
   data: z.infer<typeof updateDefSchema>,
-) { main
+) {
   const parsed = updateDefSchema.safeParse(data);
   if (!parsed.success) {
     return {
@@ -172,9 +194,6 @@ export async function updatePromptDefinitionAction(
           parsed.data.id,
           {
             ...parsed.data,
-            category: parsed.data.category as PromptCategory | undefined,
-            intent: parsed.data.intent as PromptIntentType | undefined,
-            variables: parsed.data.variables as PromptVariable[] | undefined,
           },
           userId,
         );
@@ -222,8 +241,8 @@ export async function getPromptDefinitionsAction(brandId: string) {
             brandId,
             "سهم صدای برند کلی (Brand Discovery)",
             "معرفی کامل برند {brand} به زبان فارسی چیست و چه مزیتی نسبت به رقبای سنتی دارد؟",
-            "Brand Discovery",
-            "Discovery",
+            "Brand Discovery", // Safe native literal string
+            "Discovery",       // Safe native literal string
             "fa",
             [
               {
@@ -239,7 +258,6 @@ export async function getPromptDefinitionsAction(brandId: string) {
           );
           return { success: true, result: [seeded] };
         }
-
         return { success: true, result: paginated.data };
       },
     );
@@ -302,7 +320,6 @@ export async function getPromptDetailsAction(promptId: string) {
             latestExec.id,
           );
         }
-
         return {
           success: true,
           result: {
@@ -322,7 +339,9 @@ export async function getPromptDetailsAction(promptId: string) {
 /**
  * Executes a single prompt template against a specific AI model.
  */
-export async function executePromptAction(data: z.infer<typeof executeSchema>) {
+export async function executePromptAction(
+  data: z.infer<typeof executeSchema>,
+) {
   const parsed = executeSchema.safeParse(data);
   if (!parsed.success) {
     return {
@@ -364,7 +383,6 @@ export async function executePromptAction(data: z.infer<typeof executeSchema>) {
           tenantId,
           exec.id,
         );
-
         return { success: true, result: { execution: exec, positions } };
       },
     );
@@ -378,7 +396,7 @@ export async function executePromptAction(data: z.infer<typeof executeSchema>) {
  */
 export async function executeModelComparisonAction(
   data: z.infer<typeof compareSchema>,
-) { main
+) {
   const parsed = compareSchema.safeParse(data);
   if (!parsed.success) {
     return {
@@ -416,7 +434,6 @@ export async function executeModelComparisonAction(
           parsed.data.models,
           userId,
         );
-
         const mappedPositions: Record<string, PositionObservation[]> = {};
         for (const exec of executions) {
           mappedPositions[exec.id] = await repo.findPositionsByExecutionId(
@@ -424,7 +441,6 @@ export async function executeModelComparisonAction(
             exec.id,
           );
         }
-
         return {
           success: true,
           result: { executions, positions: mappedPositions },
@@ -441,7 +457,7 @@ export async function executeModelComparisonAction(
  */
 export async function schedulePromptAction(
   data: z.infer<typeof scheduleSchema>,
-) { main
+) {
   const parsed = scheduleSchema.safeParse(data);
   if (!parsed.success) {
     return {
@@ -488,7 +504,9 @@ export async function schedulePromptAction(
 /**
  * Disables an existing prompt schedule.
  */
-export async function unschedulePromptAction(data: z.infer<typeof idSchema>) {
+export async function unschedulePromptAction(
+  data: z.infer<typeof idSchema>,
+) {
   const parsed = idSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: "Validation failed" };
