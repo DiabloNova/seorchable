@@ -1,12 +1,11 @@
 "use server";
 
-import { z } from "zod";
 import { TenantContextManager } from "@/core/database/tenant-context";
 import { requireSession } from "@/services/auth/session";
 import { requireWorkspaceMembership } from "@/services/auth/authorization";
 import { BrandIntelligenceService } from "@/features/ai-intelligence/services/brand-intelligence-service";
-import { BrandIntelligenceRepository, BrandRepository, db } from "@/features/ai-intelligence/repositories";
-import { Brand } from "@/features/ai-intelligence/domain/types";
+import { BrandIntelligenceRepository, BrandRepository } from "@/features/ai-intelligence/repositories";
+import { BrandAssociation } from "@/features/ai-intelligence/domain/types";
 
 /**
  * Exposes brand intelligence telemetry, associations, and recommendation metrics.
@@ -18,8 +17,8 @@ export async function getBrandIntelligenceOverviewAction() {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -70,7 +69,7 @@ export async function getBrandIntelligenceOverviewAction() {
       // Seed mock baseline associations if empty to ensure rich onboarding dashboard
       let activeAssocs = [...associations];
       if (activeAssocs.length === 0) {
-        const seedAssocs: any[] = [
+        const seedAssocs: BrandAssociation[] = [
           {
             id: crypto.randomUUID(),
             organizationId: tenantId,
@@ -131,7 +130,7 @@ export async function getBrandIntelligenceOverviewAction() {
         }
       };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message || "Internal Server Error" };
+  } catch (err) {
+    return { success: false, error: (err as Error).message || "Internal Server Error" };
   }
 }
