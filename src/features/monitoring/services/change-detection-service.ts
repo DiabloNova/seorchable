@@ -21,8 +21,8 @@ export class ChangeDetectionService {
     let hasChanges = false;
 
     // Normalize properties for current snapshot comparison
-    const currentHash = this.hashContent(currentSnapshot.extractedContent);
-    const prevHash = previousSnapshot ? this.hashContent(previousSnapshot.extractedContent) : null;
+    const currentHash = this.hashContent(currentSnapshot.extractedContent ?? null);
+    const prevHash = previousSnapshot ? this.hashContent(previousSnapshot.extractedContent ?? null) : null;
     const isInitialSnapshot = previousSnapshot === null;
 
     if (isInitialSnapshot) {
