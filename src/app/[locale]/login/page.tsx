@@ -96,7 +96,6 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
   // OAuth integration placeholder triggers
   const handleOAuthClick = (provider: string) => {
     // Under active architecture - OAuth will link directly to backend SSO redirect
-    console.log(`SSO OAuth triggered for provider: ${provider}`);
     alert(isFa
       ? `لایه اتصال یکپارچه ${provider} آماده است. در فاز بعدی به سرویس بک‌اند متصل خواهد شد.`
       : `${provider} SSO integration layer ready. Connecting to backend identity service in the next phase.`
