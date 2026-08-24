@@ -133,7 +133,7 @@ export class GeminiAIVisibilityProvider implements IAIVisibilityProvider {
           temperature: 0.1
         }
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
       const latencyMs = Date.now() - startTime;
       return {
         provider: "Google",

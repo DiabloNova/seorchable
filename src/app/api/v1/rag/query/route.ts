@@ -19,10 +19,11 @@ export async function POST(req: NextRequest) {
       const auth = await authorizeApiRequest(req);
       userId = auth.userId;
       tenantId = auth.tenantId;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string; statusCode?: number };
       return NextResponse.json(
-        { error: "Unauthorized", message: err.message || "Authentication failed" },
-        { status: err.statusCode || 401 }
+        { error: "Unauthorized", message: errorObj.message || (err instanceof Error ? err.message : "Authentication failed") },
+        { status: errorObj.statusCode || 401 }
       );
     }
 

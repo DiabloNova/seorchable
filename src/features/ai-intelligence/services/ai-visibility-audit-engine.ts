@@ -209,7 +209,7 @@ export class AIVisibilityAuditEngine {
           status: analysis.answerInclusion.status
         });
 
-      } catch (err: any) {
+      } catch (err: unknown) {
         failedCount++;
         prompt.status = "FAILED";
         prompt.errorMessage = err instanceof Error ? err.message : String(err);

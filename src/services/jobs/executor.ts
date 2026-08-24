@@ -40,11 +40,12 @@ export class JobExecutionManager implements IJobExecutor {
       );
 
       await this.jobService.transitionStatus(job.id, "completed");
-    } catch (err: any) {
-      const isRetryable = err.retryable !== false; // Default to retryable unless marked non-retryable
+    } catch (err: unknown) {
+      const errorObj = err as { retryable?: boolean; code?: string; message?: string };
+      const isRetryable = errorObj.retryable !== false; // Default to retryable unless marked non-retryable
       const jobError = {
-        code: err.code || "EXECUTION_FAILURE",
-        message: err.message || String(err),
+        code: errorObj.code || "EXECUTION_FAILURE",
+        message: errorObj.message || (err instanceof Error ? err.message : String(err)),
         retryable: isRetryable && job.attempts < job.maxAttempts
       };
 

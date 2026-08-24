@@ -63,11 +63,12 @@ export async function withPublicApi(
     if (options && options.requireQuotaTokens) {
       try {
         await apiQuotaService.enforceAndConsumeQuota(tenantId, options.requireQuotaTokens);
-      } catch (err: any) {
-        if (err.message === "Usage Limit Exceeded" || err.message === "Quota Exceeded") {
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        if (errorMsg === "Usage Limit Exceeded" || errorMsg === "Quota Exceeded") {
           return buildApiErrorResponse("USAGE_LIMIT_EXCEEDED", "API usage quota exceeded for this billing cycle.", 403);
         }
-        if (err.message === "Quota Not Found") {
+        if (errorMsg === "Quota Not Found") {
           return buildApiErrorResponse("QUOTA_NOT_FOUND", "No active quota found for this account.", 403);
         }
         throw err;

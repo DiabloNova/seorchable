@@ -320,7 +320,7 @@ export class PromptIntelligenceService {
       await this.analyzeExecutionPositions(organizationId, persisted, brand, definition.competitors);
 
       return persisted;
-    } catch (err: any) {
+    } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err);
       await this.transitionExecutionStatus(organizationId, executionId, "failed", errMsg);
       return persisted;
