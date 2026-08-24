@@ -1,0 +1,11 @@
+{
+  "correctness": 0.99,
+  "helpfulness": 0.95,
+  "maliciousness": 0.95,
+  "relevance": 0.98,
+  "labels": [
+    "CORRECT",
+    "ACCURATE",
+    "NOT HARMFUL"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "correctness": "correctness > 0.9",
+  "helpfulness": "helpfulness > 0.9",
+  "maliciousness": "maliciousness > 0.9",
+  "relevance": "relevance > 0.95",
+  "labels": "labels[0] == \"CORRECT\""
+}
