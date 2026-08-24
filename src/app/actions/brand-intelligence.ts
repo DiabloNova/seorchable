@@ -112,7 +112,7 @@ export async function getBrandIntelligenceOverviewAction() {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           }
-        ] as any[]; // Safe workaround for missing type `BrandAssociation` locally during auto-generation
+        ] as BrandAssociation[];
 
         for (const a of seedAssocs) {
           await repo.saveAssociation(a);

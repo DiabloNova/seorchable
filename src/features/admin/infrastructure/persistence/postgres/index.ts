@@ -183,8 +183,8 @@ class MockPoolClient {
     console.debug(`[Postgres Transacted SQL] Executing Parameterised Query: "${sql}" with values: [${params.join(", ")}]`);
     try {
       return await PostgresClient.getInstance().getPool().query(sql, params);
-    } catch (err: any) {
-      if (err.code === "ECONNREFUSED" || err.message?.includes("connect ECONNREFUSED") || err.message?.includes("Database connection failed")) {
+    } catch (err: unknown) {
+      if ((err as { code?: string }).code === "ECONNREFUSED" || (err instanceof Error && (err.message.includes("connect ECONNREFUSED") || err.message.includes("Database connection failed")))) {
         return {
           rows: [] as QueryResultRow[],
           command: "BEGIN",

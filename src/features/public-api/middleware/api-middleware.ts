@@ -63,11 +63,12 @@ export async function withPublicApi(
     if (options && options.requireQuotaTokens) {
       try {
         await apiQuotaService.enforceAndConsumeQuota(tenantId, options.requireQuotaTokens);
-      } catch (err: any) {
-        if (err.message === "Usage Limit Exceeded" || err.message === "Quota Exceeded") {
+      } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        if (errMsg === "Usage Limit Exceeded" || errMsg === "Quota Exceeded") {
           return buildApiErrorResponse("USAGE_LIMIT_EXCEEDED", "API usage quota exceeded for this billing cycle.", 403);
         }
-        if (err.message === "Quota Not Found") {
+        if (errMsg === "Quota Not Found") {
           return buildApiErrorResponse("QUOTA_NOT_FOUND", "No active quota found for this account.", 403);
         }
         throw err;
@@ -87,7 +88,7 @@ export async function withPublicApi(
 
     return response;
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[Public API Error]", error);
     // Never expose stack traces or internal SQL errors to the API
     return buildApiErrorResponse("INTERNAL_SERVER_ERROR", "An unexpected error occurred.", 500);
