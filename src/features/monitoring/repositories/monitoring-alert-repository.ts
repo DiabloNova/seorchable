@@ -109,7 +109,6 @@ export class MonitoringAlertRepository {
         eq(monitoringAlerts.organizationId, tenantId)
       ));
   }
-}
 
   public async findOpenAlertsByConfig(monitoringConfigId: string): Promise<MonitoringAlert[]> {
     const tenantId = TenantContextManager.getRequiredTenantId();
