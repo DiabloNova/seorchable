@@ -1192,15 +1192,14 @@ export const monitoringConfigs = pgTable("monitoring_configs", {
   id: uuid("id").default(defaultUuid).primaryKey(),
   organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   websiteId: uuid("website_id").notNull().references(() => websites.id, { onDelete: "cascade" }),
-  targetUrl: text("target_url").notNull(),
   enabled: boolean("enabled").notNull().default(true),
-  crawlPolicy: jsonb("crawl_policy").notNull(),
+  schedule: text("schedule").notNull(),
+  crawlUrl: text("crawl_url").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow)
 }, (table) => {
   return [
-    index("idx_monitoring_configs_org").on(table.organizationId),
-    index("idx_monitoring_configs_website").on(table.websiteId),
+    index("idx_monitoring_configs_org_enabled").on(table.organizationId, table.enabled),
     ...tenantPolicy("organization_id")
   ];
 });
@@ -1209,16 +1208,19 @@ export const crawlSnapshots = pgTable("crawl_snapshots", {
   id: uuid("id").default(defaultUuid).primaryKey(),
   organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   monitoringConfigId: uuid("monitoring_config_id").notNull().references(() => monitoringConfigs.id, { onDelete: "cascade" }),
-  crawlJobId: uuid("crawl_job_id").notNull().references(() => crawlJobs.id, { onDelete: "cascade" }),
+  websiteId: uuid("website_id").notNull().references(() => websites.id, { onDelete: "cascade" }),
   capturedAt: timestamp("captured_at", { withTimezone: true }).notNull().default(defaultNow),
-  contentHash: text("content_hash"),
-  extractedContent: text("extracted_content"),
-  snapshotMetadata: jsonb("snapshot_metadata").notNull().default({})
+  pages: jsonb("pages").notNull(),
+  totalPages: integer("total_pages").notNull(),
+  indexablePages: integer("indexable_pages").notNull(),
+  nonIndexablePages: integer("non_indexable_pages").notNull(),
+  error4xxCount: integer("error_4xx_count").notNull(),
+  error5xxCount: integer("error_5xx_count").notNull(),
+  robotsTxtAvailable: boolean("robots_txt_available").notNull(),
+  sitemapAvailable: boolean("sitemap_available").notNull()
 }, (table) => {
   return [
-    index("idx_crawl_snapshots_org").on(table.organizationId),
-    index("idx_crawl_snapshots_config").on(table.monitoringConfigId),
-    index("idx_crawl_snapshots_captured").on(table.capturedAt),
+    index("idx_crawl_snapshots_config_captured").on(table.monitoringConfigId, table.capturedAt),
     ...tenantPolicy("organization_id")
   ];
 });
@@ -1227,18 +1229,23 @@ export const monitoringAlerts = pgTable("monitoring_alerts", {
   id: uuid("id").default(defaultUuid).primaryKey(),
   organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   monitoringConfigId: uuid("monitoring_config_id").notNull().references(() => monitoringConfigs.id, { onDelete: "cascade" }),
-  crawlSnapshotId: uuid("crawl_snapshot_id").references(() => crawlSnapshots.id, { onDelete: "cascade" }),
-  alertType: text("alert_type").notNull(),
+  snapshotId: uuid("snapshot_id").notNull().references(() => crawlSnapshots.id, { onDelete: "cascade" }),
+  category: text("category").notNull(),
   severity: text("severity").notNull(),
+  type: text("type").notNull(),
+  fingerprint: text("fingerprint").notNull(),
+  url: text("url"),
   message: text("message").notNull(),
-  eventMetadata: jsonb("event_metadata").notNull().default({}),
+  previousValue: jsonb("previous_value"),
+  currentValue: jsonb("current_value"),
+  status: text("status").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-  dedupKey: text("dedup_key").notNull()
+  resolvedAt: timestamp("resolved_at", { withTimezone: true })
 }, (table) => {
   return [
-    index("idx_monitoring_alerts_org").on(table.organizationId),
-    index("idx_monitoring_alerts_config").on(table.monitoringConfigId),
-    uniqueIndex("idx_monitoring_alerts_dedup").on(table.organizationId, table.dedupKey),
+    index("idx_monitoring_alerts_config_status").on(table.monitoringConfigId, table.status),
+    index("idx_monitoring_alerts_fingerprint_status").on(table.fingerprint, table.status),
+    uniqueIndex("idx_monitoring_alerts_open_fingerprint").on(table.fingerprint).where(sql`status = 'open'`),
     ...tenantPolicy("organization_id")
   ];
 });
