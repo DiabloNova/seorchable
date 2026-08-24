@@ -13,6 +13,7 @@ import {
   Prompt,
   AIObservation,
   BrandMention,
+  CompetitorMention,
   Citation,
   VisibilityScore,
   Recommendation,
@@ -108,6 +109,8 @@ export interface IObservationRepository {
   // Extracted Mentions (Tenant-scoped)
   findMentionsByObservationId(organizationId: string, observationId: string): Promise<BrandMention[]>;
   saveMention(mention: BrandMention): Promise<BrandMention>;
+  findCompetitorMentionsByObservationId(organizationId: string, observationId: string): Promise<CompetitorMention[]>;
+  saveCompetitorMention(mention: CompetitorMention): Promise<CompetitorMention>;
 
   // Extracted Citations (Tenant-scoped)
   findCitationsByObservationId(organizationId: string, observationId: string): Promise<Citation[]>;
@@ -234,6 +237,7 @@ export interface IPromptIntelligenceRepository {
   findScheduleByPromptId(organizationId: string, promptId: string): Promise<PromptSchedule | null>;
   findScheduleById(organizationId: string, id: string): Promise<PromptSchedule | null>;
   findAllSchedules(organizationId: string): Promise<PromptSchedule[]>;
+  findActiveSchedules(): Promise<PromptSchedule[]>;
   saveSchedule(schedule: PromptSchedule): Promise<PromptSchedule>;
 
   // Executions (Tenant-scoped)

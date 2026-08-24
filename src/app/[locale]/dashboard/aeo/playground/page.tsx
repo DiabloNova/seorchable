@@ -210,6 +210,7 @@ export default function AeoPlaygroundPage() {
 
     startTransition(async () => {
       const res = await createPromptDefinitionAction({
+        // brandId has been removed from schema or was invalid
         brandId: selectedBrandId,
         name: newPromptName,
         promptTemplate: newTemplate,

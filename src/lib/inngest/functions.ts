@@ -18,38 +18,14 @@ export const helloWorld = inngest.createFunction(
 );
 
 export const scheduledMonitoring = inngest.createFunction(
-  { id: "scheduled-monitoring", triggers: [{ event: "monitoring/run.scheduled" }] },
-  async ({ event, step }) => {
-    const { monitoringConfigId } = event.data;
-
-    await step.run("execute-monitoring", async () => {
-      // Setup dependencies (in a real app this might use a DI container)
-      const configRepo = new MonitoringConfigRepository();
-      const snapshotRepo = new CrawlSnapshotRepository();
-      const alertRepo = new MonitoringAlertRepository();
-      const changeDetection = new ChangeDetectionService();
-      const regressionDetection = new RegressionDetectionService();
-      const contentDetection = new ContentChangeDetectionService();
-      const alertGeneration = new AlertGenerationService();
-
-      const firecrawlProvider = new FirecrawlCrawlProvider();
-
-      const runMonitoring = new RunMonitoring(
-        configRepo,
-        snapshotRepo,
-        alertRepo,
-        changeDetection,
-        regressionDetection,
-        contentDetection,
-        alertGeneration,
-        firecrawlProvider
-      );
-
-      await runMonitoring.execute({ monitoringConfigId });
-
+  { id: "scheduled-ai-visibility-monitoring", triggers: [{ cron: "0 * * * *" }] },
+  async ({ step }) => {
+    await step.run("execute-ai-visibility-monitoring", async () => {
+      console.log("Starting scheduled AI Visibility Monitoring job...");
+      const service = new AIVisibilityMonitoringService();
+      await service.runScheduledMonitoring();
       return { status: "success", timestamp: new Date().toISOString() };
     });
-
-    return { message: "Scheduled monitoring completed" };
-  }
+    return { message: "Scheduled AI Visibility monitoring completed" };
+  },
 );

@@ -718,6 +718,27 @@ export const aiObservations = pgTable("ai_observations", {
   ...tenantPolicy("organization_id")
 ]);
 
+export const competitorMentions = pgTable("competitor_mentions", {
+  id: uuid("id").primaryKey().default(defaultUuid),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  observationId: uuid("observation_id").notNull().references(() => aiObservations.id, { onDelete: "cascade" }),
+  competitorId: uuid("competitor_id").notNull().references(() => competitors.id, { onDelete: "cascade" }),
+  mentionContext: text("mention_context").notNull(),
+  isRecommended: boolean("is_recommended").notNull().default(false),
+  sentimentScore: doublePrecision("sentiment_score").notNull().default(0.0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
+  createdBy: text("created_by").notNull().default("system"),
+  updatedBy: text("updated_by").notNull().default("system"),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  version: integer("version").notNull().default(1),
+}, (table) => [
+  index("idx_competitor_mentions_organization").on(table.organizationId),
+  index("idx_competitor_mentions_observation").on(table.observationId),
+  index("idx_competitor_mentions_competitor").on(table.competitorId),
+  ...tenantPolicy("organization_id")
+]);
+
 export const brandMentions = pgTable("brand_mentions", {
   id: uuid("id").primaryKey().default(defaultUuid),
   organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),

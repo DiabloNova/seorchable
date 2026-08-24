@@ -1,5 +1,5 @@
 {
-  "id": "d7b88998-83f6-4c9c-b88b-16b4b8c1ba9b",
+"id": "e47e3244-5dd5-4c83-ae18-9347ea366673", main
   "prevId": "e6d89dfd-7442-447b-a2bc-a3ed8a520f99",
   "version": "7",
   "dialect": "postgresql",
@@ -2846,6 +2846,230 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.competitor_mentions": {
+      "name": "competitor_mentions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "observation_id": {
+          "name": "observation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "competitor_id": {
+          "name": "competitor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mention_context": {
+          "name": "mention_context",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_recommended": {
+          "name": "is_recommended",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "sentiment_score": {
+          "name": "sentiment_score",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idx_competitor_mentions_organization": {
+          "name": "idx_competitor_mentions_organization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_competitor_mentions_observation": {
+          "name": "idx_competitor_mentions_observation",
+          "columns": [
+            {
+              "expression": "observation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_competitor_mentions_competitor": {
+          "name": "idx_competitor_mentions_competitor",
+          "columns": [
+            {
+              "expression": "competitor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "competitor_mentions_organization_id_organizations_id_fk": {
+          "name": "competitor_mentions_organization_id_organizations_id_fk",
+          "tableFrom": "competitor_mentions",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "competitor_mentions_observation_id_ai_observations_id_fk": {
+          "name": "competitor_mentions_observation_id_ai_observations_id_fk",
+          "tableFrom": "competitor_mentions",
+          "tableTo": "ai_observations",
+          "columnsFrom": [
+            "observation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "competitor_mentions_competitor_id_competitors_id_fk": {
+          "name": "competitor_mentions_competitor_id_competitors_id_fk",
+          "tableFrom": "competitor_mentions",
+          "tableTo": "competitors",
+          "columnsFrom": [
+            "competitor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "select_organization_id_isolation_policy": {
+          "name": "select_organization_id_isolation_policy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organization_id\" = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid"
+        },
+        "insert_organization_id_isolation_policy": {
+          "name": "insert_organization_id_isolation_policy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organization_id\" = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid"
+        },
+        "update_organization_id_isolation_policy": {
+          "name": "update_organization_id_isolation_policy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organization_id\" = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid",
+          "withCheck": "\"organization_id\" = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid"
+        },
+        "delete_organization_id_isolation_policy": {
+          "name": "delete_organization_id_isolation_policy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organization_id\" = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+ main
     "public.competitors": {
       "name": "competitors",
       "schema": "",
@@ -3638,8 +3862,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "website_id": {
-          "name": "website_id",
+"crawl_job_id": {
+  "name": "crawl_job_id", main
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -3650,6 +3874,25 @@
           "primaryKey": false,
           "notNull": true,
           "default": "NOW()"
+        },
+        "content_hash": {
+          "name": "content_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extracted_content": {
+          "name": "extracted_content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "snapshot_metadata": {
+          "name": "snapshot_metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
         },
         "pages": {
           "name": "pages",
@@ -3701,6 +3944,51 @@
         }
       },
       "indexes": {
+        "idx_crawl_snapshots_org": {
+          "name": "idx_crawl_snapshots_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_crawl_snapshots_config": {
+          "name": "idx_crawl_snapshots_config",
+          "columns": [
+            {
+              "expression": "monitoring_config_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_crawl_snapshots_captured": {
+          "name": "idx_crawl_snapshots_captured",
+          "columns": [
+            {
+              "expression": "captured_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "idx_crawl_snapshots_config_captured": {
           "name": "idx_crawl_snapshots_config_captured",
           "columns": [
@@ -3750,12 +4038,20 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "crawl_snapshots_website_id_websites_id_fk": {
-          "name": "crawl_snapshots_website_id_websites_id_fk",
+        "crawl_snapshots_crawl_job_id_crawl_jobs_id_fk": {
+          "name": "crawl_snapshots_crawl_job_id_crawl_jobs_id_fk",
           "tableFrom": "crawl_snapshots",
-          "tableTo": "websites",
+          "tableTo": "crawl_jobs",
           "columnsFrom": [
-            "website_id"
+            "crawl_job_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      }, main
           ],
           "columnsTo": [
             "id"
@@ -6032,14 +6328,63 @@
           "primaryKey": false,
           "notNull": true
         },
-        "snapshot_id": {
-          "name": "snapshot_id",
+        "crawl_snapshot_id": {
+          "name": "crawl_snapshot_id",
           "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alert_type": {
+          "name": "alert_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }, main
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+      ]  },
+        "severity": {
+          "name": "severity",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "category": {
-          "name": "category",
+        "event_metadata": {
+          "name": "event_metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        }, main
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+main
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "dedup_key": {
+          "name": "dedup_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "idx_monitoring_alerts_org": {
+          "name": "idx_monitoring_alerts_org",
+          "columns": [
+            {
+              "expression": "organization_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -6050,47 +6395,18 @@
           "primaryKey": false,
           "notNull": true
         },
-        "type": {
-          "name": "type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "fingerprint": {
-          "name": "fingerprint",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "url": {
-          "name": "url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "message": {
           "name": "message",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "previous_value": {
-          "name": "previous_value",
+        "event_metadata": {
+          "name": "event_metadata",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false
-        },
-        "current_value": {
-          "name": "current_value",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'{}'::jsonb"
         },
         "created_at": {
           "name": "created_at",
@@ -6099,28 +6415,37 @@
           "notNull": true,
           "default": "NOW()"
         },
-        "resolved_at": {
-          "name": "resolved_at",
-          "type": "timestamp with time zone",
+        "dedup_key": {
+          "name": "dedup_key",
+          "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {
-        "idx_monitoring_alerts_config_status": {
-          "name": "idx_monitoring_alerts_config_status",
+        "idx_monitoring_alerts_org": {
+          "name": "idx_monitoring_alerts_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_monitoring_alerts_config": {
+          "name": "idx_monitoring_alerts_config",
           "columns": [
             {
               "expression": "monitoring_config_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
-            },
-            {
-              "expression": "status",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
             }
           ],
           "isUnique": false,
@@ -6128,39 +6453,23 @@
           "method": "btree",
           "with": {}
         },
-        "idx_monitoring_alerts_fingerprint_status": {
-          "name": "idx_monitoring_alerts_fingerprint_status",
+        "idx_monitoring_alerts_dedup": {
+          "name": "idx_monitoring_alerts_dedup",
           "columns": [
             {
-              "expression": "fingerprint",
+              "expression": "organization_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             },
             {
-              "expression": "status",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_monitoring_alerts_open_fingerprint": {
-          "name": "idx_monitoring_alerts_open_fingerprint",
-          "columns": [
-            {
-              "expression": "fingerprint",
+              "expression": "dedup_key",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
           "isUnique": true,
-          "where": "status = 'open'",
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -6193,12 +6502,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "monitoring_alerts_snapshot_id_crawl_snapshots_id_fk": {
-          "name": "monitoring_alerts_snapshot_id_crawl_snapshots_id_fk",
+        "monitoring_alerts_crawl_snapshot_id_crawl_snapshots_id_fk": {
+          "name": "monitoring_alerts_crawl_snapshot_id_crawl_snapshots_id_fk",
           "tableFrom": "monitoring_alerts",
           "tableTo": "crawl_snapshots",
           "columnsFrom": [
-            "snapshot_id"
+            "crawl_snapshot_id"
           ],
           "columnsTo": [
             "id"
@@ -6274,6 +6583,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "target_url": {
+          "name": "target_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "enabled": {
           "name": "enabled",
           "type": "boolean",
@@ -6281,15 +6596,9 @@
           "notNull": true,
           "default": true
         },
-        "schedule": {
-          "name": "schedule",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "crawl_url": {
-          "name": "crawl_url",
-          "type": "text",
+        "crawl_policy": {
+          "name": "crawl_policy",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": true
         },
@@ -6309,17 +6618,26 @@
         }
       },
       "indexes": {
-        "idx_monitoring_configs_org_enabled": {
-          "name": "idx_monitoring_configs_org_enabled",
+        "idx_monitoring_configs_org": {
+          "name": "idx_monitoring_configs_org",
           "columns": [
             {
               "expression": "organization_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
-            },
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_monitoring_configs_website": {
+          "name": "idx_monitoring_configs_website",
+          "columns": [
             {
-              "expression": "enabled",
+              "expression": "website_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -10405,4 +10723,3 @@
     "schemas": {},
     "tables": {}
   }
-}
