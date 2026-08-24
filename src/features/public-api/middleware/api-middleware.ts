@@ -13,13 +13,20 @@ export interface AuthenticatedApiRequest extends NextRequest {
 /**
  * Common response error formatter for the Public API
  */
-export function buildApiErrorResponse(code: string, message: string, status: number) {
-  return NextResponse.json({
-    error: {
-      code,
-      message
-    }
-  }, { status });
+export function buildApiErrorResponse(
+  code: string,
+  message: string,
+  status: number
+) {
+  return NextResponse.json(
+    {
+      error: {
+        code,
+        message,
+      },
+    },
+    { status }
+  );
 }
 
 /**
@@ -31,45 +38,95 @@ export function buildApiErrorResponse(code: string, message: string, status: num
  */
 export async function withPublicApi(
   req: NextRequest,
-  handler: (req: AuthenticatedApiRequest) => Promise<NextResponse>,
+  handler: (
+    req: AuthenticatedApiRequest
+  ) => Promise<NextResponse>,
   options?: { requireQuotaTokens?: number }
 ): Promise<NextResponse> {
   try {
     const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
-      return buildApiErrorResponse("UNAUTHORIZED", "Missing or invalid Authorization header. Expected Bearer <API_KEY>", 401);
+
+    if (
+      !authHeader ||
+      !authHeader.toLowerCase().startsWith("bearer ")
+    ) {
+      return buildApiErrorResponse(
+        "UNAUTHORIZED",
+        "Missing or invalid Authorization header. Expected Bearer <API_KEY>",
+        401
+      );
     }
 
     const token = authHeader.substring(7).trim();
     const apiKey = await apiService.authenticateKey(token);
 
     if (!apiKey) {
-      return buildApiErrorResponse("UNAUTHORIZED", "Invalid, revoked, or expired API key.", 401);
+      return buildApiErrorResponse(
+        "UNAUTHORIZED",
+        "Invalid, revoked, or expired API key.",
+        401
+      );
     }
 
     const tenantId = apiKey.organizationId;
-    const userId = apiKey.id; // Treat the API key as the identity executing the request
+    const userId = apiKey.id;
 
     // 2. Check Rate Limit (e.g. 100 requests per minute)
-    const rateLimit = await apiQuotaService.checkRateLimit(tenantId, 100, 60000);
+    const rateLimit = await apiQuotaService.checkRateLimit(
+      tenantId,
+      100,
+      60000
+    );
+
     if (!rateLimit.allowed) {
-      const response = buildApiErrorResponse("RATE_LIMIT_EXCEEDED", "API rate limit exceeded.", 429);
+      const response = buildApiErrorResponse(
+        "RATE_LIMIT_EXCEEDED",
+        "API rate limit exceeded.",
+        429
+      );
+
       response.headers.set("X-RateLimit-Remaining", "0");
       response.headers.set("Retry-After", "60");
+
       return response;
     }
 
     // 3. Optional: Enforce Usage Quota
-    if (options && options.requireQuotaTokens) {
+    if (options?.requireQuotaTokens) {
       try {
-        await apiQuotaService.enforceAndConsumeQuota(tenantId, options.requireQuotaTokens);
-      } catch (err: any) {
-        if (err.message === "Usage Limit Exceeded" || err.message === "Quota Exceeded") {
-          return buildApiErrorResponse("USAGE_LIMIT_EXCEEDED", "API usage quota exceeded for this billing cycle.", 403);
+        await apiQuotaService.enforceAndConsumeQuota(
+          tenantId,
+          options.requireQuotaTokens
+        );
+      } catch (err: unknown) {
+        const errorObj = err as {
+          message?: string;
+        };
+
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : errorObj.message || String(err);
+
+        if (
+          errorMessage === "Usage Limit Exceeded" ||
+          errorMessage === "Quota Exceeded"
+        ) {
+          return buildApiErrorResponse(
+            "USAGE_LIMIT_EXCEEDED",
+            "API usage quota exceeded for this billing cycle.",
+            403
+          );
         }
-        if (err.message === "Quota Not Found") {
-          return buildApiErrorResponse("QUOTA_NOT_FOUND", "No active quota found for this account.", 403);
+
+        if (errorMessage === "Quota Not Found") {
+          return buildApiErrorResponse(
+            "QUOTA_NOT_FOUND",
+            "No active quota found for this account.",
+            403
+          );
         }
+
         throw err;
       }
     }
@@ -77,19 +134,26 @@ export async function withPublicApi(
     // 4. Attach resolved context to request for the downstream handler
     const authenticatedReq = req as AuthenticatedApiRequest;
     authenticatedReq.tenantId = tenantId;
-    authenticatedReq.userId = userId; // Used in runWithTenantContext as the user identity (acting on behalf)
+    authenticatedReq.userId = userId;
 
     // 5. Execute handler
     const response = await handler(authenticatedReq);
 
     // Add rate limit headers to success responses
-    response.headers.set("X-RateLimit-Remaining", rateLimit.remaining.toString());
+    response.headers.set(
+      "X-RateLimit-Remaining",
+      rateLimit.remaining.toString()
+    );
 
     return response;
-
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[Public API Error]", error);
+
     // Never expose stack traces or internal SQL errors to the API
-    return buildApiErrorResponse("INTERNAL_SERVER_ERROR", "An unexpected error occurred.", 500);
+    return buildApiErrorResponse(
+      "INTERNAL_SERVER_ERROR",
+      "An unexpected error occurred.",
+      500
+    );
   }
 }

@@ -1,5 +1,13 @@
 import { inngest } from "./client";
-import { AIVisibilityMonitoringService } from "../../features/monitoring/services/ai-visibility-monitoring-service";
+import { RunMonitoring } from "../../features/monitoring/application/run-monitoring";
+import { MonitoringConfigRepository } from "../../features/monitoring/repositories/monitoring-config-repository";
+import { CrawlSnapshotRepository } from "../../features/monitoring/repositories/crawl-snapshot-repository";
+import { MonitoringAlertRepository } from "../../features/monitoring/repositories/monitoring-alert-repository";
+import { ChangeDetectionService } from "../../features/monitoring/services/change-detection-service";
+import { RegressionDetectionService } from "../../features/monitoring/services/regression-detection-service";
+import { ContentChangeDetectionService } from "../../features/monitoring/services/content-change-detection-service";
+import { AlertGenerationService } from "../../features/monitoring/services/alert-generation-service";
+import { FirecrawlCrawlProvider } from "../../features/acquisition/infrastructure/providers/firecrawl/firecrawl-crawl-provider";
 
 export const helloWorld = inngest.createFunction(
   { id: "hello-world", triggers: [{ event: "test/hello.world" }] },

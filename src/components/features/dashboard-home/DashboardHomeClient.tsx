@@ -113,8 +113,8 @@ export default function DashboardHomeClient({ initialData, user }: DashboardHome
 
       // Navigate to the list of audits to see historical results
       router.push(`/${language}/dashboard/audits`);
-    } catch (err: any) {
-      setNewUrlError(err.message || (isRtl ? "ارتباط با لایه تحلیل با خطا مواجه شد." : "Error communicating with crawling layer."));
+    } catch (err: unknown) {
+      setNewUrlError(err instanceof Error ? err.message : (isRtl ? "ارتباط با لایه تحلیل با خطا مواجه شد." : "Error communicating with crawling layer."));
     } finally {
       setIsSubmitting(false);
     }

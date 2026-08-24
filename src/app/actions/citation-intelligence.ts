@@ -16,8 +16,8 @@ export async function getCitationsDashboardDataAction() {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -64,7 +64,7 @@ export async function getCitationsDashboardDataAction() {
         const secureSiteId = crypto.randomUUID();
         const compSiteId = crypto.randomUUID();
 
-        const seedSources: any[] = [
+        const seedSources = [
           {
             id: wikipediaId,
             organizationId: tenantId,
@@ -175,7 +175,7 @@ export async function getCitationsDashboardDataAction() {
         }
       };
     });
-  } catch (err: any) {
-    return { success: false, error: err.message || "Internal Server Error" };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "Internal Server Error" };
   }
 }

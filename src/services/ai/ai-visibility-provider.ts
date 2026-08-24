@@ -10,7 +10,7 @@ export interface AIVisibilityProviderResult {
   latencyMs?: number;
   status: "success" | "failed";
   error?: string;
-  reproducibilityMetadata?: Record<string, any>;
+  reproducibilityMetadata?: Record<string, unknown>;
 }
 
 export interface IAIVisibilityProvider {
@@ -133,7 +133,7 @@ export class GeminiAIVisibilityProvider implements IAIVisibilityProvider {
           temperature: 0.1
         }
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
       const latencyMs = Date.now() - startTime;
       return {
         provider: "Google",
