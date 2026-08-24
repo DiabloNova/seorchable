@@ -10,7 +10,7 @@ export interface AIVisibilityProviderResult {
   latencyMs?: number;
   status: "success" | "failed";
   error?: string;
-  reproducibilityMetadata?: Record<string, any>;
+  reproducibilityMetadata?: Record<string, unknown>;
 }
 
 export interface IAIVisibilityProvider {

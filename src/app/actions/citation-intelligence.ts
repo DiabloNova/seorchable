@@ -64,7 +64,7 @@ export async function getCitationsDashboardDataAction() {
         const secureSiteId = crypto.randomUUID();
         const compSiteId = crypto.randomUUID();
 
-        const seedSources: any[] = [
+        const seedSources = [
           {
             id: wikipediaId,
             organizationId: tenantId,

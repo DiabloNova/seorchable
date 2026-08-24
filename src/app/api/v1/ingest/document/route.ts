@@ -21,15 +21,21 @@ export async function POST(req: NextRequest) {
     // 1. Authoritative API identity resolution (session overrides client headers)
     let userId: string;
     let tenantId: string;
+
     try {
       const auth = await authorizeApiRequest(req);
       userId = auth.userId;
       tenantId = auth.tenantId;
     } catch (err: unknown) {
-      const errorObj = err as { message?: string; statusCode?: number };
       return NextResponse.json(
-        { error: "Unauthorized", message: errorObj.message || (err instanceof Error ? err.message : "Authentication failed") },
-        { status: errorObj.statusCode || 401 }
+        {
+          error: "Unauthorized",
+          message:
+            err instanceof Error ? err.message : "Authentication failed",
+        },
+        {
+          status: (err as { statusCode?: number }).statusCode || 401,
+        }
       );
     }
 
@@ -50,14 +56,19 @@ export async function POST(req: NextRequest) {
     const ingestionService = new DocumentIngestionService();
 
     // 4. Secure the execution inside a transactional Tenant Context
-    const requestId = req.headers.get("x-request-id") || `req-ingest-${Date.now()}`;
+    const requestId =
+      req.headers.get("x-request-id") || `req-ingest-${Date.now()}`;
 
     const result = await TenantContextManager.runWithTenantContext(
       tenantId,
       userId,
       requestId,
       async () => {
-        return await ingestionService.ingestDocument(text, metadata, chunkingOptions);
+        return await ingestionService.ingestDocument(
+          text,
+          metadata,
+          chunkingOptions
+        );
       }
     );
 
@@ -79,7 +90,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result, { status: 200 });
   } catch (error: unknown) {
     console.error("[API Document Ingestion Route Error]:", error);
-    const message = error instanceof Error ? error.message : "Unknown error";
+    const message =
+      error instanceof Error ? error.message : "Unknown error";
+
     return NextResponse.json(
       { error: "Internal Server Error", message },
       { status: 500 }

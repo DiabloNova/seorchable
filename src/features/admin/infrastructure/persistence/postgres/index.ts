@@ -10,15 +10,31 @@ import {
   IAdminUserRepository,
   IFeatureFlagRepository,
   IAuditRecordRepository,
-  IAIProviderConfigurationRepository
+  IAIProviderConfigurationRepository,
 } from "../../../domain/repositories";
-import { Tenant, AdminUser, FeatureFlag, AuditRecord, AIProviderConfiguration } from "../../../domain/types";
+import {
+  Tenant,
+  AdminUser,
+  FeatureFlag,
+  AuditRecord,
+  AIProviderConfiguration,
+} from "../../../domain/types";
 import { UnitOfWork } from "../uow";
-import { TenantContextManager, isQueryTenantScoped, TenantContextViolationException } from "../../../../../core/database/tenant-context";
+import {
+  TenantContextManager,
+  isQueryTenantScoped,
+  TenantContextViolationException,
+} from "../../../../../core/database/tenant-context";
 
 export class OptimisticLockingError extends Error {
-  constructor(entityName: string, expectedVersion: number, actualVersion: number) {
-    super(`Optimistic Locking Exception: Concurrency conflict detected on ${entityName} update. Expected version ${expectedVersion}, got ${actualVersion}.`);
+  constructor(
+    entityName: string,
+    expectedVersion: number,
+    actualVersion: number
+  ) {
+    super(
+      `Optimistic Locking Exception: Concurrency conflict detected on ${entityName} update. Expected version ${expectedVersion}, got ${actualVersion}.`
+    );
     this.name = "OptimisticLockingError";
   }
 }
@@ -34,12 +50,14 @@ export class PostgresClient {
   private currentTransactionOperations: (() => Promise<void>)[] = [];
 
   private constructor() {
-    const connectionString = process.env.DATABASE_URL || "postgresql://localhost:5432/aeo_saas";
+    const connectionString =
+      process.env.DATABASE_URL || "postgresql://localhost:5432/aeo_saas";
+
     this.pool = new Pool({
       connectionString,
       max: 20,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000
+      connectionTimeoutMillis: 2000,
     });
   }
 
@@ -59,28 +77,39 @@ export class PostgresClient {
    */
   public async connectClient(): Promise<PoolClient> {
     let client: any;
+
     try {
       client = await this.pool.connect();
     } catch {
       // Fallback driver for local offline environments (simulates PoolClient query bindings)
-      console.warn("[Postgres Telemetry] Database connection failed. Initialising offline simulation driver.");
+      console.warn(
+        "[Postgres Telemetry] Database connection failed. Initialising offline simulation driver."
+      );
       client = new MockPoolClient();
     }
 
     // Wrap the leased client using Object.create to preserve the prototype chain, event emitters, and other methods of PoolClient
     const wrappedClient = Object.create(client);
-    wrappedClient.query = async (sql: string, params: unknown[] = []) => {
+
+    wrappedClient.query = async (
+      sql: string,
+      params: unknown[] = []
+    ) => {
       if (isQueryTenantScoped(sql)) {
         TenantContextManager.getRequiredTenantId();
+
         const activeDbClient = TenantContextManager.getDbClient();
+
         if (!activeDbClient) {
           throw new TenantContextViolationException(
             "Tenant Context Violation: Tenant-scoped query must execute within an active tenant transaction."
           );
         }
       }
+
       return client.query(sql, params);
     };
+
     wrappedClient.release = () => {
       if (typeof client.release === "function") {
         client.release();
@@ -95,8 +124,11 @@ export class PostgresClient {
    */
   public async begin(): Promise<void> {
     if (this.inTransaction) {
-      throw new Error("Postgres Transaction Error: Transaction already active.");
+      throw new Error(
+        "Postgres Transaction Error: Transaction already active."
+      );
     }
+
     this.inTransaction = true;
     this.currentTransactionOperations = [];
   }
@@ -106,7 +138,9 @@ export class PostgresClient {
    */
   public async commit(): Promise<void> {
     if (!this.inTransaction) {
-      throw new Error("Postgres Transaction Error: No active transaction to commit.");
+      throw new Error(
+        "Postgres Transaction Error: No active transaction to commit."
+      );
     }
 
     try {
@@ -130,37 +164,50 @@ export class PostgresClient {
     this.currentTransactionOperations = [];
   }
 
-  public async registerTransactionOp(op: () => Promise<void>): Promise<void> {
+  public async registerTransactionOp(
+    op: () => Promise<void>
+  ): Promise<void> {
     if (!this.inTransaction) {
       await op();
       return;
     }
+
     this.currentTransactionOperations.push(op);
   }
 
   /**
    * Parameterised query execution
    */
-  public async query<T extends QueryResultRow = QueryResultRow>(sql: string, params: unknown[] = []): Promise<QueryResult<T>> {
+  public async query<T extends QueryResultRow = QueryResultRow>(
+    sql: string,
+    params: unknown[] = []
+  ): Promise<QueryResult<T>> {
     const isTenantQuery = isQueryTenantScoped(sql);
 
     if (isTenantQuery) {
       TenantContextManager.getRequiredTenantId();
+
       const activeDbClient = TenantContextManager.getDbClient();
+
       if (!activeDbClient) {
         throw new TenantContextViolationException(
           "Tenant Context Violation: Tenant-scoped query must execute within an active tenant transaction."
         );
       }
+
       return activeDbClient.query(sql, params);
     }
 
     const activeDbClient = TenantContextManager.getDbClient();
+
     if (activeDbClient) {
       return activeDbClient.query(sql, params);
     }
 
-    console.debug(`[Postgres SQL] Executing Parameterised Query: "${sql}" with values: [${params.join(", ")}]`);
+    console.debug(
+      `[Postgres SQL] Executing Parameterised Query: "${sql}" with values: [${params.join(", ")}]`
+    );
+
     try {
       return await this.pool.query(sql, params);
     } catch {
@@ -169,7 +216,7 @@ export class PostgresClient {
         command: "SELECT",
         rowCount: 0,
         oid: 0,
-        fields: []
+        fields: [],
       };
     }
   }
@@ -179,24 +226,38 @@ export class PostgresClient {
  * Mock Pool Client for offline tsx testing contexts
  */
 class MockPoolClient {
-  public async query(sql: string, params: unknown[] = []): Promise<QueryResult<QueryResultRow>> {
-    console.debug(`[Postgres Transacted SQL] Executing Parameterised Query: "${sql}" with values: [${params.join(", ")}]`);
+  public async query(
+    sql: string,
+    params: unknown[] = []
+  ): Promise<QueryResult<QueryResultRow>> {
+    console.debug(
+      `[Postgres Transacted SQL] Executing Parameterised Query: "${sql}" with values: [${params.join(", ")}]`
+    );
+
     try {
-      return await PostgresClient.getInstance().getPool().query(sql, params);
+      return await PostgresClient.getInstance()
+        .getPool()
+        .query(sql, params);
     } catch (err: unknown) {
-      const errorObj = err as { code?: string; message?: string };
-      if (errorObj.code === "ECONNREFUSED" || errorObj.message?.includes("connect ECONNREFUSED") || (err instanceof Error && err.message.includes("Database connection failed"))) {
+      if (
+        (err as { code?: string }).code === "ECONNREFUSED" ||
+        (err instanceof Error &&
+          (err.message.includes("connect ECONNREFUSED") ||
+            err.message.includes("Database connection failed")))
+      ) {
         return {
           rows: [] as QueryResultRow[],
           command: "BEGIN",
           rowCount: 0,
           oid: 0,
-          fields: []
+          fields: [],
         };
       }
+
       throw err;
     }
   }
+
   public release(): void {}
 }
 
@@ -204,13 +265,16 @@ class MockPoolClient {
  * PostgreSQL Implementation of Tenant Repository
  */
 interface IPgExecutor {
-  query(sql: string, params?: unknown[]): Promise<QueryResult<QueryResultRow>>;
+  query(
+    sql: string,
+    params?: unknown[]
+  ): Promise<QueryResult<QueryResultRow>>;
 }
 
 export class PostgresTenantRepository implements ITenantRepository {
   private pg: PostgresClient;
   private uow: UnitOfWork | null;
-  private static store: Map<string, Tenant> = new Map(); // Simulated real persistent table
+  private static store: Map<string, Tenant> = new Map();
 
   constructor(pg?: PostgresClient, uow?: UnitOfWork) {
     this.pg = pg || PostgresClient.getInstance();
@@ -219,6 +283,7 @@ export class PostgresTenantRepository implements ITenantRepository {
 
   public static seed(tenants: Tenant[]) {
     this.store.clear();
+
     for (const tenant of tenants) {
       this.store.set(tenant.id, { ...tenant });
     }
@@ -232,6 +297,7 @@ export class PostgresTenantRepository implements ITenantRepository {
     if (this.uow && this.uow.getActiveTransactionClient()) {
       return this.uow.getActiveTransactionClient() as IPgExecutor;
     }
+
     return this.pg;
   }
 
@@ -241,33 +307,50 @@ export class PostgresTenantRepository implements ITenantRepository {
 
     if (res.rows && res.rows.length > 0) {
       const row = res.rows[0];
+
       return {
         id: row.id as string,
         name: row.name as string,
         slug: row.slug as string,
-        status: (row.status || "active") as "active" | "suspended" | "archived",
-        configuration: typeof row.configuration === "string" ? JSON.parse(row.configuration) : (row.configuration || {}),
-        quota: typeof row.quota === "string" ? JSON.parse(row.quota) : (row.quota || {}),
-        subscription: typeof row.subscription === "string" ? JSON.parse(row.subscription) : (row.subscription || {}),
+        status: (row.status || "active") as
+          | "active"
+          | "suspended"
+          | "archived",
+        configuration:
+          typeof row.configuration === "string"
+            ? JSON.parse(row.configuration)
+            : row.configuration || {},
+        quota:
+          typeof row.quota === "string"
+            ? JSON.parse(row.quota)
+            : row.quota || {},
+        subscription:
+          typeof row.subscription === "string"
+            ? JSON.parse(row.subscription)
+            : row.subscription || {},
         audit: {
           createdAt: row.created_at as string,
           updatedAt: row.updated_at as string,
           createdBy: (row.created_by || "system") as string,
           updatedBy: (row.updated_by || "system") as string,
           deletedAt: (row.deleted_at || undefined) as string | undefined,
-          version: (row.version || 1) as number
-        }
+          version: (row.version || 1) as number,
+        },
       };
     }
 
     const tenant = PostgresTenantRepository.store.get(id);
-    if (!tenant || tenant.audit.deletedAt) return null;
+
+    if (!tenant || tenant.audit.deletedAt) {
+      return null;
+    }
+
     return {
       ...tenant,
       audit: { ...tenant.audit },
       configuration: { ...tenant.configuration },
       quota: { ...tenant.quota },
-      subscription: { ...tenant.subscription }
+      subscription: { ...tenant.subscription },
     };
   }
 
@@ -277,22 +360,35 @@ export class PostgresTenantRepository implements ITenantRepository {
 
     if (res.rows && res.rows.length > 0) {
       const row = res.rows[0];
+
       return {
         id: row.id as string,
         name: row.name as string,
         slug: row.slug as string,
-        status: (row.status || "active") as "active" | "suspended" | "archived",
-        configuration: typeof row.configuration === "string" ? JSON.parse(row.configuration) : (row.configuration || {}),
-        quota: typeof row.quota === "string" ? JSON.parse(row.quota) : (row.quota || {}),
-        subscription: typeof row.subscription === "string" ? JSON.parse(row.subscription) : (row.subscription || {}),
+        status: (row.status || "active") as
+          | "active"
+          | "suspended"
+          | "archived",
+        configuration:
+          typeof row.configuration === "string"
+            ? JSON.parse(row.configuration)
+            : row.configuration || {},
+        quota:
+          typeof row.quota === "string"
+            ? JSON.parse(row.quota)
+            : row.quota || {},
+        subscription:
+          typeof row.subscription === "string"
+            ? JSON.parse(row.subscription)
+            : row.subscription || {},
         audit: {
           createdAt: row.created_at as string,
           updatedAt: row.updated_at as string,
           createdBy: (row.created_by || "system") as string,
           updatedBy: (row.updated_by || "system") as string,
           deletedAt: (row.deleted_at || undefined) as string | undefined,
-          version: (row.version || 1) as number
-        }
+          version: (row.version || 1) as number,
+        },
       };
     }
 
@@ -303,85 +399,133 @@ export class PostgresTenantRepository implements ITenantRepository {
           audit: { ...tenant.audit },
           configuration: { ...tenant.configuration },
           quota: { ...tenant.quota },
-          subscription: { ...tenant.subscription }
+          subscription: { ...tenant.subscription },
         };
       }
     }
+
     return null;
   }
 
-  public async findAll(status?: "active" | "suspended" | "archived"): Promise<Tenant[]> {
+  public async findAll(
+    status?: "active" | "suspended" | "archived"
+  ): Promise<Tenant[]> {
     const sql = `SELECT * FROM organizations WHERE deleted_at IS NULL;`;
     const res = await this.getExecutor().query(sql, []);
 
     if (res.rows && res.rows.length > 0) {
-      return res.rows.map(row => ({
+      return res.rows.map((row) => ({
         id: row.id as string,
         name: row.name as string,
         slug: row.slug as string,
-        status: (row.status || "active") as "active" | "suspended" | "archived",
-        configuration: typeof row.configuration === "string" ? JSON.parse(row.configuration) : (row.configuration || {}),
-        quota: typeof row.quota === "string" ? JSON.parse(row.quota) : (row.quota || {}),
-        subscription: typeof row.subscription === "string" ? JSON.parse(row.subscription) : (row.subscription || {}),
+        status: (row.status || "active") as
+          | "active"
+          | "suspended"
+          | "archived",
+        configuration:
+          typeof row.configuration === "string"
+            ? JSON.parse(row.configuration)
+            : row.configuration || {},
+        quota:
+          typeof row.quota === "string"
+            ? JSON.parse(row.quota)
+            : row.quota || {},
+        subscription:
+          typeof row.subscription === "string"
+            ? JSON.parse(row.subscription)
+            : row.subscription || {},
         audit: {
           createdAt: row.created_at as string,
           updatedAt: row.updated_at as string,
           createdBy: (row.created_by || "system") as string,
           updatedBy: (row.updated_by || "system") as string,
           deletedAt: (row.deleted_at || undefined) as string | undefined,
-          version: (row.version || 1) as number
-        }
+          version: (row.version || 1) as number,
+        },
       }));
     }
 
     const list = Array.from(PostgresTenantRepository.store.values());
-    const filtered = list.filter(t => !t.audit.deletedAt && (!status || t.status === status));
-    return filtered.map(t => ({ ...t }));
+
+    const filtered = list.filter(
+      (t) =>
+        !t.audit.deletedAt && (!status || t.status === status)
+    );
+
+    return filtered.map((t) => ({ ...t }));
   }
 
   public async save(entity: Tenant): Promise<Tenant> {
     const execute = async () => {
-      // Guard against cross-tenant slug conflicts / identity hijack
       const slugSql = `SELECT id FROM organizations WHERE slug = $1 AND deleted_at IS NULL LIMIT 1;`;
-      const slugRes = await this.getExecutor().query(slugSql, [entity.slug]);
+      const slugRes = await this.getExecutor().query(slugSql, [
+        entity.slug,
+      ]);
+
       if (slugRes.rows && slugRes.rows.length > 0) {
         const slugId = slugRes.rows[0].id;
+
         if (slugId !== entity.id) {
-          throw new Error("Tenant Isolation Exception: Cannot modify or change tenantId ownership or conflict with existing tenant.");
+          throw new Error(
+            "Tenant Isolation Exception: Cannot modify or change tenantId ownership or conflict with existing tenant."
+          );
         }
       }
 
-      // Check fallback in-memory store for slug conflict in offline simulation
       for (const t of PostgresTenantRepository.store.values()) {
-        if (t.slug === entity.slug && t.id !== entity.id && !t.audit.deletedAt) {
-          throw new Error("Tenant Isolation Exception: Cannot modify or change tenantId ownership or conflict with existing tenant.");
+        if (
+          t.slug === entity.slug &&
+          t.id !== entity.id &&
+          !t.audit.deletedAt
+        ) {
+          throw new Error(
+            "Tenant Isolation Exception: Cannot modify or change tenantId ownership or conflict with existing tenant."
+          );
         }
       }
 
       let existing: Tenant | null = null;
+
       const findSql = `SELECT * FROM organizations WHERE id = $1 LIMIT 1;`;
       const res = await this.getExecutor().query(findSql, [entity.id]);
+
       if (res.rows && res.rows.length > 0) {
         const row = res.rows[0];
+
         existing = {
           id: row.id as string,
           name: row.name as string,
           slug: row.slug as string,
-          status: (row.status || "active") as "active" | "suspended" | "archived",
-          configuration: typeof row.configuration === "string" ? JSON.parse(row.configuration) : (row.configuration || {}),
-          quota: typeof row.quota === "string" ? JSON.parse(row.quota) : (row.quota || {}),
-          subscription: typeof row.subscription === "string" ? JSON.parse(row.subscription) : (row.subscription || {}),
+          status: (row.status || "active") as
+            | "active"
+            | "suspended"
+            | "archived",
+          configuration:
+            typeof row.configuration === "string"
+              ? JSON.parse(row.configuration)
+              : row.configuration || {},
+          quota:
+            typeof row.quota === "string"
+              ? JSON.parse(row.quota)
+              : row.quota || {},
+          subscription:
+            typeof row.subscription === "string"
+              ? JSON.parse(row.subscription)
+              : row.subscription || {},
           audit: {
             createdAt: row.created_at as string,
             updatedAt: row.updated_at as string,
             createdBy: (row.created_by || "system") as string,
             updatedBy: (row.updated_by || "system") as string,
-            deletedAt: (row.deleted_at || undefined) as string | undefined,
-            version: (row.version || 1) as number
-          }
+            deletedAt: (row.deleted_at || undefined) as
+              | string
+              | undefined,
+            version: (row.version || 1) as number,
+          },
         };
       } else {
         const inMem = PostgresTenantRepository.store.get(entity.id);
+
         if (inMem) {
           existing = inMem;
         }
@@ -389,21 +533,33 @@ export class PostgresTenantRepository implements ITenantRepository {
 
       if (existing) {
         if (existing.id !== entity.id) {
-          throw new Error("Tenant Isolation Exception: Cannot modify or change tenantId ownership or conflict with existing tenant.");
+          throw new Error(
+            "Tenant Isolation Exception: Cannot modify or change tenantId ownership or conflict with existing tenant."
+          );
         }
 
-        const versionDiff = entity.audit.version - existing.audit.version;
+        const versionDiff =
+          entity.audit.version - existing.audit.version;
+
         if (versionDiff !== 0 && versionDiff !== 1) {
-          throw new OptimisticLockingError("Tenant", entity.audit.version, existing.audit.version);
+          throw new OptimisticLockingError(
+            "Tenant",
+            entity.audit.version,
+            existing.audit.version
+          );
         }
 
-        const nextVersion = versionDiff === 0 ? entity.audit.version + 1 : entity.audit.version;
+        const nextVersion =
+          versionDiff === 0
+            ? entity.audit.version + 1
+            : entity.audit.version;
 
         const sql = `
           UPDATE organizations
           SET name = $1, slug = $2, plan = $3, updated_at = $4, version = $5
           WHERE id = $6 AND version = $7;
         `;
+
         const updateRes = await this.getExecutor().query(sql, [
           entity.name,
           entity.slug,
@@ -411,11 +567,21 @@ export class PostgresTenantRepository implements ITenantRepository {
           new Date().toISOString(),
           nextVersion,
           entity.id,
-          existing.audit.version
+          existing.audit.version,
         ]);
 
-        if (updateRes && typeof updateRes.rowCount === "number" && updateRes.rowCount === 0 && res.rows && res.rows.length > 0) {
-          throw new OptimisticLockingError("Tenant", entity.audit.version, existing.audit.version);
+        if (
+          updateRes &&
+          typeof updateRes.rowCount === "number" &&
+          updateRes.rowCount === 0 &&
+          res.rows &&
+          res.rows.length > 0
+        ) {
+          throw new OptimisticLockingError(
+            "Tenant",
+            entity.audit.version,
+            existing.audit.version
+          );
         }
 
         entity.audit.version = nextVersion;
@@ -425,9 +591,13 @@ export class PostgresTenantRepository implements ITenantRepository {
           INSERT INTO organizations (id, name, slug, plan, created_at, updated_at, created_by, updated_by, version)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
         `;
+
         if (!entity.id) {
-          entity.id = `tenant-${Math.random().toString(36).substr(2, 9)}-uuid`;
+          entity.id = `tenant-${Math.random()
+            .toString(36)
+            .substr(2, 9)}-uuid`;
         }
+
         entity.audit.version = 1;
         entity.audit.createdAt = new Date().toISOString();
         entity.audit.updatedAt = new Date().toISOString();
@@ -441,42 +611,64 @@ export class PostgresTenantRepository implements ITenantRepository {
           entity.audit.updatedAt,
           entity.audit.createdBy || "system",
           entity.audit.updatedBy || "system",
-          entity.audit.version
+          entity.audit.version,
         ]);
       }
-      PostgresTenantRepository.store.set(entity.id, { ...entity });
+
+      PostgresTenantRepository.store.set(entity.id, {
+        ...entity,
+      });
     };
 
     await this.pg.registerTransactionOp(execute);
+
     return entity;
   }
 
   public async delete(id: string): Promise<void> {
     const execute = async () => {
       let tenant: Tenant | null = null;
+
       const findSql = `SELECT * FROM organizations WHERE id = $1 LIMIT 1;`;
       const res = await this.getExecutor().query(findSql, [id]);
+
       if (res.rows && res.rows.length > 0) {
         const row = res.rows[0];
+
         tenant = {
           id: row.id as string,
           name: row.name as string,
           slug: row.slug as string,
-          status: (row.status || "active") as "active" | "suspended" | "archived",
-          configuration: typeof row.configuration === "string" ? JSON.parse(row.configuration) : (row.configuration || {}),
-          quota: typeof row.quota === "string" ? JSON.parse(row.quota) : (row.quota || {}),
-          subscription: typeof row.subscription === "string" ? JSON.parse(row.subscription) : (row.subscription || {}),
+          status: (row.status || "active") as
+            | "active"
+            | "suspended"
+            | "archived",
+          configuration:
+            typeof row.configuration === "string"
+              ? JSON.parse(row.configuration)
+              : row.configuration || {},
+          quota:
+            typeof row.quota === "string"
+              ? JSON.parse(row.quota)
+              : row.quota || {},
+          subscription:
+            typeof row.subscription === "string"
+              ? JSON.parse(row.subscription)
+              : row.subscription || {},
           audit: {
             createdAt: row.created_at as string,
             updatedAt: row.updated_at as string,
             createdBy: (row.created_by || "system") as string,
             updatedBy: (row.updated_by || "system") as string,
-            deletedAt: (row.deleted_at || undefined) as string | undefined,
-            version: (row.version || 1) as number
-          }
+            deletedAt: (row.deleted_at || undefined) as
+              | string
+              | undefined,
+            version: (row.version || 1) as number,
+          },
         };
       } else {
         const inMem = PostgresTenantRepository.store.get(id);
+
         if (inMem) {
           tenant = inMem;
         }
@@ -485,12 +677,18 @@ export class PostgresTenantRepository implements ITenantRepository {
       if (tenant) {
         const sql = `UPDATE organizations SET deleted_at = $1, version = $2 WHERE id = $3;`;
         const nextVersion = tenant.audit.version + 1;
-        await this.getExecutor().query(sql, [new Date().toISOString(), nextVersion, id]);
+
+        await this.getExecutor().query(sql, [
+          new Date().toISOString(),
+          nextVersion,
+          id,
+        ]);
 
         tenant.audit.deletedAt = new Date().toISOString();
         tenant.audit.updatedAt = new Date().toISOString();
         tenant.status = "archived";
         tenant.audit.version = nextVersion;
+
         PostgresTenantRepository.store.set(id, tenant);
       }
     };
@@ -502,7 +700,9 @@ export class PostgresTenantRepository implements ITenantRepository {
 /**
  * PostgreSQL Implementation of Admin User Repository
  */
-export class PostgresAdminUserRepository implements IAdminUserRepository {
+export class PostgresAdminUserRepository
+  implements IAdminUserRepository
+{
   private pg: PostgresClient;
   private uow: UnitOfWork | null;
   private static store: Map<string, AdminUser> = new Map();
@@ -514,6 +714,7 @@ export class PostgresAdminUserRepository implements IAdminUserRepository {
 
   public static seed(users: AdminUser[]) {
     this.store.clear();
+
     for (const u of users) {
       this.store.set(u.id, { ...u });
     }
@@ -527,6 +728,7 @@ export class PostgresAdminUserRepository implements IAdminUserRepository {
     if (this.uow && this.uow.getActiveTransactionClient()) {
       return this.uow.getActiveTransactionClient() as IPgExecutor;
     }
+
     return this.pg;
   }
 
@@ -535,11 +737,17 @@ export class PostgresAdminUserRepository implements IAdminUserRepository {
     await this.getExecutor().query(sql, [id]);
 
     const user = PostgresAdminUserRepository.store.get(id);
-    if (!user || user.audit.deletedAt) return null;
+
+    if (!user || user.audit.deletedAt) {
+      return null;
+    }
+
     return {
       ...user,
       audit: { ...user.audit },
-      ssoIdentities: user.ssoIdentities ? user.ssoIdentities.map(i => ({ ...i })) : undefined
+      ssoIdentities: user.ssoIdentities
+        ? user.ssoIdentities.map((i) => ({ ...i }))
+        : undefined,
     };
   }
 
@@ -552,10 +760,13 @@ export class PostgresAdminUserRepository implements IAdminUserRepository {
         return {
           ...user,
           audit: { ...user.audit },
-          ssoIdentities: user.ssoIdentities ? user.ssoIdentities.map(i => ({ ...i })) : undefined
+          ssoIdentities: user.ssoIdentities
+            ? user.ssoIdentities.map((i) => ({ ...i }))
+            : undefined,
         };
       }
     }
+
     return null;
   }
 
@@ -563,27 +774,43 @@ export class PostgresAdminUserRepository implements IAdminUserRepository {
     const sql = `SELECT * FROM admin_users WHERE deleted_at IS NULL;`;
     await this.getExecutor().query(sql, []);
 
-    const list = Array.from(PostgresAdminUserRepository.store.values());
-    const filtered = list.filter(u => !u.audit.deletedAt);
-    return filtered.map(u => ({ ...u }));
+    const list = Array.from(
+      PostgresAdminUserRepository.store.values()
+    );
+
+    const filtered = list.filter((u) => !u.audit.deletedAt);
+
+    return filtered.map((u) => ({ ...u }));
   }
 
   public async save(entity: AdminUser): Promise<AdminUser> {
     const execute = async () => {
-      const existing = PostgresAdminUserRepository.store.get(entity.id);
+      const existing =
+        PostgresAdminUserRepository.store.get(entity.id);
+
       if (existing) {
-        const versionDiff = entity.audit.version - existing.audit.version;
+        const versionDiff =
+          entity.audit.version - existing.audit.version;
+
         if (versionDiff !== 0 && versionDiff !== 1) {
-          throw new OptimisticLockingError("AdminUser", entity.audit.version, existing.audit.version);
+          throw new OptimisticLockingError(
+            "AdminUser",
+            entity.audit.version,
+            existing.audit.version
+          );
         }
 
-        const nextVersion = versionDiff === 0 ? entity.audit.version + 1 : entity.audit.version;
+        const nextVersion =
+          versionDiff === 0
+            ? entity.audit.version + 1
+            : entity.audit.version;
 
         const sql = `
           UPDATE admin_users
           SET email = $1, full_name = $2, role = $3, permissions = $4, is_active = $5, sso_identities = $6, updated_at = $7, version = $8
           WHERE id = $9 AND version = $10;
         `;
+
         await this.getExecutor().query(sql, [
           entity.email,
           entity.fullName,
@@ -594,7 +821,7 @@ export class PostgresAdminUserRepository implements IAdminUserRepository {
           new Date().toISOString(),
           nextVersion,
           entity.id,
-          existing.audit.version
+          existing.audit.version,
         ]);
 
         entity.audit.version = nextVersion;
@@ -604,9 +831,13 @@ export class PostgresAdminUserRepository implements IAdminUserRepository {
           INSERT INTO admin_users (id, email, full_name, role, permissions, is_active, sso_identities, created_at, updated_at, created_by, updated_by, version)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
         `;
+
         if (!entity.id) {
-          entity.id = `admin-user-${Math.random().toString(36).substr(2, 9)}`;
+          entity.id = `admin-user-${Math.random()
+            .toString(36)
+            .substr(2, 9)}`;
         }
+
         entity.audit.version = 1;
         entity.audit.createdAt = new Date().toISOString();
         entity.audit.updatedAt = new Date().toISOString();
@@ -623,28 +854,41 @@ export class PostgresAdminUserRepository implements IAdminUserRepository {
           entity.audit.updatedAt,
           entity.audit.createdBy,
           entity.audit.updatedBy,
-          entity.audit.version
+          entity.audit.version,
         ]);
       }
-      PostgresAdminUserRepository.store.set(entity.id, { ...entity });
+
+      PostgresAdminUserRepository.store.set(entity.id, {
+        ...entity,
+      });
     };
 
     await this.pg.registerTransactionOp(execute);
+
     return entity;
   }
 
   public async delete(id: string): Promise<void> {
     const execute = async () => {
-      const user = PostgresAdminUserRepository.store.get(id);
+      const user =
+        PostgresAdminUserRepository.store.get(id);
+
       if (user) {
         const sql = `UPDATE admin_users SET deleted_at = $1, is_active = $2, version = $3 WHERE id = $4;`;
         const nextVersion = user.audit.version + 1;
-        await this.getExecutor().query(sql, [new Date().toISOString(), false, nextVersion, id]);
+
+        await this.getExecutor().query(sql, [
+          new Date().toISOString(),
+          false,
+          nextVersion,
+          id,
+        ]);
 
         user.audit.deletedAt = new Date().toISOString();
         user.audit.updatedAt = new Date().toISOString();
         user.isActive = false;
         user.audit.version = nextVersion;
+
         PostgresAdminUserRepository.store.set(id, user);
       }
     };
@@ -656,7 +900,9 @@ export class PostgresAdminUserRepository implements IAdminUserRepository {
 /**
  * PostgreSQL Feature Flag Repository Implementation
  */
-export class PostgresFeatureFlagRepository implements IFeatureFlagRepository {
+export class PostgresFeatureFlagRepository
+  implements IFeatureFlagRepository
+{
   private pg: PostgresClient;
   private uow: UnitOfWork | null;
   private static store: Map<string, FeatureFlag> = new Map();
@@ -668,6 +914,7 @@ export class PostgresFeatureFlagRepository implements IFeatureFlagRepository {
 
   public static seed(flags: FeatureFlag[]) {
     this.store.clear();
+
     for (const f of flags) {
       this.store.set(f.key, { ...f });
     }
@@ -681,6 +928,7 @@ export class PostgresFeatureFlagRepository implements IFeatureFlagRepository {
     if (this.uow && this.uow.getActiveTransactionClient()) {
       return this.uow.getActiveTransactionClient() as IPgExecutor;
     }
+
     return this.pg;
   }
 
@@ -693,6 +941,7 @@ export class PostgresFeatureFlagRepository implements IFeatureFlagRepository {
         return { ...flag };
       }
     }
+
     return null;
   }
 
@@ -700,8 +949,13 @@ export class PostgresFeatureFlagRepository implements IFeatureFlagRepository {
     const sql = `SELECT * FROM feature_flags WHERE key = $1 LIMIT 1;`;
     await this.getExecutor().query(sql, [key]);
 
-    const flag = PostgresFeatureFlagRepository.store.get(key);
-    if (!flag || flag.audit.deletedAt) return null;
+    const flag =
+      PostgresFeatureFlagRepository.store.get(key);
+
+    if (!flag || flag.audit.deletedAt) {
+      return null;
+    }
+
     return { ...flag };
   }
 
@@ -709,27 +963,43 @@ export class PostgresFeatureFlagRepository implements IFeatureFlagRepository {
     const sql = `SELECT * FROM feature_flags WHERE deleted_at IS NULL;`;
     await this.getExecutor().query(sql, []);
 
-    const list = Array.from(PostgresFeatureFlagRepository.store.values());
-    const filtered = list.filter(f => !f.audit.deletedAt);
-    return filtered.map(f => ({ ...f }));
+    const list = Array.from(
+      PostgresFeatureFlagRepository.store.values()
+    );
+
+    const filtered = list.filter((f) => !f.audit.deletedAt);
+
+    return filtered.map((f) => ({ ...f }));
   }
 
   public async save(entity: FeatureFlag): Promise<FeatureFlag> {
     const execute = async () => {
-      const existing = PostgresFeatureFlagRepository.store.get(entity.key);
+      const existing =
+        PostgresFeatureFlagRepository.store.get(entity.key);
+
       if (existing) {
-        const versionDiff = entity.audit.version - existing.audit.version;
+        const versionDiff =
+          entity.audit.version - existing.audit.version;
+
         if (versionDiff !== 0 && versionDiff !== 1) {
-          throw new OptimisticLockingError("FeatureFlag", entity.audit.version, existing.audit.version);
+          throw new OptimisticLockingError(
+            "FeatureFlag",
+            entity.audit.version,
+            existing.audit.version
+          );
         }
 
-        const nextVersion = versionDiff === 0 ? entity.audit.version + 1 : entity.audit.version;
+        const nextVersion =
+          versionDiff === 0
+            ? entity.audit.version + 1
+            : entity.audit.version;
 
         const sql = `
           UPDATE feature_flags
           SET name = $1, description = $2, is_enabled_globally = $3, tenant_overrides = $4, updated_at = $5, version = $6
           WHERE key = $7 AND version = $8;
         `;
+
         await this.getExecutor().query(sql, [
           entity.name,
           entity.description,
@@ -738,7 +1008,7 @@ export class PostgresFeatureFlagRepository implements IFeatureFlagRepository {
           new Date().toISOString(),
           nextVersion,
           entity.key,
-          existing.audit.version
+          existing.audit.version,
         ]);
 
         entity.audit.version = nextVersion;
@@ -748,9 +1018,13 @@ export class PostgresFeatureFlagRepository implements IFeatureFlagRepository {
           INSERT INTO feature_flags (id, key, name, description, is_enabled_globally, tenant_overrides, created_at, updated_at, created_by, updated_by, version)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
         `;
+
         if (!entity.id) {
-          entity.id = `flag-${Math.random().toString(36).substr(2, 9)}`;
+          entity.id = `flag-${Math.random()
+            .toString(36)
+            .substr(2, 9)}`;
         }
+
         entity.audit.version = 1;
         entity.audit.createdAt = new Date().toISOString();
         entity.audit.updatedAt = new Date().toISOString();
@@ -766,13 +1040,17 @@ export class PostgresFeatureFlagRepository implements IFeatureFlagRepository {
           entity.audit.updatedAt,
           entity.audit.createdBy,
           entity.audit.updatedBy,
-          entity.audit.version
+          entity.audit.version,
         ]);
       }
-      PostgresFeatureFlagRepository.store.set(entity.key, { ...entity });
+
+      PostgresFeatureFlagRepository.store.set(entity.key, {
+        ...entity,
+      });
     };
 
     await this.pg.registerTransactionOp(execute);
+
     return entity;
   }
 }
@@ -780,7 +1058,9 @@ export class PostgresFeatureFlagRepository implements IFeatureFlagRepository {
 /**
  * PostgreSQL Audit Record Repository Implementation
  */
-export class PostgresAuditRecordRepository implements IAuditRecordRepository {
+export class PostgresAuditRecordRepository
+  implements IAuditRecordRepository
+{
   private pg: PostgresClient;
   private uow: UnitOfWork | null;
   private static store: AuditRecord[] = [];
@@ -802,6 +1082,7 @@ export class PostgresAuditRecordRepository implements IAuditRecordRepository {
     if (this.uow && this.uow.getActiveTransactionClient()) {
       return this.uow.getActiveTransactionClient() as IPgExecutor;
     }
+
     return this.pg;
   }
 
@@ -809,32 +1090,59 @@ export class PostgresAuditRecordRepository implements IAuditRecordRepository {
     const sql = `SELECT * FROM audit_records WHERE id = $1 LIMIT 1;`;
     await this.getExecutor().query(sql, [id]);
 
-    const record = PostgresAuditRecordRepository.store.find(r => r.id === id);
-    if (!record) return null;
+    const record =
+      PostgresAuditRecordRepository.store.find(
+        (r) => r.id === id
+      );
+
+    if (!record) {
+      return null;
+    }
+
     return { ...record };
   }
 
-  public async findByActorId(actorId: string): Promise<AuditRecord[]> {
+  public async findByActorId(
+    actorId: string
+  ): Promise<AuditRecord[]> {
     const sql = `SELECT * FROM audit_records WHERE actor_id = $1 ORDER BY timestamp DESC;`;
     await this.getExecutor().query(sql, [actorId]);
 
-    const records = PostgresAuditRecordRepository.store.filter(r => r.actorId === actorId);
-    return records.map(r => ({ ...r }));
+    const records =
+      PostgresAuditRecordRepository.store.filter(
+        (r) => r.actorId === actorId
+      );
+
+    return records.map((r) => ({ ...r }));
   }
 
-  public async findByResourceId(resourceType: string, resourceId: string): Promise<AuditRecord[]> {
+  public async findByResourceId(
+    resourceType: string,
+    resourceId: string
+  ): Promise<AuditRecord[]> {
     const sql = `SELECT * FROM audit_records WHERE resource_type = $1 AND resource_id = $2 ORDER BY timestamp DESC;`;
-    await this.getExecutor().query(sql, [resourceType, resourceId]);
+    await this.getExecutor().query(sql, [
+      resourceType,
+      resourceId,
+    ]);
 
-    const records = PostgresAuditRecordRepository.store.filter(r => r.resourceType === resourceType && r.resourceId === resourceId);
-    return records.map(r => ({ ...r }));
+    const records =
+      PostgresAuditRecordRepository.store.filter(
+        (r) =>
+          r.resourceType === resourceType &&
+          r.resourceId === resourceId
+      );
+
+    return records.map((r) => ({ ...r }));
   }
 
   public async findAll(): Promise<AuditRecord[]> {
     const sql = `SELECT * FROM audit_records ORDER BY timestamp DESC;`;
     await this.getExecutor().query(sql, []);
 
-    return PostgresAuditRecordRepository.store.map(r => ({ ...r }));
+    return PostgresAuditRecordRepository.store.map((r) => ({
+      ...r,
+    }));
   }
 
   public async save(entity: AuditRecord): Promise<AuditRecord> {
@@ -843,8 +1151,11 @@ export class PostgresAuditRecordRepository implements IAuditRecordRepository {
         INSERT INTO audit_records (id, timestamp, actor_id, actor_email, actor_role, action, resource_type, resource_id, ip_address, user_agent, payload_before, payload_after, status, error_details)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);
       `;
+
       if (!entity.id) {
-        entity.id = `audit-${Math.random().toString(36).substr(2, 9)}`;
+        entity.id = `audit-${Math.random()
+          .toString(36)
+          .substr(2, 9)}`;
       }
 
       await this.getExecutor().query(sql, [
@@ -861,13 +1172,16 @@ export class PostgresAuditRecordRepository implements IAuditRecordRepository {
         entity.payloadBefore,
         entity.payloadAfter,
         entity.status,
-        entity.errorDetails
+        entity.errorDetails,
       ]);
 
-      PostgresAuditRecordRepository.store.push({ ...entity });
+      PostgresAuditRecordRepository.store.push({
+        ...entity,
+      });
     };
 
     await this.pg.registerTransactionOp(execute);
+
     return entity;
   }
 }
@@ -875,10 +1189,15 @@ export class PostgresAuditRecordRepository implements IAuditRecordRepository {
 /**
  * PostgreSQL AI Provider Config Repository Implementation
  */
-export class PostgresAIProviderConfigurationRepository implements IAIProviderConfigurationRepository {
+export class PostgresAIProviderConfigurationRepository
+  implements IAIProviderConfigurationRepository
+{
   private pg: PostgresClient;
   private uow: UnitOfWork | null;
-  private static store: Map<string, AIProviderConfiguration> = new Map();
+  private static store: Map<
+    string,
+    AIProviderConfiguration
+  > = new Map();
 
   constructor(pg?: PostgresClient, uow?: UnitOfWork) {
     this.pg = pg || PostgresClient.getInstance();
@@ -887,12 +1206,16 @@ export class PostgresAIProviderConfigurationRepository implements IAIProviderCon
 
   public static seed(providers: AIProviderConfiguration[]) {
     this.store.clear();
+
     for (const p of providers) {
       this.store.set(p.id, { ...p });
     }
   }
 
-  public static getRawStore(): Map<string, AIProviderConfiguration> {
+  public static getRawStore(): Map<
+    string,
+    AIProviderConfiguration
+  > {
     return this.store;
   }
 
@@ -900,64 +1223,106 @@ export class PostgresAIProviderConfigurationRepository implements IAIProviderCon
     if (this.uow && this.uow.getActiveTransactionClient()) {
       return this.uow.getActiveTransactionClient() as IPgExecutor;
     }
+
     return this.pg;
   }
 
-  public async findById(id: string): Promise<AIProviderConfiguration | null> {
+  public async findById(
+    id: string
+  ): Promise<AIProviderConfiguration | null> {
     const sql = `SELECT * FROM ai_provider_configs WHERE id = $1 LIMIT 1;`;
     await this.getExecutor().query(sql, [id]);
 
-    const provider = PostgresAIProviderConfigurationRepository.store.get(id);
-    if (!provider || provider.audit.deletedAt) return null;
+    const provider =
+      PostgresAIProviderConfigurationRepository.store.get(id);
+
+    if (!provider || provider.audit.deletedAt) {
+      return null;
+    }
+
     return { ...provider };
   }
 
-  public async findByProviderName(name: string): Promise<AIProviderConfiguration | null> {
+  public async findByProviderName(
+    name: string
+  ): Promise<AIProviderConfiguration | null> {
     const sql = `SELECT * FROM ai_provider_configs WHERE provider_name = $1 LIMIT 1;`;
     await this.getExecutor().query(sql, [name]);
 
     for (const provider of PostgresAIProviderConfigurationRepository.store.values()) {
-      if (provider.providerName === name && !provider.audit.deletedAt) {
+      if (
+        provider.providerName === name &&
+        !provider.audit.deletedAt
+      ) {
         return { ...provider };
       }
     }
+
     return null;
   }
 
-  public async findAllActive(): Promise<AIProviderConfiguration[]> {
+  public async findAllActive(): Promise<
+    AIProviderConfiguration[]
+  > {
     const sql = `SELECT * FROM ai_provider_configs WHERE is_active = TRUE AND deleted_at IS NULL;`;
     await this.getExecutor().query(sql, []);
 
-    const list = Array.from(PostgresAIProviderConfigurationRepository.store.values());
-    const filtered = list.filter(p => p.isActive && !p.audit.deletedAt);
-    return filtered.map(p => ({ ...p }));
+    const list = Array.from(
+      PostgresAIProviderConfigurationRepository.store.values()
+    );
+
+    const filtered = list.filter(
+      (p) => p.isActive && !p.audit.deletedAt
+    );
+
+    return filtered.map((p) => ({ ...p }));
   }
 
   public async findAll(): Promise<AIProviderConfiguration[]> {
     const sql = `SELECT * FROM ai_provider_configs WHERE deleted_at IS NULL;`;
     await this.getExecutor().query(sql, []);
 
-    const list = Array.from(PostgresAIProviderConfigurationRepository.store.values());
-    const filtered = list.filter(p => !p.audit.deletedAt);
-    return filtered.map(p => ({ ...p }));
+    const list = Array.from(
+      PostgresAIProviderConfigurationRepository.store.values()
+    );
+
+    const filtered = list.filter((p) => !p.audit.deletedAt);
+
+    return filtered.map((p) => ({ ...p }));
   }
 
-  public async save(entity: AIProviderConfiguration): Promise<AIProviderConfiguration> {
+  public async save(
+    entity: AIProviderConfiguration
+  ): Promise<AIProviderConfiguration> {
     const execute = async () => {
-      const existing = PostgresAIProviderConfigurationRepository.store.get(entity.id);
+      const existing =
+        PostgresAIProviderConfigurationRepository.store.get(
+          entity.id
+        );
+
       if (existing) {
-        const versionDiff = entity.audit.version - existing.audit.version;
+        const versionDiff =
+          entity.audit.version - existing.audit.version;
+
         if (versionDiff !== 0 && versionDiff !== 1) {
-          throw new OptimisticLockingError("AIProvider", entity.audit.version, existing.audit.version);
+          throw new OptimisticLockingError(
+            "AIProvider",
+            entity.audit.version,
+            existing.audit.version
+          );
         }
 
-        const nextVersion = versionDiff === 0 ? entity.audit.version + 1 : entity.audit.version;
+        const nextVersion =
+          versionDiff === 0
+            ? entity.audit.version + 1
+            : entity.audit.version;
 
         const sql = `
           UPDATE ai_provider_configs
           SET provider_name = $1, endpoint_url = $2, api_key_masked = $3, is_active = $4, failover_provider_id = $5, updated_at = $6, version = $7
           WHERE id = $8 AND version = $9;
         `;
+
         await this.getExecutor().query(sql, [
           entity.providerName,
           entity.endpointUrl,
@@ -967,7 +1332,7 @@ export class PostgresAIProviderConfigurationRepository implements IAIProviderCon
           new Date().toISOString(),
           nextVersion,
           entity.id,
-          existing.audit.version
+          existing.audit.version,
         ]);
 
         entity.audit.version = nextVersion;
@@ -977,9 +1342,13 @@ export class PostgresAIProviderConfigurationRepository implements IAIProviderCon
           INSERT INTO ai_provider_configs (id, provider_name, endpoint_url, api_key_masked, is_active, failover_provider_id, created_at, updated_at, created_by, updated_by, version)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
         `;
+
         if (!entity.id) {
-          entity.id = `ai-provider-${Math.random().toString(36).substr(2, 9)}`;
+          entity.id = `ai-provider-${Math.random()
+            .toString(36)
+            .substr(2, 9)}`;
         }
+
         entity.audit.version = 1;
         entity.audit.createdAt = new Date().toISOString();
         entity.audit.updatedAt = new Date().toISOString();
@@ -995,13 +1364,18 @@ export class PostgresAIProviderConfigurationRepository implements IAIProviderCon
           entity.audit.updatedAt,
           entity.audit.createdBy,
           entity.audit.updatedBy,
-          entity.audit.version
+          entity.audit.version,
         ]);
       }
-      PostgresAIProviderConfigurationRepository.store.set(entity.id, { ...entity });
+
+      PostgresAIProviderConfigurationRepository.store.set(
+        entity.id,
+        { ...entity }
+      );
     };
 
     await this.pg.registerTransactionOp(execute);
+
     return entity;
   }
 }
