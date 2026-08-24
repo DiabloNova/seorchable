@@ -107,7 +107,7 @@ export async function getCitationsDashboardDataAction() {
         ];
 
         for (const s of seedSources) {
-          await repo.saveSource(s);
+          await repo.saveSource(s as any);
 
           // Save mock occurrences
           for (let i = 0; i < s.occurrenceCount; i++) {
