@@ -69,7 +69,7 @@ export async function getBrandIntelligenceOverviewAction() {
       // Seed mock baseline associations if empty to ensure rich onboarding dashboard
       let activeAssocs = [...associations];
       if (activeAssocs.length === 0) {
-        const seedAssocs = [
+        const seedAssocs: BrandAssociation[] = [
           {
             id: crypto.randomUUID(),
             organizationId: tenantId,
@@ -112,7 +112,7 @@ export async function getBrandIntelligenceOverviewAction() {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           }
-        ] as any[]; // Safe workaround for missing type `BrandAssociation` locally during auto-generation
+        ];
 
         for (const a of seedAssocs) {
           await repo.saveAssociation(a);
