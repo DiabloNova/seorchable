@@ -8,6 +8,7 @@ import { RegressionDetectionService } from "../../features/monitoring/services/r
 import { ContentChangeDetectionService } from "../../features/monitoring/services/content-change-detection-service";
 import { AlertGenerationService } from "../../features/monitoring/services/alert-generation-service";
 import { FirecrawlCrawlProvider } from "../../features/acquisition/infrastructure/providers/firecrawl/firecrawl-crawl-provider";
+import { RecommendationEngineService } from "../../features/recommendations/services/recommendation-engine-service";
 
 export const helloWorld = inngest.createFunction(
   { id: "hello-world", triggers: [{ event: "test/hello.world" }] },
@@ -27,5 +28,28 @@ export const scheduledMonitoring = inngest.createFunction(
       return { status: "success", timestamp: new Date().toISOString() };
     });
     return { message: "Scheduled AI Visibility monitoring completed" };
+  },
+);
+
+export const automatedRecommendationsDiagnosis = inngest.createFunction(
+  { id: "automated-recommendations-diagnosis", triggers: [{ cron: "0 2 * * *" }] },
+  async ({ step }) => {
+    await step.run("execute-recommendations-diagnosis", async () => {
+      console.log("Starting Automated Recommendations Diagnosis job...");
+      const service = new RecommendationEngineService();
+
+      // Import the proper database instance from the core connection manager rather than relying on global.pgClient.
+      const { TenantContextManager } = require("../../core/database/tenant-context");
+      const { drizzle } = require("drizzle-orm/node-postgres");
+      const db = drizzle(TenantContextManager.getDbClient());
+      const res = await db.execute('SELECT id FROM organizations');
+
+      for (const row of res.rows) {
+        await service.runDiagnosisForTenant(row.id as string);
+      }
+
+      return { status: "success", timestamp: new Date().toISOString() };
+    });
+    return { message: "Automated Recommendations diagnosis completed" };
   },
 );

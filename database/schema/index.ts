@@ -1040,6 +1040,28 @@ export const kgAlignments = pgTable("kg_alignments", {
   ...tenantPolicy("tenant_id")
 ]);
 
+
+export const automatedRecommendations = pgTable("automated_recommendations", {
+  id: uuid("id").primaryKey().default(defaultUuid),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  websiteId: uuid("website_id").references(() => websites.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  type: text("type").notNull(),
+  priorityScore: integer("priority_score").notNull(),
+  status: text("status").notNull().default("pending"),
+  recommendedAction: jsonb("recommended_action").notNull().default({}),
+  dedupKey: text("dedup_key").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
+}, (table) => [
+  index("idx_automated_recs_org").on(table.organizationId),
+  index("idx_automated_recs_status").on(table.status),
+  index("idx_automated_recs_score").on(table.priorityScore),
+  uniqueIndex("idx_automated_recs_dedup").on(table.organizationId, table.dedupKey).where(sql`status = 'pending'`),
+  ...tenantPolicy("organization_id")
+]);
+
 // ==========================================
 // 10. COMPETITOR & COMPETITIVE FINDINGS
 // ==========================================
