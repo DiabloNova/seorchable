@@ -2,10 +2,54 @@ import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { TenantContextManager } from "../../../core/database/tenant-context";
 import { crawlSnapshots } from "../../../../database/schema";
-import { CrawlSnapshot } from "../domain/types";
+import { CrawlSnapshot, SnapshotPage } from "../domain/entities/crawl-snapshot";
 
 export class CrawlSnapshotRepository {
-  public async getPreviousSnapshot(monitoringConfigId: string): Promise<CrawlSnapshot | null> {
+  public async create(snapshot: CrawlSnapshot): Promise<CrawlSnapshot> {
+    const tenantId = TenantContextManager.getRequiredTenantId();
+    const ctx = TenantContextManager.getContext();
+    const db = drizzle(ctx?.dbClient || (global as any).pgClient);
+
+    const rows = await db
+      .insert(crawlSnapshots)
+      .values({
+        id: snapshot.id,
+        organizationId: tenantId,
+        monitoringConfigId: snapshot.monitoringConfigId,
+        websiteId: snapshot.websiteId,
+        capturedAt: snapshot.capturedAt,
+        pages: snapshot.pages,
+        totalPages: snapshot.totalPages,
+        indexablePages: snapshot.indexablePages,
+        nonIndexablePages: snapshot.nonIndexablePages,
+        error4xxCount: snapshot.error4xxCount,
+        error5xxCount: snapshot.error5xxCount,
+        robotsTxtAvailable: snapshot.robotsTxtAvailable,
+        sitemapAvailable: snapshot.sitemapAvailable
+      })
+      .returning();
+
+    const row = rows[0];
+    return {
+      id: row.id,
+      tenantId: row.organizationId,
+      monitoringConfigId: row.monitoringConfigId,
+      websiteId: row.websiteId,
+      capturedAt: row.capturedAt,
+      pages: row.pages as SnapshotPage[],
+      totalPages: row.totalPages,
+      indexablePages: row.indexablePages,
+      nonIndexablePages: row.nonIndexablePages,
+      error4xxCount: row.error4xxCount,
+      error5xxCount: row.error5xxCount,
+      robotsTxtAvailable: row.robotsTxtAvailable,
+      sitemapAvailable: row.sitemapAvailable
+    };
+  }
+
+  public async findLatestSuccessful(
+    monitoringConfigId: string
+  ): Promise<CrawlSnapshot | null> {
     const tenantId = TenantContextManager.getRequiredTenantId();
     const ctx = TenantContextManager.getContext();
     const db = drizzle(ctx?.dbClient || (global as any).pgClient);
@@ -25,43 +69,18 @@ export class CrawlSnapshotRepository {
     const row = rows[0];
     return {
       id: row.id,
-      organizationId: row.organizationId,
+      tenantId: row.organizationId,
       monitoringConfigId: row.monitoringConfigId,
-      crawlJobId: row.crawlJobId,
-      capturedAt: row.capturedAt?.toISOString() || new Date().toISOString(),
-      contentHash: row.contentHash,
-      extractedContent: row.extractedContent,
-      snapshotMetadata: row.snapshotMetadata as Record<string, unknown>
-    };
-  }
-
-  public async create(snapshot: Omit<CrawlSnapshot, "id" | "organizationId" | "capturedAt">): Promise<CrawlSnapshot> {
-    const tenantId = TenantContextManager.getRequiredTenantId();
-    const ctx = TenantContextManager.getContext();
-    const db = drizzle(ctx?.dbClient || (global as any).pgClient);
-
-    const rows = await db
-      .insert(crawlSnapshots)
-      .values({
-        organizationId: tenantId,
-        monitoringConfigId: snapshot.monitoringConfigId,
-        crawlJobId: snapshot.crawlJobId,
-        contentHash: snapshot.contentHash,
-        extractedContent: snapshot.extractedContent,
-        snapshotMetadata: snapshot.snapshotMetadata
-      })
-      .returning();
-
-    const row = rows[0];
-    return {
-      id: row.id,
-      organizationId: row.organizationId,
-      monitoringConfigId: row.monitoringConfigId,
-      crawlJobId: row.crawlJobId,
-      capturedAt: row.capturedAt?.toISOString() || new Date().toISOString(),
-      contentHash: row.contentHash,
-      extractedContent: row.extractedContent,
-      snapshotMetadata: row.snapshotMetadata as Record<string, unknown>
+      websiteId: row.websiteId,
+      capturedAt: row.capturedAt,
+      pages: row.pages as SnapshotPage[],
+      totalPages: row.totalPages,
+      indexablePages: row.indexablePages,
+      nonIndexablePages: row.nonIndexablePages,
+      error4xxCount: row.error4xxCount,
+      error5xxCount: row.error5xxCount,
+      robotsTxtAvailable: row.robotsTxtAvailable,
+      sitemapAvailable: row.sitemapAvailable
     };
   }
 }

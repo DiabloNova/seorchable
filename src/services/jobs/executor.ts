@@ -17,8 +17,14 @@ export class JobExecutionManager implements IJobExecutor {
 
   async execute(job: Job): Promise<void> {
     const handler = this.executors.get(job.type);
+
     if (!handler) {
-      const err = { code: "NO_EXECUTOR", message: `No executor registered for job type ${job.type}`, retryable: false };
+      const err = {
+        code: "NO_EXECUTOR",
+        message: `No executor registered for job type ${job.type}`,
+        retryable: false,
+      };
+
       await this.jobService.transitionStatus(job.id, "failed", err);
       return;
     }
@@ -27,9 +33,12 @@ export class JobExecutionManager implements IJobExecutor {
     job.attempts++;
 
     try {
-      // Execute the domain handler inside the secure tenant context!
-      // This enforces database isolation and RLS boundaries on background operations!
-      const { TenantContextManager } = await import("../../core/database/tenant-context");
+      // Execute the domain handler inside the secure tenant context.
+      // This enforces database isolation and RLS boundaries on background operations.
+      const { TenantContextManager } = await import(
+        "../../core/database/tenant-context"
+      );
+
       await TenantContextManager.runWithTenantContext(
         job.tenantId,
         job.userId,
@@ -41,15 +50,29 @@ export class JobExecutionManager implements IJobExecutor {
 
       await this.jobService.transitionStatus(job.id, "completed");
     } catch (err: unknown) {
-      const isRetryable = (err as { retryable?: boolean }).retryable !== false; // Default to retryable unless marked non-retryable
+      const errorObj = err as {
+        retryable?: boolean;
+        code?: string;
+        message?: string;
+      };
+
+      const isRetryable = errorObj.retryable !== false;
+
       const jobError = {
-        code: (err as { code?: string }).code || "EXECUTION_FAILURE",
-        message: err instanceof Error ? err.message : String(err),
-        retryable: isRetryable && job.attempts < job.maxAttempts
+        code: errorObj.code || "EXECUTION_FAILURE",
+        message:
+          errorObj.message ||
+          (err instanceof Error ? err.message : String(err)),
+        retryable: isRetryable && job.attempts < job.maxAttempts,
       };
 
       if (jobError.retryable) {
-        await this.jobService.transitionStatus(job.id, "retrying", jobError);
+        await this.jobService.transitionStatus(
+          job.id,
+          "retrying",
+          jobError
+        );
+
         // Exponential backoff delay
         const delay = this.retryPolicy.getDelay(job.attempts);
 
@@ -59,7 +82,11 @@ export class JobExecutionManager implements IJobExecutor {
           await this.execute(job);
         }, delay);
       } else {
-        await this.jobService.transitionStatus(job.id, "failed", jobError);
+        await this.jobService.transitionStatus(
+          job.id,
+          "failed",
+          jobError
+        );
       }
     }
   }
