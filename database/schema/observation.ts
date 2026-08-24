@@ -156,12 +156,12 @@ CREATE TABLE IF NOT EXISTS ai_observations (
   sentiment_confidence DOUBLE PRECISION NOT NULL,
   confidence_score DOUBLE PRECISION NOT NULL,
   confidence_rating TEXT NOT NULL,
-  executed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  executed_at TIMESTAMP  NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMP  NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP  NOT NULL DEFAULT NOW(),
   created_by TEXT NOT NULL DEFAULT 'system',
   updated_by TEXT NOT NULL DEFAULT 'system',
-  deleted_at TIMESTAMP WITH TIME ZONE,
+  deleted_at TIMESTAMP ,
   version INTEGER NOT NULL DEFAULT 1
 );
 
@@ -355,11 +355,11 @@ CREATE TABLE IF NOT EXISTS brand_mentions (
   sentiment_confidence DOUBLE PRECISION NOT NULL,
   confidence_score DOUBLE PRECISION NOT NULL,
   confidence_rating TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMP  NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP  NOT NULL DEFAULT NOW(),
   created_by TEXT NOT NULL DEFAULT 'system',
   updated_by TEXT NOT NULL DEFAULT 'system',
-  deleted_at TIMESTAMP WITH TIME ZONE,
+  deleted_at TIMESTAMP ,
   version INTEGER NOT NULL DEFAULT 1
 );
 
@@ -394,4 +394,44 @@ CREATE POLICY delete_tenant_isolation_policy ON brand_mentions
   FOR DELETE
   USING (organization_id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid);
   `
+};
+export const competitorMentionsTable: TableDefinition = {
+  tableName: "competitor_mentions",
+  columns: [
+    { name: "id", type: "UUID", nullable: false, primaryKey: true, description: "Unique competitor mention record identifier" },
+    { name: "organization_id", type: "UUID", nullable: false, references: { table: "organizations", column: "id", onDelete: "CASCADE" }, description: "Organization (tenant) partition key" },
+    { name: "observation_id", type: "UUID", nullable: false, references: { table: "ai_observations", column: "id", onDelete: "CASCADE" }, description: "Linked AI observation" },
+    { name: "competitor_id", type: "UUID", nullable: false, references: { table: "competitors", column: "id", onDelete: "CASCADE" }, description: "Linked competitor reference" },
+    { name: "mention_context", type: "TEXT", nullable: false, description: "The text snippet where the competitor was mentioned" },
+    { name: "is_recommended", type: "BOOLEAN", nullable: false, default: "false", description: "Whether the competitor was recommended" },
+    { name: "sentiment_score", type: "DOUBLE PRECISION", nullable: false, default: "0.0", description: "Sentiment score of the mention" },
+    { name: "created_at", type: "TIMESTAMP", nullable: false, default: "NOW()", description: "Record creation timestamp" },
+    { name: "updated_at", type: "TIMESTAMP", nullable: false, default: "NOW()", description: "Record last update timestamp" },
+    { name: "created_by", type: "TEXT", nullable: false, default: "'system'", description: "Identity of the creator" },
+    { name: "updated_by", type: "TEXT", nullable: false, default: "'system'", description: "Identity of the last updater" },
+    { name: "deleted_at", type: "TIMESTAMP", nullable: true, description: "Soft deletion timestamp" },
+    { name: "version", type: "INTEGER", nullable: false, default: "1", description: "Optimistic locking version counter" }
+  ],
+  indexes: [
+    "CREATE INDEX idx_competitor_mentions_organization ON competitor_mentions(organization_id);",
+    "CREATE INDEX idx_competitor_mentions_observation ON competitor_mentions(observation_id);",
+    "CREATE INDEX idx_competitor_mentions_competitor ON competitor_mentions(competitor_id);"
+  ],
+  sql: `
+CREATE TABLE IF NOT EXISTS competitor_mentions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  observation_id UUID NOT NULL REFERENCES ai_observations(id) ON DELETE CASCADE,
+  competitor_id UUID NOT NULL REFERENCES competitors(id) ON DELETE CASCADE,
+  mention_context TEXT NOT NULL,
+  is_recommended BOOLEAN NOT NULL DEFAULT false,
+  sentiment_score DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+  created_at TIMESTAMP  NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP  NOT NULL DEFAULT NOW(),
+  created_by TEXT NOT NULL DEFAULT 'system',
+  updated_by TEXT NOT NULL DEFAULT 'system',
+  deleted_at TIMESTAMP ,
+  version INTEGER NOT NULL DEFAULT 1
+);
+`
 };

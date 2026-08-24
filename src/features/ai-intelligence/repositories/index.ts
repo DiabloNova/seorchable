@@ -15,6 +15,7 @@ import {
   Prompt,
   AIObservation,
   BrandMention,
+  CompetitorMention,
   Citation,
   VisibilityScore,
   Recommendation,
@@ -104,6 +105,7 @@ class InMemoryDatabase {
   public prompts: Map<string, Prompt> = new Map();
   public observations: Map<string, AIObservation> = new Map();
   public mentions: Map<string, BrandMention> = new Map();
+  public competitorMentions: Map<string, CompetitorMention> = new Map();
   public citations: Map<string, Citation> = new Map();
   public visibilityScores: Map<string, VisibilityScore> = new Map();
   public recommendations: Map<string, Recommendation> = new Map();
@@ -1386,6 +1388,19 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
     const item = db.promptSchedules.get(id);
     if (!item || item.organizationId !== organizationId) return null;
     return item;
+  }
+
+  public async findActiveSchedules(): Promise<PromptSchedule[]> {
+    try {
+      const sql = `SELECT * FROM prompt_schedules WHERE enabled = true;`;
+      const res = await this.pg.query(sql, []);
+      if (res.rowCount && res.rowCount > 0) {
+        return res.rows.map(row => this.mapRowToSchedule(row));
+      }
+    } catch (err) {
+      console.warn("Error", err);
+    }
+    return Array.from(db.promptSchedules.values()).filter(p => p.enabled);
   }
 
   public async findAllSchedules(organizationId: string): Promise<PromptSchedule[]> {
@@ -3469,6 +3484,23 @@ export class ObservationRepository implements IObservationRepository {
     return mention;
   }
 
+  public async findCompetitorMentionsByObservationId(organizationId: string, observationId: string): Promise<CompetitorMention[]> {
+    enforceTenantContext(organizationId);
+    return Array.from(db.competitorMentions.values()).filter(
+      m => m.organizationId === organizationId && m.observationId === observationId && !m.audit.deletedAt
+    );
+  }
+
+  public async saveCompetitorMention(mention: CompetitorMention): Promise<CompetitorMention> {
+    enforceTenantContext(mention.organizationId);
+    const existing = db.competitorMentions.get(mention.id);
+    if (existing && existing.organizationId !== mention.organizationId) {
+      throw new Error("Tenant Isolation Exception: Cannot modify or change tenant ownership for existing CompetitorMention.");
+    }
+    db.competitorMentions.set(mention.id, mention);
+    return mention;
+  }
+
   // Citations
   public async findCitationsByObservationId(organizationId: string, observationId: string): Promise<Citation[]> {
     enforceTenantContext(organizationId);
@@ -3546,4 +3578,7 @@ export class RecommendationRepository implements IRecommendationRepository {
     rec.audit.updatedAt = new Date().toISOString();
     return true;
   }
+
+
+
 }

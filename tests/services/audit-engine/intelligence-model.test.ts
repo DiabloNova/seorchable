@@ -71,8 +71,7 @@ export async function runIntelligenceModelTests() {
         organizationId: tenantA,
         domain: "my-brand.com",
         normalizedUrl: "https://my-brand.com",
-        status: "active",
-        audit: createAudit()
+        status: "active", audit: createAudit()
       };
       await websiteRepo.save(site);
       const savedSite = await websiteRepo.findById(tenantA, "web-site-a1");
@@ -104,8 +103,7 @@ export async function runIntelligenceModelTests() {
         organizationId: tenantA,
         name: "Rival Corp",
         domain: "rival-site.com",
-        status: "active",
-        audit: createAudit()
+        status: "active", classification: "direct" as any, monitoringStatus: "active" as any, audit: createAudit()
       };
       await competitorRepo.save(competitor);
       const savedComp = await competitorRepo.findById(tenantA, "comp-rival-a1");
@@ -300,8 +298,7 @@ export async function runIntelligenceModelTests() {
           organizationId: tenantA, // Pointing to tenant A
           domain: "hijack.com",
           normalizedUrl: "https://hijack.com",
-          status: "active",
-          audit: createAudit()
+          status: "active", audit: createAudit()
         };
         await websiteRepo.save(maliciousSite);
       });

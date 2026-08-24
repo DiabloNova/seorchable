@@ -1249,3 +1249,13 @@ export interface KgRelationship {
   createdAt: Date | string;
   updatedAt: Date | string;
 }
+export interface CompetitorMention {
+  id: string;
+  organizationId: string;
+  observationId: string;
+  competitorId: string;
+  context: TextContextVO;
+  sentiment: SentimentVO;
+  confidence: ConfidenceVO;
+  audit: AuditMetadata;
+}

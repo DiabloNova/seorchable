@@ -80,9 +80,9 @@ const idSchema = z.object({
 /**
  * Creates a new prompt definition.
  */
-export async function updatePromptDefinitionAction(
-  data: z.infer<typeof updateDefSchema>,
-) { main
+export async function createPromptDefinitionAction(
+  data: z.infer<typeof createDefSchema>,
+) {
   const parsed = createDefSchema.safeParse(data);
   if (!parsed.success) {
     return {
@@ -137,8 +137,8 @@ export async function updatePromptDefinitionAction(
  * Updates a prompt definition.
  */
 export async function updatePromptDefinitionAction(
-  data: z.infer<typeof updateDefSchema>,
-) { main
+  data: z.infer<typeof createDefSchema>,
+) {
   const parsed = updateDefSchema.safeParse(data);
   if (!parsed.success) {
     return {
@@ -378,7 +378,7 @@ export async function executePromptAction(data: z.infer<typeof executeSchema>) {
  */
 export async function executeModelComparisonAction(
   data: z.infer<typeof compareSchema>,
-) { main
+) {
   const parsed = compareSchema.safeParse(data);
   if (!parsed.success) {
     return {
@@ -441,7 +441,7 @@ export async function executeModelComparisonAction(
  */
 export async function schedulePromptAction(
   data: z.infer<typeof scheduleSchema>,
-) { main
+) {
   const parsed = scheduleSchema.safeParse(data);
   if (!parsed.success) {
     return {
@@ -519,6 +519,149 @@ export async function unschedulePromptAction(data: z.infer<typeof idSchema>) {
         );
         return { success };
       },
+    );
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
+  }
+}
+
+// =========================================================================
+// AI VISIBILITY MONITORING ACTIONS
+// =========================================================================
+
+/**
+ * Retrieves the monitoring schedule history for a prompt.
+ */
+export async function getScheduleHistoryAction(promptId: string) {
+  let session;
+  try {
+    session = await requireSession();
+    if (!session.user) throw new Error("Unauthorized");
+    await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
+  }
+
+  const tenantId = session.user.workspaceId;
+  const userId = session.user.id;
+
+  try {
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      "ctx-get-schedule-history",
+      async () => {
+        const repo = new PromptIntelligenceRepository();
+        const history = await repo.findExecutionsByPromptId(tenantId, promptId, { limit: 50 });
+        return { success: true, result: history.data };
+      }
+    );
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
+  }
+}
+
+/**
+ * Retrieves historical brand/competitor visibility observations for a prompt.
+ */
+export async function getVisibilityHistoryAction(promptId: string) {
+  let session;
+  try {
+    session = await requireSession();
+    if (!session.user) throw new Error("Unauthorized");
+    await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
+  }
+
+  const tenantId = session.user.workspaceId;
+  const userId = session.user.id;
+
+  try {
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      "ctx-get-visibility-history",
+      async () => {
+        const { ObservationRepository } = require("../../features/ai-intelligence/repositories/index");
+        const obsRepo = new ObservationRepository();
+        const paginated = await obsRepo.findByPromptId(tenantId, promptId, { limit: 50 });
+        return { success: true, result: paginated.data || paginated.items || [] };
+      }
+    );
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
+  }
+}
+
+/**
+ * Retrieves historical citations detected for a prompt over time.
+ */
+export async function getCitationHistoryAction(promptId: string) {
+  let session;
+  try {
+    session = await requireSession();
+    if (!session.user) throw new Error("Unauthorized");
+    await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
+  }
+
+  const tenantId = session.user.workspaceId;
+  const userId = session.user.id;
+
+  try {
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      "ctx-get-citation-history",
+      async () => {
+        const { ObservationRepository } = require("../../features/ai-intelligence/repositories/index");
+        const obsRepo = new ObservationRepository();
+        const paginated = await obsRepo.findByPromptId(tenantId, promptId, { limit: 50 });
+        const obsList = paginated.data || paginated.items || [];
+
+        const citations = [];
+        for (const obs of obsList) {
+           const obsCitations = await obsRepo.findCitationsByObservationId(tenantId, obs.id);
+           citations.push(...obsCitations);
+        }
+
+        return { success: true, result: citations };
+      }
+    );
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message };
+  }
+}
+
+/**
+ * Retrieves recent visibility alerts (score drops, disappearances, etc).
+ */
+export async function getVisibilityAlertsAction() {
+  let session;
+  try {
+    session = await requireSession();
+    if (!session.user) throw new Error("Unauthorized");
+    await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message || "Unauthorized" };
+  }
+
+  const tenantId = session.user.workspaceId;
+  const userId = session.user.id;
+
+  try {
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      "ctx-get-visibility-alerts",
+      async () => {
+        const { db } = require("../../features/ai-intelligence/repositories/index");
+        // For memory fallback we use the array if the repo handles alerts, but here we query directly or use the mock array
+        const alerts = db.monitoringAlerts ? Array.from(db.monitoringAlerts.values()).filter((a: any) => a.organizationId === tenantId) : [];
+        return { success: true, result: alerts };
+      }
     );
   } catch (err: unknown) {
     return { success: false, error: (err as Error).message };

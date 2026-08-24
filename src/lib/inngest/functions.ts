@@ -1,4 +1,5 @@
 import { inngest } from "./client";
+import { AIVisibilityMonitoringService } from "../../features/monitoring/services/ai-visibility-monitoring-service";
 
 export const helloWorld = inngest.createFunction(
   { id: "hello-world", triggers: [{ event: "test/hello.world" }] },
@@ -9,13 +10,14 @@ export const helloWorld = inngest.createFunction(
 );
 
 export const scheduledMonitoring = inngest.createFunction(
-  { id: "scheduled-monitoring-placeholder", triggers: [{ cron: "0 * * * *" }] },
+  { id: "scheduled-ai-visibility-monitoring", triggers: [{ cron: "0 * * * *" }] },
   async ({ step }) => {
-    await step.run("execute-monitoring", async () => {
-      // Placeholder for future Website Monitoring job implementation
-      console.log("Running scheduled monitoring placeholder...");
+    await step.run("execute-ai-visibility-monitoring", async () => {
+      console.log("Starting scheduled AI Visibility Monitoring job...");
+      const service = new AIVisibilityMonitoringService();
+      await service.runScheduledMonitoring();
       return { status: "success", timestamp: new Date().toISOString() };
     });
-    return { message: "Scheduled monitoring completed" };
+    return { message: "Scheduled AI Visibility monitoring completed" };
   },
 );

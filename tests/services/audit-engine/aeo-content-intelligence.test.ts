@@ -53,8 +53,7 @@ export async function runAeoContentIntelligenceTests() {
     organizationId: tenantA,
     name: "CompetitorX",
     domain: "external-competitor.com",
-    status: "active",
-    audit: {
+    status: "active", classification: "direct" as any, monitoringStatus: "active" as any, audit: {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: "test",
