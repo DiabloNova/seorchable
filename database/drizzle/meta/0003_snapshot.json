@@ -4051,14 +4051,6 @@
           "onUpdate": "no action"
         }
       },
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {
@@ -6339,10 +6331,6 @@
           "primaryKey": false,
           "notNull": true
         },
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-      ]  },
         "severity": {
           "name": "severity",
           "type": "text",
@@ -6361,50 +6349,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
-        },
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "NOW()"
-        },
-        "dedup_key": {
-          "name": "dedup_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "idx_monitoring_alerts_org": {
-          "name": "idx_monitoring_alerts_org",
-          "columns": [
-            {
-              "expression": "organization_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "severity": {
-          "name": "severity",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "message": {
-          "name": "message",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "event_metadata": {
-          "name": "event_metadata",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::jsonb"
         },
         "created_at": {
           "name": "created_at",
