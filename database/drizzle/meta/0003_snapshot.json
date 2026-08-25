@@ -3069,7 +3069,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
- main
     "public.competitors": {
       "name": "competitors",
       "schema": "",
@@ -4051,7 +4050,7 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
-      }, main
+      },
           ],
           "columnsTo": [
             "id"
@@ -6339,7 +6338,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
-        }, main
+        },
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -6356,14 +6355,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'{}'::jsonb"
-        }, main
+        },
         "message": {
           "name": "message",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-main
         },
         "created_at": {
           "name": "created_at",
