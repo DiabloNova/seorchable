@@ -159,7 +159,7 @@ export async function createPromptDefinitionAction(
  * Updates a prompt definition.
  */
 export async function updatePromptDefinitionAction(
-data: z.infer<typeof updateDefSchema>
+data: z.infer<typeof updateDefSchema>,
 ) {
   const parsed = updateDefSchema.safeParse(data);
   if (!parsed.success) {

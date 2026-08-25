@@ -40,17 +40,24 @@ export const Dialog: React.FC<DialogProps> = ({
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Content Container */}
-      <div className="relative bg-[var(--background)] text-[var(--foreground)] border border-[var(--border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-lg overflow-hidden animate-in fade-in-50 duration-150 z-10">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dialog-title"
+        className="relative bg-[var(--background)] text-[var(--foreground)] border border-[var(--border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-lg overflow-hidden animate-in fade-in-50 duration-150 z-10"
+      >
         <div className="px-6 py-4 border-b border-[var(--border)] flex items-center justify-between">
-          <h2 className="text-lg font-bold text-[var(--text-primary)]">{title}</h2>
+          <h2 id="dialog-title" className="text-lg font-bold text-[var(--text-primary)]">{title}</h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
             className="p-1 hover:bg-[var(--card)]"
+            aria-label="Close dialog"
           >
             ✕
           </Button>

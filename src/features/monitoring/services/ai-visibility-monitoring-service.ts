@@ -141,7 +141,7 @@ export class AIVisibilityMonitoringService {
                  for (const alert of alerts) {
                     await this.alertRepository.create({
                         monitoringConfigId: schedule.id, // Using schedule ID as config ID for AI visibility
-                        crawlSnapshotId: null, // Since this is not a crawl
+                        snapshotId: null, // Since this is not a crawl
                         ...alert
                     });
                  }
