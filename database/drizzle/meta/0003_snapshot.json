@@ -3861,8 +3861,8 @@
           "primaryKey": false,
           "notNull": true
         },
-"crawl_job_id": {
-  "name": "crawl_job_id", main
+        "crawl_job_id": {
+          "name": "crawl_job_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
