@@ -27,4 +27,5 @@ export interface CrawlSnapshot {
   error5xxCount: number;
   robotsTxtAvailable: boolean;
   sitemapAvailable: boolean;
+  extractedContent?: string | null;
 }

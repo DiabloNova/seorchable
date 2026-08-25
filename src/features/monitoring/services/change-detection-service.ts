@@ -34,31 +34,20 @@ export class ChangeDetectionService {
     previousSnapshot: CrawlSnapshot | null,
     currentSnapshot: CrawlSnapshot
   ): SnapshotChangeResult {
-const result: SnapshotChangeResult = {
-  addedPages: [],
-  removedPages: [],
-  modifiedPages: [],
-  technicalChanges: [],
-  seoChanges: [],
-  contentChanges: [],
-  hasChanges: false,
-};
+    const result: SnapshotChangeResult = {
+      addedPages: [],
+      removedPages: [],
+      modifiedPages: [],
+      technicalChanges: [],
+      seoChanges: [],
+      contentChanges: [],
+      hasChanges: false,
+    };
 
-const isInitialSnapshot = !previousSnapshot;
+    const isInitialSnapshot = !previousSnapshot;
 
-if (isInitialSnapshot) {
-  return result;
-}
-
-const currentHash = this.hashContent(
-  currentSnapshot.extractedContent ?? null,
-);
-
-const prevHash = this.hashContent(
-  previousSnapshot.extractedContent ?? null,
-);
-
-// ... existing comparison logic main
+    if (isInitialSnapshot) {
+      return result;
     }
 
     const prevPagesMap = new Map<string, SnapshotPage>();
