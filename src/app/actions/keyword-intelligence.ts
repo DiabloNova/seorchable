@@ -11,7 +11,7 @@ import {
   CompetitiveSeoFindingRepository,
   EntityRepository,
   TopicRepository,
-  PromptIntelligenceRepository
+  PromptIntelligenceRepository,
 } from "@/features/ai-intelligence/repositories";
 import { KeywordIntelligenceService } from "@/features/ai-intelligence/services/keyword-intelligence-service";
 
@@ -26,8 +26,11 @@ export async function getKeywordIntelligenceAction() {
     session = await requireSession();
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: any) {
-    return { success: false, error: err.message || "Unauthorized" };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Unauthorized",
+    };
   }
 
   const tenantId = session.user.workspaceId;
@@ -36,35 +39,43 @@ export async function getKeywordIntelligenceAction() {
   try {
     const requestId = `req-keyword-intel-${Date.now()}`;
 
-    return await TenantContextManager.runWithTenantContext(tenantId, userId, requestId, async () => {
-      const keywordRepo = new KeywordRepository();
-      const pageRepo = new PageRepository();
-      const websiteRepo = new WebsiteRepository();
-      const competitorRepo = new CompetitorRepository();
-      const findingRepo = new CompetitiveSeoFindingRepository();
-      const entityRepo = new EntityRepository();
-      const topicRepo = new TopicRepository();
-      const promptRepo = new PromptIntelligenceRepository();
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      requestId,
+      async () => {
+        const keywordRepo = new KeywordRepository();
+        const pageRepo = new PageRepository();
+        const websiteRepo = new WebsiteRepository();
+        const competitorRepo = new CompetitorRepository();
+        const findingRepo = new CompetitiveSeoFindingRepository();
+        const entityRepo = new EntityRepository();
+        const topicRepo = new TopicRepository();
+        const promptRepo = new PromptIntelligenceRepository();
 
-      const service = new KeywordIntelligenceService(
-        keywordRepo,
-        pageRepo,
-        websiteRepo,
-        competitorRepo,
-        findingRepo,
-        entityRepo,
-        topicRepo,
-        promptRepo
-      );
+        const service = new KeywordIntelligenceService(
+          keywordRepo,
+          pageRepo,
+          websiteRepo,
+          competitorRepo,
+          findingRepo,
+          entityRepo,
+          topicRepo,
+          promptRepo,
+        );
 
-      const result = await service.analyzeKeywords(tenantId);
+        const result = await service.analyzeKeywords(tenantId);
 
-      return {
-        success: true,
-        result
-      };
-    });
-  } catch (err: any) {
-    return { success: false, error: err.message || "Internal Server Error" };
+        return {
+          success: true,
+          result,
+        };
+      },
+    );
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Internal Server Error",
+    };
   }
 }

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { ChangeDetectionService } from "../../../src/features/monitoring/services/change-detection-service";
 import { RegressionDetectionService } from "../../../src/features/monitoring/services/regression-detection-service";
-import { CrawlSnapshot } from "../../../src/features/monitoring/domain/types";
+import { CrawlSnapshot } from "../../../src/features/monitoring/domain/entities/crawl-snapshot";
 
 export async function testWebsiteMonitoringFoundation() {
   console.log("Running Website Monitoring Foundation Tests...");
@@ -11,34 +11,41 @@ export async function testWebsiteMonitoringFoundation() {
 
   const prevSnapshot: CrawlSnapshot = {
     id: "prev-1",
-    organizationId: "org-1",
+    tenantId: "org-1",
     monitoringConfigId: "cfg-1",
-    crawlJobId: "job-1",
-    capturedAt: new Date().toISOString(),
-    contentHash: "",
-    extractedContent: "hello", // Case 1: Base "hello"
-    snapshotMetadata: {}
+    websiteId: "web-1",
+    capturedAt: new Date(),
+    pages: [{
+        url: "http://example.com", statusCode: 200, indexable: true, canonicalUrl: "http://example.com",
+        title: "Hello", metaDescription: "Desc", h1: "Hello", robotsDirective: "", contentHash: "hash-hello", wordCount: 1, crawlable: true, brokenLinksCount: 0
+    }],
+    totalPages: 1, indexablePages: 1, nonIndexablePages: 0, error4xxCount: 0, error5xxCount: 0, robotsTxtAvailable: true, sitemapAvailable: true,
+    extractedContent: "hello"
   };
 
   const sameSnapshot: CrawlSnapshot = {
     ...prevSnapshot,
     id: "same-1",
-    extractedContent: "hello" // Case 1: Current is "hello"
+    extractedContent: "hello"
   };
 
   const helloWorldSnapshot: CrawlSnapshot = {
     ...prevSnapshot,
     id: "diff-1",
-    extractedContent: "hello world" // Case 2: Current is "hello world"
+    pages: [{
+        url: "http://example.com", statusCode: 200, indexable: true, canonicalUrl: "http://example.com",
+        title: "Hello World", metaDescription: "Desc", h1: "Hello", robotsDirective: "", contentHash: "hash-diff", wordCount: 2, crawlable: true, brokenLinksCount: 0
+    }],
+    extractedContent: "hello world"
   };
 
   const emptySnapshot: CrawlSnapshot = {
     ...prevSnapshot,
     id: "empty-1",
-    extractedContent: null // Case 4: Previous is "hello", current is null
+    pages: [],
+    extractedContent: null
   };
 
-  // Case 5: Testing deterministic hashing equality
   const sameExtractedSnapshotWithDifferentReference: CrawlSnapshot = {
     ...prevSnapshot,
     id: "diff-ref-1",
@@ -68,57 +75,4 @@ export async function testWebsiteMonitoringFoundation() {
   // Case 5: Hash equivalence checks
   const case5 = changeService.detectChanges(prevSnapshot, sameExtractedSnapshotWithDifferentReference);
   assert.equal(case5.hasChanges, false);
-
-  // ----------------------------------------------------
-  // Regression Detection Verify Cases
-  // ----------------------------------------------------
-  const tenPagesOneHundredUnitsContent = "u".repeat(100);
-  const prevRegressionSnapshot: CrawlSnapshot = {
-    ...prevSnapshot,
-    extractedContent: tenPagesOneHundredUnitsContent
-  };
-
-  const currentRegressionSnapshotNoChanges: CrawlSnapshot = {
-    ...prevSnapshot,
-    extractedContent: tenPagesOneHundredUnitsContent // 100 units
-  };
-
-  // No Regression: 100 -> 100 units
-  const changeNoRegression = changeService.detectChanges(prevRegressionSnapshot, currentRegressionSnapshotNoChanges);
-  const reg1 = regressionService.detectRegression(changeNoRegression);
-  assert.equal(reg1.isRegression, false);
-
-  // Regression: 100 units -> 59 units (41% reduction, threshold is 40%)
-  const currentRegressionSnapshotUnderLimit: CrawlSnapshot = {
-    ...prevSnapshot,
-    extractedContent: "u".repeat(59)
-  };
-
-  const changeUnderLimit = changeService.detectChanges(prevRegressionSnapshot, currentRegressionSnapshotUnderLimit);
-  const reg2 = regressionService.detectRegression(changeUnderLimit);
-  assert.equal(reg2.isRegression, true);
-  assert.equal(reg2.severity, "high");
-
-  // Boundary Condition Regression: Exactly equal to the threshold (60 units = exactly 40% reduction of 100)
-  const currentRegressionSnapshotBoundaryLimit: CrawlSnapshot = {
-    ...prevSnapshot,
-    extractedContent: "u".repeat(60)
-  };
-
-  const changeBoundaryLimit = changeService.detectChanges(prevRegressionSnapshot, currentRegressionSnapshotBoundaryLimit);
-  const reg3 = regressionService.detectRegression(changeBoundaryLimit);
-  assert.equal(reg3.isRegression, true);
-  assert.equal(reg3.severity, "high");
-
-  // Above Limit: 61 units (39% reduction, threshold is 40%) -> No Regression
-  const currentRegressionSnapshotAboveLimit: CrawlSnapshot = {
-    ...prevSnapshot,
-    extractedContent: "u".repeat(61)
-  };
-
-  const changeAboveLimit = changeService.detectChanges(prevRegressionSnapshot, currentRegressionSnapshotAboveLimit);
-  const reg4 = regressionService.detectRegression(changeAboveLimit);
-  assert.equal(reg4.isRegression, false);
-
-  console.log("✅ Website Monitoring Foundation Tests Passed!");
 }

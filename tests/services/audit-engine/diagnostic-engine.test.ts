@@ -109,7 +109,7 @@ export async function runDiagnosticEngineTests() {
 
     // Construct mock Competitors & Metrics
     const competitors: Competitor[] = [
-      { id: "comp-1", organizationId: tenantA, name: "Rival Corp", domain: "rival.com", status: "active", audit: createAudit() }
+      { id: "comp-1", organizationId: tenantA, name: "Rival Corp", domain: "rival.com", status: "active", classification: "direct" as any, monitoringStatus: "active" as any, audit: createAudit() }
     ];
 
     const historicalMetrics: HistoricalMetric[] = [

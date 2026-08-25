@@ -1,4 +1,5 @@
-import { AIObservation, BrandMention, Citation, Prompt, PromptIntent, PriorityLevel } from "../domain/types";
+import { AIObservation, BrandMention,
+  CompetitorMention, Citation, Prompt, PromptIntent, PriorityLevel } from "../domain/types";
 import { IObservationRepository, IPromptRepository, IRecommendationRepository } from "../repositories/interfaces";
 import { ObservationRepository, PromptRepository, RecommendationRepository } from "../repositories";
 import { ObservationAggregate } from "../domain/models/observation-aggregate";
@@ -130,6 +131,8 @@ export class ObservationService {
       await this.obsRepo.saveMention(mention);
       mentions.push(mention);
     }
+    const competitorMentions: CompetitorMention[] = [];
+    // Logic for extracting competitor mentions from responseText would be implemented here or handled via AI.
 
     // Extract links as Citations if present (represented as urls)
     const urlMatches = responseText.match(/https?:\/\/[^\s]+/g);

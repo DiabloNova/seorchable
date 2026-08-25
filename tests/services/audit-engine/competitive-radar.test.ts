@@ -327,7 +327,7 @@ export async function runCompetitiveRadarTests() {
       assert.strictEqual(techWeakness!.tenantValue, "60%");
       assert.strictEqual(techWeakness!.competitiveReference, "90%");
       assert.strictEqual(techWeakness!.competitiveGap, -30);
-      assert.strictEqual(techWeakness!.evidence.explanation.includes("holds a performance advantage"), true);
+      assert.strictEqual((techWeakness!.evidence as any).explanation.includes("holds a performance advantage"), true);
 
       // Strength finding: Content Coverage (800 words vs 400 words)
       const contentStrength = insights.find(i => i.type === "strength" && i.dimension === "Content Coverage");
@@ -375,7 +375,7 @@ export async function runCompetitiveRadarTests() {
     console.log("✅ ALL PHASE 6.3: COMPETITIVE RADAR INTEGRATION TESTS PASSED SUCCESSFULLY!");
     console.log("=========================================================================");
 
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("❌ Test Suite failed:", err);
     throw err;
   }
