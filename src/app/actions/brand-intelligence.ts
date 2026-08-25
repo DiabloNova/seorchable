@@ -156,7 +156,7 @@ export async function getBrandIntelligenceOverviewAction() {
         };
       }
     );
-  } catch (err: unknown) {
+  catch (err: unknown) {
     return {
       success: false,
       error: err instanceof Error ? err.message : "Internal Server Error",
