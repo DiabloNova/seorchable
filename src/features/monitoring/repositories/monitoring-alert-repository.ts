@@ -105,7 +105,7 @@ export class MonitoringAlertRepository {
       .update(monitoringAlerts)
       .set({
         status: "resolved",
-        resolvedAt
+            resolvedAt: new Date().toISOString(),
       })
       .where(and(
         eq(monitoringAlerts.id, id),
