@@ -123,7 +123,7 @@ export async function getCitationsDashboardDataAction() {
           }
         }
 
-        activeSources = seedSources;
+        activeSources = seedSources as any;
       }
 
       // Reload occurrences to include the freshly seeded ones if applicable
