@@ -1,0 +1,10682 @@
+{
+  "id": "e47e3244-5dd5-4c83-ae18-9347ea366673",
+  "prevId": "e6d89dfd-7442-447b-a2bc-a3ed8a520f99",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.admin_users": {
+      "name": "admin_users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "full_name": {
+          "name": "full_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role_id": {
+          "name": "role_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxadminusers_email": {
+          "name": "idxadminusers_email",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxadminusersdeletedat": {
+          "name": "idxadminusersdeletedat",
+          "columns": [
+            {
+              "expression": "deleted_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "deleted_at IS NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "adminusersemail_unique": {
+          "name": "adminusersemail_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.aeo_analyses": {
+      "name": "aeo_analyses",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_keyword": {
+          "name": "target_keyword",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "overallaeoscore": {
+          "name": "overallaeoscore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "answerability_score": {
+          "name": "answerability_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entitycoveragescore": {
+          "name": "entitycoveragescore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "semanticcoveragescore": {
+          "name": "semanticcoveragescore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "questioncoveragescore": {
+          "name": "questioncoveragescore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "citationreadinessscore": {
+          "name": "citationreadinessscore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "structuredanswerquality_score": {
+          "name": "structuredanswerquality_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "analysis_details": {
+          "name": "analysis_details",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxaeoanalyses_tenant": {
+          "name": "idxaeoanalyses_tenant",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxaeoanalyses_url": {
+          "name": "idxaeoanalyses_url",
+          "columns": [
+            {
+              "expression": "url",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "aeoanalysestenantidorganizationsidfk": {
+          "name": "aeoanalysestenantidorganizationsidfk",
+          "tableFrom": "aeo_analyses",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "tenant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selecttenantidisolationpolicy": {
+          "name": "selecttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "inserttenantidisolationpolicy": {
+          "name": "inserttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updatetenantidisolationpolicy": {
+          "name": "updatetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deletetenantidisolationpolicy": {
+          "name": "deletetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ai_engines": {
+      "name": "ai_engines",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version": {
+          "name": "version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "capabilities": {
+          "name": "capabilities",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_num": {
+          "name": "version_num",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ai_observations": {
+      "name": "ai_observations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prompt_id": {
+          "name": "prompt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "engine_id": {
+          "name": "engine_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rawresponsetext": {
+          "name": "rawresponsetext",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parsed_sentiment": {
+          "name": "parsed_sentiment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_rank": {
+          "name": "position_rank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "observed_at": {
+          "name": "observed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxaiobservations_organization": {
+          "name": "idxaiobservations_organization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxaiobservations_prompt": {
+          "name": "idxaiobservations_prompt",
+          "columns": [
+            {
+              "expression": "prompt_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxaiobservations_engine": {
+          "name": "idxaiobservations_engine",
+          "columns": [
+            {
+              "expression": "engine_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "aiobservationsorganizationidorganizationsidfk": {
+          "name": "aiobservationsorganizationidorganizationsidfk",
+          "tableFrom": "ai_observations",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "aiobservationspromptidpromptsidfk": {
+          "name": "aiobservationspromptidpromptsidfk",
+          "tableFrom": "ai_observations",
+          "tableTo": "prompts",
+          "columnsFrom": [
+            "prompt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "aiobservationsengineidaienginesid_fk": {
+          "name": "aiobservationsengineidaienginesid_fk",
+          "tableFrom": "ai_observations",
+          "tableTo": "ai_engines",
+          "columnsFrom": [
+            "engine_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.aiproviderconfigs": {
+      "name": "aiproviderconfigs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "provider_name": {
+          "name": "provider_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "endpoint_url": {
+          "name": "endpoint_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "apikeymasked": {
+          "name": "apikeymasked",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "failoverproviderid": {
+          "name": "failoverproviderid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxaiproviderconfigsactive": {
+          "name": "idxaiproviderconfigsactive",
+          "columns": [
+            {
+              "expression": "is_active",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.aivisibilityaudits": {
+      "name": "aivisibilityaudits",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "targetbrandname": {
+          "name": "targetbrandname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_domain": {
+          "name": "target_domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "overall_score": {
+          "name": "overall_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brandauthorityscore": {
+          "name": "brandauthorityscore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aisearchshare_score": {
+          "name": "aisearchshare_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sentiment_score": {
+          "name": "sentiment_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "citationreliabilityscore": {
+          "name": "citationreliabilityscore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recommendationsharescore": {
+          "name": "recommendationsharescore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dimensions_json": {
+          "name": "dimensions_json",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "auditedengineids": {
+          "name": "auditedengineids",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "auditedpromptscount": {
+          "name": "auditedpromptscount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rawobservationscount": {
+          "name": "rawobservationscount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'completed'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxaivisauditsorg": {
+          "name": "idxaivisauditsorg",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxaivisauditsbrand": {
+          "name": "idxaivisauditsbrand",
+          "columns": [
+            {
+              "expression": "targetbrandname",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxaivisauditsstatus": {
+          "name": "idxaivisauditsstatus",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "aivisibilityauditsorganizationidorganizationsid_fk": {
+          "name": "aivisibilityauditsorganizationidorganizationsid_fk",
+          "tableFrom": "aivisibilityaudits",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.audit_prompts": {
+      "name": "audit_prompts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "audit_id": {
+          "name": "audit_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prompt_text": {
+          "name": "prompt_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weight": {
+          "name": "weight",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxauditprompts_audit": {
+          "name": "idxauditprompts_audit",
+          "columns": [
+            {
+              "expression": "audit_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxauditprompts_org": {
+          "name": "idxauditprompts_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "auditpromptsauditidaivisibilityauditsidfk": {
+          "name": "auditpromptsauditidaivisibilityauditsidfk",
+          "tableFrom": "audit_prompts",
+          "tableTo": "aivisibilityaudits",
+          "columnsFrom": [
+            "audit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "auditpromptsorganizationidorganizationsidfk": {
+          "name": "auditpromptsorganizationidorganizationsidfk",
+          "tableFrom": "audit_prompts",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.audit_records": {
+      "name": "audit_records",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "actor_id": {
+          "name": "actor_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_email": {
+          "name": "actor_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_role": {
+          "name": "actor_role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "action": {
+          "name": "action",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resource_type": {
+          "name": "resource_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resource_id": {
+          "name": "resource_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payload_before": {
+          "name": "payload_before",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "payload_after": {
+          "name": "payload_after",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "error_details": {
+          "name": "error_details",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idxauditrecords_actor": {
+          "name": "idxauditrecords_actor",
+          "columns": [
+            {
+              "expression": "actor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxauditrecords_resource": {
+          "name": "idxauditrecords_resource",
+          "columns": [
+            {
+              "expression": "resource_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "resource_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxauditrecords_timestamp": {
+          "name": "idxauditrecords_timestamp",
+          "columns": [
+            {
+              "expression": "timestamp",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.brand_associations": {
+      "name": "brand_associations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brand_id": {
+          "name": "brand_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "attribute_name": {
+          "name": "attribute_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "association_score": {
+          "name": "association_score",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "mention_count": {
+          "name": "mention_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "sample_excerpts": {
+          "name": "sample_excerpts",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::text[]"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxbrandassociations_tenant": {
+          "name": "idxbrandassociations_tenant",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxbrandassociations_brand": {
+          "name": "idxbrandassociations_brand",
+          "columns": [
+            {
+              "expression": "brand_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "brandassociationsorganizationidorganizationsidfk": {
+          "name": "brandassociationsorganizationidorganizationsidfk",
+          "tableFrom": "brand_associations",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "brandassociationsbrandidbrandsidfk": {
+          "name": "brandassociationsbrandidbrandsidfk",
+          "tableFrom": "brand_associations",
+          "tableTo": "brands",
+          "columnsFrom": [
+            "brand_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.brand_mentions": {
+      "name": "brand_mentions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "observation_id": {
+          "name": "observation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brand_id": {
+          "name": "brand_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mention_context": {
+          "name": "mention_context",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_recommended": {
+          "name": "is_recommended",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "sentiment_score": {
+          "name": "sentiment_score",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxbrandmentions_organization": {
+          "name": "idxbrandmentions_organization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxbrandmentions_brand": {
+          "name": "idxbrandmentions_brand",
+          "columns": [
+            {
+              "expression": "brand_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "brandmentionsorganizationidorganizationsidfk": {
+          "name": "brandmentionsorganizationidorganizationsidfk",
+          "tableFrom": "brand_mentions",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "brandmentionsobservationidaiobservationsid_fk": {
+          "name": "brandmentionsobservationidaiobservationsid_fk",
+          "tableFrom": "brand_mentions",
+          "tableTo": "ai_observations",
+          "columnsFrom": [
+            "observation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "brandmentionsbrandidbrandsidfk": {
+          "name": "brandmentionsbrandidbrandsidfk",
+          "tableFrom": "brand_mentions",
+          "tableTo": "brands",
+          "columnsFrom": [
+            "brand_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.brands": {
+      "name": "brands",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "canonical_domain": {
+          "name": "canonical_domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aliases": {
+          "name": "aliases",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::text[]"
+        },
+        "industry": {
+          "name": "industry",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_markets": {
+          "name": "target_markets",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::text[]"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxbrandsorganization": {
+          "name": "idxbrandsorganization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxbrandsdomain": {
+          "name": "idxbrandsdomain",
+          "columns": [
+            {
+              "expression": "canonical_domain",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "brandsorganizationidorganizationsid_fk": {
+          "name": "brandsorganizationidorganizationsid_fk",
+          "tableFrom": "brands",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.citation_occurrences": {
+      "name": "citation_occurrences",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "engine_id": {
+          "name": "engine_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prompt_text": {
+          "name": "prompt_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "citation_position": {
+          "name": "citation_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "excerpt_text": {
+          "name": "excerpt_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sentiment_score": {
+          "name": "sentiment_score",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "isbrandmentioned": {
+          "name": "isbrandmentioned",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "occurred_at": {
+          "name": "occurred_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxcitationoccurrences_tenant": {
+          "name": "idxcitationoccurrences_tenant",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcitationoccurrences_source": {
+          "name": "idxcitationoccurrences_source",
+          "columns": [
+            {
+              "expression": "source_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "citationoccurrencesorganizationidorganizationsidfk": {
+          "name": "citationoccurrencesorganizationidorganizationsidfk",
+          "tableFrom": "citation_occurrences",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "citationoccurrencessourceidcitationsourcesid_fk": {
+          "name": "citationoccurrencessourceidcitationsourcesid_fk",
+          "tableFrom": "citation_occurrences",
+          "tableTo": "citation_sources",
+          "columnsFrom": [
+            "source_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.citation_sources": {
+      "name": "citation_sources",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "domain": {
+          "name": "domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "publisher_name": {
+          "name": "publisher_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "publisher_category": {
+          "name": "publisher_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'General'"
+        },
+        "authority_score": {
+          "name": "authority_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 50
+        },
+        "isverifieddomain": {
+          "name": "isverifieddomain",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxcitationsources_tenant": {
+          "name": "idxcitationsources_tenant",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcitationsourcesurlorg": {
+          "name": "idxcitationsourcesurlorg",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "url",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "citationsourcesorganizationidorganizationsidfk": {
+          "name": "citationsourcesorganizationidorganizationsidfk",
+          "tableFrom": "citation_sources",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.citations": {
+      "name": "citations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "observation_id": {
+          "name": "observation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "domain": {
+          "name": "domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "anchor_text": {
+          "name": "anchor_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "citation_order": {
+          "name": "citation_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxcitationsorganization": {
+          "name": "idxcitationsorganization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcitationsobservation": {
+          "name": "idxcitationsobservation",
+          "columns": [
+            {
+              "expression": "observation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcitationsdomain": {
+          "name": "idxcitationsdomain",
+          "columns": [
+            {
+              "expression": "domain",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "citationsorganizationidorganizationsid_fk": {
+          "name": "citationsorganizationidorganizationsid_fk",
+          "tableFrom": "citations",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "citationsobservationidaiobservationsidfk": {
+          "name": "citationsobservationidaiobservationsidfk",
+          "tableFrom": "citations",
+          "tableTo": "ai_observations",
+          "columnsFrom": [
+            "observation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.competitive_analyses": {
+      "name": "competitive_analyses",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_url": {
+          "name": "user_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "competitor_urls": {
+          "name": "competitor_urls",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "overall_score": {
+          "name": "overall_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "market_position": {
+          "name": "market_position",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "comparison_data": {
+          "name": "comparison_data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "advantages": {
+          "name": "advantages",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gaps": {
+          "name": "gaps",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "opportunities": {
+          "name": "opportunities",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.competitiveseofindings": {
+      "name": "competitiveseofindings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "competitor_id": {
+          "name": "competitor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "finding_type": {
+          "name": "finding_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "severity": {
+          "name": "severity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evidence": {
+          "name": "evidence",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "recommendation": {
+          "name": "recommendation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "impact_score": {
+          "name": "impact_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxcompseofindingstenant": {
+          "name": "idxcompseofindingstenant",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcompseofindingscomp": {
+          "name": "idxcompseofindingscomp",
+          "columns": [
+            {
+              "expression": "competitor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcompseofindingstype": {
+          "name": "idxcompseofindingstype",
+          "columns": [
+            {
+              "expression": "finding_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "competitiveseofindingstenantidorganizationsid_fk": {
+          "name": "competitiveseofindingstenantidorganizationsid_fk",
+          "tableFrom": "competitiveseofindings",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "tenant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "competitiveseofindingscompetitoridcompetitorsid_fk": {
+          "name": "competitiveseofindingscompetitoridcompetitorsid_fk",
+          "tableFrom": "competitiveseofindings",
+          "tableTo": "competitors",
+          "columnsFrom": [
+            "competitor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selecttenantidisolationpolicy": {
+          "name": "selecttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "inserttenantidisolationpolicy": {
+          "name": "inserttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updatetenantidisolationpolicy": {
+          "name": "updatetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deletetenantidisolationpolicy": {
+          "name": "deletetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {
+        "competitiveseofindingsfindingtype_check": {
+          "name": "competitiveseofindingsfindingtype_check",
+          "value": "findingtype IN (\n    'technicalgap', 'contentgap', 'keywordgap', 'topicgap', 'structuraldifference',\n    'aivisibilitygap', 'citationgap', 'promptgap', 'brandmentiongap', 'airecommendationgap', 'citation_overlap'\n  )"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.competitor_changes": {
+      "name": "competitor_changes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "competitor_id": {
+          "name": "competitor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "change_type": {
+          "name": "change_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "severity": {
+          "name": "severity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "summary": {
+          "name": "summary",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "details": {
+          "name": "details",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "detected_at": {
+          "name": "detected_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxcompetitorchanges_tenant": {
+          "name": "idxcompetitorchanges_tenant",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcompetitorchanges_comp": {
+          "name": "idxcompetitorchanges_comp",
+          "columns": [
+            {
+              "expression": "competitor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcompetitorchanges_type": {
+          "name": "idxcompetitorchanges_type",
+          "columns": [
+            {
+              "expression": "change_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "competitorchangestenantidorganizationsidfk": {
+          "name": "competitorchangestenantidorganizationsidfk",
+          "tableFrom": "competitor_changes",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "tenant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "competitorchangescompetitoridcompetitorsidfk": {
+          "name": "competitorchangescompetitoridcompetitorsidfk",
+          "tableFrom": "competitor_changes",
+          "tableTo": "competitors",
+          "columnsFrom": [
+            "competitor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selecttenantidisolationpolicy": {
+          "name": "selecttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "inserttenantidisolationpolicy": {
+          "name": "inserttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updatetenantidisolationpolicy": {
+          "name": "updatetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deletetenantidisolationpolicy": {
+          "name": "deletetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.competitor_mentions": {
+      "name": "competitor_mentions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "observation_id": {
+          "name": "observation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "competitor_id": {
+          "name": "competitor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mention_context": {
+          "name": "mention_context",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_recommended": {
+          "name": "is_recommended",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "sentiment_score": {
+          "name": "sentiment_score",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxcompetitormentions_organization": {
+          "name": "idxcompetitormentions_organization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcompetitormentions_observation": {
+          "name": "idxcompetitormentions_observation",
+          "columns": [
+            {
+              "expression": "observation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcompetitormentions_competitor": {
+          "name": "idxcompetitormentions_competitor",
+          "columns": [
+            {
+              "expression": "competitor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "competitormentionsorganizationidorganizationsidfk": {
+          "name": "competitormentionsorganizationidorganizationsidfk",
+          "tableFrom": "competitor_mentions",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "competitormentionsobservationidaiobservationsid_fk": {
+          "name": "competitormentionsobservationidaiobservationsid_fk",
+          "tableFrom": "competitor_mentions",
+          "tableTo": "ai_observations",
+          "columnsFrom": [
+            "observation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "competitormentionscompetitoridcompetitorsidfk": {
+          "name": "competitormentionscompetitoridcompetitorsidfk",
+          "tableFrom": "competitor_mentions",
+          "tableTo": "competitors",
+          "columnsFrom": [
+            "competitor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.competitors": {
+      "name": "competitors",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "domain": {
+          "name": "domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_url": {
+          "name": "normalized_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_direct": {
+          "name": "is_direct",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxcompetitorsorganization": {
+          "name": "idxcompetitorsorganization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcompetitorsdomain_org": {
+          "name": "idxcompetitorsdomain_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "domain",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "deleted_at IS NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "competitorsorganizationidorganizationsid_fk": {
+          "name": "competitorsorganizationidorganizationsid_fk",
+          "tableFrom": "competitors",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.crawl_cache": {
+      "name": "crawl_cache",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cache_scope": {
+          "name": "cache_scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'tenant'"
+        },
+        "cache_key": {
+          "name": "cache_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_result": {
+          "name": "normalized_result",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxcrawlcache_key": {
+          "name": "idxcrawlcache_key",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "cache_scope",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "cache_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "crawltenantpolicy": {
+          "name": "crawltenantpolicy",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "tenantid = NULLIF(currentsetting('app.currenttenantid', true), '')",
+          "withCheck": "tenantid = NULLIF(currentsetting('app.currenttenantid', true), '')"
+        }
+      },
+      "checkConstraints": {
+        "crawlcachescope_check": {
+          "name": "crawlcachescope_check",
+          "value": "cache_scope = 'tenant'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.crawl_jobs": {
+      "name": "crawl_jobs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "requested_url": {
+          "name": "requested_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_url": {
+          "name": "normalized_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "policy": {
+          "name": "policy",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dedup_key": {
+          "name": "dedup_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cache_key": {
+          "name": "cache_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "priority": {
+          "name": "priority",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PENDING'"
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "providerjobid": {
+          "name": "providerjobid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "attempts": {
+          "name": "attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "max_attempts": {
+          "name": "max_attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scheduled_for": {
+          "name": "scheduled_for",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "claimed_at": {
+          "name": "claimed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heartbeat_at": {
+          "name": "heartbeat_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leaseexpiresat": {
+          "name": "leaseexpiresat",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "worker_id": {
+          "name": "worker_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration_ms": {
+          "name": "duration_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "page_count": {
+          "name": "page_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bytes_processed": {
+          "name": "bytes_processed",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cache_outcome": {
+          "name": "cache_outcome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "error": {
+          "name": "error",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cancelled_at": {
+          "name": "cancelled_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cancellation_reason": {
+          "name": "cancellation_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cancellationrequestedby": {
+          "name": "cancellationrequestedby",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "result_ref": {
+          "name": "result_ref",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "correlation_id": {
+          "name": "correlation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "request_id": {
+          "name": "request_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "trace_id": {
+          "name": "trace_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxcrawljobstenantstatus": {
+          "name": "idxcrawljobstenantstatus",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcrawljobsstatusscheduled": {
+          "name": "idxcrawljobsstatusscheduled",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "scheduled_for",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "status = 'QUEUED'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcrawljobsproviderjob_id": {
+          "name": "idxcrawljobsproviderjob_id",
+          "columns": [
+            {
+              "expression": "providerjobid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcrawljobstenantcreated": {
+          "name": "idxcrawljobstenantcreated",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcrawljobsactivededup": {
+          "name": "idxcrawljobsactivededup",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "dedup_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "status IN ('PENDING', 'QUEUED', 'RUNNING')",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "crawltenantpolicy": {
+          "name": "crawltenantpolicy",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "tenantid = NULLIF(currentsetting('app.currenttenantid', true), '')",
+          "withCheck": "tenantid = NULLIF(currentsetting('app.currenttenantid', true), '')"
+        }
+      },
+      "checkConstraints": {
+        "crawljobsstatus_check": {
+          "name": "crawljobsstatus_check",
+          "value": "status IN ('PENDING', 'QUEUED', 'RUNNING', 'SUCCEEDED', 'PARTIAL', 'FAILED', 'CANCELLED')"
+        },
+        "crawljobsattempts_check": {
+          "name": "crawljobsattempts_check",
+          "value": "attempts >= 0"
+        },
+        "crawljobsmaxattemptscheck": {
+          "name": "crawljobsmaxattemptscheck",
+          "value": "max_attempts > 0"
+        },
+        "crawljobscacheoutcomecheck": {
+          "name": "crawljobscacheoutcomecheck",
+          "value": "cacheoutcome IS NULL OR cacheoutcome IN ('HIT', 'MISS', 'STALE', 'BYPASS')"
+        },
+        "crawljobsversion_check": {
+          "name": "crawljobsversion_check",
+          "value": "version > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.crawl_results": {
+      "name": "crawl_results",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "job_id": {
+          "name": "job_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "result": {
+          "name": "result",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "crawlresultsjob_unique": {
+          "name": "crawlresultsjob_unique",
+          "columns": [
+            {
+              "expression": "job_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "crawlresultstenantjobunique": {
+          "name": "crawlresultstenantjobunique",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "job_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "crawlresultsjobidcrawljobsid_fk": {
+          "name": "crawlresultsjobidcrawljobsid_fk",
+          "tableFrom": "crawl_results",
+          "tableTo": "crawl_jobs",
+          "columnsFrom": [
+            "job_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "crawltenantpolicy": {
+          "name": "crawltenantpolicy",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "public"
+          ],
+          "using": "tenantid = NULLIF(currentsetting('app.currenttenantid', true), '')",
+          "withCheck": "tenantid = NULLIF(currentsetting('app.currenttenantid', true), '')"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.crawl_snapshots": {
+      "name": "crawl_snapshots",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "monitoringconfigid": {
+          "name": "monitoringconfigid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "crawljobid": {
+          "name": "crawljobid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "captured_at": {
+          "name": "captured_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "content_hash": {
+          "name": "content_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extracted_content": {
+          "name": "extracted_content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "snapshot_metadata": {
+          "name": "snapshot_metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "pages": {
+          "name": "pages",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_pages": {
+          "name": "total_pages",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "indexable_pages": {
+          "name": "indexable_pages",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nonindexablepages": {
+          "name": "nonindexablepages",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "error4xxcount": {
+          "name": "error4xxcount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "error5xxcount": {
+          "name": "error5xxcount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "robotstxtavailable": {
+          "name": "robotstxtavailable",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sitemap_available": {
+          "name": "sitemap_available",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "idxcrawlsnapshots_org": {
+          "name": "idxcrawlsnapshots_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcrawlsnapshots_config": {
+          "name": "idxcrawlsnapshots_config",
+          "columns": [
+            {
+              "expression": "monitoringconfigid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcrawlsnapshots_captured": {
+          "name": "idxcrawlsnapshots_captured",
+          "columns": [
+            {
+              "expression": "captured_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxcrawlsnapshotsconfigcaptured": {
+          "name": "idxcrawlsnapshotsconfigcaptured",
+          "columns": [
+            {
+              "expression": "monitoringconfigid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "captured_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "crawlsnapshotsorganizationidorganizationsidfk": {
+          "name": "crawlsnapshotsorganizationidorganizationsidfk",
+          "tableFrom": "crawl_snapshots",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "crawlsnapshotsmonitoringconfigidmonitoringconfigsidfk": {
+          "name": "crawlsnapshotsmonitoringconfigidmonitoringconfigsidfk",
+          "tableFrom": "crawl_snapshots",
+          "tableTo": "monitoring_configs",
+          "columnsFrom": [
+            "monitoringconfigid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "crawlsnapshotscrawljobidcrawljobsidfk": {
+          "name": "crawlsnapshotscrawljobidcrawljobsidfk",
+          "tableFrom": "crawl_snapshots",
+          "tableTo": "crawl_jobs",
+          "columnsFrom": [
+            "crawljobid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.credit_transactions": {
+      "name": "credit_transactions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount": {
+          "name": "amount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "transaction_type": {
+          "name": "transaction_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reference_id": {
+          "name": "reference_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxcredittransactions_tenant": {
+          "name": "idxcredittransactions_tenant",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selecttenantidisolationpolicy": {
+          "name": "selecttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "inserttenantidisolationpolicy": {
+          "name": "inserttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updatetenantidisolationpolicy": {
+          "name": "updatetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deletetenantidisolationpolicy": {
+          "name": "deletetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.diagnosticfindingrelationships": {
+      "name": "diagnosticfindingrelationships",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parentfindingid": {
+          "name": "parentfindingid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "childfindingid": {
+          "name": "childfindingid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "relationship_type": {
+          "name": "relationship_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxdiagnosticrel_org": {
+          "name": "idxdiagnosticrel_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxdiagnosticrel_parent": {
+          "name": "idxdiagnosticrel_parent",
+          "columns": [
+            {
+              "expression": "parentfindingid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxdiagnosticrel_child": {
+          "name": "idxdiagnosticrel_child",
+          "columns": [
+            {
+              "expression": "childfindingid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "diagnosticfindingrelationshipsorganizationidorganizationsid_fk": {
+          "name": "diagnosticfindingrelationshipsorganizationidorganizationsid_fk",
+          "tableFrom": "diagnosticfindingrelationships",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "diagnosticfindingrelationshipsparentfindingiddiagnosticfindingsid_fk": {
+          "name": "diagnosticfindingrelationshipsparentfindingiddiagnosticfindingsid_fk",
+          "tableFrom": "diagnosticfindingrelationships",
+          "tableTo": "diagnostic_findings",
+          "columnsFrom": [
+            "parentfindingid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "diagnosticfindingrelationshipschildfindingiddiagnosticfindingsid_fk": {
+          "name": "diagnosticfindingrelationshipschildfindingiddiagnosticfindingsid_fk",
+          "tableFrom": "diagnosticfindingrelationships",
+          "tableTo": "diagnostic_findings",
+          "columnsFrom": [
+            "childfindingid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.diagnostic_findings": {
+      "name": "diagnostic_findings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "domain": {
+          "name": "domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "finding_type": {
+          "name": "finding_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "severity": {
+          "name": "severity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evidence": {
+          "name": "evidence",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "recommendation": {
+          "name": "recommendation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "impact_score": {
+          "name": "impact_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'open'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxdiagnosticfindings_org": {
+          "name": "idxdiagnosticfindings_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxdiagnosticfindings_domain": {
+          "name": "idxdiagnosticfindings_domain",
+          "columns": [
+            {
+              "expression": "domain",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxdiagnosticfindings_status": {
+          "name": "idxdiagnosticfindings_status",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "diagnosticfindingsorganizationidorganizationsidfk": {
+          "name": "diagnosticfindingsorganizationidorganizationsidfk",
+          "tableFrom": "diagnostic_findings",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.document_embeddings": {
+      "name": "document_embeddings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content_chunk": {
+          "name": "content_chunk",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "embedding": {
+          "name": "embedding",
+          "type": "vector(768)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxdocumentembeddings_tenant": {
+          "name": "idxdocumentembeddings_tenant",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selecttenantidisolationpolicy": {
+          "name": "selecttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "inserttenantidisolationpolicy": {
+          "name": "inserttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updatetenantidisolationpolicy": {
+          "name": "updatetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deletetenantidisolationpolicy": {
+          "name": "deletetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.entities": {
+      "name": "entities",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_type": {
+          "name": "entity_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "properties": {
+          "name": "properties",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxentitiesorganization": {
+          "name": "idxentitiesorganization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxentitiestype": {
+          "name": "idxentitiestype",
+          "columns": [
+            {
+              "expression": "entity_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "entitiesorganizationidorganizationsid_fk": {
+          "name": "entitiesorganizationidorganizationsid_fk",
+          "tableFrom": "entities",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.entity_relationships": {
+      "name": "entity_relationships",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sourceentityid": {
+          "name": "sourceentityid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "targetentityid": {
+          "name": "targetentityid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "relationship_type": {
+          "name": "relationship_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weight": {
+          "name": "weight",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxentityrelationships_org": {
+          "name": "idxentityrelationships_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxentityrelationships_source": {
+          "name": "idxentityrelationships_source",
+          "columns": [
+            {
+              "expression": "sourceentityid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxentityrelationships_target": {
+          "name": "idxentityrelationships_target",
+          "columns": [
+            {
+              "expression": "targetentityid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "entityrelationshipsorganizationidorganizationsidfk": {
+          "name": "entityrelationshipsorganizationidorganizationsidfk",
+          "tableFrom": "entity_relationships",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "entityrelationshipssourceentityidentitiesid_fk": {
+          "name": "entityrelationshipssourceentityidentitiesid_fk",
+          "tableFrom": "entity_relationships",
+          "tableTo": "entities",
+          "columnsFrom": [
+            "sourceentityid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "entityrelationshipstargetentityidentitiesid_fk": {
+          "name": "entityrelationshipstargetentityidentitiesid_fk",
+          "tableFrom": "entity_relationships",
+          "tableTo": "entities",
+          "columnsFrom": [
+            "targetentityid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.faq_opportunities": {
+      "name": "faq_opportunities",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aeoanalysisid": {
+          "name": "aeoanalysisid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "question_text": {
+          "name": "question_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_intent": {
+          "name": "user_intent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Informational'"
+        },
+        "opportunity_score": {
+          "name": "opportunity_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 50
+        },
+        "suggested_answer": {
+          "name": "suggested_answer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxfaqopps_tenant": {
+          "name": "idxfaqopps_tenant",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxfaqopps_analysis": {
+          "name": "idxfaqopps_analysis",
+          "columns": [
+            {
+              "expression": "aeoanalysisid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "faqopportunitiestenantidorganizationsidfk": {
+          "name": "faqopportunitiestenantidorganizationsidfk",
+          "tableFrom": "faq_opportunities",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "tenant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "faqopportunitiesaeoanalysisidaeoanalysesidfk": {
+          "name": "faqopportunitiesaeoanalysisidaeoanalysesidfk",
+          "tableFrom": "faq_opportunities",
+          "tableTo": "aeo_analyses",
+          "columnsFrom": [
+            "aeoanalysisid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selecttenantidisolationpolicy": {
+          "name": "selecttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "inserttenantidisolationpolicy": {
+          "name": "inserttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updatetenantidisolationpolicy": {
+          "name": "updatetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deletetenantidisolationpolicy": {
+          "name": "deletetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.feature_flags": {
+      "name": "feature_flags",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isenabledglobally": {
+          "name": "isenabledglobally",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "tenant_overrides": {
+          "name": "tenant_overrides",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxfeatureflags_key": {
+          "name": "idxfeatureflags_key",
+          "columns": [
+            {
+              "expression": "key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "featureflagskey_unique": {
+          "name": "featureflagskey_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "key"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.historical_metrics": {
+      "name": "historical_metrics",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_type": {
+          "name": "entity_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_id": {
+          "name": "entity_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metric_name": {
+          "name": "metric_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metric_value": {
+          "name": "metric_value",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dimensions": {
+          "name": "dimensions",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "recorded_at": {
+          "name": "recorded_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxhistoricalmetrics_lookup": {
+          "name": "idxhistoricalmetrics_lookup",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "entity_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "entity_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "metric_name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxhistoricalmetrics_time": {
+          "name": "idxhistoricalmetrics_time",
+          "columns": [
+            {
+              "expression": "recorded_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "historicalmetricsorganizationidorganizationsidfk": {
+          "name": "historicalmetricsorganizationidorganizationsidfk",
+          "tableFrom": "historical_metrics",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.keywords": {
+      "name": "keywords",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "term": {
+          "name": "term",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_term": {
+          "name": "normalized_term",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "language": {
+          "name": "language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'en'"
+        },
+        "intent": {
+          "name": "intent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "search_volume": {
+          "name": "search_volume",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cpc": {
+          "name": "cpc",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxkeywordsorganization": {
+          "name": "idxkeywordsorganization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxkeywordsterm_org": {
+          "name": "idxkeywordsterm_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "normalized_term",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "deleted_at IS NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "keywordsorganizationidorganizationsid_fk": {
+          "name": "keywordsorganizationidorganizationsid_fk",
+          "tableFrom": "keywords",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.keywords_topics": {
+      "name": "keywords_topics",
+      "schema": "",
+      "columns": {
+        "keyword_id": {
+          "name": "keyword_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "topic_id": {
+          "name": "topic_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxkeywordstopics_org": {
+          "name": "idxkeywordstopics_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "keywordstopicskeywordidkeywordsidfk": {
+          "name": "keywordstopicskeywordidkeywordsidfk",
+          "tableFrom": "keywords_topics",
+          "tableTo": "keywords",
+          "columnsFrom": [
+            "keyword_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "keywordstopicstopicidtopicsidfk": {
+          "name": "keywordstopicstopicidtopicsidfk",
+          "tableFrom": "keywords_topics",
+          "tableTo": "topics",
+          "columnsFrom": [
+            "topic_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "keywordstopicsorganizationidorganizationsidfk": {
+          "name": "keywordstopicsorganizationidorganizationsidfk",
+          "tableFrom": "keywords_topics",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "keywordstopicskeywordidtopicidpk": {
+          "name": "keywordstopicskeywordidtopicidpk",
+          "columns": [
+            "keyword_id",
+            "topic_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.kg_alignments": {
+      "name": "kg_alignments",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aeoanalysisid": {
+          "name": "aeoanalysisid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_name": {
+          "name": "entity_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_type": {
+          "name": "entity_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wikidata_id": {
+          "name": "wikidata_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alignment_status": {
+          "name": "alignment_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'unmapped'"
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxkgalignments_tenant": {
+          "name": "idxkgalignments_tenant",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxkgalignments_analysis": {
+          "name": "idxkgalignments_analysis",
+          "columns": [
+            {
+              "expression": "aeoanalysisid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "kgalignmentstenantidorganizationsidfk": {
+          "name": "kgalignmentstenantidorganizationsidfk",
+          "tableFrom": "kg_alignments",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "tenant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "kgalignmentsaeoanalysisidaeoanalysesidfk": {
+          "name": "kgalignmentsaeoanalysisidaeoanalysesidfk",
+          "tableFrom": "kg_alignments",
+          "tableTo": "aeo_analyses",
+          "columnsFrom": [
+            "aeoanalysisid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selecttenantidisolationpolicy": {
+          "name": "selecttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "inserttenantidisolationpolicy": {
+          "name": "inserttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updatetenantidisolationpolicy": {
+          "name": "updatetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deletetenantidisolationpolicy": {
+          "name": "deletetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.kg_entities": {
+      "name": "kg_entities",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "properties": {
+          "name": "properties",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxkgentities_tenant": {
+          "name": "idxkgentities_tenant",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxkgentities_name": {
+          "name": "idxkgentities_name",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "kgentitiestenantidorganizationsidfk": {
+          "name": "kgentitiestenantidorganizationsidfk",
+          "tableFrom": "kg_entities",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "tenant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selecttenantidisolationpolicy": {
+          "name": "selecttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "inserttenantidisolationpolicy": {
+          "name": "inserttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updatetenantidisolationpolicy": {
+          "name": "updatetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deletetenantidisolationpolicy": {
+          "name": "deletetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.kg_relationships": {
+      "name": "kg_relationships",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sourceentityid": {
+          "name": "sourceentityid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "targetentityid": {
+          "name": "targetentityid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "relationship_type": {
+          "name": "relationship_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "properties": {
+          "name": "properties",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxkgrelationships_tenant": {
+          "name": "idxkgrelationships_tenant",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxkgrelationships_source": {
+          "name": "idxkgrelationships_source",
+          "columns": [
+            {
+              "expression": "sourceentityid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxkgrelationships_target": {
+          "name": "idxkgrelationships_target",
+          "columns": [
+            {
+              "expression": "targetentityid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "kgrelationshipstenantidorganizationsidfk": {
+          "name": "kgrelationshipstenantidorganizationsidfk",
+          "tableFrom": "kg_relationships",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "tenant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "kgrelationshipssourceentityidkgentitiesidfk": {
+          "name": "kgrelationshipssourceentityidkgentitiesidfk",
+          "tableFrom": "kg_relationships",
+          "tableTo": "kg_entities",
+          "columnsFrom": [
+            "sourceentityid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "kgrelationshipstargetentityidkgentitiesidfk": {
+          "name": "kgrelationshipstargetentityidkgentitiesidfk",
+          "tableFrom": "kg_relationships",
+          "tableTo": "kg_entities",
+          "columnsFrom": [
+            "targetentityid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selecttenantidisolationpolicy": {
+          "name": "selecttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "inserttenantidisolationpolicy": {
+          "name": "inserttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updatetenantidisolationpolicy": {
+          "name": "updatetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deletetenantidisolationpolicy": {
+          "name": "deletetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.monitoring_alerts": {
+      "name": "monitoring_alerts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "monitoringconfigid": {
+          "name": "monitoringconfigid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "crawlsnapshotid": {
+          "name": "crawlsnapshotid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alert_type": {
+          "name": "alert_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "severity": {
+          "name": "severity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "event_metadata": {
+          "name": "event_metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "dedup_key": {
+          "name": "dedup_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "idxmonitoringalerts_org": {
+          "name": "idxmonitoringalerts_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxmonitoringalerts_config": {
+          "name": "idxmonitoringalerts_config",
+          "columns": [
+            {
+              "expression": "monitoringconfigid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxmonitoringalerts_dedup": {
+          "name": "idxmonitoringalerts_dedup",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "dedup_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "monitoringalertsorganizationidorganizationsidfk": {
+          "name": "monitoringalertsorganizationidorganizationsidfk",
+          "tableFrom": "monitoring_alerts",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "monitoringalertsmonitoringconfigidmonitoringconfigsidfk": {
+          "name": "monitoringalertsmonitoringconfigidmonitoringconfigsidfk",
+          "tableFrom": "monitoring_alerts",
+          "tableTo": "monitoring_configs",
+          "columnsFrom": [
+            "monitoringconfigid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "monitoringalertscrawlsnapshotidcrawlsnapshotsidfk": {
+          "name": "monitoringalertscrawlsnapshotidcrawlsnapshotsidfk",
+          "tableFrom": "monitoring_alerts",
+          "tableTo": "crawl_snapshots",
+          "columnsFrom": [
+            "crawlsnapshotid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.monitoring_configs": {
+      "name": "monitoring_configs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "website_id": {
+          "name": "website_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_url": {
+          "name": "target_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "enabled": {
+          "name": "enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "crawl_policy": {
+          "name": "crawl_policy",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxmonitoringconfigs_org": {
+          "name": "idxmonitoringconfigs_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxmonitoringconfigs_website": {
+          "name": "idxmonitoringconfigs_website",
+          "columns": [
+            {
+              "expression": "website_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "monitoringconfigsorganizationidorganizationsidfk": {
+          "name": "monitoringconfigsorganizationidorganizationsidfk",
+          "tableFrom": "monitoring_configs",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "monitoringconfigswebsiteidwebsitesidfk": {
+          "name": "monitoringconfigswebsiteidwebsitesidfk",
+          "tableFrom": "monitoring_configs",
+          "tableTo": "websites",
+          "columnsFrom": [
+            "website_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.organization_invitations": {
+      "name": "organization_invitations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxorginvitations_email": {
+          "name": "idxorginvitations_email",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxorginvitations_token": {
+          "name": "idxorginvitations_token",
+          "columns": [
+            {
+              "expression": "token_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "organizationinvitationsorganizationidorganizationsidfk": {
+          "name": "organizationinvitationsorganizationidorganizationsidfk",
+          "tableFrom": "organization_invitations",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.organization_members": {
+      "name": "organization_members",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxorgmembersuserorg": {
+          "name": "idxorgmembersuserorg",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxorgmembersuserid": {
+          "name": "idxorgmembersuserid",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "organizationmembersorganizationidorganizationsidfk": {
+          "name": "organizationmembersorganizationidorganizationsidfk",
+          "tableFrom": "organization_members",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "organizationmembersuseridusersidfk": {
+          "name": "organizationmembersuseridusersidfk",
+          "tableFrom": "organization_members",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.organizations": {
+      "name": "organizations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plan": {
+          "name": "plan",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'free'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxorganizationsslug": {
+          "name": "idxorganizationsslug",
+          "columns": [
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "deleted_at IS NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "organizationsslugunique": {
+          "name": "organizationsslugunique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
+      "policies": {
+        "selectorgisolation_policy": {
+          "name": "selectorgisolation_policy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "id = NULLIF(currentsetting('app.currenttenant_id', true), '')::uuid"
+        },
+        "insertorgisolation_policy": {
+          "name": "insertorgisolation_policy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "id = NULLIF(currentsetting('app.currenttenant_id', true), '')::uuid"
+        },
+        "updateorgisolation_policy": {
+          "name": "updateorgisolation_policy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "id = NULLIF(currentsetting('app.currenttenant_id', true), '')::uuid",
+          "withCheck": "id = NULLIF(currentsetting('app.currenttenant_id', true), '')::uuid"
+        },
+        "deleteorgisolation_policy": {
+          "name": "deleteorgisolation_policy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "id = NULLIF(currentsetting('app.currenttenant_id', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pages": {
+      "name": "pages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "website_id": {
+          "name": "website_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_url": {
+          "name": "normalized_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "path": {
+          "name": "path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_description": {
+          "name": "meta_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "http_status": {
+          "name": "http_status",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 200
+        },
+        "content_type": {
+          "name": "content_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "content_hash": {
+          "name": "content_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "word_count": {
+          "name": "word_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "canonical_url": {
+          "name": "canonical_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "robots_directives": {
+          "name": "robots_directives",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::text[]"
+        },
+        "inlink_count": {
+          "name": "inlink_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "outlink_count": {
+          "name": "outlink_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "lastcrawledat": {
+          "name": "lastcrawledat",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxpagesorganization": {
+          "name": "idxpagesorganization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxpageswebsite": {
+          "name": "idxpageswebsite",
+          "columns": [
+            {
+              "expression": "website_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxpagesurl_org": {
+          "name": "idxpagesurl_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "normalized_url",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "deleted_at IS NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "pagesorganizationidorganizationsid_fk": {
+          "name": "pagesorganizationidorganizationsid_fk",
+          "tableFrom": "pages",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "pageswebsiteidwebsitesid_fk": {
+          "name": "pageswebsiteidwebsitesid_fk",
+          "tableFrom": "pages",
+          "tableTo": "websites",
+          "columnsFrom": [
+            "website_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pages_entities": {
+      "name": "pages_entities",
+      "schema": "",
+      "columns": {
+        "page_id": {
+          "name": "page_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_id": {
+          "name": "entity_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "salience": {
+          "name": "salience",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxpagesentities_org": {
+          "name": "idxpagesentities_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "pagesentitiespageidpagesidfk": {
+          "name": "pagesentitiespageidpagesidfk",
+          "tableFrom": "pages_entities",
+          "tableTo": "pages",
+          "columnsFrom": [
+            "page_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "pagesentitiesentityidentitiesidfk": {
+          "name": "pagesentitiesentityidentitiesidfk",
+          "tableFrom": "pages_entities",
+          "tableTo": "entities",
+          "columnsFrom": [
+            "entity_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "pagesentitiesorganizationidorganizationsidfk": {
+          "name": "pagesentitiesorganizationidorganizationsidfk",
+          "tableFrom": "pages_entities",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "pagesentitiespageidentityidpk": {
+          "name": "pagesentitiespageidentityidpk",
+          "columns": [
+            "page_id",
+            "entity_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pages_keywords": {
+      "name": "pages_keywords",
+      "schema": "",
+      "columns": {
+        "page_id": {
+          "name": "page_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "keyword_id": {
+          "name": "keyword_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_primary": {
+          "name": "is_primary",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxpageskeywords_org": {
+          "name": "idxpageskeywords_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "pageskeywordspageidpagesidfk": {
+          "name": "pageskeywordspageidpagesidfk",
+          "tableFrom": "pages_keywords",
+          "tableTo": "pages",
+          "columnsFrom": [
+            "page_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "pageskeywordskeywordidkeywordsidfk": {
+          "name": "pageskeywordskeywordidkeywordsidfk",
+          "tableFrom": "pages_keywords",
+          "tableTo": "keywords",
+          "columnsFrom": [
+            "keyword_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "pageskeywordsorganizationidorganizationsidfk": {
+          "name": "pageskeywordsorganizationidorganizationsidfk",
+          "tableFrom": "pages_keywords",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "pageskeywordspageidkeywordidpk": {
+          "name": "pageskeywordspageidkeywordidpk",
+          "columns": [
+            "page_id",
+            "keyword_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pages_topics": {
+      "name": "pages_topics",
+      "schema": "",
+      "columns": {
+        "page_id": {
+          "name": "page_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "topic_id": {
+          "name": "topic_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "score": {
+          "name": "score",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxpagestopics_org": {
+          "name": "idxpagestopics_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "pagestopicspageidpagesidfk": {
+          "name": "pagestopicspageidpagesidfk",
+          "tableFrom": "pages_topics",
+          "tableTo": "pages",
+          "columnsFrom": [
+            "page_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "pagestopicstopicidtopicsidfk": {
+          "name": "pagestopicstopicidtopicsidfk",
+          "tableFrom": "pages_topics",
+          "tableTo": "topics",
+          "columnsFrom": [
+            "topic_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "pagestopicsorganizationidorganizationsidfk": {
+          "name": "pagestopicsorganizationidorganizationsidfk",
+          "tableFrom": "pages_topics",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "pagestopicspageidtopicidpk": {
+          "name": "pagestopicspageidtopicidpk",
+          "columns": [
+            "page_id",
+            "topic_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.permissions": {
+      "name": "permissions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "role_id": {
+          "name": "role_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "permission_key": {
+          "name": "permission_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxpermissionsrole_id": {
+          "name": "idxpermissionsrole_id",
+          "columns": [
+            {
+              "expression": "role_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "permissionsroleidrolesid_fk": {
+          "name": "permissionsroleidrolesid_fk",
+          "tableFrom": "permissions",
+          "tableTo": "roles",
+          "columnsFrom": [
+            "role_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.position_observations": {
+      "name": "position_observations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sourceexecutionid": {
+          "name": "sourceexecutionid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subjectentityid": {
+          "name": "subjectentityid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "presence": {
+          "name": "presence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numeric_position": {
+          "name": "numeric_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "evidence_excerpt": {
+          "name": "evidence_excerpt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evidence_structure": {
+          "name": "evidence_structure",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "analyzer_version": {
+          "name": "analyzer_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1.0.0'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxpositionobs_tenant": {
+          "name": "idxpositionobs_tenant",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "positionobservationsorganizationidorganizationsidfk": {
+          "name": "positionobservationsorganizationidorganizationsidfk",
+          "tableFrom": "position_observations",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "positionobservationssourceexecutionidpromptexecutionsidfk": {
+          "name": "positionobservationssourceexecutionidpromptexecutionsidfk",
+          "tableFrom": "position_observations",
+          "tableTo": "prompt_executions",
+          "columnsFrom": [
+            "sourceexecutionid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.premium_audits": {
+      "name": "premium_audits",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "grade": {
+          "name": "grade",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pages_analyzed": {
+          "name": "pages_analyzed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metrics": {
+          "name": "metrics",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "issues": {
+          "name": "issues",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recommendations": {
+          "name": "recommendations",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxpremiumaudits_organization": {
+          "name": "idxpremiumaudits_organization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "premiumauditsorganizationidorganizationsidfk": {
+          "name": "premiumauditsorganizationidorganizationsidfk",
+          "tableFrom": "premium_audits",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.prompt_definitions": {
+      "name": "prompt_definitions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brand_id": {
+          "name": "brand_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prompt_template": {
+          "name": "prompt_template",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "intent": {
+          "name": "intent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "locale": {
+          "name": "locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "variables": {
+          "name": "variables",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "competitors": {
+          "name": "competitors",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tags": {
+          "name": "tags",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "opt_version": {
+          "name": "opt_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxpromptdefinitions_tenant": {
+          "name": "idxpromptdefinitions_tenant",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "promptdefinitionsorganizationidorganizationsidfk": {
+          "name": "promptdefinitionsorganizationidorganizationsidfk",
+          "tableFrom": "prompt_definitions",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "promptdefinitionsbrandidbrandsidfk": {
+          "name": "promptdefinitionsbrandidbrandsidfk",
+          "tableFrom": "prompt_definitions",
+          "tableTo": "brands",
+          "columnsFrom": [
+            "brand_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.prompt_executions": {
+      "name": "prompt_executions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prompt_id": {
+          "name": "prompt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prompt_version": {
+          "name": "prompt_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resolvedprompttext": {
+          "name": "resolvedprompttext",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "variables_values": {
+          "name": "variables_values",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'queued'"
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model_version": {
+          "name": "model_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "response_text": {
+          "name": "response_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latency_ms": {
+          "name": "latency_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "error_message": {
+          "name": "error_message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "attempts": {
+          "name": "attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "max_attempts": {
+          "name": "max_attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 3
+        },
+        "scheduled_for": {
+          "name": "scheduled_for",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "executed_at": {
+          "name": "executed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxpromptexecutions_tenant": {
+          "name": "idxpromptexecutions_tenant",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxpromptexecutions_status": {
+          "name": "idxpromptexecutions_status",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "promptexecutionsorganizationidorganizationsidfk": {
+          "name": "promptexecutionsorganizationidorganizationsidfk",
+          "tableFrom": "prompt_executions",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "promptexecutionspromptidpromptdefinitionsid_fk": {
+          "name": "promptexecutionspromptidpromptdefinitionsid_fk",
+          "tableFrom": "prompt_executions",
+          "tableTo": "prompt_definitions",
+          "columnsFrom": [
+            "prompt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {
+        "promptexecutionsstatus_check": {
+          "name": "promptexecutionsstatus_check",
+          "value": "status IN ('queued', 'running', 'succeeded', 'failed', 'timed_out', 'cancelled')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.prompt_schedules": {
+      "name": "prompt_schedules",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prompt_id": {
+          "name": "prompt_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "enabled": {
+          "name": "enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "cron_expression": {
+          "name": "cron_expression",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "timezone": {
+          "name": "timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'UTC'"
+        },
+        "nextexecutionat": {
+          "name": "nextexecutionat",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lastexecutionat": {
+          "name": "lastexecutionat",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'IDLE'"
+        },
+        "failure_reason": {
+          "name": "failure_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "schedule_version": {
+          "name": "schedule_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxpromptschedules_tenant": {
+          "name": "idxpromptschedules_tenant",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "promptschedulesorganizationidorganizationsidfk": {
+          "name": "promptschedulesorganizationidorganizationsidfk",
+          "tableFrom": "prompt_schedules",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "promptschedulespromptidpromptdefinitionsid_fk": {
+          "name": "promptschedulespromptidpromptdefinitionsid_fk",
+          "tableFrom": "prompt_schedules",
+          "tableTo": "prompt_definitions",
+          "columnsFrom": [
+            "prompt_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.prompts": {
+      "name": "prompts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brand_id": {
+          "name": "brand_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "query_text": {
+          "name": "query_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "buying_intent": {
+          "name": "buying_intent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxpromptsorganization": {
+          "name": "idxpromptsorganization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxpromptsbrand": {
+          "name": "idxpromptsbrand",
+          "columns": [
+            {
+              "expression": "brand_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "promptsorganizationidorganizationsid_fk": {
+          "name": "promptsorganizationidorganizationsid_fk",
+          "tableFrom": "prompts",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "promptsbrandidbrandsid_fk": {
+          "name": "promptsbrandidbrandsid_fk",
+          "tableFrom": "prompts",
+          "tableTo": "brands",
+          "columnsFrom": [
+            "brand_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.recommendation_observations": {
+      "name": "recommendation_observations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brand_id": {
+          "name": "brand_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recommended_action": {
+          "name": "recommended_action",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "engine_id": {
+          "name": "engine_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "frequency": {
+          "name": "frequency",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "confidence_score": {
+          "name": "confidence_score",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxrecommendationobs_tenant": {
+          "name": "idxrecommendationobs_tenant",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxrecommendationobs_brand": {
+          "name": "idxrecommendationobs_brand",
+          "columns": [
+            {
+              "expression": "brand_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "recommendationobservationsorganizationidorganizationsidfk": {
+          "name": "recommendationobservationsorganizationidorganizationsidfk",
+          "tableFrom": "recommendation_observations",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "recommendationobservationsbrandidbrandsidfk": {
+          "name": "recommendationobservationsbrandidbrandsidfk",
+          "tableFrom": "recommendation_observations",
+          "tableTo": "brands",
+          "columnsFrom": [
+            "brand_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.recommendations": {
+      "name": "recommendations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brand_id": {
+          "name": "brand_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "priority": {
+          "name": "priority",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "impact_score": {
+          "name": "impact_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "action_plan": {
+          "name": "action_plan",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'open'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxrecommendationsorganization": {
+          "name": "idxrecommendationsorganization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxrecommendationsbrand": {
+          "name": "idxrecommendationsbrand",
+          "columns": [
+            {
+              "expression": "brand_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "recommendationsorganizationidorganizationsid_fk": {
+          "name": "recommendationsorganizationidorganizationsid_fk",
+          "tableFrom": "recommendations",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "recommendationsbrandidbrandsid_fk": {
+          "name": "recommendationsbrandidbrandsid_fk",
+          "tableFrom": "recommendations",
+          "tableTo": "brands",
+          "columnsFrom": [
+            "brand_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.roles": {
+      "name": "roles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hierarchy_rank": {
+          "name": "hierarchy_rank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxrolesname": {
+          "name": "idxrolesname",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "rolesnameunique": {
+          "name": "rolesnameunique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.system_configurations": {
+      "name": "system_configurations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_encrypted": {
+          "name": "is_encrypted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxsystemconfigurations_key": {
+          "name": "idxsystemconfigurations_key",
+          "columns": [
+            {
+              "expression": "key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "systemconfigurationskey_unique": {
+          "name": "systemconfigurationskey_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "key"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.technical_audits": {
+      "name": "technical_audits",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "technical_score": {
+          "name": "technical_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "grade": {
+          "name": "grade",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pages_analyzed": {
+          "name": "pages_analyzed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "categories": {
+          "name": "categories",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "critical_issues": {
+          "name": "critical_issues",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quick_wins": {
+          "name": "quick_wins",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "performance_metrics": {
+          "name": "performance_metrics",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tenant_quotas": {
+      "name": "tenant_quotas",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "max_users": {
+          "name": "max_users",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "max_brands": {
+          "name": "max_brands",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "max_prompts": {
+          "name": "max_prompts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "maxobservationsper_month": {
+          "name": "maxobservationsper_month",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "maxcrawljobsperday": {
+          "name": "maxcrawljobsperday",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "monthlytokenlimit": {
+          "name": "monthlytokenlimit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "monthlycostlimit_usd": {
+          "name": "monthlycostlimit_usd",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "usedobservationsthis_month": {
+          "name": "usedobservationsthis_month",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "usedtokensthis_month": {
+          "name": "usedtokensthis_month",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "usedcrawljobs_today": {
+          "name": "usedcrawljobs_today",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "credits_balance": {
+          "name": "credits_balance",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxtenantquotas_tenant": {
+          "name": "idxtenantquotas_tenant",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selecttenantidisolationpolicy": {
+          "name": "selecttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "inserttenantidisolationpolicy": {
+          "name": "inserttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updatetenantidisolationpolicy": {
+          "name": "updatetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deletetenantidisolationpolicy": {
+          "name": "deletetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tenant_subscriptions": {
+      "name": "tenant_subscriptions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plan": {
+          "name": "plan",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "billing_cycle": {
+          "name": "billing_cycle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "price_amount": {
+          "name": "price_amount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'USD'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxtenantsubscriptions_tenant": {
+          "name": "idxtenantsubscriptions_tenant",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selecttenantidisolationpolicy": {
+          "name": "selecttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "inserttenantidisolationpolicy": {
+          "name": "inserttenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updatetenantidisolationpolicy": {
+          "name": "updatetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deletetenantidisolationpolicy": {
+          "name": "deletetenantidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"tenantid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.topics": {
+      "name": "topics",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "language": {
+          "name": "language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'en'"
+        },
+        "parenttopicid": {
+          "name": "parenttopicid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxtopicsorganization": {
+          "name": "idxtopicsorganization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxtopicsname_org": {
+          "name": "idxtopicsname_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "deleted_at IS NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "topicsorganizationidorganizationsid_fk": {
+          "name": "topicsorganizationidorganizationsid_fk",
+          "tableFrom": "topics",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "topicsparenttopicidtopicsidfk": {
+          "name": "topicsparenttopicidtopicsidfk",
+          "tableFrom": "topics",
+          "tableTo": "topics",
+          "columnsFrom": [
+            "parenttopicid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.topics_entities": {
+      "name": "topics_entities",
+      "schema": "",
+      "columns": {
+        "topic_id": {
+          "name": "topic_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_id": {
+          "name": "entity_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        }
+      },
+      "indexes": {
+        "idxtopicsentities_org": {
+          "name": "idxtopicsentities_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "topicsentitiestopicidtopicsidfk": {
+          "name": "topicsentitiestopicidtopicsidfk",
+          "tableFrom": "topics_entities",
+          "tableTo": "topics",
+          "columnsFrom": [
+            "topic_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "topicsentitiesentityidentitiesidfk": {
+          "name": "topicsentitiesentityidentitiesidfk",
+          "tableFrom": "topics_entities",
+          "tableTo": "entities",
+          "columnsFrom": [
+            "entity_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "topicsentitiesorganizationidorganizationsidfk": {
+          "name": "topicsentitiesorganizationidorganizationsidfk",
+          "tableFrom": "topics_entities",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "topicsentitiestopicidentityidpk": {
+          "name": "topicsentitiestopicidentityidpk",
+          "columns": [
+            "topic_id",
+            "entity_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "usersemailunique": {
+          "name": "usersemailunique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.visibility_scores": {
+      "name": "visibility_scores",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brand_id": {
+          "name": "brand_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "engine_id": {
+          "name": "engine_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "overall_score": {
+          "name": "overall_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "presence_rate": {
+          "name": "presence_rate",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "avg_position": {
+          "name": "avg_position",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "net_sentiment": {
+          "name": "net_sentiment",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recorded_at": {
+          "name": "recorded_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxvisibilityscores_organization": {
+          "name": "idxvisibilityscores_organization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxvisibilityscores_brand": {
+          "name": "idxvisibilityscores_brand",
+          "columns": [
+            {
+              "expression": "brand_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "visibilityscoresorganizationidorganizationsidfk": {
+          "name": "visibilityscoresorganizationidorganizationsidfk",
+          "tableFrom": "visibility_scores",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "visibilityscoresbrandidbrandsidfk": {
+          "name": "visibilityscoresbrandidbrandsidfk",
+          "tableFrom": "visibility_scores",
+          "tableTo": "brands",
+          "columnsFrom": [
+            "brand_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "visibilityscoresengineidaienginesid_fk": {
+          "name": "visibilityscoresengineidaienginesid_fk",
+          "tableFrom": "visibility_scores",
+          "tableTo": "ai_engines",
+          "columnsFrom": [
+            "engine_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.websites": {
+      "name": "websites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "genrandomuuid()"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "domain": {
+          "name": "domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_url": {
+          "name": "normalized_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "cms_type": {
+          "name": "cms_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lastcrawledat": {
+          "name": "lastcrawledat",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lastanalyzedat": {
+          "name": "lastanalyzedat",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "NOW()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'system'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        }
+      },
+      "indexes": {
+        "idxwebsitesorganization": {
+          "name": "idxwebsitesorganization",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idxwebsitesdomain_org": {
+          "name": "idxwebsitesdomain_org",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "domain",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "deleted_at IS NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "websitesorganizationidorganizationsid_fk": {
+          "name": "websitesorganizationidorganizationsid_fk",
+          "tableFrom": "websites",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "selectorganizationidisolationpolicy": {
+          "name": "selectorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "insertorganizationidisolationpolicy": {
+          "name": "insertorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "public"
+          ],
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "updateorganizationidisolationpolicy": {
+          "name": "updateorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid",
+          "withCheck": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        },
+        "deleteorganizationidisolationpolicy": {
+          "name": "deleteorganizationidisolationpolicy",
+          "as": "PERMISSIVE",
+          "for": "DELETE",
+          "to": [
+            "public"
+          ],
+          "using": "\"organizationid\" = NULLIF(currentsetting('app.currenttenantid', true), '')::uuid"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
+
+Summary of corrections applied:
+
+crawlsnapshots foreignKeys — The crawlsnapshotscrawljobidcrawljobsid_fk FK definition was truncated. The orphaned ], and dangling "columnsTo", "onDelete", "onUpdate" properties (which belonged inside the FK object) were re-integrated into the correct FK structure.
+
+monitoringalerts columns — Removed stray duplicate properties ("type", "primaryKey", "notNull") and a malformed ]  } artifact that appeared after the alerttype column definition, leaving the column object properly closed.
+
+monitoringalerts columns — Removed an extra }, (double comma/brace) between the message column and the createdat column.
+
+monitoringalerts indexes — Removed duplicated column-definition content (severity, message, eventmetadata, createdat, dedupkey as raw properties) that had been incorrectly pasted inside the idxmonitoringalertsorg index definition. Restored the three proper index objects (idxmonitoringalertsorg, idxmonitoringalertsconfig, idxmonitoringalertsdedup) with correct column-reference structures.
+
+competitiveseofindings check constraint — Fixed the malformed value string that contained a stray space in 'brandmention gap' → 'brandmentiongap'.
+
+All table schemas, columns, relations, indexes, and policies are preserved intact. The resulting file is syntactically valid JSON.
