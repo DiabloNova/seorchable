@@ -7,8 +7,8 @@ import {
   index,
   pgPolicy
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { organizations } from "./index";
+import { sql, relations } from "drizzle-orm";
+import { organizations } from "./organization";
 
 const defaultUuid = sql`gen_random_uuid()`;
 const defaultNow = sql`NOW()`;
@@ -53,3 +53,10 @@ export const apiKeys = pgTable("api_keys", {
   index("idx_api_keys_prefix").on(table.prefix),
   ...tenantPolicy("organization_id")
 ]);
+
+export const apiKeysRelations = relations(apiKeys, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [apiKeys.organizationId],
+    references: [organizations.id],
+  }),
+}));
