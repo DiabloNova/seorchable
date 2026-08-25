@@ -1,3 +1,6 @@
+import { organizations, users } from "./organization";
+export * from "./organization";
+export * from "./api-keys";
 import {
   pgTable,
   uuid,
@@ -64,78 +67,12 @@ function textTenantPolicy() {
 // ==========================================
 // 1. ORGANIZATIONS
 // ==========================================
-export const organizations = pgTable("organizations", {
-  id: uuid("id").primaryKey().default(defaultUuid),
-  name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  plan: text("plan").notNull().default("free"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-  createdBy: text("created_by").notNull().default("system"),
-  updatedBy: text("updated_by").notNull().default("system"),
-  deletedAt: timestamp("deleted_at", { withTimezone: true }),
-  version: integer("version").notNull().default(1),
-}, (table) => [
-  uniqueIndex("idx_organizations_slug").on(table.slug).where(sql`deleted_at IS NULL`),
-  pgPolicy("select_org_isolation_policy", {
-    for: "select",
-    using: sql`id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid`
-  }),
-  pgPolicy("insert_org_isolation_policy", {
-    for: "insert",
-    withCheck: sql`id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid`
-  }),
-  pgPolicy("update_org_isolation_policy", {
-    for: "update",
-    using: sql`id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid`,
-    withCheck: sql`id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid`
-  }),
-  pgPolicy("delete_org_isolation_policy", {
-    for: "delete",
-    using: sql`id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid`
-  })
-]);
 
 
 // 1.1 USERS & MEMBERSHIPS (WORKSPACE MODEL)
 // ==========================================
-export const users = pgTable("users", {
-  id: text("id").primaryKey(), // using text to match the existing usr-xxx pattern if needed
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-  deletedAt: timestamp("deleted_at", { withTimezone: true }),
-});
 
-export const organizationMembers = pgTable("organization_members", {
-  id: uuid("id").primaryKey().default(defaultUuid),
-  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
-  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  role: text("role").notNull(), // super_admin, workspace_admin, viewer
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
-  uniqueIndex("idx_org_members_user_org").on(table.organizationId, table.userId),
-  index("idx_org_members_user_id").on(table.userId),
-  ...tenantPolicy("organization_id")
-]);
 
-export const organizationInvitations = pgTable("organization_invitations", {
-  id: uuid("id").primaryKey().default(defaultUuid),
-  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
-  email: text("email").notNull(),
-  role: text("role").notNull(),
-  tokenHash: text("token_hash").notNull(),
-  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-  status: text("status").notNull().default("pending"), // pending, accepted, expired, revoked
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
-  index("idx_org_invitations_email").on(table.email),
-  index("idx_org_invitations_token").on(table.tokenHash),
-  ...tenantPolicy("organization_id")
-]);
 
 // ==========================================
 export const roles = pgTable("roles", {
