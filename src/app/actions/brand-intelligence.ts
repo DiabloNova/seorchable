@@ -145,7 +145,7 @@ export async function getBrandIntelligenceOverviewAction() {
           activeAssocs = seedAssocs;
         }
 
-        return {
+                return {
           success: true,
           result: {
             brand,
@@ -154,12 +154,11 @@ export async function getBrandIntelligenceOverviewAction() {
             alerts,
           },
         };
-      }
-    );
-  catch (err: unknown) {
-    return {
-      success: false,
-      error: err instanceof Error ? err.message : "Internal Server Error",
-    };
-  }
+      }); // پایان کال‌بک و متد
+    } catch (err: unknown) {
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : "Internal Server Error",
+      };
+    }
 }
