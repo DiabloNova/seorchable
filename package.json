@@ -16,6 +16,7 @@
     "@ai-sdk/google": "^4.0.24",
     "@base-ui/react": "^1.6.0",
     "@mendable/firecrawl-js": "^4.31.1",
+    "@upstash/redis": "^1.38.2",
     "@vercel/analytics": "1.6.1",
     "@xyflow/react": "^12.11.2",
     "ai": "^7.0.37",
