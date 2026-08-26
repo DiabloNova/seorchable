@@ -5,6 +5,7 @@ import { inngest } from "@/lib/inngest/client";
 import { TenantContextManager } from "@/core/database/tenant-context";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { audits } from "../../../database/schema";
+import { eq } from "drizzle-orm";
 
 export const triggerAuditAction = secureServerAction(
   async (url: string, ctx) => {
@@ -44,6 +45,31 @@ export const triggerAuditAction = secureServerAction(
         });
 
         return { auditId: insertedAudit.id };
+      }
+    );
+  }
+);
+
+export const getAuditAction = secureServerAction(
+  async (id: string, ctx) => {
+    return await TenantContextManager.runWithTenantContext(
+      ctx.workspaceId!,
+      ctx.userId,
+      "get-audit",
+      async () => {
+        const client = TenantContextManager.getDbClient();
+        if (!client) {
+          throw new Error("Failed to get DB client in tenant context");
+        }
+        const db = drizzle(client);
+
+        const [audit] = await db
+          .select()
+          .from(audits)
+          .where(eq(audits.id, id))
+          .limit(1);
+
+        return audit || null;
       }
     );
   }
