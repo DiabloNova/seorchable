@@ -1,8 +1,9 @@
-import { organizations, users } from "./organization";
+import { organizations } from "./organization";
 export * from "./organization";
 export * from "./api-keys";
 export * from "./credits";
 export * from "./credit-transactions";
+export * from "./audits";
 import {
   pgTable,
   uuid,
@@ -82,7 +83,7 @@ export const roles = pgTable("roles", {
   name: text("name").notNull().unique(),
   hierarchyRank: integer("hierarchy_rank").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_roles_name").on(table.name),
 ]);
 
@@ -91,7 +92,7 @@ export const permissions = pgTable("permissions", {
   roleId: uuid("role_id").notNull().references(() => roles.id, { onDelete: "cascade" }),
   permissionKey: text("permission_key").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_permissions_role_id").on(table.roleId),
 ]);
 
@@ -105,7 +106,7 @@ export const adminUsers = pgTable("admin_users", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_admin_users_email").on(table.email),
   index("idx_admin_users_deleted_at").on(table.deletedAt).where(sql`deleted_at IS NULL`),
 ]);
@@ -125,7 +126,7 @@ export const auditRecords = pgTable("audit_records", {
   payloadAfter: text("payload_after"),
   status: text("status").notNull(),
   errorDetails: text("error_details"),
-}, (table) => [
+}, () => [
   index("idx_audit_records_actor").on(table.actorId),
   index("idx_audit_records_resource").on(table.resourceType, table.resourceId),
   index("idx_audit_records_timestamp").on(table.timestamp),
@@ -140,7 +141,7 @@ export const featureFlags = pgTable("feature_flags", {
   tenantOverrides: text("tenant_overrides").notNull().default("{}"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_feature_flags_key").on(table.key),
 ]);
 
@@ -152,7 +153,7 @@ export const systemConfigurations = pgTable("system_configurations", {
   isEncrypted: boolean("is_encrypted").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_system_configurations_key").on(table.key),
 ]);
 
@@ -172,7 +173,7 @@ export const tenantQuotas = pgTable("tenant_quotas", {
   creditsBalance: integer("credits_balance").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_tenant_quotas_tenant").on(table.tenantId),
   ...tenantPolicy("tenant_id")
 ]);
@@ -185,7 +186,7 @@ export const creditTransactions = pgTable("credit_transactions", {
   description: text("description"),
   referenceId: text("reference_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_credit_transactions_tenant").on(table.tenantId),
   ...tenantPolicy("tenant_id")
 ]);
@@ -202,7 +203,7 @@ export const tenantSubscriptions = pgTable("tenant_subscriptions", {
   currency: text("currency").notNull().default("USD"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_tenant_subscriptions_tenant").on(table.tenantId),
   ...tenantPolicy("tenant_id")
 ]);
@@ -216,7 +217,7 @@ export const aiProviderConfigs = pgTable("ai_provider_configs", {
   failoverProviderId: uuid("failover_provider_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_ai_provider_configs_active").on(table.isActive),
 ]);
 
@@ -237,7 +238,7 @@ export const brands = pgTable("brands", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_brands_organization").on(table.organizationId),
   index("idx_brands_domain").on(table.canonicalDomain),
   ...tenantPolicy("organization_id")
@@ -256,7 +257,7 @@ export const entities = pgTable("entities", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_entities_organization").on(table.organizationId),
   index("idx_entities_type").on(table.entityType),
   ...tenantPolicy("organization_id")
@@ -275,7 +276,7 @@ export const entityRelationships = pgTable("entity_relationships", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_entity_relationships_org").on(table.organizationId),
   index("idx_entity_relationships_source").on(table.sourceEntityId),
   index("idx_entity_relationships_target").on(table.targetEntityId),
@@ -300,7 +301,7 @@ export const websites = pgTable("websites", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_websites_organization").on(table.organizationId),
   uniqueIndex("idx_websites_domain_org").on(table.organizationId, table.domain).where(sql`deleted_at IS NULL`),
   ...tenantPolicy("organization_id")
@@ -330,7 +331,7 @@ export const pages = pgTable("pages", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_pages_organization").on(table.organizationId),
   index("idx_pages_website").on(table.websiteId),
   uniqueIndex("idx_pages_url_org").on(table.organizationId, table.normalizedUrl).where(sql`deleted_at IS NULL`),
@@ -352,7 +353,7 @@ export const keywords = pgTable("keywords", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_keywords_organization").on(table.organizationId),
   uniqueIndex("idx_keywords_term_org").on(table.organizationId, table.normalizedTerm).where(sql`deleted_at IS NULL`),
   ...tenantPolicy("organization_id")
@@ -364,14 +365,14 @@ export const topics = pgTable("topics", {
   name: text("name").notNull(),
   description: text("description"),
   language: text("language").notNull().default("en"),
-  parentTopicId: uuid("parent_topic_id").references((): any => topics.id, { onDelete: "set null" }),
+  parentTopicId: uuid("parent_topic_id").references(() => topics.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
   createdBy: text("created_by").notNull().default("system"),
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_topics_organization").on(table.organizationId),
   uniqueIndex("idx_topics_name_org").on(table.organizationId, table.name).where(sql`deleted_at IS NULL`),
   ...tenantPolicy("organization_id")
@@ -391,7 +392,7 @@ export const competitors = pgTable("competitors", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_competitors_organization").on(table.organizationId),
   uniqueIndex("idx_competitors_domain_org").on(table.organizationId, table.domain).where(sql`deleted_at IS NULL`),
   ...tenantPolicy("organization_id")
@@ -407,7 +408,7 @@ export const historicalMetrics = pgTable("historical_metrics", {
   dimensions: jsonb("dimensions").notNull().default({}),
   recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().default(defaultNow),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_historical_metrics_lookup").on(table.organizationId, table.entityType, table.entityId, table.metricName),
   index("idx_historical_metrics_time").on(table.recordedAt),
   ...tenantPolicy("organization_id")
@@ -419,7 +420,7 @@ export const pagesKeywords = pgTable("pages_keywords", {
   organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   isPrimary: boolean("is_primary").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   primaryKey({ columns: [table.pageId, table.keywordId] }),
   index("idx_pages_keywords_org").on(table.organizationId),
 ]);
@@ -430,7 +431,7 @@ export const pagesTopics = pgTable("pages_topics", {
   organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   score: doublePrecision("score").notNull().default(1.0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   primaryKey({ columns: [table.pageId, table.topicId] }),
   index("idx_pages_topics_org").on(table.organizationId),
 ]);
@@ -441,7 +442,7 @@ export const pagesEntities = pgTable("pages_entities", {
   organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   salience: doublePrecision("salience").notNull().default(1.0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   primaryKey({ columns: [table.pageId, table.entityId] }),
   index("idx_pages_entities_org").on(table.organizationId),
 ]);
@@ -451,7 +452,7 @@ export const keywordsTopics = pgTable("keywords_topics", {
   topicId: uuid("topic_id").notNull().references(() => topics.id, { onDelete: "cascade" }),
   organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   primaryKey({ columns: [table.keywordId, table.topicId] }),
   index("idx_keywords_topics_org").on(table.organizationId),
 ]);
@@ -461,7 +462,7 @@ export const topicsEntities = pgTable("topics_entities", {
   entityId: uuid("entity_id").notNull().references(() => entities.id, { onDelete: "cascade" }),
   organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   primaryKey({ columns: [table.topicId, table.entityId] }),
   index("idx_topics_entities_org").on(table.organizationId),
 ]);
@@ -484,7 +485,7 @@ export const diagnosticFindings = pgTable("diagnostic_findings", {
   status: text("status").notNull().default("open"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_diagnostic_findings_org").on(table.organizationId),
   index("idx_diagnostic_findings_domain").on(table.domain),
   index("idx_diagnostic_findings_status").on(table.status),
@@ -498,7 +499,7 @@ export const diagnosticFindingRelationships = pgTable("diagnostic_finding_relati
   childFindingId: uuid("child_finding_id").notNull().references(() => diagnosticFindings.id, { onDelete: "cascade" }),
   relationshipType: text("relationship_type").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_diagnostic_rel_org").on(table.organizationId),
   index("idx_diagnostic_rel_parent").on(table.parentFindingId),
   index("idx_diagnostic_rel_child").on(table.childFindingId),
@@ -537,7 +538,7 @@ export const prompts = pgTable("prompts", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_prompts_organization").on(table.organizationId),
   index("idx_prompts_brand").on(table.brandId),
   ...tenantPolicy("organization_id")
@@ -564,7 +565,7 @@ export const promptDefinitions = pgTable("prompt_definitions", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   optVersion: integer("opt_version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_prompt_definitions_tenant").on(table.organizationId),
   ...tenantPolicy("organization_id")
 ]);
@@ -583,7 +584,7 @@ export const promptSchedules = pgTable("prompt_schedules", {
   scheduleVersion: integer("schedule_version").notNull().default(1),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_prompt_schedules_tenant").on(table.organizationId),
   ...tenantPolicy("organization_id")
 ]);
@@ -608,7 +609,7 @@ export const promptExecutions = pgTable("prompt_executions", {
   executedAt: timestamp("executed_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_prompt_executions_tenant").on(table.organizationId),
   index("idx_prompt_executions_status").on(table.status),
   check("prompt_executions_status_check", sql`status IN ('queued', 'running', 'succeeded', 'failed', 'timed_out', 'cancelled')`),
@@ -627,7 +628,7 @@ export const positionObservations = pgTable("position_observations", {
   confidence: doublePrecision("confidence").notNull(),
   analyzerVersion: text("analyzer_version").notNull().default("1.0.0"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_position_obs_tenant").on(table.organizationId),
   ...tenantPolicy("organization_id")
 ]);
@@ -650,7 +651,7 @@ export const aiObservations = pgTable("ai_observations", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_ai_observations_organization").on(table.organizationId),
   index("idx_ai_observations_prompt").on(table.promptId),
   index("idx_ai_observations_engine").on(table.engineId),
@@ -671,7 +672,7 @@ export const competitorMentions = pgTable("competitor_mentions", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_competitor_mentions_organization").on(table.organizationId),
   index("idx_competitor_mentions_observation").on(table.observationId),
   index("idx_competitor_mentions_competitor").on(table.competitorId),
@@ -692,7 +693,7 @@ export const brandMentions = pgTable("brand_mentions", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_brand_mentions_organization").on(table.organizationId),
   index("idx_brand_mentions_brand").on(table.brandId),
   ...tenantPolicy("organization_id")
@@ -712,7 +713,7 @@ export const citations = pgTable("citations", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_citations_organization").on(table.organizationId),
   index("idx_citations_observation").on(table.observationId),
   index("idx_citations_domain").on(table.domain),
@@ -731,7 +732,7 @@ export const citationSources = pgTable("citation_sources", {
   metadata: jsonb("metadata").notNull().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_citation_sources_tenant").on(table.organizationId),
   uniqueIndex("idx_citation_sources_url_org").on(table.organizationId, table.url),
   ...tenantPolicy("organization_id")
@@ -749,7 +750,7 @@ export const citationOccurrences = pgTable("citation_occurrences", {
   isBrandMentioned: boolean("is_brand_mentioned").notNull().default(false),
   occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull().default(defaultNow),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_citation_occurrences_tenant").on(table.organizationId),
   index("idx_citation_occurrences_source").on(table.sourceId),
   ...tenantPolicy("organization_id")
@@ -774,7 +775,7 @@ export const visibilityScores = pgTable("visibility_scores", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_visibility_scores_organization").on(table.organizationId),
   index("idx_visibility_scores_brand").on(table.brandId),
   ...tenantPolicy("organization_id")
@@ -797,7 +798,7 @@ export const recommendations = pgTable("recommendations", {
   updatedBy: text("updated_by").notNull().default("system"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_recommendations_organization").on(table.organizationId),
   index("idx_recommendations_brand").on(table.brandId),
   ...tenantPolicy("organization_id")
@@ -813,7 +814,7 @@ export const brandAssociations = pgTable("brand_associations", {
   sampleExcerpts: text("sample_excerpts").array().notNull().default(sql`'{}'::text[]`),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_brand_associations_tenant").on(table.organizationId),
   index("idx_brand_associations_brand").on(table.brandId),
   ...tenantPolicy("organization_id")
@@ -831,7 +832,7 @@ export const recommendationObservations = pgTable("recommendation_observations",
   metadata: jsonb("metadata").notNull().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_recommendation_obs_tenant").on(table.organizationId),
   index("idx_recommendation_obs_brand").on(table.brandId),
   ...tenantPolicy("organization_id")
@@ -855,7 +856,7 @@ export const aiVisibilityAudits = pgTable("ai_visibility_audits", {
   status: text("status").notNull().default("completed"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_ai_vis_audits_org").on(table.organizationId),
   index("idx_ai_vis_audits_brand").on(table.targetBrandName),
   index("idx_ai_vis_audits_status").on(table.status),
@@ -870,7 +871,7 @@ export const auditPrompts = pgTable("audit_prompts", {
   category: text("category").notNull(),
   weight: doublePrecision("weight").notNull().default(1.0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_audit_prompts_audit").on(table.auditId),
   index("idx_audit_prompts_org").on(table.organizationId),
   ...tenantPolicy("organization_id")
@@ -887,7 +888,7 @@ export const premiumAudits = pgTable("premium_audits", {
   issues: jsonb("issues").notNull(),
   recommendations: jsonb("recommendations").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_premium_audits_organization").on(table.organizationId),
   ...tenantPolicy("organization_id")
 ]);
@@ -904,7 +905,7 @@ export const technicalAudits = pgTable("technical_audits", {
   quickWins: jsonb("quick_wins").notNull(),
   performanceMetrics: jsonb("performance_metrics").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).default(defaultNow),
-}, (table) => [
+}, () => [
   ...tenantPolicy("organization_id")
 ]);
 
@@ -920,7 +921,7 @@ export const competitiveAnalyses = pgTable("competitive_analyses", {
   gaps: jsonb("gaps").notNull(),
   opportunities: jsonb("opportunities").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).default(defaultNow),
-}, (table) => [
+}, () => [
   ...tenantPolicy("organization_id")
 ]);
 
@@ -942,7 +943,7 @@ export const aeoAnalyses = pgTable("aeo_analyses", {
   analysisDetails: jsonb("analysis_details").notNull().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_aeo_analyses_tenant").on(table.tenantId),
   index("idx_aeo_analyses_url").on(table.url),
   ...tenantPolicy("tenant_id")
@@ -957,7 +958,7 @@ export const faqOpportunities = pgTable("faq_opportunities", {
   opportunityScore: integer("opportunity_score").notNull().default(50),
   suggestedAnswer: text("suggested_answer"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_faq_opps_tenant").on(table.tenantId),
   index("idx_faq_opps_analysis").on(table.aeoAnalysisId),
   ...tenantPolicy("tenant_id")
@@ -973,7 +974,7 @@ export const kgAlignments = pgTable("kg_alignments", {
   alignmentStatus: text("alignment_status").notNull().default("unmapped"),
   confidence: doublePrecision("confidence").notNull().default(0.0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_kg_alignments_tenant").on(table.tenantId),
   index("idx_kg_alignments_analysis").on(table.aeoAnalysisId),
   ...tenantPolicy("tenant_id")
@@ -993,7 +994,7 @@ export const automatedRecommendations = pgTable("automated_recommendations", {
   dedupKey: text("dedup_key").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_automated_recs_org").on(table.organizationId),
   index("idx_automated_recs_status").on(table.status),
   index("idx_automated_recs_score").on(table.priorityScore),
@@ -1014,7 +1015,7 @@ export const competitorChanges = pgTable("competitor_changes", {
   details: jsonb("details").notNull().default({}),
   detectedAt: timestamp("detected_at", { withTimezone: true }).notNull().default(defaultNow),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_competitor_changes_tenant").on(table.tenantId),
   index("idx_competitor_changes_comp").on(table.competitorId),
   index("idx_competitor_changes_type").on(table.changeType),
@@ -1033,7 +1034,7 @@ export const competitiveSeoFindings = pgTable("competitive_seo_findings", {
   recommendation: text("recommendation").notNull(),
   impactScore: integer("impact_score").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_comp_seo_findings_tenant").on(table.tenantId),
   index("idx_comp_seo_findings_comp").on(table.competitorId),
   index("idx_comp_seo_findings_type").on(table.findingType),
@@ -1054,7 +1055,7 @@ export const documentEmbeddings = pgTable("document_embeddings", {
   metadata: jsonb("metadata").notNull().default({}),
   embedding: vector("embedding").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_document_embeddings_tenant").on(table.tenantId),
   ...tenantPolicy("tenant_id")
 ]);
@@ -1067,7 +1068,7 @@ export const kgEntities = pgTable("kg_entities", {
   properties: jsonb("properties").notNull().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_kg_entities_tenant").on(table.tenantId),
   index("idx_kg_entities_name").on(table.name),
   ...tenantPolicy("tenant_id")
@@ -1082,7 +1083,7 @@ export const kgRelationships = pgTable("kg_relationships", {
   properties: jsonb("properties").notNull().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   index("idx_kg_relationships_tenant").on(table.tenantId),
   index("idx_kg_relationships_source").on(table.sourceEntityId),
   index("idx_kg_relationships_target").on(table.targetEntityId),
@@ -1128,7 +1129,7 @@ export const crawlJobs = pgTable("crawl_jobs", {
   requestId: text("request_id"),
   traceId: text("trace_id"),
   version: integer("version").notNull().default(1),
-}, (table) => [
+}, () => [
   index("idx_crawl_jobs_tenant_status").on(table.tenantId, table.status),
   index("idx_crawl_jobs_status_scheduled").on(table.status, table.scheduledFor).where(sql`status = 'QUEUED'`),
   index("idx_crawl_jobs_provider_job_id").on(table.providerJobId),
@@ -1148,7 +1149,7 @@ export const crawlResults = pgTable("crawl_results", {
   jobId: uuid("job_id").notNull().references(() => crawlJobs.id, { onDelete: "cascade" }),
   result: jsonb("result").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   uniqueIndex("crawl_results_job_unique").on(table.jobId),
   uniqueIndex("crawl_results_tenant_job_unique").on(table.tenantId, table.jobId),
   ...textTenantPolicy()
@@ -1163,7 +1164,7 @@ export const crawlCache = pgTable("crawl_cache", {
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
-}, (table) => [
+}, () => [
   uniqueIndex("idx_crawl_cache_key").on(table.tenantId, table.cacheScope, table.cacheKey),
   check("crawl_cache_scope_check", sql`cache_scope = 'tenant'`),
   ...textTenantPolicy()
