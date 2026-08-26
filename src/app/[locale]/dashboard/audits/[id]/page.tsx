@@ -6,8 +6,22 @@ import { useTheme } from "@/components/ThemeProvider";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
 import { Button } from "@/components/Button";
 import {
-  ArrowLeft, ArrowRight, Award, Shield, Activity, Layers, Brain, FileCode, Sparkles, XCircle, Compass, Terminal
+  ArrowLeft, ArrowRight, Award, Shield, Activity, Layers, Brain, FileCode, Sparkles, XCircle, Compass, Terminal, Loader2
 } from "lucide-react";
+import { getAuditAction } from "@/app/actions/audit";
+
+type AuditRecord = {
+  id: string;
+  workspaceId: string;
+  userId: string;
+  url: string;
+  status: string;
+  rawSignals: unknown;
+  aiInsights: unknown;
+  errorMessage: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export default function AuditDetailPage() {
   const router = useRouter();
@@ -16,11 +30,48 @@ export default function AuditDetailPage() {
   const { language, direction } = useTheme();
   const isRtl = language === "fa";
 
-  const id = params?.id as string || "aud-001";
-  const urlParam = searchParams?.get("url") || "https://example.com";
-  const scoreParam = parseInt(searchParams?.get("score") || "82", 10);
+  const id = params?.id as string;
+
+  const [auditRecord, setAuditRecord] = useState<AuditRecord | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<"overview" | "engine" | "recommendations">("overview");
+
+  useEffect(() => {
+    if (!id) return;
+    let isMounted = true;
+    const fetchAudit = async () => {
+      try {
+        const data = await getAuditAction(id);
+        if (isMounted) {
+          if (!data) {
+            setError(isRtl ? "پایشی یافت نشد" : "Audit not found");
+          } else {
+            setAuditRecord(data);
+          }
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : "Failed to load audit");
+          setLoading(false);
+        }
+      }
+    };
+    fetchAudit();
+
+    // Polling if it's processing
+    let interval: NodeJS.Timeout;
+    if (auditRecord && ["pending", "crawling", "analyzing"].includes(auditRecord.status)) {
+      interval = setInterval(fetchAudit, 5000);
+    }
+
+    return () => {
+      isMounted = false;
+      if (interval) clearInterval(interval);
+    };
+  }, [id, auditRecord?.status, isRtl]);
 
   // Helper colors
   const getScoreColor = (score: number) => {
@@ -59,64 +110,110 @@ export default function AuditDetailPage() {
     priorityMedium: isRtl ? "اولویت متوسط" : "Medium Priority",
   };
 
-  // Mocked details matching the query or defaults
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 animate-fade-in" dir={direction}>
+        <Loader2 className="w-8 h-8 animate-spin text-[var(--sky-blue-500)]" />
+        <p className="text-sm font-medium text-[var(--text-secondary)]">
+          {isRtl ? "در حال بارگذاری اطلاعات..." : "Loading audit details..."}
+        </p>
+      </div>
+    );
+  }
+
+  if (error || !auditRecord) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 animate-fade-in" dir={direction}>
+        <div className="p-4 bg-rose-500/10 rounded-full">
+          <XCircle className="w-10 h-10 text-rose-500" />
+        </div>
+        <h2 className="text-lg font-bold text-[var(--text-primary)]">
+          {error || (isRtl ? "پایشی یافت نشد" : "Audit not found")}
+        </h2>
+        <Button onClick={() => router.push(`/${language}/dashboard/audits`)}>
+          {strings.back}
+        </Button>
+      </div>
+    );
+  }
+
+  if (["pending", "crawling", "analyzing"].includes(auditRecord.status)) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 animate-fade-in" dir={direction}>
+        <div className="relative">
+          <div className="absolute inset-0 bg-[var(--sky-blue-500)]/20 blur-xl rounded-full" />
+          <div className="p-5 bg-[var(--muted-surface)] border border-[var(--border)] rounded-full relative">
+            <Loader2 className="w-10 h-10 animate-spin text-[var(--sky-blue-500)]" />
+          </div>
+        </div>
+        <div className="text-center space-y-2">
+          <h2 className="text-xl font-black text-[var(--text-primary)]">
+            {isRtl ? "پایش در حال انجام است" : "Audit is processing"}
+          </h2>
+          <p className="text-sm font-medium text-[var(--text-secondary)]">
+            {isRtl ? "لطفا منتظر بمانید..." : "Please wait while we analyze the page..."}
+            <br />
+            <span className="text-xs text-[var(--text-muted)]">
+              Status: <span className="font-bold text-[var(--sky-blue-500)] uppercase">{auditRecord.status}</span>
+            </span>
+          </p>
+        </div>
+        <Button variant="outline" onClick={() => router.push(`/${language}/dashboard/audits`)}>
+          {strings.back}
+        </Button>
+      </div>
+    );
+  }
+
+  if (auditRecord.status === "failed") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 animate-fade-in" dir={direction}>
+        <div className="p-4 bg-rose-500/10 rounded-full">
+          <XCircle className="w-10 h-10 text-rose-500" />
+        </div>
+        <h2 className="text-lg font-bold text-[var(--text-primary)]">
+          {isRtl ? "خطا در انجام پایش" : "Audit failed"}
+        </h2>
+        <p className="text-sm text-[var(--text-secondary)]">
+          {auditRecord.errorMessage || (isRtl ? "خطای نامشخص" : "Unknown error")}
+        </p>
+        <Button onClick={() => router.push(`/${language}/dashboard/audits`)}>
+          {strings.back}
+        </Button>
+      </div>
+    );
+  }
+
+  // Parse AI Insights if it's completed
+  const aiInsights = typeof auditRecord.aiInsights === 'string' ? JSON.parse(auditRecord.aiInsights) : (auditRecord.aiInsights as Record<string, unknown> || {});
+
+  // Calculate a score safely
+  let scoreParam = 0;
+  if (aiInsights && Array.isArray(aiInsights.llmProviderInsights) && aiInsights.llmProviderInsights.length > 0) {
+     scoreParam = Math.round(aiInsights.llmProviderInsights.reduce((acc: number, cur: { visibilityIndex?: number }) => acc + (cur.visibilityIndex || 0), 0) / aiInsights.llmProviderInsights.length);
+  }
+
+  if (scoreParam === 0) {
+      scoreParam = parseInt(searchParams?.get("score") || "82", 10);
+  }
+
   const auditDetails = {
-    url: urlParam,
+    url: auditRecord.url || "https://example.com",
     score: scoreParam,
     grade: scoreParam >= 85 ? "A" : scoreParam >= 75 ? "B" : "C",
     analysis: {
-      geminiInsights: isRtl
-        ? `وب‌سایت ${urlParam} فاقد ساختار داده‌های معنایی (Microdata) و فیلدهای نشانی سازمان در هدرها است. برای افزایش سهم صدا، پیشنهاد می‌شود تریپل‌های اطلاعاتی مربوط به حوزه سرویس‌دهی برند را در قالب فرمت JSON-LD توسعه دهید. این کار احتمال ابهام‌زدایی پاسخ‌ها در مدل‌های GPT-4o و Gemini Pro را تا ۴۵ درصد بهبود می‌بخشد.`
-        : `The website ${urlParam} shows some structural indexing layouts. However, it lacks robust semantic schemas, requiring conversational models to guess your brand value proposition. We recommend creating clear, declarative entity descriptions and utilizing JSON-LD microdata on key transactional pages.`,
-      crawledPagesCount: 15,
-      firecrawlLogs: [
-        { timestamp: "12:04:15", level: "info", message: "Successfully initiated Firecrawl scraping agent." },
-        { timestamp: "12:04:18", level: "info", message: "Parsed Sitemap and fetched 15 priority documents." },
-        { timestamp: "12:04:22", level: "warning", message: "Schema definition warning: No Organisation JSON-LD metadata detected on the root URL." }
+      geminiInsights: aiInsights.geminiInsights || (isRtl ? "تحلیلی یافت نشد" : "No insights found"),
+      crawledPagesCount: aiInsights.crawledPagesCount || 1,
+      firecrawlLogs: aiInsights.firecrawlLogs || [
+        { timestamp: new Date(auditRecord.createdAt).toLocaleTimeString(), level: "info", message: "Audit completed" }
       ],
-      llmProviderInsights: [
-        {
-          providerName: "OpenAI GPT-4o",
-          sentimentScore: scoreParam + 2 > 100 ? 98 : scoreParam + 2,
-          visibilityIndex: scoreParam - 4,
-          recommendation: isRtl ? "ایجاد صفحات مقایسه‌ای شفاف برای از بین بردن تورش‌های بازیابی مدل." : "Structure comparison documentation pages explicitly to avoid model retrieval bias."
-        },
-        {
-          providerName: "Anthropic Claude 3.5 Sonnet",
-          sentimentScore: scoreParam - 3,
-          visibilityIndex: scoreParam + 1 > 100 ? 95 : scoreParam + 1,
-          recommendation: isRtl ? "قالب‌بندی دقیق هزینه‌ها و قیمت‌ها در قالب جدول به منظور به دست آوردن مراجع استناد صحیح." : "Format plans and pricing sheets inside explicit table schemas to secure exact citations."
-        },
-        {
-          providerName: "Perplexity AI",
-          sentimentScore: scoreParam + 1 > 100 ? 97 : scoreParam + 1,
-          visibilityIndex: scoreParam - 2,
-          recommendation: isRtl ? "بررسی و فعال‌سازی دسترسی کراولر Perplexity در فایل robots.txt." : "Double-check crawl agents authorization rules inside robots.txt settings."
-        }
-      ]
+      llmProviderInsights: aiInsights.llmProviderInsights || []
     },
     recommendations: {
-      contentGaps: [
-        {
-          issue: isRtl ? "فقدان مقالات جامع در حوزه پاسخ به سوالات متداول فنی کاربران." : "No explicit Q&A schemas addressing system integrations details.",
-          recommendation: isRtl ? "ایجاد بخش سوالات متداول همراه با نشانی Schema.org/Question." : "Add structural Question-Answer blocks using schema schemas.",
-          priority: "high"
-        },
-        {
-          issue: isRtl ? "توضیحات مبهم خدمات برند روی صفحات لندینگ فرعی." : "Ambiguous service value descriptions on secondary product landings.",
-          recommendation: isRtl ? "بیان ساده و مشخص کارایی‌ها با کلمات کلیدی مشخص." : "Use simple active-voice sentences highlighting primary capabilities.",
-          priority: "medium"
-        }
-      ],
-      missingEntities: ["BrandSaaSOrganization", "ConversationalCitationNode", "TechnicalSchemaVerification"],
-      brandPositioning: [
-        isRtl ? "قرار دادن نام دیپ‌لینک‌های مستقیم در هدرها به عنوان مراجع خزش مدل‌های ترنسفورمر." : "Provide structured, deep-link references in page footers for transformer-based crawlers.",
-        isRtl ? "پرهیز از واژگان استعاری مبهم در متون لندینگ که ممکن است هوش مصنوعی را به اشتباه بیندازد." : "Avoid metaphoric or abstract statements on major service lines to avoid machine categorization ambiguity."
-      ],
-      aiDiscoverability: [
-        isRtl ? "به‌روزرسانی قواعد robots.txt جهت مجاز کردن ربات‌های پرایوت هوش مصنوعی." : "Configure robots.txt explicitly to permit AI web crawlers.",
-        isRtl ? "ثبت اطلاعات شرکت در مراجع مرجع معتبر وب به منظور تکمیل گراف دانش چت‌ببات‌ها." : "Register enterprise details on global open registries to boost conversational Knowledge Graph completeness."
-      ]
+      contentGaps: aiInsights.contentGaps || [],
+      missingEntities: aiInsights.missingEntities || [],
+      brandPositioning: aiInsights.brandPositioning || [],
+      aiDiscoverability: aiInsights.aiDiscoverability || []
     }
   };
 
@@ -170,7 +267,7 @@ export default function AuditDetailPage() {
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as "overview" | "engine" | "recommendations")}
               className={`flex-1 py-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
                 activeTab === tab.id
                   ? "bg-gradient-to-r from-[var(--sky-blue-500)]/25 to-[var(--orange-500)]/15 border border-[var(--sky-blue-500)]/30 text-[var(--text-primary)] shadow-sm font-black"
@@ -312,10 +409,10 @@ export default function AuditDetailPage() {
               </span>
             </CardHeader>
             <CardContent className="pt-4 space-y-2 text-start px-5 font-mono text-[11px] text-slate-300">
-              {auditDetails.analysis.firecrawlLogs.map((log, i) => (
+              {auditDetails.analysis.firecrawlLogs.map((log: { timestamp?: string; level?: string; message?: string }, i: number) => (
                 <div key={i} className="flex items-start gap-2 p-1.5 rounded bg-slate-950/40 border border-white/5">
                   <span className={`px-1.5 rounded text-[9px] font-bold ${log.level === "info" ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"}`}>
-                    {log.level.toUpperCase()}
+                    {log.level ? log.level.toUpperCase() : "INFO"}
                   </span>
                   <span className="text-slate-500">{log.timestamp}</span>
                   <span className="leading-normal font-sans font-medium">{log.message}</span>
@@ -343,7 +440,7 @@ export default function AuditDetailPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--border)] text-[11px] font-semibold">
-                  {auditDetails.analysis.llmProviderInsights.map((prov, i) => (
+                  {auditDetails.analysis.llmProviderInsights.map((prov: { providerName?: string; sentimentScore?: number; visibilityIndex?: number; recommendation?: string }, i: number) => (
                     <tr key={i} className="hover:bg-[var(--muted-surface)]/20 transition-colors">
                       <td className="py-3 px-5 text-start text-[var(--text-primary)] font-black">{prov.providerName}</td>
                       <td className="py-3 px-5 text-center font-mono">
@@ -373,7 +470,7 @@ export default function AuditDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-3.5 text-start">
-              {auditDetails.recommendations.contentGaps.map((gap, i) => (
+              {auditDetails.recommendations.contentGaps.map((gap: { priority?: string; issue?: string; recommendation?: string }, i: number) => (
                 <div key={i} className="p-3.5 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)]/60 space-y-1.5 relative">
                   <span className={`absolute top-3 right-3 text-[8px] font-black px-1.5 py-0.5 rounded uppercase ${
                     gap.priority === "high" ? "bg-rose-500/10 text-rose-400" : "bg-amber-500/10 text-amber-400"
@@ -397,7 +494,7 @@ export default function AuditDetailPage() {
             </CardHeader>
             <CardContent className="pt-4 space-y-3 text-start">
               <div className="flex flex-wrap gap-2">
-                {auditDetails.recommendations.missingEntities.map((ent, i) => (
+                {auditDetails.recommendations.missingEntities.map((ent: string, i: number) => (
                   <span key={i} className="px-3 py-1.5 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)] text-xs font-mono font-bold text-amber-400">
                     {ent}
                   </span>
@@ -415,7 +512,7 @@ export default function AuditDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-3 text-start">
-              {auditDetails.recommendations.brandPositioning.map((item, i) => (
+              {auditDetails.recommendations.brandPositioning.map((item: string, i: number) => (
                 <div key={i} className="flex gap-2 text-xs font-medium text-[var(--text-secondary)] leading-relaxed">
                   <span className="text-[#38bdf8] font-bold shrink-0">•</span>
                   <span>{item}</span>
@@ -433,7 +530,7 @@ export default function AuditDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-3 text-start">
-              {auditDetails.recommendations.aiDiscoverability.map((item, i) => (
+              {auditDetails.recommendations.aiDiscoverability.map((item: string, i: number) => (
                 <div key={i} className="flex gap-2 text-xs font-medium text-[var(--text-secondary)] leading-relaxed">
                   <span className="text-emerald-400 font-bold shrink-0">•</span>
                   <span>{item}</span>
