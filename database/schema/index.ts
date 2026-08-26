@@ -1,6 +1,8 @@
 import { organizations, users } from "./organization";
 export * from "./organization";
 export * from "./api-keys";
+export * from "./credits";
+export * from "./credit-transactions";
 import {
   pgTable,
   uuid,
