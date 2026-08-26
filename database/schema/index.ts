@@ -1,6 +1,7 @@
 import { organizations } from "./organization";
 export * from "./organization";
 export * from "./api-keys";
+export * from "./audits";
 export * from "./credits";
 export * from "./credit-transactions";
 export * from "./audits";
