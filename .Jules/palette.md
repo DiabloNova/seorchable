@@ -1,0 +1,3 @@
+## 2023-10-27 - Input form validation accessibility
+**Learning:** Proper form validation requires clear communication to assistive technologies. Using `aria-invalid` allows screen readers to announce when a field is in an error state. Coupling this with `aria-describedby` linking to the error message (which uses `role="alert"`) ensures the error is both discoverable when navigating to the field and announced immediately when it appears.
+**Action:** When creating reusable input or form components that support error states, always include `aria-invalid={!!error}` and map `aria-describedby` to the error message element's `id`.
