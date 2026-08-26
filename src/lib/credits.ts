@@ -58,3 +58,47 @@ export async function deductCredits(
     });
   });
 }
+
+
+export async function addCredits(
+  workspaceId: string,
+  amount: number,
+  feature: string,
+  description: string
+): Promise<boolean> {
+  return await TenantContextManager.runWithTenantContext(workspaceId, null, null, async () => {
+    const db = drizzle(TenantContextManager.getDbClient());
+
+    return await db.transaction(async (tx: any) => {
+      // Upsert the credits record
+      const [updatedCredit] = await tx
+        .insert(credits)
+        .values({
+          organizationId: workspaceId,
+          availableCredits: amount,
+          usedCredits: 0,
+        })
+        .onConflictDoUpdate({
+          target: credits.organizationId,
+          set: {
+            availableCredits: sql`${credits.availableCredits} + ${amount}`,
+            updatedAt: new Date(),
+          },
+        })
+        .returning();
+
+      if (!updatedCredit) {
+        return false;
+      }
+
+      await tx.insert(creditTransactions).values({
+        organizationId: workspaceId,
+        amount: amount, // Positive to indicate addition
+        feature,
+        description,
+      });
+
+      return true;
+    });
+  });
+}
