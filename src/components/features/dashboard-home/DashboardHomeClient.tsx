@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/Button";
@@ -14,6 +14,7 @@ import { RecommendedActionsPanel } from "./RecommendedActionsPanel";
 import { RecentAuditsPanel } from "./RecentAuditsPanel";
 import { RecentActivityPanel } from "./RecentActivityPanel";
 import { DashboardSummaryData } from "@/services/dashboard-home";
+import { triggerAuditAction } from "@/app/actions/audit";
 
 interface DashboardHomeClientProps {
   initialData: DashboardSummaryData;
@@ -26,7 +27,10 @@ interface DashboardHomeClientProps {
   } | null;
 }
 
-export default function DashboardHomeClient({ initialData, user }: DashboardHomeClientProps) {
+export default function DashboardHomeClient({
+  initialData,
+  user,
+}: DashboardHomeClientProps) {
   const router = useRouter();
   const { language, direction } = useTheme();
   const isRtl = language === "fa";
@@ -36,21 +40,24 @@ export default function DashboardHomeClient({ initialData, user }: DashboardHome
   const [isNewAuditOpen, setIsNewAuditOpen] = useState(false);
   const [newUrl, setNewUrl] = useState("");
   const [newUrlError, setNewUrlError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   // Trigger manual refresh by calling the server API summary route or re-fetching via client
   const handleRefresh = async () => {
     try {
       setIsRefreshing(true);
       const workspaceId = user?.workspaceId || "ws-default";
-      const response = await fetch(`/api/v1/dashboard/summary?locale=${language}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "x-tenant-id": workspaceId,
-          "x-user-id": user?.id || "usr-default",
+      const response = await fetch(
+        `/api/v1/dashboard/summary?locale=${language}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "x-tenant-id": workspaceId,
+            "x-user-id": user?.id || "usr-default",
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const refreshedData = await response.json();
@@ -73,7 +80,9 @@ export default function DashboardHomeClient({ initialData, user }: DashboardHome
 
     // Validate URL protocol and hostname
     try {
-      const withProto = trimmed.match(/^https?:\/\//i) ? trimmed : `https://${trimmed}`;
+      const withProto = trimmed.match(/^https?:\/\//i)
+        ? trimmed
+        : `https://${trimmed}`;
       const parsed = new URL(withProto);
       if (!parsed.hostname.includes(".")) {
         throw new Error();
@@ -82,42 +91,36 @@ export default function DashboardHomeClient({ initialData, user }: DashboardHome
       setNewUrlError(
         isRtl
           ? "لطفاً یک آدرس وب‌سایت معتبر همراه با پروتکل وارد کنید (مثال: https://example.ir)."
-          : "Please enter a valid website URL with protocol (e.g., https://example.com)."
+          : "Please enter a valid website URL with protocol (e.g., https://example.com).",
       );
       return;
     }
 
-    setIsSubmitting(true);
+    startTransition(async () => {
+      try {
+        const result = await triggerAuditAction(trimmed);
 
-    try {
-      const workspaceId = user?.workspaceId || "ws-default";
-      const response = await fetch("/api/v1/audit/engine", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-tenant-id": workspaceId,
-          "x-user-id": user?.id || "usr-default",
-        },
-        body: JSON.stringify({ url: trimmed }),
-      });
+        // Automatically refresh summary metrics and navigate to results list
+        setIsNewAuditOpen(false);
+        setNewUrl("");
+        await handleRefresh();
 
-      if (!response.ok) {
-        const errPayload = await response.json();
-        throw new Error(errPayload.message || "Failed to execute audit.");
+        // Navigate to the specific audit to see results
+        if (result && result.auditId) {
+          router.push(`/${language}/dashboard/audits/${result.auditId}`);
+        } else {
+          router.push(`/${language}/dashboard/audits`);
+        }
+      } catch (err: unknown) {
+        setNewUrlError(
+          err instanceof Error
+            ? err.message
+            : isRtl
+              ? "ارتباط با لایه تحلیل با خطا مواجه شد."
+              : "Error communicating with crawling layer.",
+        );
       }
-
-      // Automatically refresh summary metrics and navigate to results list
-      setIsNewAuditOpen(false);
-      setNewUrl("");
-      await handleRefresh();
-
-      // Navigate to the list of audits to see historical results
-      router.push(`/${language}/dashboard/audits`);
-    } catch (err: unknown) {
-      setNewUrlError(err instanceof Error ? err.message : (isRtl ? "ارتباط با لایه تحلیل با خطا مواجه شد." : "Error communicating with crawling layer."));
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
 
   return (
@@ -146,7 +149,10 @@ export default function DashboardHomeClient({ initialData, user }: DashboardHome
             disabled={isRefreshing}
             className="flex items-center gap-2"
           >
-            <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
+            <RefreshCw
+              size={14}
+              className={isRefreshing ? "animate-spin" : ""}
+            />
             <span>{isRtl ? "بروزرسانی آمار" : "Refresh"}</span>
           </Button>
 
@@ -183,7 +189,10 @@ export default function DashboardHomeClient({ initialData, user }: DashboardHome
           <h2 className="text-xs font-black uppercase text-[var(--text-muted)] tracking-wider">
             {isRtl ? "لایه هوشمندی و روند تغییرات" : "Intelligence Layer"}
           </h2>
-          <VisibilityTrendChart data={data.visibilityTrends} loading={isRefreshing} />
+          <VisibilityTrendChart
+            data={data.visibilityTrends}
+            loading={isRefreshing}
+          />
         </div>
       </div>
 
@@ -191,16 +200,26 @@ export default function DashboardHomeClient({ initialData, user }: DashboardHome
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-3">
           <h2 className="text-xs font-black uppercase text-[var(--text-muted)] tracking-wider">
-            {isRtl ? "مشکلات بحرانی و با اولویت بالا" : "Action Layer — Critical Issues"}
+            {isRtl
+              ? "مشکلات بحرانی و با اولویت بالا"
+              : "Action Layer — Critical Issues"}
           </h2>
-          <CriticalIssuesPanel issues={data.criticalIssues} loading={isRefreshing} />
+          <CriticalIssuesPanel
+            issues={data.criticalIssues}
+            loading={isRefreshing}
+          />
         </div>
 
         <div className="space-y-3">
           <h2 className="text-xs font-black uppercase text-[var(--text-muted)] tracking-wider">
-            {isRtl ? "اقدامات و اولویت‌های بهبود استراتژیک" : "Action Layer — Recommended Actions"}
+            {isRtl
+              ? "اقدامات و اولویت‌های بهبود استراتژیک"
+              : "Action Layer — Recommended Actions"}
           </h2>
-          <RecommendedActionsPanel actions={data.recommendedActions} loading={isRefreshing} />
+          <RecommendedActionsPanel
+            actions={data.recommendedActions}
+            loading={isRefreshing}
+          />
         </div>
       </div>
 
@@ -208,16 +227,26 @@ export default function DashboardHomeClient({ initialData, user }: DashboardHome
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-3">
           <h2 className="text-xs font-black uppercase text-[var(--text-muted)] tracking-wider">
-            {isRtl ? "آخرین پایش‌های ثبت شده دامنه‌ها" : "Activity Layer — Recent Audits"}
+            {isRtl
+              ? "آخرین پایش‌های ثبت شده دامنه‌ها"
+              : "Activity Layer — Recent Audits"}
           </h2>
-          <RecentAuditsPanel audits={data.recentAudits} loading={isRefreshing} />
+          <RecentAuditsPanel
+            audits={data.recentAudits}
+            loading={isRefreshing}
+          />
         </div>
 
         <div className="space-y-3">
           <h2 className="text-xs font-black uppercase text-[var(--text-muted)] tracking-wider">
-            {isRtl ? "جریان بلادرنگ فعالیت‌های فضای کاربری" : "Activity Layer — Recent Activities"}
+            {isRtl
+              ? "جریان بلادرنگ فعالیت‌های فضای کاربری"
+              : "Activity Layer — Recent Activities"}
           </h2>
-          <RecentActivityPanel activities={data.recentActivity} loading={isRefreshing} />
+          <RecentActivityPanel
+            activities={data.recentActivity}
+            loading={isRefreshing}
+          />
         </div>
       </div>
 
@@ -225,7 +254,11 @@ export default function DashboardHomeClient({ initialData, user }: DashboardHome
       <Dialog
         isOpen={isNewAuditOpen}
         onClose={() => setIsNewAuditOpen(false)}
-        title={isRtl ? "اجرای پایش و تحلیل کامل معنایی" : "Crawl & Run New Brand Audit"}
+        title={
+          isRtl
+            ? "اجرای پایش و تحلیل کامل معنایی"
+            : "Crawl & Run New Brand Audit"
+        }
       >
         <form onSubmit={handleStartAudit} className="space-y-4 text-start">
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -235,30 +268,50 @@ export default function DashboardHomeClient({ initialData, user }: DashboardHome
           </p>
 
           <Input
-            label={isRtl ? "آدرس کامل وب‌سایت همراه با پروتکل" : "Target Website Address with Protocol"}
+            label={
+              isRtl
+                ? "آدرس کامل وب‌سایت همراه با پروتکل"
+                : "Target Website Address with Protocol"
+            }
             placeholder="https://company.ir"
             value={newUrl}
             onChange={(e) => setNewUrl(e.target.value)}
-            disabled={isSubmitting}
+            disabled={isPending}
             required
           />
 
           {newUrlError && (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs rounded-xl flex items-center gap-2">
+            <div
+              className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs rounded-xl flex items-center gap-2"
+              role="alert"
+            >
               <AlertCircle size={14} className="shrink-0" />
               <span className="font-bold">{newUrlError}</span>
             </div>
           )}
 
           <div className="flex items-center gap-3 justify-end pt-4 border-t border-[var(--border)]">
-            <Button variant="outline" type="button" onClick={() => setIsNewAuditOpen(false)} disabled={isSubmitting}>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => setIsNewAuditOpen(false)}
+              disabled={isPending}
+            >
               {isRtl ? "انصراف" : "Cancel"}
             </Button>
-            <Button variant="primary" type="submit" disabled={isSubmitting || !newUrl.trim()}>
-              {isSubmitting ? (
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={isPending || !newUrl.trim()}
+            >
+              {isPending ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-1.5" />
-                  <span>{isRtl ? "در حال اجرای فرآیند خزش..." : "Executing Scrape..."}</span>
+                  <span>
+                    {isRtl
+                      ? "در حال اجرای فرآیند خزش..."
+                      : "Executing Scrape..."}
+                  </span>
                 </>
               ) : (
                 <>
