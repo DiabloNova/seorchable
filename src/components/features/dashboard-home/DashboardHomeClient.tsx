@@ -15,6 +15,7 @@ import { RecentAuditsPanel } from "./RecentAuditsPanel";
 import { RecentActivityPanel } from "./RecentActivityPanel";
 import { DashboardSummaryData } from "@/services/dashboard-home";
 import { triggerAuditAction } from "@/app/actions/audit";
+import { getDashboardStatsAction } from "@/app/actions/dashboard";
 
 interface DashboardHomeClientProps {
   initialData: DashboardSummaryData;
@@ -36,17 +37,42 @@ export default function DashboardHomeClient({
   const isRtl = language === "fa";
 
   const [data, setData] = useState<DashboardSummaryData>(initialData);
+  const [realStats, setRealStats] = useState<{
+    totalAudits: number;
+    completedAudits: number;
+    seoHealth: number | "N/A";
+    aiVisibility: "N/A";
+    brandAuthority: "N/A";
+    citationVisibility: "N/A";
+    technicalHealth: number | "N/A";
+    contentHealth: number | "N/A";
+    competitivePosition: "N/A";
+  } | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isNewAuditOpen, setIsNewAuditOpen] = useState(false);
   const [newUrl, setNewUrl] = useState("");
   const [newUrlError, setNewUrlError] = useState("");
   const [isPending, startTransition] = useTransition();
 
+  const fetchRealStats = React.useCallback(async () => {
+    try {
+      const stats = await getDashboardStatsAction();
+      setRealStats(stats);
+    } catch (err) {
+      console.error("Failed to fetch real dashboard stats", err);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    fetchRealStats();
+  }, [fetchRealStats]);
+
   // Trigger manual refresh by calling the server API summary route or re-fetching via client
   const handleRefresh = async () => {
     try {
       setIsRefreshing(true);
       const workspaceId = user?.workspaceId || "ws-default";
+
       const response = await fetch(
         `/api/v1/dashboard/summary?locale=${language}`,
         {
@@ -63,6 +89,8 @@ export default function DashboardHomeClient({
         const refreshedData = await response.json();
         setData(refreshedData);
       }
+
+      await fetchRealStats();
     } catch (err) {
       console.error("Failed to refresh dashboard stats", err);
     } finally {
@@ -172,14 +200,14 @@ export default function DashboardHomeClient({
           {isRtl ? "شاخص‌های کلیدی عملکرد اجرایی" : "Executive KPI Layer"}
         </h2>
         <DashboardKpiGrid
-          seoHealth={data.seoHealth}
-          aiVisibility={data.aiVisibility}
-          brandAuthority={data.brandAuthority}
-          citationVisibility={data.citationVisibility}
-          technicalHealth={data.technicalHealth}
-          contentHealth={data.contentHealth}
-          competitivePosition={data.competitivePosition}
-          loading={isRefreshing}
+          seoHealth={realStats?.seoHealth ?? data.seoHealth}
+          aiVisibility={realStats?.aiVisibility ?? data.aiVisibility}
+          brandAuthority={realStats?.brandAuthority ?? data.brandAuthority}
+          citationVisibility={realStats?.citationVisibility ?? data.citationVisibility}
+          technicalHealth={realStats?.technicalHealth ?? data.technicalHealth}
+          contentHealth={realStats?.contentHealth ?? data.contentHealth}
+          competitivePosition={realStats?.competitivePosition ?? data.competitivePosition}
+          loading={isRefreshing || !realStats}
         />
       </div>
 
