@@ -35,11 +35,13 @@ export default function PromptsPage() {
 
   const fetchPrompts = async () => {
     try {
-      const response = await getPromptsAction();
-      if (response.success && response.result) {
-        setPrompts(response.result as PromptRecord[]);
-      }
-    } catch (error) {
+  const response = (await getPromptsAction()) as { success: boolean; result?: unknown };
+  
+  if (response.success && response.result) {
+    setPrompts(response.result as PromptRecord[]);
+  }
+} catch (error) {
+
       console.error(error);
     } finally {
       setIsLoading(false);
