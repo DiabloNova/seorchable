@@ -35,7 +35,7 @@ export default function PromptsPage() {
 
   const fetchPrompts = async () => {
     try {
-      const response = await getPromptsAction({});
+      const response = await getPromptsAction();
       if (response.success && response.result) {
         setPrompts(response.result as PromptRecord[]);
       }
