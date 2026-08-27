@@ -61,34 +61,39 @@ export async function registerAction(name: string, email: string): Promise<User>
         throw new Error("Failed to get DB client in system context");
     }
 
-    // Check if user exists
-    const { rows: existingUser } = await client.query("SELECT id FROM users WHERE email = $1", [email]);
-    if (existingUser.length > 0) {
-        throw new Error("User already exists.");
+    try {
+        // Check if user exists
+        const { rows: existingUser } = await client.query("SELECT id FROM users WHERE email = $1", [email]);
+        if (existingUser.length > 0) {
+            throw new Error("User already exists.");
+        }
+
+        const userId = randomUUID();
+
+        // Create User
+        await client.query("INSERT INTO users (id, name, email) VALUES ($1, $2, $3)", [userId, name, email]);
+
+        // Create Organization (Workspace)
+        const orgId = randomUUID();
+        const orgSlug = `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${randomUUID().slice(0,4)}`;
+        const orgName = `${name}'s Workspace`;
+
+        await client.query("INSERT INTO organizations (id, name, slug) VALUES ($1, $2, $3)", [orgId, orgName, orgSlug]);
+
+        // Create Membership
+        await client.query("INSERT INTO organization_members (organization_id, user_id, role) VALUES ($1, $2, $3)", [orgId, userId, "workspace_admin"]);
+
+        return {
+            id: userId,
+            name,
+            email,
+            role: "workspace_admin" as UserRole,
+            workspaceId: orgId,
+        };
+    } catch (err: unknown) {
+        console.error("Registration failed:", err);
+        throw err;
     }
-
-    const userId = `usr-${randomUUID().slice(0,8)}`;
-
-    // Create User
-    await client.query("INSERT INTO users (id, name, email) VALUES ($1, $2, $3)", [userId, name, email]);
-
-    // Create Organization (Workspace)
-    const orgId = randomUUID();
-    const orgSlug = `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${randomUUID().slice(0,4)}`;
-    const orgName = `${name}'s Workspace`;
-
-    await client.query("INSERT INTO organizations (id, name, slug) VALUES ($1, $2, $3)", [orgId, orgName, orgSlug]);
-
-    // Create Membership
-    await client.query("INSERT INTO organization_members (organization_id, user_id, role) VALUES ($1, $2, $3)", [orgId, userId, "workspace_admin"]);
-
-    return {
-        id: userId,
-        name,
-        email,
-        role: "workspace_admin" as UserRole,
-        workspaceId: orgId,
-    };
   });
 
   await createSession(result);

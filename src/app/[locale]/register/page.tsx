@@ -115,7 +115,11 @@ export default function RegisterPage({ params }: { params: Promise<{ locale: str
       }, 1500);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      setSubmitError(isFa ? "خطا در ثبت‌نام. احتمال دارد این ایمیل قبلاً ثبت شده باشد." : "Registration failed. This email may already exist.");
+      if (msg === "User already exists.") {
+        setSubmitError(isFa ? "این ایمیل قبلاً ثبت شده است." : "This email is already registered.");
+      } else {
+        setSubmitError(isFa ? "خطا در ثبت‌نام. لطفا دوباره تلاش کنید." : "Registration failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
