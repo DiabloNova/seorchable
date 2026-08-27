@@ -1,45 +1,50 @@
 "use server";
 
-import { secureServerAction } from "@/lib/safe-action";
+import { secureServerAction, secureServerActionNoInput } from "@/lib/safe-action";
 import { z } from "zod";
 import { TenantContextManager } from "@/core/database/tenant-context";
 import { eq, and } from "drizzle-orm";
 import { prompts, brands } from "../../../database/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 
-export const getPromptsAction = secureServerAction
-  .schema(z.object({}))
-  .action(async ({ ctx }) => {
-    return TenantContextManager.runWithTenantContext(ctx.workspaceId, async () => {
-      const db = drizzle(TenantContextManager.getDbClient());
+// 1. دریافت لیست پرامپت‌ها بدون نیاز به ورودی (استفاده از secureServerActionNoInput)
+export const getPromptsAction = secureServerActionNoInput(async (ctx) => {
+  return TenantContextManager.runWithTenantContext(ctx.workspaceId, async () => {
+    const db = drizzle(TenantContextManager.getDbClient());
 
-      const allPrompts = await db
-        .select({
-          id: prompts.id,
-          queryText: prompts.queryText,
-          category: prompts.category,
-          buyingIntent: prompts.buyingIntent,
-          createdAt: prompts.createdAt,
-          brandName: brands.name,
-        })
-        .from(prompts)
-        .leftJoin(brands, eq(prompts.brandId, brands.id))
-        .where(eq(prompts.organizationId, ctx.workspaceId))
-        .orderBy(prompts.createdAt);
+    const allPrompts = await db
+      .select({
+        id: prompts.id,
+        queryText: prompts.queryText,
+        category: prompts.category,
+        buyingIntent: prompts.buyingIntent,
+        createdAt: prompts.createdAt,
+        brandName: brands.name,
+      })
+      .from(prompts)
+      .leftJoin(brands, eq(prompts.brandId, brands.id))
+      .where(eq(prompts.organizationId, ctx.workspaceId))
+      .orderBy(prompts.createdAt);
 
-      return allPrompts;
-    });
+    return allPrompts;
   });
+});
 
-export const addPromptAction = secureServerAction
-  .schema(z.object({
-    query: z.string().min(1, "Query is required")
-  }))
-  .action(async ({ parsedInput, ctx }) => {
+// تعریف اسکیما برای اعتبارسنجی ورودی افزودن پرامپت
+const addPromptSchema = z.object({
+  query: z.string().min(1, "Query is required"),
+});
+
+// 2. افزودن پرامپت جدید با استفاده از secureServerAction
+export const addPromptAction = secureServerAction(
+  async (input: z.infer<typeof addPromptSchema>, ctx) => {
+    // اعتبارسنجی ورودی با Zod
+    const parsedInput = addPromptSchema.parse(input);
+
     return TenantContextManager.runWithTenantContext(ctx.workspaceId, async () => {
       const db = drizzle(TenantContextManager.getDbClient());
 
-      // Find first brand or default brand for the tenant
+      // یافتن اولین برند برای فضای کاری
       const userBrands = await db
         .select({ id: brands.id })
         .from(brands)
@@ -60,19 +65,26 @@ export const addPromptAction = secureServerAction
           queryText: parsedInput.query,
           category: "General",
           buyingIntent: "Discovery",
-          isActive: true
+          isActive: true,
         })
         .returning();
 
       return inserted;
     });
-  });
+  }
+);
 
-export const deletePromptAction = secureServerAction
-  .schema(z.object({
-    promptId: z.string().uuid()
-  }))
-  .action(async ({ parsedInput, ctx }) => {
+// تعریف اسکیما برای اعتبارسنجی ورودی حذف پرامپت
+const deletePromptSchema = z.object({
+  promptId: z.string().uuid(),
+});
+
+// 3. حذف پرامپت با استفاده از secureServerAction
+export const deletePromptAction = secureServerAction(
+  async (input: z.infer<typeof deletePromptSchema>, ctx) => {
+    // اعتبارسنجی ورودی با Zod
+    const parsedInput = deletePromptSchema.parse(input);
+
     return TenantContextManager.runWithTenantContext(ctx.workspaceId, async () => {
       const db = drizzle(TenantContextManager.getDbClient());
 
@@ -92,4 +104,5 @@ export const deletePromptAction = secureServerAction
 
       return deleted;
     });
-  });
+  }
+);
