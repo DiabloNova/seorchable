@@ -140,7 +140,8 @@ export const ContentStudio: React.FC = () => {
     btnCopied: isRtl ? "کپی شد!" : "Copied!",
     voice1: isRtl ? "رسمی و شرکتی" : "Formal & Enterprise",
     voice2: isRtl ? "دوستانه و صمیمی" : "Friendly & Conversational",
-    voice3: isRtl ? "تخصصی و علمی" : "Scientific & Highly Technical"
+    voice3: isRtl ? "تخصصی و علمی" : "Scientific & Highly Technical",
+    removeKeyword: isRtl ? "حذف کلمه کلیدی" : "Remove keyword"
   };
 
   const handleAddKeyword = (e: React.KeyboardEvent) => {
@@ -268,7 +269,12 @@ export const ContentStudio: React.FC = () => {
                   {keywords.map((kw, i) => (
                     <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-lg bg-sky-500/10 border border-sky-500/25 text-sky-400 animate-fade-in">
                       <span>{kw}</span>
-                      <button type="button" onClick={() => handleRemoveKeyword(i)} className="hover:text-red-400 transition-colors">
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveKeyword(i)}
+                        className="hover:text-red-400 transition-colors"
+                        aria-label={`${strings.removeKeyword} ${kw}`}
+                      >
                         <X size={10} />
                       </button>
                     </span>
