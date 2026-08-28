@@ -7,6 +7,7 @@ import { users, organizationMembers, organizations } from "../../../database/sch
 import { eq, and } from "drizzle-orm";
 import { TenantContextManager } from "@/core/database/tenant-context";
 import { randomUUID } from "crypto";
+import { sendVerificationEmail, sendPasswordResetEmail } from "@/lib/email";
 
 /**
  * Authenticates user, resolves identity/workspace strictly on the server, and establishes a secure signed session.
@@ -19,7 +20,7 @@ export async function loginAction(email: string): Promise<User> {
     }
 
     const { rows: userRows } = await client.query("SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL", [email]);
-    let userRecord = userRows[0];
+    const userRecord = userRows[0];
 
     if (!userRecord) {
         throw new Error("Invalid credentials or user not found.");
@@ -49,6 +50,35 @@ export async function loginAction(email: string): Promise<User> {
 
   await createSession(result);
   return result;
+}
+
+/**
+ * Requests a password reset and sends a password reset email to the user.
+ */
+export async function requestPasswordResetAction(email: string): Promise<void> {
+  await TenantContextManager.runWithSystemContext(null, "sys-password-reset", async () => {
+    const client = TenantContextManager.getDbClient();
+    if (!client) {
+        throw new Error("Failed to get DB client in system context");
+    }
+
+    const { rows: userRows } = await client.query("SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL", [email]);
+    const userRecord = userRows[0];
+
+    // Avoid revealing whether the user exists or not
+    if (!userRecord) {
+        return;
+    }
+
+    // Mock reset token generation
+    const resetToken = randomUUID();
+    const resetLink = `https://app.seorchable.com/reset-password?token=${resetToken}`;
+
+    // Fire and forget email sending
+    sendPasswordResetEmail(email, resetLink).catch((err) => {
+      console.error("Failed to send password reset email:", err);
+    });
+  });
 }
 
 /**
@@ -89,6 +119,15 @@ export async function registerAction(name: string, email: string): Promise<User>
         role: "workspace_admin" as UserRole,
         workspaceId: orgId,
     };
+  });
+
+  // Mock verification link generation
+  const verificationToken = randomUUID();
+  const verificationLink = `https://app.seorchable.com/verify-email?token=${verificationToken}`;
+
+  // Fire and forget email sending
+  sendVerificationEmail(email, name, verificationLink).catch((err) => {
+    console.error("Failed to send verification email:", err);
   });
 
   await createSession(result);
