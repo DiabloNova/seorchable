@@ -52,20 +52,33 @@ export function Hero() {
 
           <h1 className="font-display font-black tracking-tight text-balance text-5xl sm:text-6xl md:text-7xl leading-[1.15]">
             <span className="text-[var(--text-primary)]">
-              {isFa ? "ارتقای جایگاه دیجیتال شما، در " : "Elevating your digital presence in "}
-            </span>
-            <span className="text-gradient-brand block mt-2">
-              {isFa ? "نسل جدید موتورهای جستجو" : "the new generation of search engines"}
-            </span>
-            <span className="text-[var(--text-primary)]">
-              {isFa ? " و هوش مصنوعی" : " and AI"}
+              معرفی برند شما در هوش مصنوعی
             </span>
           </h1>
 
           <p className="text-lg md:text-xl text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto text-pretty">
-            {isFa
-              ? "ما با ارائه راهکارهای یکپارچه بهینه‌سازی سایت (SEO) و موتورهای پاسخگو (AEO)، شما را به اولین انتخاب مخاطبان تبدیل می‌کنیم."
-              : "With integrated Search (SEO) and Answer Engine (AEO) optimization, we make your brand the first choice for your audience."}
+            آنالیز داده های هوش مصنوعی در معرفی برند شما به میلیون ها کاربر ایرانی
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
+            <button
+              className="w-full sm:w-auto px-8 py-4 rounded-xl text-white text-base font-bold bg-gradient-to-r from-[#38bdf8] to-[#f97316] shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+              onClick={() => {
+                const ref = document.getElementById("free-audit");
+                if (ref) ref.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            >
+              <span>شروع رایگان</span>
+            </button>
+
+            <Link href={`/${language}/contact`} className="w-full sm:w-auto">
+              <button className="w-full px-8 py-4 rounded-xl text-base font-bold bg-slate-900/40 hover:bg-[#38bdf8]/10 text-[var(--text-primary)] border border-[var(--glass-border)] transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <span>تماس با ما</span>
+              </button>
+            </Link>
+          </div>
+          <p className="text-[10px] text-[var(--text-muted)] text-center mt-2">
+            شروع آزمایشی به مدت یک هفته کاملا رایگان
           </p>
 
           <div className="flex flex-wrap gap-3 justify-center">

@@ -501,7 +501,7 @@ input:focus, textarea:focus {
   height: 45vw;
   top: -12vw;
   inset-inline-start: -8vw;
-  background: radial-gradient(circle at center, color-mix(in srgb, var(--color-primary-600) 60%, transparent), transparent 70%);
+  background: radial-gradient(circle at center, rgba(56, 189, 248, 0.4) 0%, transparent 70%);
   animation: var(--animate-aurora);
 }
 .aurora-bg::after {
@@ -509,9 +509,26 @@ input:focus, textarea:focus {
   height: 40vw;
   bottom: -14vw;
   inset-inline-end: -6vw;
-  background: radial-gradient(circle at center, color-mix(in srgb, var(--color-accent) 45%, transparent), transparent 70%);
+  background: radial-gradient(circle at center, rgba(249, 115, 22, 0.3) 0%, transparent 70%);
   animation: var(--animate-aurora);
   animation-delay: -9s;
+}
+
+/* Add a third layer for gray */
+.aurora-bg > div:first-child::before {
+  content: "";
+  position: absolute;
+  width: 50vw;
+  height: 50vw;
+  top: 10vw;
+  left: 25vw;
+  background: radial-gradient(circle at center, rgba(156, 163, 175, 0.3) 0%, transparent 70%);
+  filter: blur(90px);
+  animation: var(--animate-aurora);
+  animation-delay: -4s;
+  z-index: -1;
+  border-radius: 9999px;
+  pointer-events: none;
 }
 
 /* Gradient text */
