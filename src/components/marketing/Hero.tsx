@@ -78,7 +78,7 @@ export function Hero() {
             </Link>
           </div>
           <p className="text-[10px] text-[var(--text-muted)] text-center mt-2">
-            شروع آزمایشی به مدت یک هفته کاملا رایگان
+            شروع آزمایشی به مدت یک هفته کاملا رایگان.
           </p>
 
           <div className="flex flex-wrap gap-3 justify-center">
