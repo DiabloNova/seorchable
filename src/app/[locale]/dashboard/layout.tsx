@@ -33,11 +33,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex bg-[var(--background)] text-[var(--foreground)] relative overflow-hidden" dir={direction}>
-        {/* Ambient Background orbs for premium enterprise look */}
-        <div className="ambient-bg fixed inset-0 -z-10">
-          <div className="ambient-orb orb-1" />
-          <div className="ambient-orb orb-2" />
+
+        {/* Ambient Background orbs for premium enterprise look with Persian color palette */}
+        <div className="fixed inset-0 -z-10 pointer-events-none bg-[var(--background)]">
+          {/* Subtle geometric pattern overlay (SVG) */}
+          <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
+          {/* Deep Persian Blue / Turquoise / Gold Orbs */}
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[#1A365D] dark:bg-[#0F172A] mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-70 animate-blob" />
+          <div className="absolute top-[20%] right-[-10%] w-[35%] h-[35%] rounded-full bg-[#008080] dark:bg-[#0D9488] mix-blend-multiply dark:mix-blend-screen filter blur-[120px] opacity-50 animate-blob animation-delay-2000" />
+          <div className="absolute bottom-[-20%] left-[20%] w-[50%] h-[50%] rounded-full bg-[#B8860B] dark:bg-[#D97706] mix-blend-multiply dark:mix-blend-screen filter blur-[150px] opacity-40 animate-blob animation-delay-4000" />
         </div>
+
 
         {/* Modular Sidebar */}
         <DashboardSidebar
