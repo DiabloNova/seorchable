@@ -1,9 +1,9 @@
 import React from "react";
-import { HeroSection } from "@/types/services";
+import { Hero } from "@/types/services";
 import { Sparkles, ArrowRight } from "lucide-react";
 
 interface ServiceHeroProps {
-  data: HeroSection;
+  data: Hero;
   isFa: boolean;
 }
 
