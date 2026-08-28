@@ -21,7 +21,7 @@ export function LandingFooter() {
       heading: isFa ? "محصولات" : "Products",
       links: [
         { label: isFa ? "میز فرماندهی هوشمند" : "Command Center", href: `/${language}/dashboard` },
-        { label: isFa ? "تحلیل استاندارد برند" : "Standard Brand Audit", href: `/${language}/dashboard/intelligence` },
+        { label: isFa ? "تحلیل استاندارد برند" : "Standard Brand Audit", href: `/${language}/dashboard/audits` },
         { label: isFa ? "گراف دانش سازمانی" : "Enterprise Knowledge Graph", href: `/${language}/dashboard/entities` },
         { label: isFa ? "جستجوی معنایی RAG" : "AI Semantic Discovery", href: `/${language}/dashboard/query` },
         { label: isFa ? "پایش پرومپت‌ها" : "Prompt Monitoring", href: `/${language}/dashboard` },
