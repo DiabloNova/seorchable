@@ -157,7 +157,7 @@ export default function DashboardSidebar({
             onClick={() => handleItemClick(item)}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 border cursor-pointer group outline-none focus:ring-1 focus:ring-[var(--sky-blue-500)]
               ${isActive
-                ? "bg-gradient-to-r from-[var(--sky-blue-500)]/15 to-[var(--orange-500)]/5 text-[var(--text-primary)] border-[var(--sky-blue-500)]/30 font-bold"
+                ? "bg-gradient-to-r from-[#1A365D]/20 to-[#008080]/10 text-[var(--text-primary)] border-[#008080]/40 font-bold dark:from-[#0F172A]/40 dark:to-[#0D9488]/20"
                 : "text-[var(--text-secondary)] hover:bg-[var(--muted-surface)] hover:text-[var(--text-primary)] border-transparent"
               }
               ${collapsed && !isMobileState ? "justify-center" : ""}`}
@@ -250,7 +250,7 @@ export default function DashboardSidebar({
         {(!collapsed || isMobileState) && (
           <div className="p-4 border-t border-[var(--border)] bg-[rgba(15,23,42,0.15)] shrink-0 space-y-3">
             <div className="flex items-center gap-2 px-2 py-1 rounded-xl bg-white/[0.02] border border-white/[0.04]">
-              <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--sky-blue-500)] to-[var(--orange-500)] text-white flex items-center justify-center text-xs font-bold uppercase shrink-0">
+              <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1A365D] to-[#B8860B] dark:from-[#0D9488] dark:to-[#D97706] text-white flex items-center justify-center text-xs font-bold uppercase shrink-0 shadow-inner">
                 {session.user?.name?.slice(0, 1) || "U"}
               </span>
               <div className="min-w-0 flex-1 text-start">
