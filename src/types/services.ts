@@ -24,7 +24,7 @@ export interface Insight {
   metric?: BilingualString;
 }
 
-export interface HeroSection {
+export interface Hero {
   title: BilingualString;
   subtitle: BilingualString;
   ctaText: BilingualString;
@@ -33,7 +33,7 @@ export interface HeroSection {
 
 export interface ServicePageData {
   slug: string;
-  hero: HeroSection;
+  hero: Hero;
   capabilities: Capability[];
   workflow: WorkflowStep[];
   insights: Insight[];

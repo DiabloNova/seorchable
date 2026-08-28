@@ -7,7 +7,7 @@ import { ServiceCapabilities } from "@/components/marketing/services/ServiceCapa
 import { ServiceWorkflow } from "@/components/marketing/services/ServiceWorkflow";
 import { ServiceInsights } from "@/components/marketing/services/ServiceInsights";
 import { ServiceCTA } from "@/components/marketing/services/ServiceCTA";
-import { LandingHeader } from "@/components/marketing/LandingHeader";
+import { Header } from "@/components/marketing/Header";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
 import AppSidebar from "@/components/navigation/AppSidebar";
 import { siteConfig } from "@/config/site";
@@ -60,7 +60,7 @@ export default function ServicePage({ params }: PageProps) {
   return (
     <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--text-primary)]" style={{ direction: isFa ? "rtl" : "ltr" }}>
       <AppSidebar />
-      <LandingHeader />
+      <Header />
 
       <main className="flex-1">
         <ServiceHero data={data.hero} isFa={isFa} />

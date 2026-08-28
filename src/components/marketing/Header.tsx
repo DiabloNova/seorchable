@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Moon, Sun, Languages, Receipt, ChevronDown, Sparkles, LogIn, Menu } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
-import { marketingContent as C } from "./content";
 import { SeorchableLogo } from "./SeorchableLogo";
 import { Dropdown } from "@/components/Dropdown";
 import AppSidebar from "@/components/navigation/AppSidebar";
@@ -13,7 +12,7 @@ import AppSidebar from "@/components/navigation/AppSidebar";
  * Enterprise-grade Sticky navigation bar with advanced adjacent Hamburger selector and sliding drawer,
  * mapped to the product-first flow sections (Platform, Solutions, Comparison, Trust, Pricing, Docs, Resources).
  */
-export function LandingHeader() {
+export function Header() {
   const { language, setLanguage, theme, setTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);

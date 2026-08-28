@@ -32,7 +32,7 @@ interface AppSidebarProps {
   setCollapsed?: (val: boolean) => void;
   mobileOpen?: boolean;
   setMobileOpen?: (val: boolean) => void;
-  hideToggle?: boolean; // Prop to hide the floating top-left toggle when rendered inside LandingHeader
+  hideToggle?: boolean; // Prop to hide the floating top-left toggle when rendered inside Header
 }
 
 export default function AppSidebar({
