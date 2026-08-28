@@ -35,13 +35,14 @@ export default function PromptsPage() {
 
   const fetchPrompts = async () => {
     try {
-  const response = (await getPromptsAction()) as { success: boolean; result?: unknown };
-  
-  if (response.success && response.result) {
-    setPrompts(response.result as PromptRecord[]);
-  }
-} catch (error) {
+      const response = await getPromptsAction();
 
+      if (Array.isArray(response)) {
+        setPrompts(response as PromptRecord[]);
+      } else if (response && typeof response === 'object' && 'result' in response && Array.isArray((response as {result: unknown}).result)) {
+        setPrompts((response as {result: unknown}).result as PromptRecord[]);
+      }
+    } catch (error) {
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -69,14 +70,23 @@ export default function PromptsPage() {
     startTransition(async () => {
       try {
         const result = await addPromptAction({ query: trimmed });
-        if (result.success && result.result) {
+        if (result && typeof result === 'object' && 'id' in result) {
           setIsNewPromptOpen(false);
           setNewQuery("");
           // Graceful update without full reload spinner
-          const newPrompt = result.result as PromptRecord;
+          const newPrompt = result as unknown as PromptRecord;
+          if (!newPrompt.brandName) {
+            newPrompt.brandName = "New Brand";
+          }
+          setPrompts(prev => [newPrompt, ...prev]);
+        } else if (result && typeof result === 'object' && 'success' in result && (result as { success: boolean }).success && 'result' in result) {
+          setIsNewPromptOpen(false);
+          setNewQuery("");
+          const newPrompt = (result as { result: unknown }).result as PromptRecord;
           setPrompts(prev => [newPrompt, ...prev]);
         } else {
-          setNewQueryError(result.error || (isRtl ? "خطا در افزودن پرامپت." : "Error creating prompt."));
+          const err = result && typeof result === 'object' && 'error' in result ? String((result as { error: unknown }).error) : "";
+          setNewQueryError(err || (isRtl ? "خطا در افزودن پرامپت." : "Error creating prompt."));
         }
       } catch (error) {
         console.error(error);
@@ -93,10 +103,13 @@ export default function PromptsPage() {
     startTransition(async () => {
       try {
         const response = await deletePromptAction({ promptId: id });
-        if (response.success) {
+        if (response && typeof response === 'object' && 'id' in response) {
+          setPrompts(prev => prev.filter(p => p.id !== id));
+        } else if (response && typeof response === 'object' && 'success' in response && (response as { success: boolean }).success) {
           setPrompts(prev => prev.filter(p => p.id !== id));
         } else {
-          alert(response.error || "Failed to delete prompt");
+          const err = response && typeof response === 'object' && 'error' in response ? String((response as { error: unknown }).error) : "";
+          alert(err || "Failed to delete prompt");
         }
       } catch (err) {
         console.error(err);

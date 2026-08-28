@@ -10,9 +10,8 @@ type EvaluatePromptsData = {
 };
 
 export const evaluatePrompts = inngest.createFunction(
-  { id: "evaluate-prompts" },
-  { event: "seorchable/evaluate.prompts" },
-  async ({ event, step }) => {
+  { id: "evaluate-prompts", triggers: [{ event: "seorchable/evaluate.prompts" }] },
+  async ({ event, step }: { event: { data: unknown }; step: { run: (name: string, cb: () => Promise<unknown>) => Promise<unknown> } }) => {
     const data = event.data as unknown as EvaluatePromptsData;
     const { organizationId, userId } = data;
 
@@ -29,7 +28,7 @@ export const evaluatePrompts = inngest.createFunction(
         });
       });
 
-      if (!activePrompts || activePrompts.length === 0) {
+      if (!activePrompts || (activePrompts as Array<unknown>).length === 0) {
         return { success: true, message: "No active prompts found to evaluate" };
       }
 
@@ -47,8 +46,8 @@ export const evaluatePrompts = inngest.createFunction(
       }
 
       // Step 3: Simulate Evaluation
-      const evaluations = await step.run("simulate-evaluation", async () => {
-        return activePrompts.map((prompt) => {
+      const evaluations = (await step.run("simulate-evaluation", async () => {
+        return (activePrompts as Array<{ id: string; brandId: string }>).map((prompt) => {
           // Simulating sentiment analysis, mention detection, etc.
           const overallScore = Math.floor(Math.random() * 100);
           const presenceRate = Math.random();
@@ -64,7 +63,7 @@ export const evaluatePrompts = inngest.createFunction(
             netSentiment,
           };
         });
-      });
+      })) as Array<{ promptId: string; brandId: string; overallScore: number; presenceRate: number; avgPosition: number; netSentiment: number }>;
 
       // Step 4: Save Visibility Results
       await step.run("save-visibility-results", async () => {
@@ -73,7 +72,7 @@ export const evaluatePrompts = inngest.createFunction(
           const recordsToInsert = evaluations.map((evalData) => ({
             organizationId,
             brandId: evalData.brandId,
-            engineId: engine.id,
+            engineId: (engine as { id: string }).id,
             overallScore: evalData.overallScore,
             presenceRate: evalData.presenceRate,
             avgPosition: evalData.avgPosition,
