@@ -56,7 +56,7 @@ const Logo = ({
   <div className="flex items-center gap-2.5">
     <div className="relative w-9 h-9 flex-shrink-0 rounded-[var(--radius-md)] overflow-hidden ring-1 ring-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-md">
       <Image
-        src="/logo-horse.png"
+        src="/logo-transparent.png"
         alt="Brand logo"
         fill
         sizes="36px"

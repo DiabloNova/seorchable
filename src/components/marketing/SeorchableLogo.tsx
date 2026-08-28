@@ -28,7 +28,7 @@ export function SeorchableLogo({
       )}
 
       <div className="relative w-full h-full z-10 transition-transform duration-500 hover:rotate-12 cursor-pointer">
-        <Image src="/logo-horse.png" alt="Seorchable Logo" fill className="object-contain" />
+        <Image src="/logo-transparent.png" alt="Seorchable Logo" fill className="object-contain" />
       </div>
     </div>
   );
