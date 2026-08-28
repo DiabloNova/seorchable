@@ -154,7 +154,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
             language === "fa"
               ? "موتور ورود و پایش اسناد"
               : "Data Ingestion Engine",
-          href: "/dashboard/ingestion",
+          href: "/dashboard/content/ingestion",
           icon: Database,
         },
         {
@@ -183,16 +183,10 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
       items: [
         {
           name:
-            language === "fa" ? "تحلیل استاندارد برند" : "Standard Brand Audit",
-          href: "/dashboard/intelligence",
-          icon: BrainCircuit,
-        },
-        {
-          name:
             language === "fa"
               ? "رادار تحلیل رقابتی برند"
               : "Competitive Intelligence Radar",
-          href: "/dashboard/competitive",
+          href: "/dashboard/competitors",
           icon: Compass,
         },
         {
