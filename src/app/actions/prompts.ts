@@ -9,7 +9,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 
 // 1. دریافت لیست پرامپت‌ها بدون نیاز به ورودی (استفاده از secureServerActionNoInput)
 export const getPromptsAction = secureServerActionNoInput(async (ctx) => {
-  return TenantContextManager.runWithTenantContext(ctx.workspaceId, async () => {
+  return TenantContextManager.runWithTenantContext(ctx.workspaceId, ctx.userId, null, async () => {
     const db = drizzle(TenantContextManager.getDbClient());
 
     const allPrompts = await db
@@ -41,7 +41,7 @@ export const addPromptAction = secureServerAction(
     // اعتبارسنجی ورودی با Zod
     const parsedInput = addPromptSchema.parse(input);
 
-    return TenantContextManager.runWithTenantContext(ctx.workspaceId, async () => {
+    return TenantContextManager.runWithTenantContext(ctx.workspaceId, ctx.userId, null, async () => {
       const db = drizzle(TenantContextManager.getDbClient());
 
       // یافتن اولین برند برای فضای کاری
@@ -85,7 +85,7 @@ export const deletePromptAction = secureServerAction(
     // اعتبارسنجی ورودی با Zod
     const parsedInput = deletePromptSchema.parse(input);
 
-    return TenantContextManager.runWithTenantContext(ctx.workspaceId, async () => {
+    return TenantContextManager.runWithTenantContext(ctx.workspaceId, ctx.userId, null, async () => {
       const db = drizzle(TenantContextManager.getDbClient());
 
       const [deleted] = await db
