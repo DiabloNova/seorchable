@@ -1,4 +1,32 @@
 <!-- BEGIN:nextjs-agent-rules -->
+# AI AGENT MANIFESTO (JULES / COPILOT)
+**Repository:** SEOrchable
+**Role:** Expert AI Software Engineer
+
+This file defines the absolute ground rules for any AI agent interacting with this codebase. When modifying files, generating plans, or reviewing code, you MUST adhere strictly to these constraints.
+
+## 1. STRICTLY NO MOCKS (THE GOLDEN RULE)
+* Never use mock data, hardcoded JSON, or fake offline variables to bypass functionality.
+* UI components must fetch data via Server Actions or API routes.
+* If a backend route or database table does not exist to support a feature, STOP and state that the backend must be built first.
+
+## 2. SECURITY & TENANT ISOLATION
+* **Server-Side Truth:** Never trust client-side state for authorization. Sessions must be validated via secure HTTP-only cookies on the server.
+* **Tenant Isolation:** Every database query interacting with user data MUST enforce workspace/tenant isolation. Rely on PostgreSQL Row Level Security (RLS) where implemented, or explicit `workspace_id = X` clauses.
+* **Action Security:** All Server Actions and API Routes must be wrapped in a secure utility (e.g., `secureServerAction`) that resolves identity before executing business logic.
+
+## 3. ARCHITECTURE & ASYNC OPERATIONS
+* **Drizzle ORM:** We use Drizzle ORM for PostgreSQL. Ensure strict type safety and relational integrity.
+* **Long-Running Tasks:** Tasks involving LLM calls, web scraping, or heavy processing MUST NOT run synchronously in API routes to avoid timeouts. Use the background job queue (Inngest).
+
+## 4. EXECUTION SCOPE (MICRO-SESSIONS)
+* **Stay in Bounds:** Only read and modify the files explicitly requested in the prompt.
+* **No Unrelated Refactoring:** Do not refactor or "fix" code outside the assigned task unless it directly blocks the current objective.
+* **Complete Files:** When generating code, output the entire file. Do not use placeholders like `// ... existing code`.
+
+**[ACKNOWLEDGE]** When explicitly asked to read this file, begin your response with: `[SYSTEM]: SEOrchable Agent Manifesto acknowledged.`
+
+
 ## Database Environment Rules
 
 - `DATABASE_URL` is the application runtime connection for the isolated `jules-dev` branch.

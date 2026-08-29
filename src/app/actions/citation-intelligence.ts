@@ -126,7 +126,7 @@ export async function getCitationsDashboardDataAction() {
         activeSources = seedSources as any;
       }
 
-      // Reload occurrences to include the freshly seeded ones if applicable
+      activeSources = activeSources as any;
       const finalOccurrences = await repo.findAllOccurrences(tenantId);
 
       // 4. Construct time series trend

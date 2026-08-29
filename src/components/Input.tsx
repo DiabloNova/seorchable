@@ -21,13 +21,18 @@ export const Input: React.FC<InputProps> = ({
   return (
     <div className="w-full flex flex-col gap-1.5">
       {label && (
-        <label htmlFor={inputId} className="text-sm font-medium text-[var(--text-secondary)]">
+        <label
+          htmlFor={inputId}
+          className="text-sm font-medium text-[var(--text-secondary)]"
+        >
           {label}
         </label>
       )}
       <input
         type={type}
         id={inputId}
+        aria-invalid={error ? "true" : "false"}
+        aria-describedby={error ? `${inputId}-error` : undefined}
         className={`
           w-full px-3 py-2 text-sm rounded-[var(--radius-md)] outline-none
           bg-[var(--card)] text-[var(--text-primary)] border transition-all duration-200
@@ -42,7 +47,11 @@ export const Input: React.FC<InputProps> = ({
         {...props}
       />
       {error && (
-        <span className="text-xs text-[var(--color-error)] font-medium mt-0.5">
+        <span
+          id={`${inputId}-error`}
+          role="alert"
+          className="text-xs text-[var(--color-error)] font-medium mt-0.5"
+        >
           {error}
         </span>
       )}

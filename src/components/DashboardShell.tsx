@@ -34,7 +34,6 @@ interface DashboardShellProps {
   children: React.ReactNode;
 }
 
-// Helper types for lists
 interface NavItem {
   name: string;
   href: string;

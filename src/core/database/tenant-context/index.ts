@@ -120,13 +120,30 @@ export class TenantContextManager {
     requestId: string | null,
     work: () => Promise<T>
   ): Promise<T> {
+    let leasedClient: any = null;
+    try {
+      const { PostgresClient } = await import("../../../features/admin/infrastructure/persistence/postgres");
+      const pgClient = PostgresClient.getInstance();
+      leasedClient = await pgClient.connectClient();
+    } catch (err) {
+      console.warn("[TenantContextManager] DB connection failed for system context.", err);
+    }
+
     const ctx: TenantContext = Object.freeze({
       tenantId: null,
       userId,
       requestId,
-      executionMode: "system"
+      executionMode: "system",
+      dbClient: leasedClient
     });
-    return this.storage.run(ctx, work);
+
+    try {
+      return await this.storage.run(ctx, work);
+    } finally {
+      if (leasedClient && typeof leasedClient.release === "function") {
+        leasedClient.release();
+      }
+    }
   }
 
   /**
