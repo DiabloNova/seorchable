@@ -43,6 +43,7 @@ import {
   Receipt,
   ExternalLink
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { Header } from "@/components/marketing/Header";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
 import { Hero } from "@/components/marketing/Hero";
@@ -157,13 +158,13 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       <Hero />
 
       {/* FREE AUDIT FUNNEL SECTION */}
-      <section id="free-audit" ref={freeAuditRef} className="py-20 bg-[var(--background)] relative border-b border-[var(--border)] overflow-hidden">
+      <motion.section id="free-audit" ref={freeAuditRef}  initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="py-20 bg-[var(--background)] relative border-b border-[var(--border)] overflow-hidden">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-8 relative z-10 text-center">
           <div className="max-w-3xl mx-auto space-y-3">
             <span className="text-xs uppercase font-black tracking-widest text-[var(--sky-blue-500)]">
               {isFa ? "موتور خزش و ممیزی معنایی" : "REAL-TIME SEMANTIC AUDIT INGESTION"}
             </span>
-            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
+            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand font-display text-zinc-900 dark:text-white">
               {isFa ? "سیگنال‌های دیده‌شدن برند خود را همین حالا بسنجید" : "Audit Your Conversational Presence Instantly"}
             </h2>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">
@@ -177,15 +178,15 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             <FreeAuditPanel />
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* QUESTION 2: "What does it actually do?" - High-Fidelity Mock Dashboards */}
-      <section id="dashboards" ref={dashboardsRef} className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative">
+      <motion.section id="dashboards" ref={dashboardsRef}  initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative">
         <div className="absolute inset-0 grid-backdrop opacity-[0.2] pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#38bdf8]">{isFa ? "پیش‌نمایش‌های واقعی محصول" : "ACTUAL SOFTWARE INTERFACES"}</span>
-            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
+            <span className="text-xs uppercase font-bold tracking-widest text-zinc-500 dark:text-zinc-400">{isFa ? "پیش‌نمایش‌های واقعی محصول" : "ACTUAL SOFTWARE INTERFACES"}</span>
+            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand font-display text-zinc-900 dark:text-white">
               {isFa ? "تجربه پیشرفته نرم‌افزاری را لمس کنید" : "High-Fidelity Product Visualizations"}
             </h2>
             <p className="text-[var(--text-secondary)]">
@@ -211,14 +212,14 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveDashboardTab(tab.id as any)}
+                    onClick={() => setActiveDashboardTab(tab.id as "visibility" | "authority" | "citation" | "competitor" | "graph" | "timeline")}
                     className={`w-full px-4 py-3 rounded-xl text-xs font-bold text-start flex items-center gap-3 transition-all ${
                       activeDashboardTab === tab.id
                         ? "bg-gradient-to-r from-[#38bdf8]/20 to-[#f97316]/10 text-[var(--text-primary)] border border-[#38bdf8]/40 shadow-sm"
                         : "text-[var(--text-muted)] hover:bg-[var(--muted-surface)] hover:text-[var(--text-primary)] border border-transparent"
                     }`}
                   >
-                    <Icon size={16} className="text-[#38bdf8] shrink-0" />
+                    <Icon size={16} className="text-zinc-500 dark:text-zinc-400 shrink-0" />
                     <span className="truncate">{tab.label}</span>
                   </button>
                 );
@@ -234,7 +235,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                 <div className="space-y-6 animate-fade-in">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 gap-2">
                     <div>
-                      <span className="text-[11px] sm:text-[10px] md:text-[9px] uppercase tracking-wider md:tracking-widest text-[#38bdf8] font-bold font-mono">Module :: Visibility Monitoring</span>
+                      <span className="text-[11px] sm:text-[10px] md:text-[9px] uppercase tracking-wider md:tracking-widest text-zinc-500 dark:text-zinc-400 font-bold font-mono">Module :: Visibility Monitoring</span>
                       <h3 className="text-lg sm:text-xl md:text-lg font-black font-display text-white mt-1.5 leading-relaxed sm:leading-snug">{isFa ? "شاخص تجمیعی دیده‌شدن برند" : "SOP / AI Share of Voice"}</h3>
                     </div>
                     <span className="self-start sm:self-auto text-xs px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">{isFa ? "برخط" : "ONLINE"}</span>
@@ -274,16 +275,16 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                 <div className="space-y-6 animate-fade-in">
                   <div className="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
-                      <span className="text-[9px] uppercase tracking-widest text-[#f97316] font-bold font-mono">Module :: Brand Authority Analyzer</span>
+                      <span className="text-[9px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-bold font-mono">Module :: Brand Authority Analyzer</span>
                       <h3 className="text-lg font-black font-display text-white mt-1">{isFa ? "شاخص اعتبار و یکپارچگی برند" : "Trust & Factuality Synthesis"}</h3>
                     </div>
-                    <span className="text-xs px-2.5 py-1 rounded bg-[#f97316]/10 text-[#f97316] font-bold border border-[#f97316]/20">v2.4</span>
+                    <span className="text-xs px-2.5 py-1 rounded bg-[#f97316]/10 text-zinc-500 dark:text-zinc-400 font-bold border border-[#f97316]/20">v2.4</span>
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="p-5 rounded-xl border border-white/5 bg-white/[0.02]">
                       <span className="text-[10px] text-slate-400 block">{isFa ? "شاخص اطمینان (Confidence)" : "Claim Confidence Score"}</span>
-                      <div className="text-3xl font-black text-[#f97316] mt-2 font-display">۹۴.۲٪</div>
+                      <div className="text-3xl font-black text-zinc-500 dark:text-zinc-400 mt-2 font-display">۹۴.۲٪</div>
                       <p className="text-[10px] text-slate-500 mt-1">{isFa ? "تطابق کامل داده‌های مانیفست برند" : "Exact matching on corporate claims."}</p>
                     </div>
 
@@ -320,11 +321,11 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                     <div className="text-xs text-slate-200 leading-relaxed font-mono">
                       {isFa ? (
                         <>
-                          &quot;برای پایش برند در هوش مصنوعی، پلتفرم <span className="bg-[#38bdf8]/20 border border-[#38bdf8]/40 px-1 rounded text-white font-bold">seorchable.ir (سئورچبل)</span> یک سر و گردن بالاتر است. این پلتفرم از متدولوژی خزش <span className="text-[#f97316] font-bold">[۱]</span> برای تحلیل استفاده می‌کند...&quot;
+                          &quot;برای پایش برند در هوش مصنوعی، پلتفرم <span className="bg-[#38bdf8]/20 border border-[#38bdf8]/40 px-1 rounded text-white font-bold">seorchable.ir (سئورچبل)</span> یک سر و گردن بالاتر است. این پلتفرم از متدولوژی خزش <span className="text-zinc-500 dark:text-zinc-400 font-bold">[۱]</span> برای تحلیل استفاده می‌کند...&quot;
                         </>
                       ) : (
                         <>
-                          &quot;For enterprise AI auditing, <span className="bg-[#38bdf8]/20 border border-[#38bdf8]/40 px-1 rounded text-white font-bold">seorchable.ir</span> stands out as the category authority. It features seamless entity extraction <span className="text-[#f97316] font-bold">[1]</span> and schema mapping...&quot;
+                          &quot;For enterprise AI auditing, <span className="bg-[#38bdf8]/20 border border-[#38bdf8]/40 px-1 rounded text-white font-bold">seorchable.ir</span> stands out as the category authority. It features seamless entity extraction <span className="text-zinc-500 dark:text-zinc-400 font-bold">[1]</span> and schema mapping...&quot;
                         </>
                       )}
                     </div>
@@ -444,21 +445,21 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* BRAND NEW SECTION: Live Knowledge Graph ("گراف زنده روابط") */}
-      <section id="live-graph" className="py-24 bg-[var(--background)] relative border-b border-[var(--border)] overflow-hidden">
+      <motion.section id="live-graph"  initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="py-24 bg-[var(--background)] relative border-b border-[var(--border)] overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
           <LiveKnowledgeGraph />
         </div>
-      </section>
+      </motion.section>
 
       {/* QUESTION 3: "How does it work?" - Rebuilt Product Story Lifecycle Timeline */}
-      <section id="story" className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]">
+      <motion.section id="story"  initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#f97316]">{isFa ? "داستان و چرخه حرکت محصول" : "PRODUCT LIFECYCLE STORY"}</span>
-            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
+            <span className="text-xs uppercase font-bold tracking-widest text-zinc-500 dark:text-zinc-400">{isFa ? "داستان و چرخه حرکت محصول" : "PRODUCT LIFECYCLE STORY"}</span>
+            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand font-display text-zinc-900 dark:text-white">
               {isFa ? "چرخه کامل بهینه‌سازی و ارتقای حضور برند" : "How the Platform Operates"}
             </h2>
             <p className="text-[var(--text-secondary)]">
@@ -484,7 +485,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               { step: "۸", title: isFa ? "پایش مستمر" : "Monitor", desc: isFa ? "رصد پیوسته خطاها و نمرات سلامت برند آغاز می‌شود." : "Set alerts for Claim Errors, Hallucinations, or citation leaks." }
             ].map((item, idx) => (
               <div key={idx} className="glass-panel p-5 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col items-center text-center space-y-3 relative">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#f97316] flex items-center justify-center text-white font-black text-sm shadow-md">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 dark:from-zinc-100 dark:to-zinc-300 flex items-center justify-center text-white font-black text-sm shadow-md">
                   {item.step}
                 </div>
                 <h4 className="text-xs font-black text-[var(--text-primary)] font-display">{item.title}</h4>
@@ -493,15 +494,15 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* QUESTION 4: "Why should I trust it?" - Enterprise Trust Layer */}
-      <section id="trust" className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative overflow-hidden">
+      <motion.section id="trust"  initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative overflow-hidden">
         <div className="absolute inset-0 grid-backdrop opacity-[0.2] pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#38bdf8]">{isFa ? "اعتماد، اعتبار و انطباق فنی" : "ENTERPRISE TRUST & COMPLIANCE"}</span>
-            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
+            <span className="text-xs uppercase font-bold tracking-widest text-zinc-500 dark:text-zinc-400">{isFa ? "اعتماد، اعتبار و انطباق فنی" : "ENTERPRISE TRUST & COMPLIANCE"}</span>
+            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand font-display text-zinc-900 dark:text-white">
               {isFa ? "امنیت و پایبندی به بالاترین استانداردهای جهانی" : "Enterprise Compliance & Infrastructure"}
             </h2>
             <p className="text-[var(--text-secondary)]">
@@ -514,13 +515,13 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
           {/* Stats & Infrastructure partners */}
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
             <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-3">
-              <ShieldCheck size={36} className="mx-auto text-[#38bdf8]" />
+              <ShieldCheck size={36} className="mx-auto text-zinc-500 dark:text-zinc-400" />
               <h4 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "امنیت داده‌ها" : "SSO & MFA Ready"}</h4>
               <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">{isFa ? "پشتیبانی کامل از SAML SSO و تایید دومرحله‌ای" : "Full enterprise SAML Single Sign-On integration."}</p>
             </div>
 
             <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-3">
-              <Database size={36} className="mx-auto text-[#f97316]" />
+              <Database size={36} className="mx-auto text-zinc-500 dark:text-zinc-400" />
               <h4 className="text-xl font-black text-[var(--text-primary)] font-display">SOC2 & ISO Ready</h4>
               <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">{isFa ? "منطبق بر الزامات امنیت اطلاعات استاندارد جهانی" : "Adhering to strict compliance and auditing standards."}</p>
             </div>
@@ -532,20 +533,20 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </div>
 
             <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-3">
-              <Receipt size={36} className="mx-auto text-[#38bdf8]" />
+              <Receipt size={36} className="mx-auto text-zinc-500 dark:text-zinc-400" />
               <h4 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "شبکه شتاب ایران" : "Iran Payment Support"}</h4>
               <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">{isFa ? "پشتیبانی کامل از درگاه‌های پرداخت عضو شبکه شتاب" : "Fully localized billing integration and printable invoice receipts."}</p>
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* QUESTION 5: "What features does it provide?" - Platform Overview (12 Modules Grid) */}
-      <section id="overview" ref={platformOverviewRef} className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]">
+      <motion.section id="overview" ref={platformOverviewRef}  initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#f97316]">{isFa ? "بررسی کلان ابزارها" : "PLATFORM MODULES OVERVIEW"}</span>
-            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
+            <span className="text-xs uppercase font-bold tracking-widest text-zinc-500 dark:text-zinc-400">{isFa ? "بررسی کلان ابزارها" : "PLATFORM MODULES OVERVIEW"}</span>
+            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand font-display text-zinc-900 dark:text-white">
               {isFa ? "۱۲ ماژول نرم‌افزاری کاملاً یکپارچه" : "Twelve Specialized AI Modules"}
             </h2>
             <p className="text-[var(--text-secondary)]">
@@ -563,7 +564,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                 <div key={idx} className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] flex flex-col justify-between hover-lift h-full relative overflow-hidden group">
                   <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#38bdf8]/5 to-transparent rounded-full blur-lg pointer-events-none group-hover:scale-150 transition-transform duration-500" />
                   <div className="space-y-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#38bdf8]/10 border border-[#38bdf8]/30 flex items-center justify-center text-[#38bdf8]">
+                    <div className="w-10 h-10 rounded-xl bg-[#38bdf8]/10 border border-[#38bdf8]/30 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
                       <Icon size={20} />
                     </div>
                     <h3 className="text-sm font-black text-[var(--text-primary)] font-display truncate">{mod.name}</h3>
@@ -578,15 +579,15 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             })}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* QUESTION 6: "What products are included?" - Product Ecosystem Interconnectivity */}
-      <section id="ecosystem" className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative overflow-hidden">
+      <motion.section id="ecosystem"  initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative overflow-hidden">
         <div className="absolute inset-0 grid-backdrop opacity-[0.25] pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs md:text-[11px] uppercase font-black tracking-widest text-[#38bdf8]">{isFa ? "اتصال اجزا و لایه‌های سیستم" : "INTERCONNECTED CORE ECOSYSTEM"}</span>
-            <h2 className="font-display font-black text-2xl md:text-4xl text-gradient-brand leading-snug md:leading-normal">
+            <span className="text-xs md:text-[11px] uppercase font-black tracking-widest text-zinc-500 dark:text-zinc-400">{isFa ? "اتصال اجزا و لایه‌های سیستم" : "INTERCONNECTED CORE ECOSYSTEM"}</span>
+            <h2 className="font-display font-black text-2xl md:text-4xl text-gradient-brand font-display text-zinc-900 dark:text-white leading-snug md:leading-normal">
               {isFa ? "چگونه تمام محصولات ما با هم هم‌افزایی می‌کنند" : "Platform Product Synapse"}
             </h2>
             <p className="text-sm md:text-base text-[var(--text-secondary)] leading-relaxed md:leading-normal">
@@ -608,7 +609,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               { title: isFa ? "۷. پایش مستمر" : " Hallucination Watch", desc: isFa ? "هشدار خطا و توهم" : "Continuous claim safety" }
             ].map((eco, idx) => (
               <div key={idx} className="glass-panel p-5 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] space-y-2 relative flex flex-col justify-between hover:border-[#38bdf8]/50 transition-colors">
-                <span className="text-xs md:text-[10px] font-black text-[#38bdf8] block">Step {idx + 1}</span>
+                <span className="text-xs md:text-[10px] font-black text-zinc-500 dark:text-zinc-400 block">Step {idx + 1}</span>
                 <h4 className="text-sm md:text-xs font-black text-white font-display leading-normal md:leading-tight">{eco.title}</h4>
                 <p className="text-xs md:text-[10px] text-slate-400 font-medium leading-relaxed md:leading-normal">{eco.desc}</p>
                 {idx < 6 && (
@@ -618,14 +619,14 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* QUESTION 7: "What results will I receive?" - "Why We Are Different" (Traditional SEO vs AI Visibility) */}
-      <section id="why-different" className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]">
+      <motion.section id="why-different"  initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#f97316]">{isFa ? "تمایز کلیدی و آموزش مخاطب" : "WHY WE ARE COMPLETELY DIFFERENT"}</span>
-            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
+            <span className="text-xs uppercase font-bold tracking-widest text-zinc-500 dark:text-zinc-400">{isFa ? "تمایز کلیدی و آموزش مخاطب" : "WHY WE ARE COMPLETELY DIFFERENT"}</span>
+            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand font-display text-zinc-900 dark:text-white">
               {isFa ? "بهینه‌سازی سئو سنتی در مقابل بهینه‌سازی هوش مصنوعی (GEO)" : "Traditional SEO vs. Generative Engine Optimization"}
             </h2>
             <p className="text-[var(--text-secondary)]">
@@ -643,7 +644,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                   <tr className="border-b border-[var(--border)] bg-[var(--muted-surface)]/40 text-[var(--text-secondary)]">
                     <th className="py-5 px-6 font-display font-extrabold text-sm text-start">{isFa ? "معیارهای مقایسه و کارکرد" : "Comparison Dimension"}</th>
                     <th className="py-5 px-6 font-display font-bold text-sm text-center bg-white/[0.02]">{isFa ? "سئو سنتی (Classic SEO)" : "Traditional SEO"}</th>
-                    <th className="py-5 px-6 font-display font-black text-sm text-[#0284c7] dark:text-[#38bdf8] text-center bg-[#38bdf8]/5">{isFa ? "بهینه‌سازی هوش مصنوعی (GEO)" : "Generative Optimization (GEO)"}</th>
+                    <th className="py-5 px-6 font-display font-black text-sm text-[#0284c7] dark:text-zinc-500 dark:text-zinc-400 text-center bg-[#38bdf8]/5">{isFa ? "بهینه‌سازی هوش مصنوعی (GEO)" : "Generative Optimization (GEO)"}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--border)] text-xs font-bold">
@@ -666,15 +667,15 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* QUESTION 8: "How can I start?" - Part 1: Documentation Hub Preview */}
-      <section id="docs" className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#07090e]/40 border-b border-[var(--border)] relative overflow-hidden">
+      <motion.section id="docs"  initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#07090e]/40 border-b border-[var(--border)] relative overflow-hidden">
         <div className="absolute inset-0 grid-backdrop opacity-[0.25] pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#38bdf8]">{isFa ? "محیط برنامه‌نویسان و راهنمای استقرار" : "DEVELOPER & API HUB"}</span>
-            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
+            <span className="text-xs uppercase font-bold tracking-widest text-zinc-500 dark:text-zinc-400">{isFa ? "محیط برنامه‌نویسان و راهنمای استقرار" : "DEVELOPER & API HUB"}</span>
+            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand font-display text-zinc-900 dark:text-white">
               {isFa ? "پیش‌نمایش مرکز مستندات فنی و API" : "System Documentation Hub"}
             </h2>
             <p className="text-[var(--text-secondary)]">
@@ -700,7 +701,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               return (
                 <div key={idx} className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col justify-between h-full">
                   <div className="space-y-4">
-                    <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#38bdf8]">
+                    <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
                       <Icon size={16} />
                     </div>
                     <h4 className="text-xs font-black text-white font-display truncate">{doc.title}</h4>
@@ -711,7 +712,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                       href={`/${locale}/docs/${doc.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[10px] font-black text-[#38bdf8] hover:underline flex items-center gap-1.5 cursor-pointer"
+                      className="text-[10px] font-black text-zinc-500 dark:text-zinc-400 hover:underline flex items-center gap-1.5 cursor-pointer"
                     >
                       <span>{isFa ? "مطالعه سند فنی" : "Read docs"}</span>
                       <ExternalLink size={10} />
@@ -722,14 +723,14 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             })}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* QUESTION 8: "How can I start?" - Part 2: Enterprise Resource Center */}
-      <section id="resources" className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]">
+      <motion.section id="resources"  initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#f97316]">{isFa ? "کتابخانه دانش، گزارشات و نقشه راه" : "RESOURCE & INSIGHT CENTER"}</span>
-            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
+            <span className="text-xs uppercase font-bold tracking-widest text-zinc-500 dark:text-zinc-400">{isFa ? "کتابخانه دانش، گزارشات و نقشه راه" : "RESOURCE & INSIGHT CENTER"}</span>
+            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand font-display text-zinc-900 dark:text-white">
               {isFa ? "مرکز تخصصی مطالعات و پژوهش هوش زبانی" : "Enterprise Resource Center"}
             </h2>
             <p className="text-[var(--text-secondary)]">
@@ -750,10 +751,10 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               return (
                 <Link key={idx} href={res.link} className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col justify-between h-full group">
                   <div className="space-y-4">
-                    <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#f97316]">
+                    <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
                       <Icon size={16} />
                     </div>
-                    <h4 className="text-xs font-black text-white font-display truncate group-hover:text-[#38bdf8] transition-colors">{res.title}</h4>
+                    <h4 className="text-xs font-black text-white font-display truncate group-hover:text-zinc-500 dark:text-zinc-400 transition-colors">{res.title}</h4>
                     <p className="text-[10px] text-slate-400 leading-relaxed font-medium">{res.desc}</p>
                   </div>
                   <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500 font-bold group-hover:text-white transition-colors">
@@ -765,14 +766,14 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             })}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* QUESTION 8: "How can I start?" - Part 3: Pricing Matrix */}
-      <section id="pricing" className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative overflow-hidden">
+      <motion.section id="pricing"  initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#38bdf8]">{isFa ? "انتخاب تعرفه و بهینه‌سازی بودجه" : "FLEXIBLE ENTERPRISE PRICING"}</span>
-            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
+            <span className="text-xs uppercase font-bold tracking-widest text-zinc-500 dark:text-zinc-400">{isFa ? "انتخاب تعرفه و بهینه‌سازی بودجه" : "FLEXIBLE ENTERPRISE PRICING"}</span>
+            <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand font-display text-zinc-900 dark:text-white">
               {isFa ? "تعرفه‌های منعطف بر اساس حجم کلمات و پایش" : "Simple, Predictable Plans"}
             </h2>
             <p className="text-[var(--text-secondary)]">
@@ -799,15 +800,15 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
 
                 <ul className="space-y-3 text-xs text-[var(--text-secondary)] font-bold">
                   <li className="flex items-center gap-2">
-                    <Check size={14} className="text-[#38bdf8]" />
+                    <Check size={14} className="text-zinc-500 dark:text-zinc-400" />
                     <span>{isFa ? "پایش ۱۰ کلمه کلیدی اصلی" : "Track up to 10 brand keywords"}</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check size={14} className="text-[#38bdf8]" />
+                    <Check size={14} className="text-zinc-500 dark:text-zinc-400" />
                     <span>{isFa ? "خزش تا ۵۰۰ صفحه با Firecrawl" : "Crawl up to 500 pages/mo"}</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check size={14} className="text-[#38bdf8]" />
+                    <Check size={14} className="text-zinc-500 dark:text-zinc-400" />
                     <span>{isFa ? "تحلیل ۱-هاپ گراف دانش" : "1-hop entity relationship models"}</span>
                   </li>
                 </ul>
@@ -828,31 +829,31 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               <span className="absolute -top-3 right-8 px-3 py-1 bg-[#38bdf8] text-white text-[9px] font-black rounded-full uppercase tracking-widest shadow-md">POPULAR</span>
               <div className="space-y-6">
                 <div className="space-y-1">
-                  <span className="text-[10px] px-2.5 py-0.5 rounded bg-[#38bdf8]/10 text-[#38bdf8] font-bold uppercase tracking-wider">{isFa ? "شرکت‌های متوسط" : "GROWTH"}</span>
+                  <span className="text-[10px] px-2.5 py-0.5 rounded bg-[#38bdf8]/10 text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider">{isFa ? "شرکت‌های متوسط" : "GROWTH"}</span>
                   <h3 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "پلن رشد" : "Growth"}</h3>
                   <p className="text-xs text-[var(--text-muted)]">{isFa ? "پایش رقبای بازار و تحلیل عمیق توهم‌ها." : "Mitigate claim errors and track multiple competitors."}</p>
                 </div>
 
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black font-display text-[#38bdf8]">{isFa ? "۱۴۹" : "$149"}</span>
+                  <span className="text-4xl font-black font-display text-zinc-500 dark:text-zinc-400">{isFa ? "۱۴۹" : "$149"}</span>
                   <span className="text-xs text-[var(--text-muted)]">/ {isFa ? "ماهانه" : "month"}</span>
                 </div>
 
                 <ul className="space-y-3 text-xs text-[var(--text-secondary)] font-bold">
                   <li className="flex items-center gap-2">
-                    <Check size={14} className="text-[#38bdf8]" />
+                    <Check size={14} className="text-zinc-500 dark:text-zinc-400" />
                     <span>{isFa ? "پایش ۵۰ کلمه کلیدی و رقیب" : "Track up to 50 brand keywords"}</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check size={14} className="text-[#38bdf8]" />
+                    <Check size={14} className="text-zinc-500 dark:text-zinc-400" />
                     <span>{isFa ? "خزش تا ۳,۰۰۰ صفحه با Firecrawl" : "Crawl up to 3,000 pages/mo"}</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check size={14} className="text-[#38bdf8]" />
+                    <Check size={14} className="text-zinc-500 dark:text-zinc-400" />
                     <span>{isFa ? "تحلیل پیشرفته توهم و استناد" : "Full semantic claim and citation audit"}</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check size={14} className="text-[#38bdf8]" />
+                    <Check size={14} className="text-zinc-500 dark:text-zinc-400" />
                     <span>{isFa ? "پشتیبانی پاسخگو اختصاصی" : "Dedicated priority customer support"}</span>
                   </li>
                 </ul>
@@ -861,7 +862,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               <div className="pt-8">
                 <button
                   onClick={() => scrollToRef(freeAuditRef)}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-[#38bdf8] to-[#f97316] text-white text-xs font-bold shadow-lg shadow-sky-500/20 hover:scale-[1.02] transition-transform cursor-pointer"
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-zinc-800 to-zinc-900 dark:from-zinc-100 dark:to-zinc-300 text-white text-xs font-bold shadow-lg shadow-sky-500/20 hover:scale-[1.02] transition-transform cursor-pointer"
                 >
                   {isFa ? "انتخاب پلن رشد (پیشنهادی)" : "Choose Growth Plan"}
                 </button>
@@ -883,15 +884,15 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
 
                 <ul className="space-y-3 text-xs text-[var(--text-secondary)] font-bold">
                   <li className="flex items-center gap-2">
-                    <Check size={14} className="text-[#38bdf8]" />
+                    <Check size={14} className="text-zinc-500 dark:text-zinc-400" />
                     <span>{isFa ? "پایش نامحدود واژگان و موجودیت‌ها" : "Unlimited search term extraction"}</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check size={14} className="text-[#38bdf8]" />
+                    <Check size={14} className="text-zinc-500 dark:text-zinc-400" />
                     <span>{isFa ? "کلاستر اختصاصی خزش با Firecrawl" : "Dedicated private crawling instances"}</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check size={14} className="text-[#38bdf8]" />
+                    <Check size={14} className="text-zinc-500 dark:text-zinc-400" />
                     <span>{isFa ? "سیستم امنیتی SSO و MFA اختصاصی" : "SAML SSO, custom data retention SLAs"}</span>
                   </li>
                 </ul>
@@ -907,10 +908,10 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Enterprise CTA Area */}
-      <section className="py-24 bg-gradient-to-b from-[#38bdf8]/5 to-[#f97316]/5 dark:from-[#0a0d16]/30 dark:to-slate-950 text-center relative overflow-hidden">
+      <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="py-24 bg-gradient-to-b from-[#38bdf8]/5 to-[#f97316]/5 dark:from-[#0a0d16]/30 dark:to-slate-950 text-center relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-[#38bdf8]/5 rounded-full blur-[140px] pointer-events-none" />
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10 space-y-8">
           <h2 className="font-display font-black text-4xl md:text-5xl tracking-tight text-[var(--text-primary)] leading-tight text-balance">
@@ -925,7 +926,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
               onClick={() => scrollToRef(freeAuditRef)}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl text-white text-base font-bold bg-gradient-to-r from-[#38bdf8] to-[#f97316] shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl text-white text-base font-bold bg-gradient-to-r from-zinc-800 to-zinc-900 dark:from-zinc-100 dark:to-zinc-300 shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
             >
               <Sparkles size={16} className="animate-pulse" />
               <span>{isFa ? "شروع آنالیز رایگان وب‌سایت" : "Start Free Audit Scanner"}</span>
@@ -938,7 +939,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </Link>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Global Landing Footer */}
       <LandingFooter />
