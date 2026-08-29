@@ -1,15 +1,12 @@
 import {
   LayoutDashboard,
-  LayoutGrid,
-  Settings,
+  Search,
   Sparkles,
-  BookOpen,
   BarChart3,
-  Award,
-  Network,
-  LineChart,
-  Receipt,
-  HelpCircle
+  SearchCode,
+  HelpCircle,
+  Settings,
+  Receipt
 } from "lucide-react";
 import React from "react";
 
@@ -24,7 +21,7 @@ export interface NavigationItem {
   id: string;
   labelEn: string;
   labelFa: string;
-  href?: string; // If undefined, it can be a collapsible parent
+  href?: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
   children?: NavigationSubItem[];
 }
@@ -50,133 +47,32 @@ export const dashboardNavigation: NavigationSection[] = [
         icon: LayoutDashboard
       },
       {
-        id: "services",
-        labelEn: "Service Marketplace",
-        labelFa: "بازارچه خدمات",
-        href: "/dashboard/services",
-        icon: LayoutGrid
+        id: "audits",
+        labelEn: "SEO Audits",
+        labelFa: "سنجش سئو",
+        href: "/dashboard/audits",
+        icon: Search
       },
       {
-        id: "seo",
-        labelEn: "SEO Tools",
-        labelFa: "ابزارهای سئو",
-        icon: Settings,
-        children: [
-          {
-            id: "seo-technical",
-            labelEn: "Technical SEO",
-            labelFa: "سئوی تکنیکال",
-            href: "/dashboard/seo/technical"
-          },
-          {
-            id: "seo-schema",
-            labelEn: "Schema & Metadata",
-            labelFa: "طرح‌واره و متا داتا",
-            href: "/dashboard/seo/schema"
-          }
-        ]
+        id: "prompts",
+        labelEn: "AI Visibility Prompts",
+        labelFa: "دستورات رویت‌پذیری هوش مصنوعی",
+        href: "/dashboard/prompts",
+        icon: Sparkles
       },
       {
-        id: "aeo",
-        labelEn: "AI Visibility Tools",
-        labelFa: "ابزارهای رویت‌پذیری هوش مصنوعی",
-        icon: Sparkles,
-        children: [
-          {
-            id: "aeo-audits",
-            labelEn: "AI Visibility Audits",
-            labelFa: "سنجش رویت‌پذیری هوش مصنوعی",
-            href: "/dashboard/aeo/audits"
-          },
-          {
-            id: "aeo-playground",
-            labelEn: "AI Playground",
-            labelFa: "محیط اجرای هوش مصنوعی",
-            href: "/dashboard/aeo/playground"
-          },
-          {
-            id: "aeo-content",
-            labelEn: "AEO Content Intelligence",
-            labelFa: "هوشمندی محتوای AEO",
-            href: "/dashboard/aeo/content"
-          }
-        ]
+        id: "brand-monitoring",
+        labelEn: "Brand Intelligence",
+        labelFa: "هوشمندی برند",
+        href: "/dashboard/brand-monitoring",
+        icon: BarChart3
       },
       {
-        id: "content",
-        labelEn: "Content Tools",
-        labelFa: "ابزارهای محتوایی",
-        icon: BookOpen,
-        children: [
-          {
-            id: "content-studio",
-            labelEn: "Content Studio",
-            labelFa: "استودیوی محتوا",
-            href: "/dashboard/content/studio"
-          },
-          {
-            id: "content-ingestion",
-            labelEn: "Content Ingestion",
-            labelFa: "بارگذاری محتوا و مستندات",
-            href: "/dashboard/content/ingestion"
-          }
-        ]
-      },
-      {
-        id: "competitors",
-        labelEn: "Competitive Tools",
-        labelFa: "ابزارهای رقابتی",
-        icon: BarChart3,
-        children: [
-          {
-            id: "competitors-radar",
-            labelEn: "Competitor Radar",
-            labelFa: "رادار رقیبان",
-            href: "/dashboard/competitors/radar"
-          }
-        ]
-      },
-      {
-        id: "brand",
-        labelEn: "Brand & Citation Tools",
-        labelFa: "ابزارهای برند و استناد",
-        icon: Award,
-        children: [
-          {
-            id: "brand-citations",
-            labelEn: "Citation Explorer",
-            labelFa: "کاوشگر استنادها",
-            href: "/dashboard/brand/citations"
-          }
-        ]
-      },
-      {
-        id: "entities",
-        labelEn: "Knowledge & Entity Tools",
-        labelFa: "ابزارهای دانش و موجودیت‌ها",
-        icon: Network,
-        children: [
-          {
-            id: "entities-graph",
-            labelEn: "Live Knowledge Graph",
-            labelFa: "نمودار زنده دانش",
-            href: "/dashboard/entities/graph"
-          }
-        ]
-      },
-      {
-        id: "analytics",
-        labelEn: "Analytics & Reporting",
-        labelFa: "تحلیل‌ها و گزارش‌دهی",
-        icon: LineChart,
-        children: [
-          {
-            id: "analytics-llm-bias",
-            labelEn: "LLM Response Share & Bias",
-            labelFa: "سهم پاسخ و انحراف مدل‌ها",
-            href: "/dashboard/analytics/llm-bias"
-          }
-        ]
+        id: "query",
+        labelEn: "Query Engine",
+        labelFa: "موتور پرس‌وجو",
+        href: "/dashboard/query",
+        icon: SearchCode
       }
     ]
   },
@@ -210,7 +106,7 @@ export const dashboardNavigation: NavigationSection[] = [
         id: "help",
         labelEn: "Help & Guide",
         labelFa: "راهنما و پشتیبانی",
-        href: "#help", // Trigger overlay or support drawer
+        href: "#help",
         icon: HelpCircle
       }
     ]

@@ -27,14 +27,13 @@ import {
   PanelLeftOpen,
   Languages,
   Receipt,
-  LogOut
+  LogOut,
 } from "lucide-react";
 
 interface DashboardShellProps {
   children: React.ReactNode;
 }
 
-// Helper types for lists
 interface NavItem {
   name: string;
   href: string;
@@ -47,10 +46,23 @@ interface NavSection {
 }
 
 // 1. Static Sub-Component: Brand Logo
-const Logo = ({ language, showText = true }: { language: "en" | "fa"; showText?: boolean }) => (
+const Logo = ({
+  language,
+  showText = true,
+}: {
+  language: "en" | "fa";
+  showText?: boolean;
+}) => (
   <div className="flex items-center gap-2.5">
     <div className="relative w-9 h-9 flex-shrink-0 rounded-[var(--radius-md)] overflow-hidden ring-1 ring-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-md">
-      <Image src="/logo-horse.png" alt="Brand logo" fill sizes="36px" className="object-contain p-0.5" priority />
+      <Image
+        src="/logo-transparent.png"
+        alt="Brand logo"
+        fill
+        sizes="36px"
+        className="object-contain p-0.5"
+        priority
+      />
     </div>
     {showText && (
       <div className="flex flex-col leading-none">
@@ -132,32 +144,97 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
     {
       title: language === "fa" ? "مرکز عملیات هسته" : "Core Operations",
       items: [
-        { name: language === "fa" ? "میز فرماندهی هوشمند" : "Command Center", href: "/dashboard", icon: LayoutDashboard },
-        { name: language === "fa" ? "موتور ورود و پایش اسناد" : "Data Ingestion Engine", href: "/dashboard/ingestion", icon: Database },
-        { name: language === "fa" ? "جستجوی پیشرفته معنایی RAG" : "AI Semantic Discovery", href: "/dashboard/query", icon: Search },
-        { name: language === "fa" ? "گراف دانش سازمانی" : "Enterprise Knowledge Graph", href: "/dashboard/entities", icon: Network },
+        {
+          name: language === "fa" ? "میز فرماندهی هوشمند" : "Command Center",
+          href: "/dashboard",
+          icon: LayoutDashboard,
+        },
+        {
+          name:
+            language === "fa"
+              ? "موتور ورود و پایش اسناد"
+              : "Data Ingestion Engine",
+          href: "/dashboard/content/ingestion",
+          icon: Database,
+        },
+        {
+          name:
+            language === "fa"
+              ? "جستجوی پیشرفته معنایی RAG"
+              : "AI Semantic Discovery",
+          href: "/dashboard/query",
+          icon: Search,
+        },
+        {
+          name:
+            language === "fa"
+              ? "گراف دانش سازمانی"
+              : "Enterprise Knowledge Graph",
+          href: "/dashboard/entities",
+          icon: Network,
+        },
       ],
     },
     {
-      title: language === "fa" ? "هوشمندی و تحلیل‌های ژرف" : "Intelligence & Deep Analysis",
+      title:
+        language === "fa"
+          ? "هوشمندی و تحلیل‌های ژرف"
+          : "Intelligence & Deep Analysis",
       items: [
-        { name: language === "fa" ? "تحلیل استاندارد برند" : "Standard Brand Audit", href: "/dashboard/intelligence", icon: BrainCircuit },
-        { name: language === "fa" ? "رادار تحلیل رقابتی برند" : "Competitive Intelligence Radar", href: "/dashboard/competitive", icon: Compass },
-        { name: language === "fa" ? "تحلیل پاسخ‌های مدل‌های زبانی" : "Language Model Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+        {
+          name:
+            language === "fa"
+              ? "رادار تحلیل رقابتی برند"
+              : "Competitive Intelligence Radar",
+          href: "/dashboard/competitors",
+          icon: Compass,
+        },
+        {
+          name:
+            language === "fa"
+              ? "تحلیل پاسخ‌های مدل‌های زبانی"
+              : "Language Model Analytics",
+          href: "/dashboard/analytics",
+          icon: BarChart3,
+        },
       ],
     },
   ];
 
   const workspaceDropdownItems = [
-    { label: "Enterprise Tehran", value: "tehran", onClick: () => setActiveWorkspace("Enterprise Tehran") },
-    { label: "Global EMEA", value: "emea", onClick: () => setActiveWorkspace("Global EMEA") },
-    { label: "GCC Regional", value: "gcc", onClick: () => setActiveWorkspace("GCC Regional") },
+    {
+      label: "Enterprise Tehran",
+      value: "tehran",
+      onClick: () => setActiveWorkspace("Enterprise Tehran"),
+    },
+    {
+      label: "Global EMEA",
+      value: "emea",
+      onClick: () => setActiveWorkspace("Global EMEA"),
+    },
+    {
+      label: "GCC Regional",
+      value: "gcc",
+      onClick: () => setActiveWorkspace("GCC Regional"),
+    },
   ];
 
   const userDropdownItems = [
-    { label: language === "fa" ? "حساب کاربری" : "User Account Profile", value: "profile", onClick: () => router.push(`/${language}/profile`) },
-    { label: language === "fa" ? "پیکربندی سیستم" : "System Configuration", value: "settings", onClick: () => router.push(`/${language}/settings`) },
-    { label: language === "fa" ? "خروج از سیستم" : "Logout of System", value: "logout", onClick: async () => await logout() },
+    {
+      label: language === "fa" ? "حساب کاربری" : "User Account Profile",
+      value: "profile",
+      onClick: () => router.push(`/${language}/profile`),
+    },
+    {
+      label: language === "fa" ? "پیکربندی سیستم" : "System Configuration",
+      value: "settings",
+      onClick: () => router.push(`/${language}/settings`),
+    },
+    {
+      label: language === "fa" ? "خروج از سیستم" : "Logout of System",
+      value: "logout",
+      onClick: async () => await logout(),
+    },
   ];
 
   const toggleLanguage = () => {
@@ -176,15 +253,22 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
 
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
 
-  const getLocalizedHref = (href: string) => `/${language}${href === "/" ? "" : href}`;
+  const getLocalizedHref = (href: string) =>
+    `/${language}${href === "/" ? "" : href}`;
 
   const isItemActive = (href: string) => {
     const localizedHref = getLocalizedHref(href);
-    return pathname === localizedHref || (href !== "/dashboard" && pathname?.startsWith(localizedHref));
+    return (
+      pathname === localizedHref ||
+      (href !== "/dashboard" && pathname?.startsWith(localizedHref))
+    );
   };
 
   return (
-    <div className="min-h-screen flex bg-transparent text-[var(--foreground)] relative overflow-hidden" dir={direction}>
+    <div
+      className="min-h-screen flex bg-transparent text-[var(--foreground)] relative overflow-hidden"
+      dir={direction}
+    >
       {/* 4. Ambient Background Orbs */}
       <div className="ambient-bg">
         <div className="ambient-orb orb-1" />
@@ -208,10 +292,18 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
               trigger={
                 <button className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover:border-[var(--sky-blue-500)]/35 transition-colors shadow-sm">
                   <span className="flex items-center gap-2 min-w-0">
-                    <Building2 size={16} className="text-[var(--color-primary-600)] flex-shrink-0" />
-                    <span className="text-sm font-medium text-[var(--text-primary)] truncate">{activeWorkspace}</span>
+                    <Building2
+                      size={16}
+                      className="text-[var(--color-primary-600)] flex-shrink-0"
+                    />
+                    <span className="text-sm font-medium text-[var(--text-primary)] truncate">
+                      {activeWorkspace}
+                    </span>
                   </span>
-                  <ChevronDown size={14} className="text-[var(--text-muted)] flex-shrink-0" />
+                  <ChevronDown
+                    size={14}
+                    className="text-[var(--text-muted)] flex-shrink-0"
+                  />
                 </button>
               }
               items={workspaceDropdownItems}
@@ -230,14 +322,23 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
         {sidebarOpen && (
           <div className="mx-3 mb-3 p-3 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-md">
             <div className="flex items-center justify-between text-xs font-medium mb-2">
-              <span className="text-[var(--text-secondary)]">{language === "fa" ? "سهمیه کوئری" : "Query Quota"}</span>
-              <span className="text-[var(--color-primary-600)] font-semibold">72%</span>
+              <span className="text-[var(--text-secondary)]">
+                {language === "fa" ? "سهمیه کوئری" : "Query Quota"}
+              </span>
+              <span className="text-[var(--color-primary-600)] font-semibold">
+                72%
+              </span>
             </div>
             <div className="h-1.5 w-full bg-[var(--border)] rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-[var(--sky-blue-500)] to-[var(--orange-500)] rounded-full" style={{ width: "72%" }} />
+              <div
+                className="h-full bg-gradient-to-r from-[var(--sky-blue-500)] to-[var(--orange-500)] rounded-full"
+                style={{ width: "72%" }}
+              />
             </div>
             <span className="mt-2 block text-[10px] text-[var(--text-muted)]">
-              {language === "fa" ? "۷,۲۰۰ از ۱۰,۰۰۰" : "7,200 of 10,000 queries"}
+              {language === "fa"
+                ? "۷,۲۰۰ از ۱۰,۰۰۰"
+                : "7,200 of 10,000 queries"}
             </span>
           </div>
         )}
@@ -249,11 +350,28 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
             size="sm"
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className={`w-full ${sidebarOpen ? "justify-start" : "justify-center"}`}
+            aria-label={
+              sidebarOpen
+                ? language === "fa"
+                  ? "جمع کردن منو"
+                  : "Collapse menu"
+                : language === "fa"
+                  ? "باز کردن منو"
+                  : "Expand menu"
+            }
           >
             <span className="rtl:-scale-x-100 inline-flex">
-              {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
+              {sidebarOpen ? (
+                <PanelLeftClose size={18} />
+              ) : (
+                <PanelLeftOpen size={18} />
+              )}
             </span>
-            {sidebarOpen && <span className="text-xs">{language === "fa" ? "جمع کردن" : "Collapse"}</span>}
+            {sidebarOpen && (
+              <span className="text-xs">
+                {language === "fa" ? "جمع کردن" : "Collapse"}
+              </span>
+            )}
           </Button>
         </div>
       </motion.aside>
@@ -278,7 +396,13 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
             >
               <div className="h-16 flex items-center justify-between px-4 border-b border-[var(--glass-border)]">
                 <Logo language={language} />
-                <Button variant="ghost" size="sm" onClick={() => setMobileSidebarOpen(false)} className="p-1.5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setMobileSidebarOpen(false)}
+                  className="p-1.5"
+                  aria-label={language === "fa" ? "بستن منو" : "Close menu"}
+                >
                   <X size={18} />
                 </Button>
               </div>
@@ -287,10 +411,18 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
                   trigger={
                     <button className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)]">
                       <span className="flex items-center gap-2 min-w-0">
-                        <Building2 size={16} className="text-[var(--color-primary-600)]" />
-                        <span className="text-sm font-medium text-[var(--text-primary)] truncate">{activeWorkspace}</span>
+                        <Building2
+                          size={16}
+                          className="text-[var(--color-primary-600)]"
+                        />
+                        <span className="text-sm font-medium text-[var(--text-primary)] truncate">
+                          {activeWorkspace}
+                        </span>
                       </span>
-                      <ChevronDown size={14} className="text-[var(--text-muted)]" />
+                      <ChevronDown
+                        size={14}
+                        className="text-[var(--text-muted)]"
+                      />
                     </button>
                   }
                   items={workspaceDropdownItems}
@@ -323,10 +455,17 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
 
             {/* Search bar */}
             <div className="relative hidden sm:flex items-center w-64 lg:w-80">
-              <Search size={16} className="absolute start-3 text-[var(--text-muted)] pointer-events-none" />
+              <Search
+                size={16}
+                className="absolute start-3 text-[var(--text-muted)] pointer-events-none"
+              />
               <input
                 type="search"
-                placeholder={language === "fa" ? "جستجو در اسناد..." : "Search documents..."}
+                placeholder={
+                  language === "fa"
+                    ? "جستجو در اسناد..."
+                    : "Search documents..."
+                }
                 className="w-full ps-9 pe-16 py-2 text-sm rounded-xl bg-white/[0.03] border border-[var(--glass-border)] focus:border-[var(--sky-blue-500)]/40 focus:bg-white/[0.05] outline-none text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-colors"
               />
               <kbd className="absolute end-2.5 hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-[var(--text-muted)] bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded">
@@ -337,13 +476,25 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
 
           <div className="flex items-center gap-1 sm:gap-2">
             {/* Language Toggle */}
-            <Button variant="ghost" size="sm" onClick={toggleLanguage} className="px-2" aria-label="Toggle language">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleLanguage}
+              className="px-2"
+              aria-label="Toggle language"
+            >
               <Languages size={16} />
               <span className="uppercase text-xs">{language}</span>
             </Button>
 
             {/* Theme Toggle */}
-            <Button variant="ghost" size="sm" onClick={toggleTheme} className="p-2" aria-label="Toggle theme">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleTheme}
+              className="p-2"
+              aria-label="Toggle theme"
+            >
               <AnimatePresence mode="wait" initial={false}>
                 <motion.span
                   key={theme}
@@ -359,8 +510,16 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
             </Button>
 
             {/* Invoice Icon button placed right next to Language and Theme Toggles */}
-            <Link href={`/${language}/invoice`} title={language === "fa" ? "پرداخت صورتحساب" : "Invoice Payment"}>
-              <Button variant="ghost" size="sm" className="p-2" aria-label="Invoice">
+            <Link
+              href={`/${language}/invoice`}
+              title={language === "fa" ? "پرداخت صورتحساب" : "Invoice Payment"}
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-2"
+                aria-label="Invoice"
+              >
                 <Receipt size={18} />
               </Button>
             </Link>
@@ -375,10 +534,17 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
                     U
                   </span>
                   <span className="hidden lg:flex flex-col items-start leading-none">
-                    <span className="text-xs font-semibold text-[var(--text-primary)]">User Admin</span>
-                    <span className="text-[10px] text-[var(--text-muted)]">tehran@brandgraph.ai</span>
+                    <span className="text-xs font-semibold text-[var(--text-primary)]">
+                      User Admin
+                    </span>
+                    <span className="text-[10px] text-[var(--text-muted)]">
+                      tehran@brandgraph.ai
+                    </span>
                   </span>
-                  <ChevronDown size={14} className="hidden lg:inline text-[var(--text-muted)]" />
+                  <ChevronDown
+                    size={14}
+                    className="hidden lg:inline text-[var(--text-muted)]"
+                  />
                 </button>
               }
               items={userDropdownItems}
@@ -388,15 +554,25 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
 
         {/* PAGE CONTENT */}
         <main className="flex-1 overflow-y-auto">
-          <div className="p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto w-full relative z-10">{children}</div>
+          <div className="p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto w-full relative z-10">
+            {children}
+          </div>
 
           <footer className="h-9 border-t border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-[var(--glass-blur)] flex items-center justify-between px-4 text-[11px] text-[var(--text-muted)] mt-auto">
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)]" />
-              <span>{language === "fa" ? "همه سیستم‌ها عملیاتی" : "All systems operational"}</span>
+              <span>
+                {language === "fa"
+                  ? "همه سیستم‌ها عملیاتی"
+                  : "All systems operational"}
+              </span>
             </div>
             <div className="hidden sm:flex items-center gap-4">
-              <span>{language === "fa" ? "همگام‌سازی: ۱ دقیقه پیش" : "Synced 1m ago"}</span>
+              <span>
+                {language === "fa"
+                  ? "همگام‌سازی: ۱ دقیقه پیش"
+                  : "Synced 1m ago"}
+              </span>
               <span>v2.4.0</span>
             </div>
           </footer>

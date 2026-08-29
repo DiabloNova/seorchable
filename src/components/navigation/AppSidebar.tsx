@@ -32,7 +32,7 @@ interface AppSidebarProps {
   setCollapsed?: (val: boolean) => void;
   mobileOpen?: boolean;
   setMobileOpen?: (val: boolean) => void;
-  hideToggle?: boolean; // Prop to hide the floating top-left toggle when rendered inside LandingHeader
+  hideToggle?: boolean; // Prop to hide the floating top-left toggle when rendered inside Header
 }
 
 export default function AppSidebar({
@@ -87,10 +87,10 @@ export default function AppSidebar({
         { href: "/dashboard/analytics/llm", icon: BarChart3, labelEn: "LLM Analytics", labelFa: "تحلیل مدل‌های زبانی بزرگ" },
         { href: "/dashboard/query", icon: MessageSquare, labelEn: "Prompt Intelligence", labelFa: "تحلیل هوش مصنوعی و پرامپت" },
         { href: "/dashboard/content", icon: LayoutDashboard, labelEn: "Content Studio", labelFa: "استودیو محتوا" },
-        { href: "/dashboard/optimization/technical", icon: Settings, labelEn: "Technical SEO", labelFa: "سئوی تکنیکال" },
+        { href: "/dashboard/seo/technical", icon: Settings, labelEn: "Technical SEO", labelFa: "سئوی تکنیکال" },
         { href: "/solutions/protection", icon: Shield, labelEn: "AI Advertising", labelFa: "تبلیغات در هوش مصنوعی" },
         { href: "/docs", icon: FileText, labelEn: "Model Context Protocol (MCP)", labelFa: "اتصال داده‌ها (MCP)" },
-        { href: "/dashboard/rag", icon: Search, labelEn: "Agent Search", labelFa: "جستجوی عامل هوشمند" }
+        { href: "/dashboard/query", icon: Search, labelEn: "Agent Search", labelFa: "جستجوی عامل هوشمند" }
       ]
     },
     {

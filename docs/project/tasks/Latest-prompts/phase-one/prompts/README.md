@@ -1,0 +1,1 @@
+Workflow rule: if any prompt discovers a blocker, stop that branch and fix the blocker with a new micro-prompt. Don’t tell Jules to “continue anyway.” That’s how agents turn one missing file into a 40-file archaeological excavation.

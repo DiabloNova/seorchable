@@ -402,7 +402,7 @@ export default function DashboardTopbar({
                 className="flex items-center gap-2 p-1 pe-2 rounded-full hover:bg-[var(--muted-surface)] transition-colors cursor-pointer outline-none focus:ring-1 focus:ring-[var(--sky-blue-500)]"
                 aria-label={isRtl ? "منوی کاربری" : "User menu"}
               >
-                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--sky-blue-500)] to-[var(--orange-500)] text-white flex items-center justify-center text-xs font-bold uppercase">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1A365D] to-[#B8860B] dark:from-[#0D9488] dark:to-[#D97706] text-white flex items-center justify-center text-xs font-bold uppercase shadow-inner">
                   {session.user?.name?.slice(0, 1) || "U"}
                 </span>
                 <span className="hidden lg:flex flex-col items-start leading-none text-start">
