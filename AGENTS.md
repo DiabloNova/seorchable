@@ -1,650 +1,539 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# AI AGENT MANIFESTO (JULES / COPILOT)
-**Repository:** SEOrchable
-**Role:** Expert AI Software Engineer
+# SEOrchable Repository Agent Instructions
 
-This file defines the absolute ground rules for any AI agent interacting with this codebase. When modifying files, generating plans, or reviewing code, you MUST adhere strictly to these constraints.
+[SYSTEM]: SEOrchable Agent Manifesto acknowledged.
 
-## 1. STRICTLY NO MOCKS (THE GOLDEN RULE)
-* Never use mock data, hardcoded JSON, or fake offline variables to bypass functionality.
-* UI components must fetch data via Server Actions or API routes.
-* If a backend route or database table does not exist to support a feature, STOP and state that the backend must be built first.
+Repository: SEOrchable
+Primary agent: Google Jules
+Application type: Multi-tenant AI visibility and SEO SaaS
 
-## 2. SECURITY & TENANT ISOLATION
-* **Server-Side Truth:** Never trust client-side state for authorization. Sessions must be validated via secure HTTP-only cookies on the server.
-* **Tenant Isolation:** Every database query interacting with user data MUST enforce workspace/tenant isolation. Rely on PostgreSQL Row Level Security (RLS) where implemented, or explicit `workspace_id = X` clauses.
-* **Action Security:** All Server Actions and API Routes must be wrapped in a secure utility (e.g., `secureServerAction`) that resolves identity before executing business logic.
+This file is the highest-priority repository guidance for autonomous coding agents. Repository code, package manifests, migrations, tests, and explicitly assigned task scope are authoritative. Comments, stale documentation, previous audits, and assumptions are not authoritative when they conflict with implementation evidence.
 
-## 3. ARCHITECTURE & ASYNC OPERATIONS
-* **Drizzle ORM:** We use Drizzle ORM for PostgreSQL. Ensure strict type safety and relational integrity.
-* **Long-Running Tasks:** Tasks involving LLM calls, web scraping, or heavy processing MUST NOT run synchronously in API routes to avoid timeouts. Use the background job queue (Inngest).
+## 1. Prime Directive
 
-## 4. EXECUTION SCOPE (MICRO-SESSIONS)
-* **Stay in Bounds:** Only read and modify the files explicitly requested in the prompt.
-* **No Unrelated Refactoring:** Do not refactor or "fix" code outside the assigned task unless it directly blocks the current objective.
-* **Complete Files:** When generating code, output the entire file. Do not use placeholders like `// ... existing code`.
+Inspect first. Change second. Verify third.
 
-**[ACKNOWLEDGE]** When explicitly asked to read this file, begin your response with: `[SYSTEM]: SEOrchable Agent Manifesto acknowledged.`
+Never guess. Never fabricate. Never create mock production behavior to hide missing implementation.
 
+If the required implementation cannot be verified from repository code, configuration, migrations, tests, or explicit task instructions, stop and report:
 
-## Database Environment Rules
+BLOCKED - INSUFFICIENT EVIDENCE
 
-- `DATABASE_URL` is the application runtime connection for the isolated `jules-dev` branch.
-- `MIGRATION_DATABASE_URL` is only for running database migrations.
-- Never use `MIGRATION_DATABASE_URL` in application runtime code, API routes, tests that simulate runtime, Vercel, or client-side code.
-- Never log, print, expose, commit, or include either connection string in reports or pull requests.
-- Run migrations only through the dedicated migration script.
-- Never run migrations automatically during `next build`, Vercel deployment, or application startup.
-- Use `DATABASE_URL` for normal queries and tenant-scoped application tests.
-- Use `MIGRATION_DATABASE_URL` only when explicitly executing migration commands.
+The report must identify:
 
-# Mandatory Engineering Rules
-
-## Evidence-First Development
-
-The repository is governed by an evidence-first, no-guessing policy.
-
-## Absolute Rule
-
-Never guess. Never invent. Never fabricate missing implementation details.
-
-## An AI agent MUST NOT:
-
-- invent a **database table**
-- invent a **column**
-- invent a **repository**
-- invent a **repository method**
-- invent a **service**
-- invent an **API contract**
-- invent **tenant behavior**
-- invent **authorization behavior**
-- invent **migration behavior**
-- invent **schema relationships**
-- invent **configuration**
-- invent **environment variables**
-- invent **production infrastructure**
-- invent a **fallback data source**
-- invent a **mock implementation** to make a task appear complete
-- **replace missing evidence with assumptions**
-
-If the required implementation detail cannot be verified from the repository, approved documentation, or explicitly provided task context:
-
-**STOP and report "BLOCKED".**
-
-**Do not continue by making an assumption**.
-
----
-
-**No Fabricated Data**
-
-Production application code MUST NOT fabricate data.
-
-## Forbidden patterns include:
-
-**`Math.random()`**
-
-used as a substitute for persisted application data.
-
-## Also forbidden:
-
-**`return mockData;`**
-**`return demoData;`**
-**``return fakeData;`**
-**``return fallbackData;`**
-
-when these values substitute for unavailable persistence or external data.
-
-## Also forbidden:
-
-**`databaseResult ?? fakeData`**
-
-and:
-
-**`try {
-  return await repository.getData();
-} catch {
-  return mockData;
-}`**
-
-unless the fallback is explicitly verified as intentional static behavior.
-
----
-
-## Mock Data Policy
-
-Mocks are allowed **only when they are explicitly required for**:
-
-- unit-test isolation
-- integration-test fixtures
-- deterministic test data
-- development tooling explicitly designed around mocks
-
-Mocks **MUST NOT** be introduced into production application paths merely because:
-
-- a repository is missing
-- a table is unclear
-- an API is unavailable
-- a test is difficult to write
-- existing implementation is incomplete
-- the agent does not understand the architecture
-
-If a production path requires persistence that cannot be verified:
-
- **BLOCK the task.**
-
----
-
-## Database Evidence Rule
-
-Before changing database-backed code, the agent **MUST** be able to identify all of the following from existing evidence:
-
-1. Canonical table
-2. Relevant columns
-3. Existing repository or approved query
-4. Repository behavior
-5. Tenant boundary
-6. Authorization boundary
-7. Expected error behavior
-
-If any one of these cannot be established:
-
-**DO NOT IMPLEMENT.**
-
-Report:
-
-**`BLOCKED — INSUFFICIENT EVIDENCE`**
-
-and identify exactly what evidence is missing.
-
----
-
-## Schema and Migration Protection
-
-AI agents MUST NOT create or modify schema/migration infrastructure simply to unblock an application task unless the task explicitly authorizes it.
-
-In particular, an agent MUST NOT:
-
-- create a guessed table
-- add a guessed column
-- create a guessed relation
-- create a migration based on assumptions
-- modify RLS policies based on assumptions
-- change tenant isolation behavior without explicit evidence
-
-Database architecture must be established before application code is connected to it.
-
----
-
-## Tenant Isolation
-
-Tenant isolation MUST NEVER be inferred.
-
-Before modifying tenant-scoped functionality, verify the existing mechanism for:
-
-- tenant identification
-- tenant context propagation
-- repository scoping
-- PostgreSQL RLS
-- authorization
-
-If the boundary cannot be demonstrated:
-
-**BLOCK.**
-
-Never bypass tenant isolation to make a feature work.
-
----
-
-## Authorization
-
-Authorization behavior MUST be preserved.
-
-An agent MUST NOT:
-
-- weaken an authorization check
-- remove an authorization check
-- bypass an existing policy
-- expose data because a repository method is easier to call directly
-- assume that authentication implies authorization
-
-If authorization behavior is unclear:
-
-**BLOCK.**
-
----
-
-## Fail-Closed Requirement
-
-Application code MUST fail closed when a required dependency fails.
-
-Database failures, authorization failures, tenant-context failures, and required external-service failures MUST NOT silently become:
-
-- mock data
-- random data
-- demo data
-- stale data
-- fabricated success responses
-
-A legitimate empty result MUST remain distinguishable from an infrastructure failure whenever the existing architecture provides that distinction.
-
----
-
-## Change Scope
-
-Agents MUST modify only files explicitly permitted by the current task.
-
-Do not expand scope because an unrelated problem is discovered.
-
-If another change is required to complete the task but is outside the allowed scope:
-
-STOP and report the dependency as BLOCKED.
-
-Do not modify the unrelated file.
-
----
-
-## Verification Before Completion
-
-An agent **MUST NOT** claim a task is complete merely because:
-
-- the code compiles
-- TypeScript passes
-- a test passes
-- a mock was replaced
-- an endpoint returns a response
-
-Completion requires evidence that the implementation respects:
-
-- canonical architecture
-- persistence
-- authorization
-- tenant isolation
-- error semantics
-- approved file scope
-
----
-
-## Required Reporting
-
-For every implementation involving previously mocked, random, fallback, or in-memory data, report:
-
-- Previous data source
-- New data source
-- Canonical repository
-- Canonical table
-- Tenant boundary
-- Authorization behavior
-- Error behavior
-- Tests executed
-- Test exit status
-- Remaining limitations
-
-For blocked work, report:
-
-- Exact file/path
-- Exact dependency that is missing
-- Evidence that was searched
+- Exact file or subsystem
+- Missing evidence
 - Why implementation would require guessing
 - What evidence would unblock the work
+- Any safe, non-mutating inspection already performed
 
----
+## 2. Technology Stack
 
-## Prime Directive
+The application uses:
 
-«Repository evidence is authoritative.
+- Next.js App Router
+- React and strict TypeScript
+- PostgreSQL
+- Drizzle ORM
+- PostgreSQL Row Level Security where implemented
+- Inngest for long-running and retryable background work
+- Tailwind CSS
+- Vercel AI SDK and configured AI providers
+- Firecrawl for controlled website acquisition
+- Redis-compatible infrastructure for rate limiting, caching, and idempotency where configured
+- pnpm as the only package manager
 
-Approved documentation is supporting evidence.
+Do not migrate frameworks, ORM technologies, queue providers, authentication providers, or database technologies unless the current task explicitly authorizes that migration.
 
-Task instructions define scope.
+## 3. Evidence-First Workflow
 
-Assumptions are not evidence.
-
-When evidence is missing, STOP — do not guess, do not fabricate, and do not create a mock to hide the gap.»
-- 
-## This is NOT the Next.js you know
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in node_modules/next/dist/docs/ before writing any code. Heed deprecation notices.
-
-# Repository Agent Instructions
-### Purpose
-This file defines the permanent working rules for AI coding agents, including Jules, working in this repository.
-The goal is to make changes that are correct, minimal, secure, testable, and consistent with the current repository.
-
-## 1. Source of Truth
-The current repository implementation is the primary source of truth.
-Before making changes, inspect the actual code, configuration, dependencies, routes, and tests.
-Do not assume that:
-
-- documentation
-- README files
-- comments
-- previous audit reports
-- old task descriptions
-- architectural diagrams
-
-accurately describe the current implementation.
-
-When documentation conflicts with implementation:
-- Trust the current implementation.
-- Do not change working code merely to match outdated documentation unless the current task explicitly requires it.
-
-## 2. Inspect Before Editing
-Before modifying code:
-
-- Locate the relevant files.
-- Read the existing implementation.
-- Trace important dependencies and consumers.
-- Inspect related tests.
-- Check relevant configuration.
-- Determine whether the requested functionality already partially exists.
-
-Do not guess file locations, APIs, routes, data models, or architecture when the repository can answer the question.
-
-## 3. Task Scope
-Implement only what the current task requires.
-Do not:
-
-- refactor unrelated code
-- redesign unrelated features
-- migrate architecture
-- move files unnecessarily
-- rename unrelated components
-- upgrade dependencies without a requirement
-- introduce speculative features
-- fix unrelated technical debt
-
-If another problem is discovered, report it instead of silently expanding the task.
-Do not start the next architectural or product task unless explicitly instructed.
-
-## 4. Preserve Existing Architecture
-Prefer existing:
-
-- components
-- utilities
-- services
-- repositories
-- feature modules
-- abstractions
-- design tokens
-- validation mechanisms
-
-over creating parallel implementations.
-
-* Do not introduce a new architectural pattern when an existing pattern already solves the problem.
-* Do not migrate frameworks, libraries, persistence technologies, or major architectural patterns unless explicitly requested.
-
-## 5. Next.js
-This repository uses a Next.js version whose APIs and conventions may differ from general training knowledge.
-Before changing Next.js-specific code:
-
-- Inspect the installed Next.js version.
-- Read the relevant documentation under node_modules/next/dist/docs/.
-- Follow the APIs and conventions supported by the installed version.
-- Check deprecation notices.
-
-* Do not rely on assumptions based on older Next.js versions.
-* Do not introduce deprecated APIs when the installed version provides a supported alternative.
-
-## 6. Client / Server Boundaries
-Respect Next.js server/client boundaries.
-Keep server-only functionality on the server.
-Never expose:
-
-- API keys
-- database credentials
-- private tokens
-- secrets
-- privileged operations
-
-to client-side code.
-
-* Do not add "use client" unless required.
-Before moving logic between server and client, inspect the security, rendering, and data-flow implications.
-
-## 7. Authentication & Authorization
-Treat authentication and authorization as security boundaries.
-Never bypass authentication or authorization for convenience.
-Protected operations must enforce authorization server-side.
-Preserve the existing authentication/session architecture unless the task explicitly requires changing it.
-* Never expose sensitive authentication information.
-
-## 8. Multi-Tenancy & Data Isolation
-- If functionality operates on tenant-specific data, tenant isolation must be preserved.
-- Never trust a client-provided tenant identifier as sufficient authorization.
-- Tenant access must be validated through the appropriate server-side/data-access boundary.
-* Do not introduce queries or repository operations that can return another tenant's data.
-* Do not bypass existing database-level or repository-level isolation mechanisms.
-
-## 9. Database & Persistence
-Do not assume the persistence architecture from documentation.
-Inspect the current implementation before changing database-related code.
-Preserve existing guarantees such as:
-
-- tenant isolation
-- transactions
-- optimistic locking
-- validation
-- repository boundaries
-- database-level security
-
-* Do not replace production persistence with in-memory or mock storage.
-* Do not change persistence architecture as part of an unrelated task.
-
-## 10. Environment Variables & Secrets
-Never expose secrets or sensitive configuration.
-Never:
-
-- commit secrets
-- hard-code credentials
-- print secret values
-- include secret values in task reports
-- include secret values in logs or debug output
-- paste `.env` contents into responses
-- expose server-only environment variables to client-side code
-
-When inspecting environment configuration, inspect variable names and usage without revealing their values.
-If a command or tool output contains credentials, tokens, API keys, passwords, or other sensitive values, do not reproduce them in the final report.
-Use existing environment-variable conventions.
-Do not create or modify production secrets as part of an unrelated task.
-
-## 11. AI & External Services
-Before modifying AI functionality or external integrations, inspect the actual implementation.
-* Do not assume that a provider, model, API, or pipeline exists because it is mentioned in documentation.
-Preserve:
-
-- existing API contracts
-- authentication
-- error handling
-- input validation
-- server/client boundaries
-- credential security
-
-* Do not introduce new external services unless explicitly required.
-
-## 12. URL Fetching & SSRF
-Any server-side fetching of user-provided URLs is security-sensitive.
-Preserve existing SSRF protections.
-* Do not introduce unrestricted requests to arbitrary user-supplied URLs.
-Be careful with:
-
-- localhost
-- loopback addresses
-- private networks
-- internal services
-- cloud metadata endpoints
-- redirects
-- unexpected protocols
-- DNS-related SSRF risks
-
-* Do not replace an existing hardened implementation with an unrestricted fetch.
-
-## 13. Localization
-The application contains localized routes including:
-- `/fa`
-- `/en`
-
-Preserve the existing localization architecture.
-UI changes must consider:
-
-- Persian RTL
-- English LTR
-- locale routing
-- translations
-- text expansion
-- responsive layouts
-
-* Do not hard-code user-facing strings when the existing localization system should be used.
-* Do not break one locale while implementing another.
-
-## 14. UI, Themes & Design System
-The application supports light and dark themes.
-Preserve both themes when modifying UI.
-Prefer existing:
-
-- design tokens
-- semantic colors
-- typography
-- spacing
-- component styles
-- Tailwind utilities
-- animation conventions
-
-* Do not introduce arbitrary visual systems when an existing design system is available.
-UI changes should remain:
-
-- responsive
-- accessible
-- RTL/LTR compatible
-- light/dark compatible
-
-Avoid visual redesign when the task only requires functional changes.
-
-## 15. Dependencies
-Before adding a dependency, verify that the repository does not already provide the required functionality.
-* Do not add packages for trivial functionality without a clear reason.
-* Do not upgrade dependencies unless required by the task.
-Avoid dependency changes that expand the scope of an unrelated task.
-
-## 16. API Contracts
-Before changing an API, inspect:
-
-- implementation
-- consumers
-- request structure
-- response structure
-- validation
-- authentication
-- authorization
-- tests
-
-* Do not silently change API contracts.
-If a breaking API change is required, clearly identify the affected consumers and implications.
-
-## 17. Testing & Validation
-Use the repository's actual validation infrastructure.
-Before running validation, inspect `package.json` to discover the exact project scripts (e.g., build, lint, test, typecheck).
-* Do not assume standard script names if `package.json` defines custom equivalents.
-
-When relevant, run the project's actual commands for:
-- TypeScript checks / type-checking
-- ESLint / linters
-- Unit tests
-- Integration tests
-- E2E tests
-- Production build
-
-* Do not invent commands when the repository already defines the correct ones.
-* Do not claim that a validation step passed unless it was actually executed.
-* Do not remove or weaken tests merely to make them pass.
-When fixing a bug, add or update a regression test when appropriate.
-- If a required validation cannot be executed, state why.
-Never include secrets or sensitive environment values in validation output or the final report.
-
-## 18. Change Hygiene
-Before completing a task:
-
-- Inspect the final diff.
-- Verify every modified file.
-- Remove unrelated changes.
-- Remove debug code.
-- Remove unused imports.
-- Remove temporary files.
-- Verify no secrets were introduced.
-- Verify no accidental architecture changes occurred.
-
-Keep changes focused and reviewable.
-
-## 19. Documentation Governance
-Documentation describes the implementation; it does not define it.
-* Do not document planned functionality as implemented functionality.
-When documentation and implementation disagree:
-- inspect the implementation;
-- identify the actual behavior;
-- report the discrepancy;
-- update documentation only when required by the task.
-
-* Do not invent architecture to make documentation appear complete.
-
-## 20. Task Workflow
 For every task:
 
-1. **Understand**
-   Identify the objective, scope, affected subsystem, and acceptance criteria.
-2. **Inspect**
-   Read the relevant implementation before editing.
-3. **Plan**
-   Create a concise plan based on repository evidence.
-4. **Implement**
-   Make the smallest safe change that satisfies the task.
-5. **Validate**
-   Run the relevant tests and checks.
-6. **Review**
-   Inspect the final diff for regressions and unintended changes.
-7. **Report**
-   Clearly report what changed, why it changed, files modified, validation performed, validation results, and remaining risks or limitations.
+1. Read this file.
+2. Read the current task completely.
+3. Inspect package.json and the lockfile.
+4. Locate the exact files before editing.
+5. Trace imports, callers, consumers, schemas, migrations, and tests.
+6. Inspect the installed Next.js documentation under node_modules/next/dist/docs/ before changing Next.js behavior.
+7. Identify the canonical data source, repository, table, tenant boundary, authorization boundary, and error behavior.
+8. Make the smallest safe change inside the requested scope.
+9. Run the relevant verification commands.
+10. Inspect the final diff.
+11. Report changed files, validation results, limitations, and remaining risks.
 
-## 21. High-Risk Changes
-Treat these as high-risk and do not perform them implicitly:
+When implementation and documentation disagree, trust the current implementation and report the discrepancy.
 
-- authentication changes
-- authorization changes
-- tenant isolation changes
-- database migrations
-- persistence architecture changes
-- API contract changes
-- route restructuring
-- localization architecture changes
-- security-control changes
-- dependency migrations
-- framework upgrades
-- deployment configuration changes
-- environment-variable changes
-- major architectural refactoring
+## 4. No Mock Production Behavior
 
-* These require explicit task scope.
+Production application code MUST NOT use:
 
-## 22. Definition of Done
-A task is complete only when:
+- Mock databases
+- In-memory persistence
+- Hardcoded demo records
+- Random application results
+- Random user identities
+- Fabricated audit scores
+- Fake fallback responses
+- Silent database fallbacks
+- Fake successful responses when an external service fails
+- `Math.random()` as an identity or business-data generator
+- `return mockData`
+- `return demoData`
+- `return fakeData`
+- `databaseResult ?? fakeData`
+- Catch blocks that convert infrastructure failures into fabricated success
 
-- the requested objective is satisfied;
-- the existing architecture is respected;
-- scope has not unnecessarily expanded;
-- relevant validation has been performed;
-- no known security boundary was weakened;
-- localization remains functional;
-- applicable themes remain functional;
-- no secrets were introduced;
-- the final diff has been reviewed;
-- the final report accurately describes the work performed.
+Mocks are permitted only for:
 
----
-Final Rules
-- When uncertain: **Inspect first.**
-- When code and documentation conflict: **Trust the current implementation.**
-- When Next.js behavior is involved: **Read the installed Next.js documentation first.**
-- When a change is not required: **Do not make it.**
-- When a security boundary is involved: **Preserve it.**
-- When another task is discovered: **Report it; do not silently expand scope.**
-- When validation was not performed: **Say so explicitly.**
+- Unit-test isolation
+- Deterministic test fixtures
+- Explicit integration-test fixtures
+- Development tooling explicitly designed around mocks
 
-The goal is to make the smallest correct, secure, maintainable, repository-consistent change that fully satisfies the assigned task.
-<!-- END:nextjs-agent-rules -->
+A mock may never be introduced merely because:
+
+- A database is unavailable
+- A repository is missing
+- An API is difficult to call
+- A test is difficult to write
+- The agent does not understand the schema
+- Existing functionality is incomplete
+
+If a production path lacks required persistence or service evidence, stop and report BLOCKED.
+
+## 5. Package Management
+
+Use pnpm only.
+
+Allowed commands include:
+
+```bash
+pnpm install
+pnpm install --frozen-lockfile
+pnpm add <package>
+pnpm add -D <package>
+pnpm exec <command>
+pnpm run <script>
+
+
+Never use npm or yarn to modify the dependency graph.
+
+Before adding a dependency:
+1. Search package.json.
+2. Search the lockfile.
+3. Search existing source utilities.
+4. Confirm the dependency is genuinely required.
+5. Update package.json and pnpm-lock.yaml together.
+
+Never claim a dependency is installed merely because it appears in pnpm-lock.yaml. Runtime dependencies must be declared in package.json.
+
+## 6. TypeScript and Code Quality
+
+Strict TypeScript is mandatory.
+
+Do not:
+• Add any unless the existing boundary makes it unavoidable and the use is documented
+• Suppress errors with @ts-ignore
+• Disable lint rules globally
+• Weaken compiler settings
+• Remove tests to make validation pass
+• Hide errors with empty catch blocks
+• Return untyped database rows from application boundaries
+
+Prefer:
+• Explicit input and output types
+• Zod validation at external boundaries
+• Narrow domain types
+• Typed repository methods
+• Typed API response contracts
+• Exhaustive status and error handling
+• Small pure functions
+• Dependency injection for infrastructure services
+
+If typecheck is not defined in package.json, use:
+pnpm exec tsc --noEmit
+
+
+Only add a typecheck script when the assigned task explicitly permits package-script changes.
+
+## 7. Next.js Server and Client Boundaries
+
+Use server-first rendering.
+
+Default to:
+• Server Components
+• Server Actions for authenticated mutations
+• Route Handlers for explicit HTTP APIs
+• Server-side session validation
+• Server-side data fetching
+• Streaming or background jobs for long-running work
+
+Use "use client" only when the component requires:
+• Browser APIs
+• Local interactive state
+• Event handlers
+• Client-only visualization libraries
+• Client-side subscriptions
+
+Never move database access, API keys, privileged operations, session signing, or authorization logic into client code.
+
+Do not put the entire marketing page or dashboard shell behind "use client" merely for convenience.
+
+Before modifying Next.js code:
+node -p "require('next/package.json').version"
+find node_modules/next/dist/docs -type f | sort
+
+
+Read the relevant installed documentation before using new framework APIs.
+
+## 8. Authentication and Authorization
+
+Authentication and authorization are different controls.
+
+Every protected operation must:
+1. Resolve the server-side session.
+2. Validate session integrity and expiry.
+3. Resolve the authenticated user.
+4. Resolve the authorized workspace or tenant.
+5. Enforce role or permission checks.
+6. Execute business logic only after those checks.
+
+Sessions must use secure HTTP-only cookies or the repository's verified session mechanism.
+
+Never trust:
+• Client state
+• Hidden form fields
+• URL parameters
+• Local storage
+• x-user-id
+• x-tenant-id
+• Any other client-provided identity header
+
+A client-provided identifier may be treated only as an untrusted lookup hint and must never establish authorization.
+
+For external API clients, use a server-validated API key or signed credential mapped to a workspace. Do not use arbitrary identity headers.
+
+Never:
+• Ignore passwords
+• Generate users on login
+• Assign every user the same workspace
+• Assign elevated roles by default
+• Create sessions for unverified accounts
+• Expose whether an email exists
+• Remove an authorization check for convenience
+• Treat authentication as proof of workspace authorization
+
+Authorization must fail closed.
+
+## 9. Tenant Isolation
+
+Tenant isolation must be enforced at every layer:
+• Session resolution
+• Authorization
+• Service methods
+• Repository methods
+• SQL predicates
+• PostgreSQL RLS
+• Cache keys
+• Background job payloads
+• Logs and observability context
+
+Before changing tenant-scoped functionality, verify:
+1. Canonical tenant identifier
+2. Tenant context propagation
+3. Repository scoping
+4. PostgreSQL RLS policy
+5. Authorization boundary
+6. Cache isolation
+7. Expected unauthorized behavior
+
+Every tenant-scoped query must include a verified tenant boundary or execute under verified RLS.
+
+Never use a tenant ID supplied only by the browser.
+
+Never use a global mutable tenant variable.
+
+## 10. PostgreSQL and Drizzle Rules
+
+Use Drizzle ORM for application database access where the existing architecture uses Drizzle.
+
+Use parameterized SQL for raw queries.
+
+Never interpolate user-controlled values into SQL.
+
+Every database operation must use a request-scoped or transaction-scoped client.
+
+Connection handling must follow this pattern:
+1. Lease a PoolClient.
+2. Begin the transaction.
+3. Set tenant context with SET LOCAL or the established equivalent.
+4. Execute the work.
+5. Commit on success.
+6. Roll back on failure.
+7. Release the client in finally.
+
+Never store transaction state on a global singleton.
+
+Never reuse a PoolClient after release.
+
+Never swallow database errors.
+
+Never convert connection failure into empty rows, in-memory data, or success.
+
+Never run migrations:
+• During next build
+• During application startup
+• During Vercel deployment hooks
+• Automatically inside request handling
+
+DATABASE_URL is for normal application runtime queries.
+
+MIGRATION_DATABASE_URL is only for explicitly executing migrations.
+
+Never expose, print, log, commit, or report connection-string values.
+
+Before database changes, establish evidence for:
+• Canonical table
+• Canonical columns
+• Existing migration history
+• Existing repository
+• Existing repository behavior
+• Tenant boundary
+• Authorization boundary
+• Error semantics
+
+If any item is unknown, stop with:
+
+BLOCKED - INSUFFICIENT EVIDENCE
+
+Do not invent tables, columns, relations, repositories, migration behavior, or RLS policies.
+
+## 11. Schema and Migration Protection
+
+Database and migration changes are high-risk.
+
+Only modify schema or migration infrastructure when the current task explicitly authorizes it.
+
+Before generating a migration:
+pnpm exec drizzle-kit --help
+pnpm exec drizzle-kit generate
+
+
+Inspect the generated SQL before applying it.
+
+Never apply a migration to production from an autonomous coding session.
+
+Never delete migration history to make Drizzle generate a clean migration.
+
+Never modify an existing applied migration unless the task explicitly authorizes a controlled migration repair.
+
+## 12. Background Jobs and External Services
+
+Long-running work MUST NOT execute synchronously inside a request when it includes:
+• Website crawling
+• Firecrawl calls
+• LLM generation
+• Embedding generation
+• Large content parsing
+• Competitive analysis
+• Report generation
+
+Use Inngest or the repository's verified background-job mechanism.
+
+Every job must have:
+• Stable event name
+• Idempotency behavior
+• Retry policy
+• Concurrency limit
+• Explicit tenant ID from server authorization
+• Explicit user ID from server authorization
+• Correlation or request ID
+• Persisted status
+• Failure state
+• Error observability
+
+Do not send an event unless a registered worker can consume it.
+
+Do not report a job as completed before the result is persisted.
+
+External-service failures must remain distinguishable from valid empty results.
+
+## 13. URL Acquisition and SSRF
+
+Any server-side request to a user-provided URL is security-sensitive.
+
+All crawl entry points must reuse the verified SSRF guard and crawl policy.
+
+Reject:
+• Unsupported protocols
+• Localhost
+• Loopback addresses
+• Private IP ranges
+• Link-local addresses
+• Cloud metadata endpoints
+• Internal hostnames
+• Dangerous redirects
+• DNS rebinding
+• Excessive response sizes
+• Excessive redirects
+• Unbounded crawl depth
+• Unbounded concurrency
+
+Validate every redirect target, not only the original URL.
+
+Respect robots policy according to the established product rules.
+
+## 14. API Route Rules
+
+Every route must define:
+• Supported HTTP methods
+• Input schema
+• Authentication requirement
+• Authorization requirement
+• Tenant boundary
+• Rate limit behavior
+• Idempotency behavior when needed
+• Success response
+• Validation error response
+• Unauthorized response
+• Forbidden response
+• External-service failure response
+• Internal error behavior
+
+Use stable public error contracts.
+
+Never return stack traces, secrets, SQL, provider credentials, or internal infrastructure details.
+
+Do not accept an unbounded JSON body.
+
+## 15. Localization and UI
+
+The application supports:
+• /fa with RTL
+• /en with LTR
+
+Preserve:
+• Locale routing
+• RTL and LTR layout behavior
+• Persian text expansion
+• English text expansion
+• Light theme
+• Dark theme
+• Keyboard navigation
+• Reduced-motion behavior
+• Semantic HTML
+
+Do not hard-code user-facing text when the existing localization architecture provides a suitable mechanism.
+
+Invalid locales must not silently render duplicate content.
+
+## 16. Performance
+
+Protect the critical rendering path.
+
+Prefer:
+• Server-rendered public content
+• Small client islands
+• Lazy loading for graphs and charts
+• Reserved dimensions for visualizations
+• Optimized fonts
+• Optimized images
+• Stable skeletons
+• Database aggregation
+• Pagination
+• Cache keys containing tenant identity
+• Cache invalidation after writes
+
+Do not optimize by weakening security or data correctness.
+
+Do not promise a performance target without measuring it against a defined device, network, and Lighthouse profile.
+
+## 17. Scope Control
+
+Modify only files explicitly listed in the current task.
+
+Do not:
+• Refactor unrelated features
+• Rename unrelated files
+• Upgrade dependencies without authorization
+• Migrate architecture without authorization
+• Change API contracts silently
+• Change tenant behavior implicitly
+• Change authorization semantics implicitly
+• Fix unrelated technical debt
+
+If a required dependency is outside scope, stop and report BLOCKED.
+
+## 18. Verification
+
+Run the repository's actual scripts from package.json.
+
+At minimum, when relevant:
+pnpm install --frozen-lockfile
+pnpm exec tsc --noEmit
+pnpm lint
+pnpm build
+pnpm test:acquisition
+pnpm exec drizzle-kit generate
+
+
+For local route checks:
+pnpm dev
+curl -i http://localhost:3000/api/inngest
+curl -i -X POST http://localhost:3000/api/v1/audit/free \
+  -H 'content-type: application/json' \
+  --data '{"url":"https://example.com"}'
+
+
+Do not claim a command passed unless it was executed and its exit status was verified.
+
+## 19. Final Diff Review
+
+Before completion:
+git status --short
+git diff --check
+git diff --stat
+git diff
+
+
+Verify:
+• No secrets
+• No debug logs
+• No temporary files
+• No mock production data
+• No unrelated files
+• No weakened authorization
+• No weakened tenant isolation
+• No unreviewed migration
+• No unused imports
+• No accidental API contract changes
+
+## 20. Required Completion Report
+
+Report:
+• Summary of implementation
+• Exact modified files
+• Exact created files
+• Previous data source, if changed
+• New data source
+• Canonical repository
+• Canonical table
+• Tenant boundary
+• Authorization behavior
+• Error behavior
+• Commands executed
+• Exit status of each command
+• Tests added or updated
+• Remaining limitations
+• Any blocked work
+
+For blocked work, use this exact heading:
+
+BLOCKED - INSUFFICIENT EVIDENCE
+
+Never claim completion when only compilation succeeded.
+
+## 21. Acknowledgement
+
+When explicitly asked to read this file, begin the response with:
+
+[SYSTEM]: SEOrchable Agent Manifesto acknowledged.
