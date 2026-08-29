@@ -33,9 +33,9 @@ export function Hero() {
       {/* WebGL Animated Background */}
       <div className="absolute inset-0 -z-20">
         <MoltenMetal
-          color1="#0a0a0a"
-          color2="#171717"
-          color3="#262626"
+          color1="#0bddef"
+          color2="#64748b"
+          color3="#105cd9"
           backgroundColor="#000000"
           lightMode={false}
           className="opacity-70 dark:opacity-100"
@@ -54,30 +54,36 @@ export function Hero() {
               <span className="absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75 animate-ping" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500" />
             </span>
-            {isFa ? "پلتفرم نسل‌بعدی AEO و GEO" : "Next-generation AEO & GEO platform"}
+            {isFa
+              ? "پلتفرم نسل‌بعدی AEO و GEO"
+              : "Next-generation AEO & GEO platform"}
           </span>
 
-          <h1 className="font-display font-black tracking-tight text-balance text-5xl sm:text-6xl md:text-7xl leading-[1.2] md:leading-[1.1] text-zinc-900 dark:text-white drop-shadow-sm">
-            معرفی برند شما در هوش مصنوعی
+          <h1 className="font-display font-black tracking-tight text-balance max-w-4xl mx-auto text-5xl sm:text-6xl md:text-7xl leading-[1.2] md:leading-[1.1] text-white drop-shadow-lg">
+            اندازه گیری، پایش و ارتقای حضور برند شما در موتورهای جستجو و هوش
+            مصنوعی
           </h1>
 
-          <p className="text-lg md:text-xl text-zinc-700 dark:text-zinc-300 leading-[1.8] max-w-xl mx-auto text-pretty font-medium">
-            آنالیز داده های هوش مصنوعی در معرفی برند شما به میلیون ها کاربر ایرانی
+          <p className="text-lg md:text-xl text-white drop-shadow-lg leading-loose max-w-4xl mx-auto text-balance font-medium">
+            مجموعه نرم افزاری یکپارچه مدیریت رتبه‌بندی، سهم استناد و برطرف کردن
+            توهم‌های هوش مصنوعی در معرفی برند شما در موتورهای جستجو و مدل‌های
+            زبانی
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10">
             <button
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full text-white text-sm font-bold bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+              className="bg-blue-600 hover:bg-blue-700 text-white border-none shadow-lg shadow-blue-500/30 w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               onClick={() => {
                 const ref = document.getElementById("free-audit");
-                if (ref) ref.scrollIntoView({ behavior: "smooth", block: "start" });
+                if (ref)
+                  ref.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
             >
               <span>{isFa ? "شروع رایگان" : "Start Free"}</span>
             </button>
 
             <Link href={`/${language}/contact`} className="w-full sm:w-auto">
-              <button className="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-bold bg-white/80 dark:bg-zinc-900/80 hover:bg-white dark:hover:bg-zinc-900 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-800 backdrop-blur-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm">
+              <button className="bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm">
                 <span>{isFa ? "تماس با ما" : "Contact Us"}</span>
               </button>
             </Link>
@@ -95,7 +101,10 @@ export function Hero() {
                   key={i}
                   className="inline-flex items-center gap-2 rounded-[var(--radius-full)] neu-surface px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] shadow-sm"
                 >
-                  <Icon size={16} className="text-[var(--color-primary-600)] rtl:-scale-x-100" />
+                  <Icon
+                    size={16}
+                    className="text-[var(--color-primary-600)] rtl:-scale-x-100"
+                  />
                   {isFa ? chip.fa : chip.en}
                 </span>
               );
@@ -203,7 +212,9 @@ export function Hero() {
                     : isFa
                       ? "ورود به نسخه‌ی دمو"
                       : "Access live sandbox demo"}
-                  {!isLoading && <ArrowRight size={16} className="rtl:-scale-x-100" />}
+                  {!isLoading && (
+                    <ArrowRight size={16} className="rtl:-scale-x-100" />
+                  )}
                 </button>
 
                 <p className="text-[11px] text-zinc-400 dark:text-zinc-500 text-center pt-2 font-medium">
