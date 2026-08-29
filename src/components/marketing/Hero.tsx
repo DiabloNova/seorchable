@@ -91,10 +91,18 @@ export function Hero() {
             <span>terminal_session</span>
           </div>
           <div className="space-y-3 leading-relaxed">
-            <p><span className="text-emerald-400">~/system $</span> initiating crawl sequence...</p>
-            <p><span className="text-emerald-400">~/system $</span> mapping semantic triples: [BRAND] -&gt; [PRODUCT]...</p>
-            <p><span className="text-emerald-400">~/system $</span> syncing to vector database...</p>
-            <p className="text-cyan-300">{isLoading ? "awaiting secure session..." : "secure session verified"}</p>
+            <p>
+              <span className="text-emerald-400">~/system $</span> initiating crawl sequence...
+            </p>
+            <p>
+              <span className="text-emerald-400">~/system $</span> mapping semantic triples: [BRAND] -&gt; [PRODUCT]...
+            </p>
+            <p>
+              <span className="text-emerald-400">~/system $</span> syncing to vector database...
+            </p>
+            <p className="text-cyan-300">
+              {isLoading ? "awaiting secure session..." : "secure session verified"}
+            </p>
           </div>
         </motion.div>
       </div>
