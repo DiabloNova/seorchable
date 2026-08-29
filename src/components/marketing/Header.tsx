@@ -42,8 +42,20 @@ export function Header() {
   ];
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 px-4 sm:px-6 pt-4">
-      <div className="mx-auto max-w-7xl flex items-center justify-between gap-3">
+    <header className="fixed inset-x-0 top-0 z-50 overflow-hidden px-4 pt-4 sm:px-6">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-44 overflow-hidden opacity-95">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-transparent" />
+        <div className="absolute -inset-x-24 top-12 h-32 rotate-[-4deg] rounded-[50%] bg-cyan-200/35 blur-2xl dark:bg-cyan-900/25" />
+        <div className="absolute -inset-x-20 top-20 h-28 rotate-[5deg] rounded-[45%] bg-indigo-200/45 blur-xl dark:bg-indigo-900/30" />
+        <div className="absolute -inset-x-16 top-24 h-24 rotate-[-7deg] rounded-[42%] bg-rose-200/35 blur-xl dark:bg-rose-900/25" />
+        <svg className="absolute inset-x-0 bottom-0 h-28 w-full text-indigo-100/70 dark:text-indigo-950/50" viewBox="0 0 1200 180" preserveAspectRatio="none" fill="none">
+          <path d="M0 105C150 38 230 78 350 110C500 150 555 8 700 62C850 118 895 155 1010 92C1090 48 1140 78 1200 110V180H0V105Z" fill="currentColor" />
+        </svg>
+        <svg className="absolute inset-x-0 bottom-[-2px] h-24 w-full text-cyan-100/65 dark:text-cyan-950/45" viewBox="0 0 1200 150" preserveAspectRatio="none" fill="none">
+          <path d="M0 72C125 28 238 115 365 72C510 24 575 126 720 83C850 45 920 112 1035 65C1110 34 1160 58 1200 80V150H0V72Z" fill="currentColor" />
+        </svg>
+      </div>
+      <div className="relative z-10 mx-auto flex max-w-7xl items-center justify-between gap-3">
         {/* Mobile: Hamburger Button */}
         <button
           type="button"
