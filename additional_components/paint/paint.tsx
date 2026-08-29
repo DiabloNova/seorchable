@@ -1,5 +1,5 @@
 // Effect inspired by Paper's Liquid Metal effect
-
+  
 import MetallicPaint from "./MetallicPaint";
 
 // Replace with your own SVG path

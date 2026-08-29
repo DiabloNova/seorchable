@@ -31,7 +31,7 @@ function App() {
         fadeOutColor="#ffffff"
         ariaLabel="Technology partners"
       />
-
+      
       {/* Vertical loop with deceleration on hover */}
       <LogoLoop
         logos={techLogos}
