@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ArrowRight, ShieldCheck, Activity, Brain, Server } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useTheme } from "@/components/ThemeProvider";
+import { Input } from "@/components/Input";
+import TextLoop from "@/components/ui/TextLoop";
 import MoltenMetal from "@/components/ui/MoltenMetal";
 import { motion } from "framer-motion";
 
@@ -90,15 +92,65 @@ export function Hero() {
           </div>
         </motion.div>
 
-        {/* Abstract Dashboard Wireframe Column */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-xl mx-auto lg:max-w-none"
-        >
-          {/* Main Glass Panel */}
-          <div className="relative rounded-2xl bg-white/40 dark:bg-zinc-900/40 backdrop-blur-2xl border border-white/60 dark:border-zinc-700/50 shadow-2xl overflow-hidden min-h-[400px] flex">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 text-center mt-4 font-medium">
+            شروع آزمایشی به مدت یک هفته کاملا رایگان.
+          </p>
+
+          <div className="flex flex-wrap gap-3 justify-center">
+            {chips.map((chip, i) => {
+              const Icon = chip.icon;
+              return (
+                <span
+                  key={i}
+                  className="inline-flex items-center gap-2 rounded-[var(--radius-full)] neu-surface px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] shadow-sm"
+                >
+                  <Icon size={16} className="text-[var(--color-primary-600)] rtl:-scale-x-100" />
+                  {isFa ? chip.fa : chip.en}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* TextLoop (Marquee) Component */}
+        <div className="w-full relative z-20 mb-16">
+          <TextLoop
+            text="SEOrchable ✦ SEO ✦ AEO ✦ GEO ✦ AI"
+            shape="line"
+            className="-mx-4 sm:-mx-6 md:-mx-8 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] md:w-[calc(100%+4rem)]"
+          />
+        </div>
+
+        {/* Dashboard Showcase Video/Slideshow Placeholder */}
+        <div className="w-full max-w-5xl mx-auto mb-16 relative perspective-1000">
+          <div className="relative rounded-2xl overflow-hidden border border-[var(--glass-border)] bg-[var(--glass-bg)] shadow-2xl shadow-sky-900/20 aspect-video group">
+            {/* Top Bar (Mockup window controls) */}
+            <div className="absolute top-0 inset-x-0 h-8 bg-[var(--muted-surface)] border-b border-[var(--glass-border)] flex items-center px-4 gap-2 z-10">
+              <div className="w-3 h-3 rounded-full bg-red-500/80" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+              <div className="w-3 h-3 rounded-full bg-green-500/80" />
+              <div className="flex-1 flex justify-center">
+                <div className="h-4 w-32 bg-[var(--glass-border)] rounded-full opacity-50" />
+              </div>
+            </div>
+
+            {/* Main Content Area Placeholder */}
+            <div className="absolute inset-0 pt-8 bg-gradient-to-br from-slate-900/40 to-slate-800/40 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-4 text-[var(--text-muted)] opacity-70 group-hover:opacity-100 transition-opacity">
+                <div className="w-16 h-16 rounded-full bg-[var(--color-primary-600)]/20 flex items-center justify-center cursor-pointer hover:bg-[var(--color-primary-600)]/30 transition-colors hover:scale-110">
+                  <div className="w-0 h-0 border-t-8 border-t-transparent border-l-[12px] border-l-[var(--color-primary-600)] border-b-8 border-b-transparent ml-1 rtl:mr-1 rtl:ml-0 rtl:border-l-0 rtl:border-r-[12px] rtl:border-r-[var(--color-primary-600)]" />
+                </div>
+                <p className="text-sm font-semibold tracking-widest uppercase">
+                  {isFa ? "مشاهده محیط پلتفرم" : "Watch Platform Demo"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Decorative glows behind the showcase */}
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-[var(--color-primary-600)]/30 rounded-full blur-3xl -z-10" />
+          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[var(--orange-500)]/20 rounded-full blur-3xl -z-10" />
+        </div>
 
             {/* Fake Sidebar */}
             <div className="w-20 hidden sm:flex flex-col items-center py-6 border-r border-zinc-200/50 dark:border-zinc-800/50 bg-white/20 dark:bg-zinc-950/20 space-y-6">
