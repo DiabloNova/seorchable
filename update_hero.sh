@@ -1,22 +1,13 @@
+cat << 'INNER_EOF' > src/components/marketing/Hero.tsx
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import {
-  TrendingUp,
-  ShieldCheck,
-  Zap,
-  ArrowRight,
-  Activity,
-  Globe,
-  Eye,
-  LineChart,
-  CheckCircle2,
-} from "lucide-react";
-import { useAuth } from "@/components/AuthProvider";
-import { Button } from "@/components/Button";
-import { Input } from "@/components/Input";
+import { TrendingUp, ShieldCheck, Zap, ArrowRight, Activity, Globe, Eye, LineChart, CheckCircle2 } from "lucide-react";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { usePathname } from "next/navigation";
 
 export function Hero() {
@@ -35,21 +26,9 @@ export function Hero() {
   };
 
   const chips = [
-    {
-      icon: TrendingUp,
-      fa: "افزایش ۳٫۸ برابری ارجاع",
-      en: "3.8× more citations",
-    },
-    {
-      icon: ShieldCheck,
-      fa: "پایش لحظه‌ای توهم برند",
-      en: "Live hallucination watch",
-    },
-    {
-      icon: Zap,
-      fa: "اتصال به ۴ موتور هوش مصنوعی",
-      en: "4 AI engines connected",
-    },
+    { icon: TrendingUp, fa: "افزایش ۳٫۸ برابری ارجاع", en: "3.8× more citations" },
+    { icon: ShieldCheck, fa: "پایش لحظه‌ای توهم برند", en: "Live hallucination watch" },
+    { icon: Zap, fa: "اتصال به ۴ موتور هوش مصنوعی", en: "4 AI engines connected" },
   ];
 
   return (
@@ -65,16 +44,12 @@ export function Hero() {
               <span className="absolute inline-flex h-full w-full rounded-full bg-teal-500 opacity-70 animate-ping" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-teal-500" />
             </span>
-            {isFa
-              ? "پلتفرم نسل‌بعدی AEO و GEO"
-              : "Next-generation AEO & GEO platform"}
+            {isFa ? "پلتفرم نسل‌بعدی AEO و GEO" : "Next-generation AEO & GEO platform"}
           </span>
 
           <h1 className="font-display font-black tracking-tight text-balance text-5xl sm:text-6xl md:text-7xl leading-[1.15] text-slate-900 dark:text-white">
             <span>
-              {isFa
-                ? "معرفی برند شما در هوش مصنوعی"
-                : "Optimize Your Brand for AI Search"}
+              {isFa ? "معرفی برند شما در هوش مصنوعی" : "Optimize Your Brand for AI Search"}
             </span>
           </h1>
 
@@ -89,8 +64,7 @@ export function Hero() {
               className="w-full sm:w-auto px-8 py-4 rounded-xl text-white text-base font-semibold bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
               onClick={() => {
                 const ref = document.getElementById("free-audit");
-                if (ref)
-                  ref.scrollIntoView({ behavior: "smooth", block: "start" });
+                if (ref) ref.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
             >
               <span>{isFa ? "شروع رایگان" : "Start Free"}</span>
@@ -103,9 +77,7 @@ export function Hero() {
             </Link>
           </div>
           <p className="text-[11px] text-slate-500 dark:text-slate-500 text-center mt-3">
-            {isFa
-              ? "شروع آزمایشی به مدت یک هفته کاملا رایگان."
-              : "Start with a one-week free trial."}
+            {isFa ? "شروع آزمایشی به مدت یک هفته کاملا رایگان." : "Start with a one-week free trial."}
           </p>
 
           <div className="flex flex-wrap gap-3 justify-center pt-4">
@@ -116,10 +88,7 @@ export function Hero() {
                   key={i}
                   className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 shadow-sm"
                 >
-                  <Icon
-                    size={16}
-                    className="text-teal-600 dark:text-teal-400 rtl:-scale-x-100"
-                  />
+                  <Icon size={16} className="text-teal-600 dark:text-teal-400 rtl:-scale-x-100" />
                   {isFa ? chip.fa : chip.en}
                 </span>
               );
@@ -130,97 +99,92 @@ export function Hero() {
         {/* Dashboard Showcase Wireframe Replacement */}
         <div className="w-full max-w-5xl mx-auto mb-20 relative perspective-1000 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
           <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-2xl shadow-slate-900/5 dark:shadow-black/40 aspect-[16/10] md:aspect-video flex flex-col">
+
             {/* Top Navigation Bar of Wireframe */}
             <div className="h-12 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 bg-slate-50/50 dark:bg-slate-900/50">
-              <div className="flex items-center gap-3">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-700" />
-                  <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-700" />
-                  <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-700" />
-                </div>
-                <div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded mx-4 hidden sm:block" />
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="h-6 w-20 bg-teal-100 dark:bg-teal-900/30 rounded-md" />
-                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800" />
-              </div>
+               <div className="flex items-center gap-3">
+                  <div className="flex gap-1.5">
+                     <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-700" />
+                     <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-700" />
+                     <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-700" />
+                  </div>
+                  <div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded mx-4 hidden sm:block" />
+               </div>
+               <div className="flex items-center gap-3">
+                  <div className="h-6 w-20 bg-teal-100 dark:bg-teal-900/30 rounded-md" />
+                  <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800" />
+               </div>
             </div>
 
             <div className="flex flex-1 overflow-hidden">
-              {/* Sidebar Wireframe */}
-              <div className="w-16 sm:w-48 border-r rtl:border-l rtl:border-r-0 border-slate-200 dark:border-slate-800 flex flex-col gap-4 p-4 bg-slate-50/30 dark:bg-slate-900/20">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 opacity-60">
-                    <div className="w-8 h-8 rounded-md bg-slate-200 dark:bg-slate-800 shrink-0" />
-                    <div className="h-3 w-full bg-slate-200 dark:bg-slate-800 rounded hidden sm:block" />
-                  </div>
-                ))}
-              </div>
-
-              {/* Main Content Area Wireframe */}
-              <div className="flex-1 p-6 sm:p-8 flex flex-col gap-6 relative overflow-hidden bg-white/50 dark:bg-slate-950/50">
-                {/* Header */}
-                <div className="flex justify-between items-start">
-                  <div className="space-y-3 w-1/3">
-                    <div className="h-6 w-full max-w-[150px] bg-slate-800 dark:bg-slate-200 rounded-md" />
-                    <div className="h-3 w-full max-w-[250px] bg-slate-200 dark:bg-slate-800 rounded" />
-                  </div>
-                  <div className="h-8 w-24 bg-slate-900 dark:bg-slate-100 rounded-lg hidden sm:block" />
-                </div>
-
-                {/* Stat Cards Row */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {[...Array(4)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="h-24 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col justify-between shadow-sm"
-                    >
-                      <div className="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800" />
-                      <div className="space-y-2">
-                        <div className="h-4 w-1/2 bg-slate-800 dark:bg-slate-200 rounded" />
-                        <div className="h-2 w-1/3 bg-slate-200 dark:bg-slate-700 rounded" />
-                      </div>
+               {/* Sidebar Wireframe */}
+               <div className="w-16 sm:w-48 border-r rtl:border-l rtl:border-r-0 border-slate-200 dark:border-slate-800 flex flex-col gap-4 p-4 bg-slate-50/30 dark:bg-slate-900/20">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="flex items-center gap-3 opacity-60">
+                       <div className="w-8 h-8 rounded-md bg-slate-200 dark:bg-slate-800 shrink-0" />
+                       <div className="h-3 w-full bg-slate-200 dark:bg-slate-800 rounded hidden sm:block" />
                     </div>
                   ))}
-                </div>
+               </div>
 
-                {/* Main Chart Area */}
-                <div className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col gap-4 relative shadow-sm">
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="h-4 w-32 bg-slate-800 dark:bg-slate-200 rounded" />
-                    <div className="flex gap-2">
-                      <div className="h-2 w-8 bg-slate-200 dark:bg-slate-800 rounded" />
-                      <div className="h-2 w-8 bg-slate-200 dark:bg-slate-800 rounded" />
-                    </div>
+               {/* Main Content Area Wireframe */}
+               <div className="flex-1 p-6 sm:p-8 flex flex-col gap-6 relative overflow-hidden bg-white/50 dark:bg-slate-950/50">
+                  {/* Header */}
+                  <div className="flex justify-between items-start">
+                     <div className="space-y-3 w-1/3">
+                        <div className="h-6 w-full max-w-[150px] bg-slate-800 dark:bg-slate-200 rounded-md" />
+                        <div className="h-3 w-full max-w-[250px] bg-slate-200 dark:bg-slate-800 rounded" />
+                     </div>
+                     <div className="h-8 w-24 bg-slate-900 dark:bg-slate-100 rounded-lg hidden sm:block" />
                   </div>
 
-                  {/* Simulated Chart Bars/Lines */}
-                  <div className="flex-1 flex items-end gap-2 md:gap-4 justify-between px-2 pb-2">
-                    {[40, 70, 45, 90, 65, 80, 55, 95, 60].map((height, i) => (
-                      <div
-                        key={i}
-                        className="w-full bg-teal-500/20 rounded-t-sm"
-                        style={{ height: `${height}%` }}
-                      >
-                        <div
-                          className="w-full bg-teal-500 rounded-t-sm"
-                          style={{ height: "4px" }}
-                        />
-                      </div>
-                    ))}
+                  {/* Stat Cards Row */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                     {[...Array(4)].map((_, i) => (
+                       <div key={i} className="h-24 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col justify-between shadow-sm">
+                          <div className="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800" />
+                          <div className="space-y-2">
+                             <div className="h-4 w-1/2 bg-slate-800 dark:bg-slate-200 rounded" />
+                             <div className="h-2 w-1/3 bg-slate-200 dark:bg-slate-700 rounded" />
+                          </div>
+                       </div>
+                     ))}
                   </div>
 
-                  {/* Floating Insight Card (Blur Effect) */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 sm:w-64 p-4 rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 shadow-xl shadow-black/5 animate-pulse">
-                    <div className="flex items-center gap-3 mb-2">
-                      <CheckCircle2 size={16} className="text-teal-500" />
-                      <div className="h-3 w-20 bg-slate-800 dark:bg-slate-200 rounded" />
-                    </div>
-                    <div className="h-2 w-full bg-slate-200 dark:bg-slate-700 rounded mb-1" />
-                    <div className="h-2 w-4/5 bg-slate-200 dark:bg-slate-700 rounded" />
+                  {/* Main Chart Area */}
+                  <div className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col gap-4 relative shadow-sm">
+                     <div className="flex justify-between items-center mb-2">
+                        <div className="h-4 w-32 bg-slate-800 dark:bg-slate-200 rounded" />
+                        <div className="flex gap-2">
+                           <div className="h-2 w-8 bg-slate-200 dark:bg-slate-800 rounded" />
+                           <div className="h-2 w-8 bg-slate-200 dark:bg-slate-800 rounded" />
+                        </div>
+                     </div>
+
+                     {/* Simulated Chart Bars/Lines */}
+                     <div className="flex-1 flex items-end gap-2 md:gap-4 justify-between px-2 pb-2">
+                        {[40, 70, 45, 90, 65, 80, 55, 95, 60].map((height, i) => (
+                           <div
+                             key={i}
+                             className="w-full bg-teal-500/20 rounded-t-sm"
+                             style={{ height: `${height}%` }}
+                           >
+                              <div className="w-full bg-teal-500 rounded-t-sm" style={{ height: '4px' }} />
+                           </div>
+                        ))}
+                     </div>
+
+                     {/* Floating Insight Card (Blur Effect) */}
+                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 sm:w-64 p-4 rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 shadow-xl shadow-black/5 animate-pulse">
+                        <div className="flex items-center gap-3 mb-2">
+                           <CheckCircle2 size={16} className="text-teal-500" />
+                           <div className="h-3 w-20 bg-slate-800 dark:bg-slate-200 rounded" />
+                        </div>
+                        <div className="h-2 w-full bg-slate-200 dark:bg-slate-700 rounded mb-1" />
+                        <div className="h-2 w-4/5 bg-slate-200 dark:bg-slate-700 rounded" />
+                     </div>
                   </div>
-                </div>
-              </div>
+               </div>
             </div>
           </div>
 
@@ -246,11 +210,7 @@ export function Hero() {
                   </p>
                 </div>
                 <Link href={`/${language}/dashboard`} className="block">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="w-full font-bold gap-2"
-                  >
+                  <Button variant="primary" size="lg" className="w-full font-bold gap-2">
                     {isFa ? "ورود به پیشخوان کاربری" : "Enter admin console"}
                     <ArrowRight size={18} className="rtl:-scale-x-100" />
                   </Button>
@@ -272,7 +232,7 @@ export function Hero() {
                   type="email"
                   placeholder={isFa ? "you@company.com" : "you@company.com"}
                   value={email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   aria-label={isFa ? "ایمیل سازمانی" : "Business email"}
                   className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800"
@@ -290,9 +250,7 @@ export function Hero() {
                     : isFa
                       ? "ورود به نسخه‌ی دمو"
                       : "Access live sandbox demo"}
-                  {!isLoading && (
-                    <ArrowRight size={18} className="rtl:-scale-x-100" />
-                  )}
+                  {!isLoading && <ArrowRight size={18} className="rtl:-scale-x-100" />}
                 </Button>
                 <p className="text-[11px] text-slate-400 text-center pt-1">
                   {isFa
@@ -307,3 +265,5 @@ export function Hero() {
     </section>
   );
 }
+INNER_EOF
+sh update_hero.sh

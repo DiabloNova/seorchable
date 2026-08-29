@@ -41,7 +41,7 @@ import {
   Award,
   ArrowDown,
   Receipt,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { Header } from "@/components/marketing/Header";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
@@ -55,13 +55,24 @@ import { LiveKnowledgeGraph } from "@/components/features/graph/LiveKnowledgeGra
  * Redesigned from scratch to establish category supremacy comparable to Stripe, Vercel, and Semrush.
  * Perfectly localized, supports RTL/LTR, dark/light modes, and follows the specified logical flow.
  */
-export default function MarketingLandingPage({ params }: { params: Promise<{ locale: string }> }) {
+export default function MarketingLandingPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const resolvedParams = use(params);
   const locale = resolvedParams.locale;
   const isFa = locale === "fa";
 
   // State for high-fidelity Mock Dashboard visualizations
-  const [activeDashboardTab, setActiveDashboardTab] = useState<"visibility" | "authority" | "citation" | "competitor" | "graph" | "timeline">("visibility");
+  const [activeDashboardTab, setActiveDashboardTab] = useState<
+    | "visibility"
+    | "authority"
+    | "citation"
+    | "competitor"
+    | "graph"
+    | "timeline"
+  >("visibility");
 
   // References for scrolling
   const freeAuditRef = useRef<HTMLDivElement | null>(null);
@@ -78,78 +89,107 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       id: "ai-visibility",
       icon: Eye,
       name: isFa ? "پایش میزان دیده‌شدن برند" : "AI Visibility Monitoring",
-      desc: isFa ? "ردیابی زنده سهم استناد و حضور برند شما در پاسخ‌های ChatGPT، Claude و موتورهای نوظهور." : "Real-time auditing of your brand's citation frequency and share of voice inside LLM responses."
+      desc: isFa
+        ? "ردیابی زنده سهم استناد و حضور برند شما در پاسخ‌های ChatGPT، Claude و موتورهای نوظهور."
+        : "Real-time auditing of your brand's citation frequency and share of voice inside LLM responses.",
     },
     {
       id: "brand-intelligence",
       icon: Brain,
       name: isFa ? "تحلیل هوشمندی و درک معنایی" : "Brand Intelligence Analyzer",
-      desc: isFa ? "کالبدشکافی دقیق برداشت مدل‌های زبانی از ارزش، هویت و خدمات اصلی کسب‌وکار شما." : "Deconstruct how generative engines interpret your core value proposition and brand context."
+      desc: isFa
+        ? "کالبدشکافی دقیق برداشت مدل‌های زبانی از ارزش، هویت و خدمات اصلی کسب‌وکار شما."
+        : "Deconstruct how generative engines interpret your core value proposition and brand context.",
     },
     {
       id: "citation-tracking",
       icon: Activity,
       name: isFa ? "ردیابی استنادهای هوش مصنوعی" : "AI Citation Tracking",
-      desc: isFa ? "پایش پیوندها، رفرنس‌های متنی و لینک‌های ارجاعی صادر شده توسط موتورهای مکالمه‌محور." : "Monitor exact hyperlinks and reference materials cited by conversational agents inside answers."
+      desc: isFa
+        ? "پایش پیوندها، رفرنس‌های متنی و لینک‌های ارجاعی صادر شده توسط موتورهای مکالمه‌محور."
+        : "Monitor exact hyperlinks and reference materials cited by conversational agents inside answers.",
     },
     {
       id: "competitor-intelligence",
       icon: Compass,
       name: isFa ? "هوشمندی رقابتی پیشرفته" : "Competitor Intelligence",
-      desc: isFa ? "تحلیل و مقایسه برداری سهم استناد و رتبه‌بندی رقبای هم‌سطح بازار در پاسخ‌ها." : "Execute multi-competitor spatial comparisons to dissect where your search share is leaking."
+      desc: isFa
+        ? "تحلیل و مقایسه برداری سهم استناد و رتبه‌بندی رقبای هم‌سطح بازار در پاسخ‌ها."
+        : "Execute multi-competitor spatial comparisons to dissect where your search share is leaking.",
     },
     {
       id: "kg-explorer",
       icon: Network,
       name: isFa ? "گراف دانش معنایی برند" : "Knowledge Graph Explorer",
-      desc: isFa ? "مدل‌سازی و ترسیم موجودیت‌ها و مفاهیم برای تثبیت لایه‌های برند در حافظه معنایی هوش مصنوعی." : "Map, explore, and establish entity-relationship graphs to inject brand context into foundational indices."
+      desc: isFa
+        ? "مدل‌سازی و ترسیم موجودیت‌ها و مفاهیم برای تثبیت لایه‌های برند در حافظه معنایی هوش مصنوعی."
+        : "Map, explore, and establish entity-relationship graphs to inject brand context into foundational indices.",
     },
     {
       id: "prompt-monitoring",
       icon: Terminal,
       name: isFa ? "رصد پرومپت‌ها و کوئری‌ها" : "Prompt Monitoring",
-      desc: isFa ? "تحلیل روزانه الگوهای جستجوی کاربران و شبیه‌سازی پرومپت‌های پرتکرار صنعت شما." : "Track daily query prompts, simulate high-frequency user behaviors, and model sentiment shifts."
+      desc: isFa
+        ? "تحلیل روزانه الگوهای جستجوی کاربران و شبیه‌سازی پرومپت‌های پرتکرار صنعت شما."
+        : "Track daily query prompts, simulate high-frequency user behaviors, and model sentiment shifts.",
     },
     {
       id: "search-analytics",
       icon: Search,
       name: isFa ? "تحلیل آماری موتورهای پاسخگو" : "AI Search Analytics",
-      desc: isFa ? "اندازه‌گیری و گزارش عمیق ایمپرشن، کلیک و ترافیک ارجاعی از موتورهای پاسخ‌دهنده." : "Measure impressions, click-through equivalents, and referral traffic driving from generative platforms."
+      desc: isFa
+        ? "اندازه‌گیری و گزارش عمیق ایمپرشن، کلیک و ترافیک ارجاعی از موتورهای پاسخ‌دهنده."
+        : "Measure impressions, click-through equivalents, and referral traffic driving from generative platforms.",
     },
     {
       id: "geo-optimization",
       icon: Zap,
-      name: isFa ? "بهینه‌سازی موتورهای پاسخگو (GEO)" : "Generative Engine Optimization",
-      desc: isFa ? "فرم‌دهی متون صفحات، متادیتا و میکرودیتا جهت فهم و ترجیح داده‌ها توسط کراولرها." : "Format page structure, XML schemas, and semantic data to guarantee optimal parsing by AI crawlers."
+      name: isFa
+        ? "بهینه‌سازی موتورهای پاسخگو (GEO)"
+        : "Generative Engine Optimization",
+      desc: isFa
+        ? "فرم‌دهی متون صفحات، متادیتا و میکرودیتا جهت فهم و ترجیح داده‌ها توسط کراولرها."
+        : "Format page structure, XML schemas, and semantic data to guarantee optimal parsing by AI crawlers.",
     },
     {
       id: "authority-score",
       icon: Award,
       name: isFa ? "شاخص اعتبار برند در هوش زبانی" : "Brand Authority Score",
-      desc: isFa ? "سنتز آماری فاکتورهای اطمینان، حقیقت‌محوری و کیفیت پاسخ‌های مربوط به برند شما." : "A unified metric scoring brand reliability, sentiment, and factuality across top model ecosystems."
+      desc: isFa
+        ? "سنتز آماری فاکتورهای اطمینان، حقیقت‌محوری و کیفیت پاسخ‌های مربوط به برند شما."
+        : "A unified metric scoring brand reliability, sentiment, and factuality across top model ecosystems.",
     },
     {
       id: "website-audit",
       icon: Globe,
       name: isFa ? "خزش ساختاری و آنالیز وب‌سایت" : "Website Audit Engine",
-      desc: isFa ? "خزش فنی با Firecrawl برای رصد سورس‌کدها، فایل‌های دسترسی و بهینه‌سازی خوانش وب‌سایت." : "Crawl public pages with advanced Firecrawl integration to discover structural indexation anomalies."
+      desc: isFa
+        ? "خزش فنی با Firecrawl برای رصد سورس‌کدها، فایل‌های دسترسی و بهینه‌سازی خوانش وب‌سایت."
+        : "Crawl public pages with advanced Firecrawl integration to discover structural indexation anomalies.",
     },
     {
       id: "content-intelligence",
       icon: FileText,
       name: isFa ? "هوشمندی و بهینه‌سازی محتوا" : "Content Intelligence",
-      desc: isFa ? "تولید پیشنهادات عملی متنی و ساختاربندی مقالات برای تطبیق با الگوریتم‌های رتبه‌دهی LLM." : "Generate copywriting revisions and content structure changes calculated to rank higher in LLM citations."
+      desc: isFa
+        ? "تولید پیشنهادات عملی متنی و ساختاربندی مقالات برای تطبیق با الگوریتم‌های رتبه‌دهی LLM."
+        : "Generate copywriting revisions and content structure changes calculated to rank higher in LLM citations.",
     },
     {
       id: "entity-monitoring",
       icon: Layers,
       name: isFa ? "پایش موجودیت‌ها و مفاهیم برند" : "Entity Monitoring",
-      desc: isFa ? "رصد پیوسته نام برند، زیربرندها، نام مدیران ارشد و دارایی‌های فکری در پایگاه‌های دانش هوش مصنوعی." : "Continuous tracking of corporate entities, executive names, and brand variants in model repositories."
-    }
+      desc: isFa
+        ? "رصد پیوسته نام برند، زیربرندها، نام مدیران ارشد و دارایی‌های فکری در پایگاه‌های دانش هوش مصنوعی."
+        : "Continuous tracking of corporate entities, executive names, and brand variants in model repositories.",
+    },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--text-primary)]" style={{ direction: isFa ? "rtl" : "ltr" }}>
+    <div
+      className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--text-primary)]"
+      style={{ direction: isFa ? "rtl" : "ltr" }}
+    >
       {/* Navigation */}
       <Header />
 
@@ -157,14 +197,22 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       <Hero />
 
       {/* FREE AUDIT FUNNEL SECTION */}
-      <section id="free-audit" ref={freeAuditRef} className="py-20 bg-[var(--background)] relative border-b border-[var(--border)] overflow-hidden">
+      <section
+        id="free-audit"
+        ref={freeAuditRef}
+        className="py-20 bg-[var(--background)] relative border-b border-[var(--border)] overflow-hidden"
+      >
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-8 relative z-10 text-center">
           <div className="max-w-3xl mx-auto space-y-3">
             <span className="text-xs uppercase font-black tracking-widest text-[var(--sky-blue-500)]">
-              {isFa ? "موتور خزش و ممیزی معنایی" : "REAL-TIME SEMANTIC AUDIT INGESTION"}
+              {isFa
+                ? "موتور خزش و ممیزی معنایی"
+                : "REAL-TIME SEMANTIC AUDIT INGESTION"}
             </span>
             <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "سیگنال‌های دیده‌شدن برند خود را همین حالا بسنجید" : "Audit Your Conversational Presence Instantly"}
+              {isFa
+                ? "سیگنال‌های دیده‌شدن برند خود را همین حالا بسنجید"
+                : "Audit Your Conversational Presence Instantly"}
             </h2>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">
               {isFa
@@ -180,13 +228,23 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       </section>
 
       {/* QUESTION 2: "What does it actually do?" - High-Fidelity Mock Dashboards */}
-      <section id="dashboards" ref={dashboardsRef} className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative">
+      <section
+        id="dashboards"
+        ref={dashboardsRef}
+        className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative"
+      >
         <div className="absolute inset-0 grid-backdrop opacity-[0.2] pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#38bdf8]">{isFa ? "پیش‌نمایش‌های واقعی محصول" : "ACTUAL SOFTWARE INTERFACES"}</span>
+            <span className="text-xs uppercase font-black tracking-widest text-[#38bdf8]">
+              {isFa
+                ? "پیش‌نمایش‌های واقعی محصول"
+                : "ACTUAL SOFTWARE INTERFACES"}
+            </span>
             <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "تجربه پیشرفته نرم‌افزاری را لمس کنید" : "High-Fidelity Product Visualizations"}
+              {isFa
+                ? "تجربه پیشرفته نرم‌افزاری را لمس کنید"
+                : "High-Fidelity Product Visualizations"}
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
@@ -200,12 +258,44 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             {/* Nav tabs list */}
             <div className="glass-panel p-4 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] space-y-1">
               {[
-                { id: "visibility", label: isFa ? "شاخص دیده‌شدن هوش مصنوعی" : "Visibility Score Dashboard", icon: Eye },
-                { id: "authority", label: isFa ? "امتیاز اعتبار برند (Authority)" : "Brand Authority Analyzer", icon: Award },
-                { id: "citation", label: isFa ? "کاوشگر استنادهای چت‌بات‌ها" : "AI Citation Explorer", icon: FileText },
-                { id: "competitor", label: isFa ? "رادار مقایسه رقبا" : "Competitor Comparison", icon: Compass },
-                { id: "graph", label: isFa ? "گراف دانش معنایی" : "Knowledge Graph Builder", icon: Network },
-                { id: "timeline", label: isFa ? "تایم‌لاین پایش پرومپت‌ها" : "Prompt Monitoring Timeline", icon: Terminal },
+                {
+                  id: "visibility",
+                  label: isFa
+                    ? "شاخص دیده‌شدن هوش مصنوعی"
+                    : "Visibility Score Dashboard",
+                  icon: Eye,
+                },
+                {
+                  id: "authority",
+                  label: isFa
+                    ? "امتیاز اعتبار برند (Authority)"
+                    : "Brand Authority Analyzer",
+                  icon: Award,
+                },
+                {
+                  id: "citation",
+                  label: isFa
+                    ? "کاوشگر استنادهای چت‌بات‌ها"
+                    : "AI Citation Explorer",
+                  icon: FileText,
+                },
+                {
+                  id: "competitor",
+                  label: isFa ? "رادار مقایسه رقبا" : "Competitor Comparison",
+                  icon: Compass,
+                },
+                {
+                  id: "graph",
+                  label: isFa ? "گراف دانش معنایی" : "Knowledge Graph Builder",
+                  icon: Network,
+                },
+                {
+                  id: "timeline",
+                  label: isFa
+                    ? "تایم‌لاین پایش پرومپت‌ها"
+                    : "Prompt Monitoring Timeline",
+                  icon: Terminal,
+                },
               ].map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -234,32 +324,62 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                 <div className="space-y-6 animate-fade-in">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 gap-2">
                     <div>
-                      <span className="text-[11px] sm:text-[10px] md:text-[9px] uppercase tracking-wider md:tracking-widest text-[#38bdf8] font-bold font-mono">Module :: Visibility Monitoring</span>
-                      <h3 className="text-lg sm:text-xl md:text-lg font-black font-display text-white mt-1.5 leading-relaxed sm:leading-snug">{isFa ? "شاخص تجمیعی دیده‌شدن برند" : "SOP / AI Share of Voice"}</h3>
+                      <span className="text-[11px] sm:text-[10px] md:text-[9px] uppercase tracking-wider md:tracking-widest text-[#38bdf8] font-bold font-mono">
+                        Module :: Visibility Monitoring
+                      </span>
+                      <h3 className="text-lg sm:text-xl md:text-lg font-black font-display text-white mt-1.5 leading-relaxed sm:leading-snug">
+                        {isFa
+                          ? "شاخص تجمیعی دیده‌شدن برند"
+                          : "SOP / AI Share of Voice"}
+                      </h3>
                     </div>
-                    <span className="self-start sm:self-auto text-xs px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">{isFa ? "برخط" : "ONLINE"}</span>
+                    <span className="self-start sm:self-auto text-xs px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
+                      {isFa ? "برخط" : "ONLINE"}
+                    </span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <span className="text-[11px] sm:text-xs md:text-[10px] text-slate-400 block">{isFa ? "امتیاز ChatGPT-4o" : "ChatGPT-4o Score"}</span>
-                      <p className="text-xl sm:text-2xl font-black text-white mt-1">۸۸٪</p>
-                      <span className="text-[11px] sm:text-xs md:text-[9px] text-emerald-400 font-bold">↑ ۴٪ {isFa ? "رشد معنایی" : "Growth"}</span>
+                      <span className="text-[11px] sm:text-xs md:text-[10px] text-slate-400 block">
+                        {isFa ? "امتیاز ChatGPT-4o" : "ChatGPT-4o Score"}
+                      </span>
+                      <p className="text-xl sm:text-2xl font-black text-white mt-1">
+                        ۸۸٪
+                      </p>
+                      <span className="text-[11px] sm:text-xs md:text-[9px] text-emerald-400 font-bold">
+                        ↑ ۴٪ {isFa ? "رشد معنایی" : "Growth"}
+                      </span>
                     </div>
                     <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <span className="text-[11px] sm:text-xs md:text-[10px] text-slate-400 block">{isFa ? "امتیاز Claude 3.5" : "Claude 3.5 Score"}</span>
-                      <p className="text-xl sm:text-2xl font-black text-white mt-1">۷۹٪</p>
-                      <span className="text-[11px] sm:text-xs md:text-[9px] text-emerald-400 font-bold">↑ ۲٪ {isFa ? "بهبود ارجاع" : "Better citation"}</span>
+                      <span className="text-[11px] sm:text-xs md:text-[10px] text-slate-400 block">
+                        {isFa ? "امتیاز Claude 3.5" : "Claude 3.5 Score"}
+                      </span>
+                      <p className="text-xl sm:text-2xl font-black text-white mt-1">
+                        ۷۹٪
+                      </p>
+                      <span className="text-[11px] sm:text-xs md:text-[9px] text-emerald-400 font-bold">
+                        ↑ ۲٪ {isFa ? "بهبود ارجاع" : "Better citation"}
+                      </span>
                     </div>
                     <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <span className="text-[11px] sm:text-xs md:text-[10px] text-slate-400 block">{isFa ? "امتیاز Perplexity AI" : "Perplexity Score"}</span>
-                      <p className="text-xl sm:text-2xl font-black text-white mt-1">۸۴٪</p>
-                      <span className="text-[11px] sm:text-xs md:text-[9px] text-slate-400">{isFa ? "بدون تغییر" : "Stable"}</span>
+                      <span className="text-[11px] sm:text-xs md:text-[10px] text-slate-400 block">
+                        {isFa ? "امتیاز Perplexity AI" : "Perplexity Score"}
+                      </span>
+                      <p className="text-xl sm:text-2xl font-black text-white mt-1">
+                        ۸۴٪
+                      </p>
+                      <span className="text-[11px] sm:text-xs md:text-[9px] text-slate-400">
+                        {isFa ? "بدون تغییر" : "Stable"}
+                      </span>
                     </div>
                   </div>
 
                   <div className="p-4 rounded-xl bg-[#38bdf8]/5 border border-[#38bdf8]/15 space-y-2">
-                    <p className="text-xs sm:text-sm md:text-xs font-bold text-white">{isFa ? "تحلیل سیگنال‌ها و ارجاع" : "Recommendation Strategy"}</p>
+                    <p className="text-xs sm:text-sm md:text-xs font-bold text-white">
+                      {isFa
+                        ? "تحلیل سیگنال‌ها و ارجاع"
+                        : "Recommendation Strategy"}
+                    </p>
                     <p className="text-[11px] sm:text-xs md:text-[11px] text-slate-300 leading-relaxed md:leading-normal">
                       {isFa
                         ? "سیگنال‌های ارجاعی در چت‌بات‌ها مثبت است، اما نرخ استناد به مستندات فنی ضعیف عمل می‌کند. کاتالوگ محصولات را با تگ‌های معنایی ساختاردهی کنید."
@@ -274,23 +394,51 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                 <div className="space-y-6 animate-fade-in">
                   <div className="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
-                      <span className="text-[9px] uppercase tracking-widest text-[#f97316] font-bold font-mono">Module :: Brand Authority Analyzer</span>
-                      <h3 className="text-lg font-black font-display text-white mt-1">{isFa ? "شاخص اعتبار و یکپارچگی برند" : "Trust & Factuality Synthesis"}</h3>
+                      <span className="text-[9px] uppercase tracking-widest text-[#f97316] font-bold font-mono">
+                        Module :: Brand Authority Analyzer
+                      </span>
+                      <h3 className="text-lg font-black font-display text-white mt-1">
+                        {isFa
+                          ? "شاخص اعتبار و یکپارچگی برند"
+                          : "Trust & Factuality Synthesis"}
+                      </h3>
                     </div>
-                    <span className="text-xs px-2.5 py-1 rounded bg-[#f97316]/10 text-[#f97316] font-bold border border-[#f97316]/20">v2.4</span>
+                    <span className="text-xs px-2.5 py-1 rounded bg-[#f97316]/10 text-[#f97316] font-bold border border-[#f97316]/20">
+                      v2.4
+                    </span>
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="p-5 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <span className="text-[10px] text-slate-400 block">{isFa ? "شاخص اطمینان (Confidence)" : "Claim Confidence Score"}</span>
-                      <div className="text-3xl font-black text-[#f97316] mt-2 font-display">۹۴.۲٪</div>
-                      <p className="text-[10px] text-slate-500 mt-1">{isFa ? "تطابق کامل داده‌های مانیفست برند" : "Exact matching on corporate claims."}</p>
+                      <span className="text-[10px] text-slate-400 block">
+                        {isFa
+                          ? "شاخص اطمینان (Confidence)"
+                          : "Claim Confidence Score"}
+                      </span>
+                      <div className="text-3xl font-black text-[#f97316] mt-2 font-display">
+                        ۹۴.۲٪
+                      </div>
+                      <p className="text-[10px] text-slate-500 mt-1">
+                        {isFa
+                          ? "تطابق کامل داده‌های مانیفست برند"
+                          : "Exact matching on corporate claims."}
+                      </p>
                     </div>
 
                     <div className="p-5 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <span className="text-[10px] text-slate-400 block">{isFa ? "ریسک توهم (Hallucination Risk)" : "Hallucination Susceptibility"}</span>
-                      <div className="text-3xl font-black text-rose-500 mt-2 font-display">۵.۸٪</div>
-                      <p className="text-[10px] text-slate-500 mt-1">{isFa ? "احتمال استناد اشتباه مدل به رقبا" : "Low risk of competitor hijacking."}</p>
+                      <span className="text-[10px] text-slate-400 block">
+                        {isFa
+                          ? "ریسک توهم (Hallucination Risk)"
+                          : "Hallucination Susceptibility"}
+                      </span>
+                      <div className="text-3xl font-black text-rose-500 mt-2 font-display">
+                        ۵.۸٪
+                      </div>
+                      <p className="text-[10px] text-slate-500 mt-1">
+                        {isFa
+                          ? "احتمال استناد اشتباه مدل به رقبا"
+                          : "Low risk of competitor hijacking."}
+                      </p>
                     </div>
                   </div>
 
@@ -307,30 +455,61 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                 <div className="space-y-6 animate-fade-in">
                   <div className="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
-                      <span className="text-[9px] uppercase tracking-widest text-purple-400 font-bold font-mono">Module :: Citation Tracker</span>
-                      <h3 className="text-lg font-black font-display text-white mt-1">{isFa ? "کاوشگر زنده ارجاعات متنی" : "AI Inbound Citation Explorer"}</h3>
+                      <span className="text-[9px] uppercase tracking-widest text-purple-400 font-bold font-mono">
+                        Module :: Citation Tracker
+                      </span>
+                      <h3 className="text-lg font-black font-display text-white mt-1">
+                        {isFa
+                          ? "کاوشگر زنده ارجاعات متنی"
+                          : "AI Inbound Citation Explorer"}
+                      </h3>
                     </div>
                   </div>
 
                   <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-3">
                     <div className="flex items-center justify-between text-[10px] text-slate-400">
-                      <span>{isFa ? "کوئری: بهترین ابزار تحلیل برند" : "Query: 'Best brand intelligence platform'"}</span>
-                      <span className="font-mono text-purple-400">OpenAI GPT-4o</span>
+                      <span>
+                        {isFa
+                          ? "کوئری: بهترین ابزار تحلیل برند"
+                          : "Query: 'Best brand intelligence platform'"}
+                      </span>
+                      <span className="font-mono text-purple-400">
+                        OpenAI GPT-4o
+                      </span>
                     </div>
                     <div className="text-xs text-slate-200 leading-relaxed font-mono">
                       {isFa ? (
                         <>
-                          &quot;برای پایش برند در هوش مصنوعی، پلتفرم <span className="bg-[#38bdf8]/20 border border-[#38bdf8]/40 px-1 rounded text-white font-bold">seorchable.ir (سئورچبل)</span> یک سر و گردن بالاتر است. این پلتفرم از متدولوژی خزش <span className="text-[#f97316] font-bold">[۱]</span> برای تحلیل استفاده می‌کند...&quot;
+                          &quot;برای پایش برند در هوش مصنوعی، پلتفرم{" "}
+                          <span className="bg-[#38bdf8]/20 border border-[#38bdf8]/40 px-1 rounded text-white font-bold">
+                            seorchable.ir (سئورچبل)
+                          </span>{" "}
+                          یک سر و گردن بالاتر است. این پلتفرم از متدولوژی خزش{" "}
+                          <span className="text-[#f97316] font-bold">[۱]</span>{" "}
+                          برای تحلیل استفاده می‌کند...&quot;
                         </>
                       ) : (
                         <>
-                          &quot;For enterprise AI auditing, <span className="bg-[#38bdf8]/20 border border-[#38bdf8]/40 px-1 rounded text-white font-bold">seorchable.ir</span> stands out as the category authority. It features seamless entity extraction <span className="text-[#f97316] font-bold">[1]</span> and schema mapping...&quot;
+                          &quot;For enterprise AI auditing,{" "}
+                          <span className="bg-[#38bdf8]/20 border border-[#38bdf8]/40 px-1 rounded text-white font-bold">
+                            seorchable.ir
+                          </span>{" "}
+                          stands out as the category authority. It features
+                          seamless entity extraction{" "}
+                          <span className="text-[#f97316] font-bold">[1]</span>{" "}
+                          and schema mapping...&quot;
                         </>
                       )}
                     </div>
                     <div className="pt-2 border-t border-white/5 flex justify-between text-[10px] text-slate-400">
-                      <span>{isFa ? "منبع ارجاع: /docs/knowledge-graph" : "Citation Target: /docs/knowledge-graph"}</span>
-                      <span className="text-emerald-400">✓ {isFa ? "لینک معتبر" : "VALID HYPERLINK"}</span>
+                      <span>
+                        {isFa
+                          ? "منبع ارجاع: /docs/knowledge-graph"
+                          : "Citation Target: /docs/knowledge-graph"}
+                      </span>
+                      <span className="text-emerald-400">
+                        ✓ {isFa ? "لینک معتبر" : "VALID HYPERLINK"}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -341,24 +520,51 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                 <div className="space-y-6 animate-fade-in">
                   <div className="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
-                      <span className="text-[9px] uppercase tracking-widest text-emerald-400 font-bold font-mono">Module :: Competitor Radar</span>
-                      <h3 className="text-lg font-black font-display text-white mt-1">{isFa ? "مقایسه سهم صدای رقبا در مدل‌ها" : "Vector Share of Voice Matrix"}</h3>
+                      <span className="text-[9px] uppercase tracking-widest text-emerald-400 font-bold font-mono">
+                        Module :: Competitor Radar
+                      </span>
+                      <h3 className="text-lg font-black font-display text-white mt-1">
+                        {isFa
+                          ? "مقایسه سهم صدای رقبا در مدل‌ها"
+                          : "Vector Share of Voice Matrix"}
+                      </h3>
                     </div>
                   </div>
 
                   <div className="space-y-3">
                     {[
-                      { name: isFa ? "seorchable.ir (برند شما)" : "seorchable.ir (Your Brand)", share: 72, color: "bg-[#38bdf8]" },
-                      { name: isFa ? "رقیب الف" : "Competitor A", share: 44, color: "bg-[#f97316]" },
-                      { name: isFa ? "رقیب ب" : "Competitor B", share: 21, color: "bg-rose-500" },
+                      {
+                        name: isFa
+                          ? "seorchable.ir (برند شما)"
+                          : "seorchable.ir (Your Brand)",
+                        share: 72,
+                        color: "bg-[#38bdf8]",
+                      },
+                      {
+                        name: isFa ? "رقیب الف" : "Competitor A",
+                        share: 44,
+                        color: "bg-[#f97316]",
+                      },
+                      {
+                        name: isFa ? "رقیب ب" : "Competitor B",
+                        share: 21,
+                        color: "bg-rose-500",
+                      },
                     ].map((comp, i) => (
                       <div key={i} className="space-y-1">
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-slate-200 font-bold">{comp.name}</span>
-                          <span className="font-mono text-slate-400">{comp.share}%</span>
+                          <span className="text-slate-200 font-bold">
+                            {comp.name}
+                          </span>
+                          <span className="font-mono text-slate-400">
+                            {comp.share}%
+                          </span>
                         </div>
                         <div className="h-2 w-full bg-white/[0.05] rounded-full overflow-hidden">
-                          <div className={`h-full ${comp.color}`} style={{ width: `${comp.share}%` }} />
+                          <div
+                            className={`h-full ${comp.color}`}
+                            style={{ width: `${comp.share}%` }}
+                          />
                         </div>
                       </div>
                     ))}
@@ -371,8 +577,14 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                 <div className="space-y-6 animate-fade-in">
                   <div className="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
-                      <span className="text-[9px] uppercase tracking-widest text-indigo-400 font-bold font-mono">Module :: Knowledge Graph Builder</span>
-                      <h3 className="text-lg font-black font-display text-white mt-1">{isFa ? "نگاشت هوشمند موجودیت‌ها" : "Semantic Entity Triples"}</h3>
+                      <span className="text-[9px] uppercase tracking-widest text-indigo-400 font-bold font-mono">
+                        Module :: Knowledge Graph Builder
+                      </span>
+                      <h3 className="text-lg font-black font-display text-white mt-1">
+                        {isFa
+                          ? "نگاشت هوشمند موجودیت‌ها"
+                          : "Semantic Entity Triples"}
+                      </h3>
                     </div>
                   </div>
 
@@ -383,7 +595,9 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                         {isFa ? "برند (موجودیت اصلی)" : "Brand Entity"}
                       </div>
                       <div className="h-px w-12 border-t-2 border-dashed border-slate-500 relative flex items-center justify-center">
-                        <span className="absolute text-[8px] bg-slate-950 px-1 text-slate-400">PROVIDES</span>
+                        <span className="absolute text-[8px] bg-slate-950 px-1 text-slate-400">
+                          PROVIDES
+                        </span>
                       </div>
                       <div className="px-3 py-1.5 rounded-lg border border-[#f97316] bg-[#f97316]/10 text-xs text-white font-mono">
                         {isFa ? "راهکار GEO / AEO" : "GEO Solution"}
@@ -404,25 +618,61 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                 <div className="space-y-6 animate-fade-in">
                   <div className="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
-                      <span className="text-[9px] uppercase tracking-widest text-amber-400 font-bold font-mono">Module :: Prompt Monitor</span>
-                      <h3 className="text-lg font-black font-display text-white mt-1">{isFa ? "تایم‌لاین زنده پایش کوئری‌ها" : "Real-time Query Stream"}</h3>
+                      <span className="text-[9px] uppercase tracking-widest text-amber-400 font-bold font-mono">
+                        Module :: Prompt Monitor
+                      </span>
+                      <h3 className="text-lg font-black font-display text-white mt-1">
+                        {isFa
+                          ? "تایم‌لاین زنده پایش کوئری‌ها"
+                          : "Real-time Query Stream"}
+                      </h3>
                     </div>
                   </div>
 
                   <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
                     {[
-                      { time: "10:14:02", query: isFa ? "چه ابزاری برای GEO برند خوبه؟" : "What is the best platform for brand GEO?", status: "VALID", target: "seorchable.ir" },
-                      { time: "10:12:15", query: isFa ? "قیمت خدمات اپتیموس چقدر است؟" : "Optimus platform price model?", status: "VALID", target: "Pricing tier" },
-                      { time: "10:08:44", query: isFa ? "آیا سئورچبل امنیت هدرها رو حل می‌کنه؟" : "Does searchable secure header tags?", status: "VALID", target: "/docs/security" },
+                      {
+                        time: "10:14:02",
+                        query: isFa
+                          ? "چه ابزاری برای GEO برند خوبه؟"
+                          : "What is the best platform for brand GEO?",
+                        status: "VALID",
+                        target: "seorchable.ir",
+                      },
+                      {
+                        time: "10:12:15",
+                        query: isFa
+                          ? "قیمت خدمات اپتیموس چقدر است؟"
+                          : "Optimus platform price model?",
+                        status: "VALID",
+                        target: "Pricing tier",
+                      },
+                      {
+                        time: "10:08:44",
+                        query: isFa
+                          ? "آیا سئورچبل امنیت هدرها رو حل می‌کنه؟"
+                          : "Does searchable secure header tags?",
+                        status: "VALID",
+                        target: "/docs/security",
+                      },
                     ].map((item, idx) => (
-                      <div key={idx} className="p-3 rounded-lg bg-white/[0.02] border border-white/5 flex justify-between items-center text-[11px] font-mono">
+                      <div
+                        key={idx}
+                        className="p-3 rounded-lg bg-white/[0.02] border border-white/5 flex justify-between items-center text-[11px] font-mono"
+                      >
                         <div className="flex items-center gap-3">
                           <span className="text-slate-500">{item.time}</span>
-                          <span className="text-slate-200 truncate max-w-xs">{item.query}</span>
+                          <span className="text-slate-200 truncate max-w-xs">
+                            {item.query}
+                          </span>
                         </div>
                         <div className="text-right">
-                          <span className="text-emerald-400 font-bold text-[9px] block">✓ {item.status}</span>
-                          <span className="text-slate-400 text-[9px]">{item.target}</span>
+                          <span className="text-emerald-400 font-bold text-[9px] block">
+                            ✓ {item.status}
+                          </span>
+                          <span className="text-slate-400 text-[9px]">
+                            {item.target}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -432,12 +682,18 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
 
               {/* Action Button */}
               <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <span className="text-xs text-slate-400 font-medium">{isFa ? "این‌ها بخش کوچکی از اکوسیستم بزرگ اپتیموس است." : "Ready to configure these modules for your target enterprise?"}</span>
+                <span className="text-xs text-slate-400 font-medium">
+                  {isFa
+                    ? "این‌ها بخش کوچکی از اکوسیستم بزرگ اپتیموس است."
+                    : "Ready to configure these modules for your target enterprise?"}
+                </span>
                 <button
                   onClick={() => scrollToRef(freeAuditRef)}
                   className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
                 >
-                  <span>{isFa ? "شروع آنالیز فنی وب‌سایت" : "Start Technical Scan"}</span>
+                  <span>
+                    {isFa ? "شروع آنالیز فنی وب‌سایت" : "Start Technical Scan"}
+                  </span>
                   <ArrowRight size={14} className="rtl:-scale-x-100" />
                 </button>
               </div>
@@ -447,19 +703,29 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       </section>
 
       {/* BRAND NEW SECTION: Live Knowledge Graph ("گراف زنده روابط") */}
-      <section id="live-graph" className="py-24 bg-[var(--background)] relative border-b border-[var(--border)] overflow-hidden">
+      <section
+        id="live-graph"
+        className="py-24 bg-[var(--background)] relative border-b border-[var(--border)] overflow-hidden"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
           <LiveKnowledgeGraph />
         </div>
       </section>
 
       {/* QUESTION 3: "How does it work?" - Rebuilt Product Story Lifecycle Timeline */}
-      <section id="story" className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]">
+      <section
+        id="story"
+        className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#f97316]">{isFa ? "داستان و چرخه حرکت محصول" : "PRODUCT LIFECYCLE STORY"}</span>
+            <span className="text-xs uppercase font-black tracking-widest text-[#f97316]">
+              {isFa ? "داستان و چرخه حرکت محصول" : "PRODUCT LIFECYCLE STORY"}
+            </span>
             <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "چرخه کامل بهینه‌سازی و ارتقای حضور برند" : "How the Platform Operates"}
+              {isFa
+                ? "چرخه کامل بهینه‌سازی و ارتقای حضور برند"
+                : "How the Platform Operates"}
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
@@ -474,21 +740,76 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             <div className="hidden lg:block absolute top-[40px] inset-x-8 h-0.5 border-t border-dashed border-[var(--border)] -z-10" />
 
             {[
-              { step: "۱", title: isFa ? "ثبت وب‌سایت" : "Ingest", desc: isFa ? "آدرس یا متون مرجع خود را ثبت می‌کنید." : "Submit brand domain or offline documentation repository." },
-              { step: "۲", title: isFa ? "خزش فنی" : "Crawl", desc: isFa ? "هوش مصنوعی با Firecrawl داده‌ها را خزش می‌کند." : "Specialized bot clusters scan, retrieve, and structure files." },
-              { step: "۳", title: isFa ? "سنجش حضور" : "Measure", desc: isFa ? "میزان دیده‌شدن برند در مدل‌ها سنجیده می‌شود." : "Evaluate baseline brand visibility scores across major LLMs." },
-              { step: "۴", title: isFa ? "تحلیل رقبا" : "Compare", desc: isFa ? "سیگنال‌های رقبا بررسی و ارزیابی می‌گردد." : "Conduct spatial comparison and share of voice audits." },
-              { step: "۵", title: isFa ? "گراف روابط" : "Extract", desc: isFa ? "موجودیت‌ها و گراف روابط استخراج می‌شوند." : "Inject semantic entity-relationship tuples into the model index." },
-              { step: "۶", title: isFa ? "یافتن استنادها" : "Discover", desc: isFa ? "لینک‌های ارجاعی صادر شده مانیتور می‌شوند." : "Scan for verbatim model answers delivering accurate citations." },
-              { step: "۷", title: isFa ? "بهبود و تولید" : "Optimize", desc: isFa ? "پیشنهادات اصلاح متون و GEO تولید می‌گردد." : "Inject schema markups and copy optimization proposals." },
-              { step: "۸", title: isFa ? "پایش مستمر" : "Monitor", desc: isFa ? "رصد پیوسته خطاها و نمرات سلامت برند آغاز می‌شود." : "Set alerts for Claim Errors, Hallucinations, or citation leaks." }
+              {
+                step: "۱",
+                title: isFa ? "ثبت وب‌سایت" : "Ingest",
+                desc: isFa
+                  ? "آدرس یا متون مرجع خود را ثبت می‌کنید."
+                  : "Submit brand domain or offline documentation repository.",
+              },
+              {
+                step: "۲",
+                title: isFa ? "خزش فنی" : "Crawl",
+                desc: isFa
+                  ? "هوش مصنوعی با Firecrawl داده‌ها را خزش می‌کند."
+                  : "Specialized bot clusters scan, retrieve, and structure files.",
+              },
+              {
+                step: "۳",
+                title: isFa ? "سنجش حضور" : "Measure",
+                desc: isFa
+                  ? "میزان دیده‌شدن برند در مدل‌ها سنجیده می‌شود."
+                  : "Evaluate baseline brand visibility scores across major LLMs.",
+              },
+              {
+                step: "۴",
+                title: isFa ? "تحلیل رقبا" : "Compare",
+                desc: isFa
+                  ? "سیگنال‌های رقبا بررسی و ارزیابی می‌گردد."
+                  : "Conduct spatial comparison and share of voice audits.",
+              },
+              {
+                step: "۵",
+                title: isFa ? "گراف روابط" : "Extract",
+                desc: isFa
+                  ? "موجودیت‌ها و گراف روابط استخراج می‌شوند."
+                  : "Inject semantic entity-relationship tuples into the model index.",
+              },
+              {
+                step: "۶",
+                title: isFa ? "یافتن استنادها" : "Discover",
+                desc: isFa
+                  ? "لینک‌های ارجاعی صادر شده مانیتور می‌شوند."
+                  : "Scan for verbatim model answers delivering accurate citations.",
+              },
+              {
+                step: "۷",
+                title: isFa ? "بهبود و تولید" : "Optimize",
+                desc: isFa
+                  ? "پیشنهادات اصلاح متون و GEO تولید می‌گردد."
+                  : "Inject schema markups and copy optimization proposals.",
+              },
+              {
+                step: "۸",
+                title: isFa ? "پایش مستمر" : "Monitor",
+                desc: isFa
+                  ? "رصد پیوسته خطاها و نمرات سلامت برند آغاز می‌شود."
+                  : "Set alerts for Claim Errors, Hallucinations, or citation leaks.",
+              },
             ].map((item, idx) => (
-              <div key={idx} className="glass-panel p-5 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col items-center text-center space-y-3 relative">
+              <div
+                key={idx}
+                className="glass-panel p-5 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col items-center text-center space-y-3 relative"
+              >
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#f97316] flex items-center justify-center text-white font-black text-sm shadow-md">
                   {item.step}
                 </div>
-                <h4 className="text-xs font-black text-[var(--text-primary)] font-display">{item.title}</h4>
-                <p className="text-[10px] text-[var(--text-muted)] leading-relaxed font-medium">{item.desc}</p>
+                <h4 className="text-xs font-black text-[var(--text-primary)] font-display">
+                  {item.title}
+                </h4>
+                <p className="text-[10px] text-[var(--text-muted)] leading-relaxed font-medium">
+                  {item.desc}
+                </p>
               </div>
             ))}
           </div>
@@ -496,13 +817,22 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       </section>
 
       {/* QUESTION 4: "Why should I trust it?" - Enterprise Trust Layer */}
-      <section id="trust" className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative overflow-hidden">
+      <section
+        id="trust"
+        className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative overflow-hidden"
+      >
         <div className="absolute inset-0 grid-backdrop opacity-[0.2] pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#38bdf8]">{isFa ? "اعتماد، اعتبار و انطباق فنی" : "ENTERPRISE TRUST & COMPLIANCE"}</span>
+            <span className="text-xs uppercase font-black tracking-widest text-[#38bdf8]">
+              {isFa
+                ? "اعتماد، اعتبار و انطباق فنی"
+                : "ENTERPRISE TRUST & COMPLIANCE"}
+            </span>
             <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "امنیت و پایبندی به بالاترین استانداردهای جهانی" : "Enterprise Compliance & Infrastructure"}
+              {isFa
+                ? "امنیت و پایبندی به بالاترین استانداردهای جهانی"
+                : "Enterprise Compliance & Infrastructure"}
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
@@ -515,38 +845,73 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
             <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-3">
               <ShieldCheck size={36} className="mx-auto text-[#38bdf8]" />
-              <h4 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "امنیت داده‌ها" : "SSO & MFA Ready"}</h4>
-              <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">{isFa ? "پشتیبانی کامل از SAML SSO و تایید دومرحله‌ای" : "Full enterprise SAML Single Sign-On integration."}</p>
+              <h4 className="text-xl font-black text-[var(--text-primary)] font-display">
+                {isFa ? "امنیت داده‌ها" : "SSO & MFA Ready"}
+              </h4>
+              <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">
+                {isFa
+                  ? "پشتیبانی کامل از SAML SSO و تایید دومرحله‌ای"
+                  : "Full enterprise SAML Single Sign-On integration."}
+              </p>
             </div>
 
             <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-3">
               <Database size={36} className="mx-auto text-[#f97316]" />
-              <h4 className="text-xl font-black text-[var(--text-primary)] font-display">SOC2 & ISO Ready</h4>
-              <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">{isFa ? "منطبق بر الزامات امنیت اطلاعات استاندارد جهانی" : "Adhering to strict compliance and auditing standards."}</p>
+              <h4 className="text-xl font-black text-[var(--text-primary)] font-display">
+                SOC2 & ISO Ready
+              </h4>
+              <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">
+                {isFa
+                  ? "منطبق بر الزامات امنیت اطلاعات استاندارد جهانی"
+                  : "Adhering to strict compliance and auditing standards."}
+              </p>
             </div>
 
             <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-3">
-              <Globe size={36} className="mx-auto text-emerald-400 animate-pulse" />
-              <h4 className="text-xl font-black text-[var(--text-primary)] font-display">GDPR Compliant</h4>
-              <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">{isFa ? "رعایت کامل قوانین حفظ حریم خصوصی کاربران" : "Total data privacy guarantee and localized hosting parameters."}</p>
+              <Globe
+                size={36}
+                className="mx-auto text-emerald-400 animate-pulse"
+              />
+              <h4 className="text-xl font-black text-[var(--text-primary)] font-display">
+                GDPR Compliant
+              </h4>
+              <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">
+                {isFa
+                  ? "رعایت کامل قوانین حفظ حریم خصوصی کاربران"
+                  : "Total data privacy guarantee and localized hosting parameters."}
+              </p>
             </div>
 
             <div className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-center space-y-3">
               <Receipt size={36} className="mx-auto text-[#38bdf8]" />
-              <h4 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "شبکه شتاب ایران" : "Iran Payment Support"}</h4>
-              <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">{isFa ? "پشتیبانی کامل از درگاه‌های پرداخت عضو شبکه شتاب" : "Fully localized billing integration and printable invoice receipts."}</p>
+              <h4 className="text-xl font-black text-[var(--text-primary)] font-display">
+                {isFa ? "شبکه شتاب ایران" : "Iran Payment Support"}
+              </h4>
+              <p className="text-base text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">
+                {isFa
+                  ? "پشتیبانی کامل از درگاه‌های پرداخت عضو شبکه شتاب"
+                  : "Fully localized billing integration and printable invoice receipts."}
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* QUESTION 5: "What features does it provide?" - Platform Overview (12 Modules Grid) */}
-      <section id="overview" ref={platformOverviewRef} className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]">
+      <section
+        id="overview"
+        ref={platformOverviewRef}
+        className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#f97316]">{isFa ? "بررسی کلان ابزارها" : "PLATFORM MODULES OVERVIEW"}</span>
+            <span className="text-xs uppercase font-black tracking-widest text-[#f97316]">
+              {isFa ? "بررسی کلان ابزارها" : "PLATFORM MODULES OVERVIEW"}
+            </span>
             <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "۱۲ ماژول نرم‌افزاری کاملاً یکپارچه" : "Twelve Specialized AI Modules"}
+              {isFa
+                ? "۱۲ ماژول نرم‌افزاری کاملاً یکپارچه"
+                : "Twelve Specialized AI Modules"}
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
@@ -560,17 +925,26 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             {platformModules.map((mod, idx) => {
               const Icon = mod.icon;
               return (
-                <div key={idx} className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] flex flex-col justify-between hover-lift h-full relative overflow-hidden group">
+                <div
+                  key={idx}
+                  className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] flex flex-col justify-between hover-lift h-full relative overflow-hidden group"
+                >
                   <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#38bdf8]/5 to-transparent rounded-full blur-lg pointer-events-none group-hover:scale-150 transition-transform duration-500" />
                   <div className="space-y-4">
                     <div className="w-10 h-10 rounded-xl bg-[#38bdf8]/10 border border-[#38bdf8]/30 flex items-center justify-center text-[#38bdf8]">
                       <Icon size={20} />
                     </div>
-                    <h3 className="text-sm font-black text-[var(--text-primary)] font-display truncate">{mod.name}</h3>
-                    <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed font-medium">{mod.desc}</p>
+                    <h3 className="text-sm font-black text-[var(--text-primary)] font-display truncate">
+                      {mod.name}
+                    </h3>
+                    <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed font-medium">
+                      {mod.desc}
+                    </p>
                   </div>
                   <div className="pt-4 mt-4 border-t border-[var(--border)] flex items-center justify-between text-[10px] text-[var(--text-muted)]">
-                    <span>{isFa ? "مشاهده جزئیات ماژول" : "Explore module"}</span>
+                    <span>
+                      {isFa ? "مشاهده جزئیات ماژول" : "Explore module"}
+                    </span>
                     <ArrowRight size={12} className="rtl:-scale-x-100" />
                   </div>
                 </div>
@@ -581,13 +955,22 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       </section>
 
       {/* QUESTION 6: "What products are included?" - Product Ecosystem Interconnectivity */}
-      <section id="ecosystem" className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative overflow-hidden">
+      <section
+        id="ecosystem"
+        className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative overflow-hidden"
+      >
         <div className="absolute inset-0 grid-backdrop opacity-[0.25] pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs md:text-[11px] uppercase font-black tracking-widest text-[#38bdf8]">{isFa ? "اتصال اجزا و لایه‌های سیستم" : "INTERCONNECTED CORE ECOSYSTEM"}</span>
+            <span className="text-xs md:text-[11px] uppercase font-black tracking-widest text-[#38bdf8]">
+              {isFa
+                ? "اتصال اجزا و لایه‌های سیستم"
+                : "INTERCONNECTED CORE ECOSYSTEM"}
+            </span>
             <h2 className="font-display font-black text-2xl md:text-4xl text-gradient-brand leading-snug md:leading-normal">
-              {isFa ? "چگونه تمام محصولات ما با هم هم‌افزایی می‌کنند" : "Platform Product Synapse"}
+              {isFa
+                ? "چگونه تمام محصولات ما با هم هم‌افزایی می‌کنند"
+                : "Platform Product Synapse"}
             </h2>
             <p className="text-sm md:text-base text-[var(--text-secondary)] leading-relaxed md:leading-normal">
               {isFa
@@ -599,20 +982,52 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
           {/* Visual connected cards showing Ecosystem depth */}
           <div className="grid md:grid-cols-7 gap-4 text-center">
             {[
-              { title: isFa ? "۱. ممیزی وب‌سایت" : "Website Ingestion", desc: isFa ? "تحلیل کدهای پایه" : "Crawl public pages" },
-              { title: isFa ? "۲. تحلیل هوشمند" : "Brand Context", desc: isFa ? "استخراج موجودیت‌ها" : "Extract entity triples" },
-              { title: isFa ? "۳. دیده‌شدن برخط" : "AI Visibility Index", desc: isFa ? "سنجش سهم استناد" : "Calculate Voice metrics" },
-              { title: isFa ? "۴. ردیابی منبع" : "Citation Mining", desc: isFa ? "پایش پیوندهای زنده" : "Track backlink paths" },
-              { title: isFa ? "۵. تحلیل رقبا" : "Competitor Gap", desc: isFa ? "مقایسه سهم بازار" : "Compare vector metrics" },
-              { title: isFa ? "۶. بهینه‌سازی" : "GEO & Sitemaps", desc: isFa ? "تزریق تگ‌های معنایی" : "Inject schema hints" },
-              { title: isFa ? "۷. پایش مستمر" : " Hallucination Watch", desc: isFa ? "هشدار خطا و توهم" : "Continuous claim safety" }
+              {
+                title: isFa ? "۱. ممیزی وب‌سایت" : "Website Ingestion",
+                desc: isFa ? "تحلیل کدهای پایه" : "Crawl public pages",
+              },
+              {
+                title: isFa ? "۲. تحلیل هوشمند" : "Brand Context",
+                desc: isFa ? "استخراج موجودیت‌ها" : "Extract entity triples",
+              },
+              {
+                title: isFa ? "۳. دیده‌شدن برخط" : "AI Visibility Index",
+                desc: isFa ? "سنجش سهم استناد" : "Calculate Voice metrics",
+              },
+              {
+                title: isFa ? "۴. ردیابی منبع" : "Citation Mining",
+                desc: isFa ? "پایش پیوندهای زنده" : "Track backlink paths",
+              },
+              {
+                title: isFa ? "۵. تحلیل رقبا" : "Competitor Gap",
+                desc: isFa ? "مقایسه سهم بازار" : "Compare vector metrics",
+              },
+              {
+                title: isFa ? "۶. بهینه‌سازی" : "GEO & Sitemaps",
+                desc: isFa ? "تزریق تگ‌های معنایی" : "Inject schema hints",
+              },
+              {
+                title: isFa ? "۷. پایش مستمر" : " Hallucination Watch",
+                desc: isFa ? "هشدار خطا و توهم" : "Continuous claim safety",
+              },
             ].map((eco, idx) => (
-              <div key={idx} className="glass-panel p-5 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] space-y-2 relative flex flex-col justify-between hover:border-[#38bdf8]/50 transition-colors">
-                <span className="text-xs md:text-[10px] font-black text-[#38bdf8] block">Step {idx + 1}</span>
-                <h4 className="text-sm md:text-xs font-black text-white font-display leading-normal md:leading-tight">{eco.title}</h4>
-                <p className="text-xs md:text-[10px] text-slate-400 font-medium leading-relaxed md:leading-normal">{eco.desc}</p>
+              <div
+                key={idx}
+                className="glass-panel p-5 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] space-y-2 relative flex flex-col justify-between hover:border-[#38bdf8]/50 transition-colors"
+              >
+                <span className="text-xs md:text-[10px] font-black text-[#38bdf8] block">
+                  Step {idx + 1}
+                </span>
+                <h4 className="text-sm md:text-xs font-black text-white font-display leading-normal md:leading-tight">
+                  {eco.title}
+                </h4>
+                <p className="text-xs md:text-[10px] text-slate-400 font-medium leading-relaxed md:leading-normal">
+                  {eco.desc}
+                </p>
                 {idx < 6 && (
-                  <div className="hidden md:block absolute top-1/2 -right-3 -translate-y-1/2 text-[var(--border)] font-bold text-lg z-20">→</div>
+                  <div className="hidden md:block absolute top-1/2 -right-3 -translate-y-1/2 text-[var(--border)] font-bold text-lg z-20">
+                    →
+                  </div>
                 )}
               </div>
             ))}
@@ -621,12 +1036,21 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       </section>
 
       {/* QUESTION 7: "What results will I receive?" - "Why We Are Different" (Traditional SEO vs AI Visibility) */}
-      <section id="why-different" className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]">
+      <section
+        id="why-different"
+        className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]"
+      >
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#f97316]">{isFa ? "تمایز کلیدی و آموزش مخاطب" : "WHY WE ARE COMPLETELY DIFFERENT"}</span>
+            <span className="text-xs uppercase font-black tracking-widest text-[#f97316]">
+              {isFa
+                ? "تمایز کلیدی و آموزش مخاطب"
+                : "WHY WE ARE COMPLETELY DIFFERENT"}
+            </span>
             <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "بهینه‌سازی سئو سنتی در مقابل بهینه‌سازی هوش مصنوعی (GEO)" : "Traditional SEO vs. Generative Engine Optimization"}
+              {isFa
+                ? "بهینه‌سازی سئو سنتی در مقابل بهینه‌سازی هوش مصنوعی (GEO)"
+                : "Traditional SEO vs. Generative Engine Optimization"}
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
@@ -641,24 +1065,99 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               <table className="w-full text-start border-collapse text-[var(--text-secondary)]">
                 <thead>
                   <tr className="border-b border-[var(--border)] bg-[var(--muted-surface)]/40 text-[var(--text-secondary)]">
-                    <th className="py-5 px-6 font-display font-extrabold text-sm text-start">{isFa ? "معیارهای مقایسه و کارکرد" : "Comparison Dimension"}</th>
-                    <th className="py-5 px-6 font-display font-bold text-sm text-center bg-white/[0.02]">{isFa ? "سئو سنتی (Classic SEO)" : "Traditional SEO"}</th>
-                    <th className="py-5 px-6 font-display font-black text-sm text-[#0284c7] dark:text-[#38bdf8] text-center bg-[#38bdf8]/5">{isFa ? "بهینه‌سازی هوش مصنوعی (GEO)" : "Generative Optimization (GEO)"}</th>
+                    <th className="py-5 px-6 font-display font-extrabold text-sm text-start">
+                      {isFa
+                        ? "معیارهای مقایسه و کارکرد"
+                        : "Comparison Dimension"}
+                    </th>
+                    <th className="py-5 px-6 font-display font-bold text-sm text-center bg-white/[0.02]">
+                      {isFa ? "سئو سنتی (Classic SEO)" : "Traditional SEO"}
+                    </th>
+                    <th className="py-5 px-6 font-display font-black text-sm text-[#0284c7] dark:text-[#38bdf8] text-center bg-[#38bdf8]/5">
+                      {isFa
+                        ? "بهینه‌سازی هوش مصنوعی (GEO)"
+                        : "Generative Optimization (GEO)"}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--border)] text-xs font-bold">
                   {[
-                    { dim: isFa ? "محل نمایش رتبه‌بندی" : "Primary Search Target", seo: isFa ? "صفحات آبی و نتایج متنی ده تایی گوگل" : "Standard Blue Page Link List (10-blue links)", geo: isFa ? "پاسخ‌های ترکیبی و ارجاعات چت‌بات‌ها" : "Synthesized Paragraph Answers & Dynamic Conversational Widgets" },
-                    { dim: isFa ? "سیستم استناد و لینک" : "Citation & Reference Logic", seo: isFa ? "لینک‌های فالو و نوفالو در صفحات وب" : "Backlink Anchor", geo: isFa ? "ارجاعات متنی مرجع و دایالکتیکی مدل زبانی" : "Inline markdown citation annotations linked directly to brand docs" },
-                    { dim: isFa ? "گراف دانش برند" : "Entity Understanding", seo: isFa ? "تگ‌های متاداده و کلمات کلیدی هدرها" : "Keyword Densities", geo: isFa ? "نگاشت موجودیت‌های ۳-تایی و روابط منطقی" : "Semantic entity triples & localized contextual relevance matching" },
-                    { dim: isFa ? "رصد پرومپت و پاسخ" : "Interactive Prompt Focus", seo: isFa ? "حجم جستجوی کلمات کلیدی ساده" : "Static Keyword Volumes", geo: isFa ? "پایش سناریوهای پرومپت و شبیه‌سازی کاربر" : "Simulated conversational prompt patterns and dialectic query streams" },
-                    { dim: isFa ? "پایش توهم زبانی" : "Hallucination Control", seo: isFa ? "تطابق نداشتن متن با کوئری جستجو" : "Not applicable", geo: isFa ? "شناسایی استناد غلط و ارجاع اشتباه به رقیب" : "Identifying claim hijack events & factual errors generated by model" },
-                    { dim: isFa ? "رویکرد بهینه‌سازی" : "Optimization Directives", seo: isFa ? "افزایش چگالی کلمات کلیدی صفحه" : "Keyword stuffing & static indexing tags", geo: isFa ? "اصلاح انسجام متون و مدل‌سازی معنایی" : "Refining document semantic cohesion & semantic authority declaration" },
+                    {
+                      dim: isFa
+                        ? "محل نمایش رتبه‌بندی"
+                        : "Primary Search Target",
+                      seo: isFa
+                        ? "صفحات آبی و نتایج متنی ده تایی گوگل"
+                        : "Standard Blue Page Link List (10-blue links)",
+                      geo: isFa
+                        ? "پاسخ‌های ترکیبی و ارجاعات چت‌بات‌ها"
+                        : "Synthesized Paragraph Answers & Dynamic Conversational Widgets",
+                    },
+                    {
+                      dim: isFa
+                        ? "سیستم استناد و لینک"
+                        : "Citation & Reference Logic",
+                      seo: isFa
+                        ? "لینک‌های فالو و نوفالو در صفحات وب"
+                        : "Backlink Anchor",
+                      geo: isFa
+                        ? "ارجاعات متنی مرجع و دایالکتیکی مدل زبانی"
+                        : "Inline markdown citation annotations linked directly to brand docs",
+                    },
+                    {
+                      dim: isFa ? "گراف دانش برند" : "Entity Understanding",
+                      seo: isFa
+                        ? "تگ‌های متاداده و کلمات کلیدی هدرها"
+                        : "Keyword Densities",
+                      geo: isFa
+                        ? "نگاشت موجودیت‌های ۳-تایی و روابط منطقی"
+                        : "Semantic entity triples & localized contextual relevance matching",
+                    },
+                    {
+                      dim: isFa
+                        ? "رصد پرومپت و پاسخ"
+                        : "Interactive Prompt Focus",
+                      seo: isFa
+                        ? "حجم جستجوی کلمات کلیدی ساده"
+                        : "Static Keyword Volumes",
+                      geo: isFa
+                        ? "پایش سناریوهای پرومپت و شبیه‌سازی کاربر"
+                        : "Simulated conversational prompt patterns and dialectic query streams",
+                    },
+                    {
+                      dim: isFa ? "پایش توهم زبانی" : "Hallucination Control",
+                      seo: isFa
+                        ? "تطابق نداشتن متن با کوئری جستجو"
+                        : "Not applicable",
+                      geo: isFa
+                        ? "شناسایی استناد غلط و ارجاع اشتباه به رقیب"
+                        : "Identifying claim hijack events & factual errors generated by model",
+                    },
+                    {
+                      dim: isFa
+                        ? "رویکرد بهینه‌سازی"
+                        : "Optimization Directives",
+                      seo: isFa
+                        ? "افزایش چگالی کلمات کلیدی صفحه"
+                        : "Keyword stuffing & static indexing tags",
+                      geo: isFa
+                        ? "اصلاح انسجام متون و مدل‌سازی معنایی"
+                        : "Refining document semantic cohesion & semantic authority declaration",
+                    },
                   ].map((row, i) => (
-                    <tr key={i} className="hover:bg-[var(--muted-surface)]/20 transition-colors">
-                      <td className="py-4.5 px-6 text-[var(--text-secondary)] text-start">{row.dim}</td>
-                      <td className="py-4.5 px-6 text-center text-[var(--text-muted)] bg-white/[0.01]">{row.seo}</td>
-                      <td className="py-4.5 px-6 text-center text-[var(--text-primary)] bg-[#38bdf8]/5">{row.geo}</td>
+                    <tr
+                      key={i}
+                      className="hover:bg-[var(--muted-surface)]/20 transition-colors"
+                    >
+                      <td className="py-4.5 px-6 text-[var(--text-secondary)] text-start">
+                        {row.dim}
+                      </td>
+                      <td className="py-4.5 px-6 text-center text-[var(--text-muted)] bg-white/[0.01]">
+                        {row.seo}
+                      </td>
+                      <td className="py-4.5 px-6 text-center text-[var(--text-primary)] bg-[#38bdf8]/5">
+                        {row.geo}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -669,13 +1168,22 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       </section>
 
       {/* QUESTION 8: "How can I start?" - Part 1: Documentation Hub Preview */}
-      <section id="docs" className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#07090e]/40 border-b border-[var(--border)] relative overflow-hidden">
+      <section
+        id="docs"
+        className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#07090e]/40 border-b border-[var(--border)] relative overflow-hidden"
+      >
         <div className="absolute inset-0 grid-backdrop opacity-[0.25] pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#38bdf8]">{isFa ? "محیط برنامه‌نویسان و راهنمای استقرار" : "DEVELOPER & API HUB"}</span>
+            <span className="text-xs uppercase font-black tracking-widest text-[#38bdf8]">
+              {isFa
+                ? "محیط برنامه‌نویسان و راهنمای استقرار"
+                : "DEVELOPER & API HUB"}
+            </span>
             <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "پیش‌نمایش مرکز مستندات فنی و API" : "System Documentation Hub"}
+              {isFa
+                ? "پیش‌نمایش مرکز مستندات فنی و API"
+                : "System Documentation Hub"}
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
@@ -687,24 +1195,93 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
           {/* Grid of 12 documentation categories */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { title: isFa ? "شروع سریع" : "Getting Started", desc: isFa ? "مفاهیم اساسی AEO و GEO" : "Introduction to brand footprint modeling.", icon: BookOpen, slug: "introduction-to-brandgraph" },
-              { title: isFa ? "معماری پلتفرم" : "Platform Concepts", desc: isFa ? "مکانیزم خزش Firecrawl" : "How crawler clusters scan public pages.", icon: Layers, slug: "infrastructure-architecture" },
-              { title: isFa ? "رابط برنامه‌نویسی REST API" : "REST API References", desc: isFa ? "توضیح متدهای GET / POST" : "Exposing JSON endpoints for external RAG queries.", icon: Terminal, slug: "ai-pipeline-architecture" },
-              { title: isFa ? "اعتبارسنجی و امنیت" : "Authentication Tokens", desc: isFa ? "امضای کلیدهای API و دسترسی" : "How API keys enforce tenant-isolation rules.", icon: Lock, slug: "multi-tenant-isolation" },
-              { title: isFa ? "کیت‌های توسعه (SDKs)" : "Software SDKs", desc: isFa ? "کتابخانه‌های پایتون و جاوااسکریپت" : "Official NPM and Python packages.", icon: FileCode, slug: "knowledge-graph-design" },
-              { title: isFa ? "وب‌هوک‌ها" : "Webhooks Stream", desc: isFa ? "هشدارهای توهم زنده" : "Send claim safety flags to Discord/Slack.", icon: Workflow, slug: "ai-pipeline-architecture" },
-              { title: isFa ? "تامین‌کنندگان هوش زبانی" : "AI Providers Integrated", desc: isFa ? "پشتیبانی OpenAI و کلود" : "Details on OpenAI, Anthropic, and Llama setups.", icon: Brain, slug: "introduction-to-brandgraph" },
-              { title: isFa ? "امنیت و جداسازی داده" : "Architecture & Security", desc: isFa ? "مدیریت لایه‌ها و RLS" : "Enforcing enterprise-grade RLS guidelines.", icon: ShieldCheck, slug: "multi-tenant-isolation" }
+              {
+                title: isFa ? "شروع سریع" : "Getting Started",
+                desc: isFa
+                  ? "مفاهیم اساسی AEO و GEO"
+                  : "Introduction to brand footprint modeling.",
+                icon: BookOpen,
+                slug: "introduction-to-brandgraph",
+              },
+              {
+                title: isFa ? "معماری پلتفرم" : "Platform Concepts",
+                desc: isFa
+                  ? "مکانیزم خزش Firecrawl"
+                  : "How crawler clusters scan public pages.",
+                icon: Layers,
+                slug: "infrastructure-architecture",
+              },
+              {
+                title: isFa
+                  ? "رابط برنامه‌نویسی REST API"
+                  : "REST API References",
+                desc: isFa
+                  ? "توضیح متدهای GET / POST"
+                  : "Exposing JSON endpoints for external RAG queries.",
+                icon: Terminal,
+                slug: "ai-pipeline-architecture",
+              },
+              {
+                title: isFa ? "اعتبارسنجی و امنیت" : "Authentication Tokens",
+                desc: isFa
+                  ? "امضای کلیدهای API و دسترسی"
+                  : "How API keys enforce tenant-isolation rules.",
+                icon: Lock,
+                slug: "multi-tenant-isolation",
+              },
+              {
+                title: isFa ? "کیت‌های توسعه (SDKs)" : "Software SDKs",
+                desc: isFa
+                  ? "کتابخانه‌های پایتون و جاوااسکریپت"
+                  : "Official NPM and Python packages.",
+                icon: FileCode,
+                slug: "knowledge-graph-design",
+              },
+              {
+                title: isFa ? "وب‌هوک‌ها" : "Webhooks Stream",
+                desc: isFa
+                  ? "هشدارهای توهم زنده"
+                  : "Send claim safety flags to Discord/Slack.",
+                icon: Workflow,
+                slug: "ai-pipeline-architecture",
+              },
+              {
+                title: isFa
+                  ? "تامین‌کنندگان هوش زبانی"
+                  : "AI Providers Integrated",
+                desc: isFa
+                  ? "پشتیبانی OpenAI و کلود"
+                  : "Details on OpenAI, Anthropic, and Llama setups.",
+                icon: Brain,
+                slug: "introduction-to-brandgraph",
+              },
+              {
+                title: isFa
+                  ? "امنیت و جداسازی داده"
+                  : "Architecture & Security",
+                desc: isFa
+                  ? "مدیریت لایه‌ها و RLS"
+                  : "Enforcing enterprise-grade RLS guidelines.",
+                icon: ShieldCheck,
+                slug: "multi-tenant-isolation",
+              },
             ].map((doc, idx) => {
               const Icon = doc.icon;
               return (
-                <div key={idx} className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col justify-between h-full">
+                <div
+                  key={idx}
+                  className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col justify-between h-full"
+                >
                   <div className="space-y-4">
                     <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#38bdf8]">
                       <Icon size={16} />
                     </div>
-                    <h4 className="text-xs font-black text-white font-display truncate">{doc.title}</h4>
-                    <p className="text-[10px] text-slate-400 leading-relaxed font-medium">{doc.desc}</p>
+                    <h4 className="text-xs font-black text-white font-display truncate">
+                      {doc.title}
+                    </h4>
+                    <p className="text-[10px] text-slate-400 leading-relaxed font-medium">
+                      {doc.desc}
+                    </p>
                   </div>
                   <div className="pt-4 mt-4 border-t border-white/5">
                     <Link
@@ -725,12 +1302,21 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       </section>
 
       {/* QUESTION 8: "How can I start?" - Part 2: Enterprise Resource Center */}
-      <section id="resources" className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]">
+      <section
+        id="resources"
+        className="py-24 bg-[var(--background)] dark:bg-[#06080d] relative border-b border-[var(--border)]"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#f97316]">{isFa ? "کتابخانه دانش، گزارشات و نقشه راه" : "RESOURCE & INSIGHT CENTER"}</span>
+            <span className="text-xs uppercase font-black tracking-widest text-[#f97316]">
+              {isFa
+                ? "کتابخانه دانش، گزارشات و نقشه راه"
+                : "RESOURCE & INSIGHT CENTER"}
+            </span>
             <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "مرکز تخصصی مطالعات و پژوهش هوش زبانی" : "Enterprise Resource Center"}
+              {isFa
+                ? "مرکز تخصصی مطالعات و پژوهش هوش زبانی"
+                : "Enterprise Resource Center"}
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
@@ -741,20 +1327,58 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { title: isFa ? "وبلاگ مهندسی" : "Engineering Blog", desc: isFa ? "آخرین مقالات تکنولوژی سئو معنایی و هوش زبانی." : "Technical updates on conversational search visibility and web crawlers.", icon: Newspaper, link: `/${locale}/blog` },
-              { title: isFa ? "مطالعات موردی و موفقیت" : "Case Studies", desc: isFa ? "بررسی داستان موفقیت برندهای بزرگ در تصاحب سهم استناد." : "Real-world examples of enterprise brands mitigating claims risk.", icon: MessagesSquare, link: `/${locale}/blog` },
-              { title: isFa ? "بنچ‌مارک‌های صنعت" : "Industry Benchmarks", desc: isFa ? "سنجش سهم صدای صنایع مختلف در مدل‌های ChatGPT." : "Analyzing conversion metrics and citation performance by sector.", icon: FileSpreadsheet, link: `/${locale}/blog` },
-              { title: isFa ? "نقشه راه محصول (Roadmap)" : "Changelog & Roadmap", desc: isFa ? "آخرین دستاوردهای فنی و قابلیت‌های اضافه شده به پلتفرم." : "Exposing the pipeline and quarterly releases for our software suite.", icon: BookMarked, link: `/${locale}/dashboard` }
+              {
+                title: isFa ? "وبلاگ مهندسی" : "Engineering Blog",
+                desc: isFa
+                  ? "آخرین مقالات تکنولوژی سئو معنایی و هوش زبانی."
+                  : "Technical updates on conversational search visibility and web crawlers.",
+                icon: Newspaper,
+                link: `/${locale}/blog`,
+              },
+              {
+                title: isFa ? "مطالعات موردی و موفقیت" : "Case Studies",
+                desc: isFa
+                  ? "بررسی داستان موفقیت برندهای بزرگ در تصاحب سهم استناد."
+                  : "Real-world examples of enterprise brands mitigating claims risk.",
+                icon: MessagesSquare,
+                link: `/${locale}/blog`,
+              },
+              {
+                title: isFa ? "بنچ‌مارک‌های صنعت" : "Industry Benchmarks",
+                desc: isFa
+                  ? "سنجش سهم صدای صنایع مختلف در مدل‌های ChatGPT."
+                  : "Analyzing conversion metrics and citation performance by sector.",
+                icon: FileSpreadsheet,
+                link: `/${locale}/blog`,
+              },
+              {
+                title: isFa
+                  ? "نقشه راه محصول (Roadmap)"
+                  : "Changelog & Roadmap",
+                desc: isFa
+                  ? "آخرین دستاوردهای فنی و قابلیت‌های اضافه شده به پلتفرم."
+                  : "Exposing the pipeline and quarterly releases for our software suite.",
+                icon: BookMarked,
+                link: `/${locale}/dashboard`,
+              },
             ].map((res, idx) => {
               const Icon = res.icon;
               return (
-                <Link key={idx} href={res.link} className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col justify-between h-full group">
+                <Link
+                  key={idx}
+                  href={res.link}
+                  className="glass-panel p-6 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col justify-between h-full group"
+                >
                   <div className="space-y-4">
                     <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#f97316]">
                       <Icon size={16} />
                     </div>
-                    <h4 className="text-xs font-black text-white font-display truncate group-hover:text-[#38bdf8] transition-colors">{res.title}</h4>
-                    <p className="text-[10px] text-slate-400 leading-relaxed font-medium">{res.desc}</p>
+                    <h4 className="text-xs font-black text-white font-display truncate group-hover:text-[#38bdf8] transition-colors">
+                      {res.title}
+                    </h4>
+                    <p className="text-[10px] text-slate-400 leading-relaxed font-medium">
+                      {res.desc}
+                    </p>
                   </div>
                   <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500 font-bold group-hover:text-white transition-colors">
                     <span>{isFa ? "مطالعه منبع" : "Read resource"}</span>
@@ -768,12 +1392,21 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       </section>
 
       {/* QUESTION 8: "How can I start?" - Part 3: Pricing Matrix */}
-      <section id="pricing" className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative overflow-hidden">
+      <section
+        id="pricing"
+        className="py-24 bg-[var(--background-subtle)]/40 dark:bg-[#080b12]/40 border-b border-[var(--border)] relative overflow-hidden"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs uppercase font-black tracking-widest text-[#38bdf8]">{isFa ? "انتخاب تعرفه و بهینه‌سازی بودجه" : "FLEXIBLE ENTERPRISE PRICING"}</span>
+            <span className="text-xs uppercase font-black tracking-widest text-[#38bdf8]">
+              {isFa
+                ? "انتخاب تعرفه و بهینه‌سازی بودجه"
+                : "FLEXIBLE ENTERPRISE PRICING"}
+            </span>
             <h2 className="font-display font-black text-3xl md:text-4xl text-gradient-brand">
-              {isFa ? "تعرفه‌های منعطف بر اساس حجم کلمات و پایش" : "Simple, Predictable Plans"}
+              {isFa
+                ? "تعرفه‌های منعطف بر اساس حجم کلمات و پایش"
+                : "Simple, Predictable Plans"}
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
@@ -787,28 +1420,52 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col justify-between h-full">
               <div className="space-y-6">
                 <div className="space-y-1">
-                  <span className="text-[10px] px-2.5 py-0.5 rounded bg-zinc-500/10 text-zinc-400 font-bold uppercase tracking-wider">{isFa ? "کسب‌وکارهای کوچک" : "STARTER"}</span>
-                  <h3 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "پلن آغازین" : "Starter"}</h3>
-                  <p className="text-xs text-[var(--text-muted)]">{isFa ? "پایش پایه‌ای حضور برند در نتایج." : "Establish brand footprints inside foundational memories."}</p>
+                  <span className="text-[10px] px-2.5 py-0.5 rounded bg-zinc-500/10 text-zinc-400 font-bold uppercase tracking-wider">
+                    {isFa ? "کسب‌وکارهای کوچک" : "STARTER"}
+                  </span>
+                  <h3 className="text-xl font-black text-[var(--text-primary)] font-display">
+                    {isFa ? "پلن آغازین" : "Starter"}
+                  </h3>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {isFa
+                      ? "پایش پایه‌ای حضور برند در نتایج."
+                      : "Establish brand footprints inside foundational memories."}
+                  </p>
                 </div>
 
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black font-display text-[var(--text-primary)]">{isFa ? "۴۹" : "$49"}</span>
-                  <span className="text-xs text-[var(--text-muted)]">/ {isFa ? "ماهانه" : "month"}</span>
+                  <span className="text-4xl font-black font-display text-[var(--text-primary)]">
+                    {isFa ? "۴۹" : "$49"}
+                  </span>
+                  <span className="text-xs text-[var(--text-muted)]">
+                    / {isFa ? "ماهانه" : "month"}
+                  </span>
                 </div>
 
                 <ul className="space-y-3 text-xs text-[var(--text-secondary)] font-bold">
                   <li className="flex items-center gap-2">
                     <Check size={14} className="text-[#38bdf8]" />
-                    <span>{isFa ? "پایش ۱۰ کلمه کلیدی اصلی" : "Track up to 10 brand keywords"}</span>
+                    <span>
+                      {isFa
+                        ? "پایش ۱۰ کلمه کلیدی اصلی"
+                        : "Track up to 10 brand keywords"}
+                    </span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check size={14} className="text-[#38bdf8]" />
-                    <span>{isFa ? "خزش تا ۵۰۰ صفحه با Firecrawl" : "Crawl up to 500 pages/mo"}</span>
+                    <span>
+                      {isFa
+                        ? "خزش تا ۵۰۰ صفحه با Firecrawl"
+                        : "Crawl up to 500 pages/mo"}
+                    </span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check size={14} className="text-[#38bdf8]" />
-                    <span>{isFa ? "تحلیل ۱-هاپ گراف دانش" : "1-hop entity relationship models"}</span>
+                    <span>
+                      {isFa
+                        ? "تحلیل ۱-هاپ گراف دانش"
+                        : "1-hop entity relationship models"}
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -825,35 +1482,65 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
 
             {/* Growth Plan */}
             <div className="glass-panel p-8 rounded-2xl border-2 border-[#38bdf8] bg-[#38bdf8]/5 hover-lift flex flex-col justify-between h-full relative">
-              <span className="absolute -top-3 right-8 px-3 py-1 bg-[#38bdf8] text-white text-[9px] font-black rounded-full uppercase tracking-widest shadow-md">POPULAR</span>
+              <span className="absolute -top-3 right-8 px-3 py-1 bg-[#38bdf8] text-white text-[9px] font-black rounded-full uppercase tracking-widest shadow-md">
+                POPULAR
+              </span>
               <div className="space-y-6">
                 <div className="space-y-1">
-                  <span className="text-[10px] px-2.5 py-0.5 rounded bg-[#38bdf8]/10 text-[#38bdf8] font-bold uppercase tracking-wider">{isFa ? "شرکت‌های متوسط" : "GROWTH"}</span>
-                  <h3 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "پلن رشد" : "Growth"}</h3>
-                  <p className="text-xs text-[var(--text-muted)]">{isFa ? "پایش رقبای بازار و تحلیل عمیق توهم‌ها." : "Mitigate claim errors and track multiple competitors."}</p>
+                  <span className="text-[10px] px-2.5 py-0.5 rounded bg-[#38bdf8]/10 text-[#38bdf8] font-bold uppercase tracking-wider">
+                    {isFa ? "شرکت‌های متوسط" : "GROWTH"}
+                  </span>
+                  <h3 className="text-xl font-black text-[var(--text-primary)] font-display">
+                    {isFa ? "پلن رشد" : "Growth"}
+                  </h3>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {isFa
+                      ? "پایش رقبای بازار و تحلیل عمیق توهم‌ها."
+                      : "Mitigate claim errors and track multiple competitors."}
+                  </p>
                 </div>
 
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black font-display text-[#38bdf8]">{isFa ? "۱۴۹" : "$149"}</span>
-                  <span className="text-xs text-[var(--text-muted)]">/ {isFa ? "ماهانه" : "month"}</span>
+                  <span className="text-4xl font-black font-display text-[#38bdf8]">
+                    {isFa ? "۱۴۹" : "$149"}
+                  </span>
+                  <span className="text-xs text-[var(--text-muted)]">
+                    / {isFa ? "ماهانه" : "month"}
+                  </span>
                 </div>
 
                 <ul className="space-y-3 text-xs text-[var(--text-secondary)] font-bold">
                   <li className="flex items-center gap-2">
                     <Check size={14} className="text-[#38bdf8]" />
-                    <span>{isFa ? "پایش ۵۰ کلمه کلیدی و رقیب" : "Track up to 50 brand keywords"}</span>
+                    <span>
+                      {isFa
+                        ? "پایش ۵۰ کلمه کلیدی و رقیب"
+                        : "Track up to 50 brand keywords"}
+                    </span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check size={14} className="text-[#38bdf8]" />
-                    <span>{isFa ? "خزش تا ۳,۰۰۰ صفحه با Firecrawl" : "Crawl up to 3,000 pages/mo"}</span>
+                    <span>
+                      {isFa
+                        ? "خزش تا ۳,۰۰۰ صفحه با Firecrawl"
+                        : "Crawl up to 3,000 pages/mo"}
+                    </span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check size={14} className="text-[#38bdf8]" />
-                    <span>{isFa ? "تحلیل پیشرفته توهم و استناد" : "Full semantic claim and citation audit"}</span>
+                    <span>
+                      {isFa
+                        ? "تحلیل پیشرفته توهم و استناد"
+                        : "Full semantic claim and citation audit"}
+                    </span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check size={14} className="text-[#38bdf8]" />
-                    <span>{isFa ? "پشتیبانی پاسخگو اختصاصی" : "Dedicated priority customer support"}</span>
+                    <span>
+                      {isFa
+                        ? "پشتیبانی پاسخگو اختصاصی"
+                        : "Dedicated priority customer support"}
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -872,27 +1559,49 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             <div className="glass-panel p-8 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover-lift flex flex-col justify-between h-full">
               <div className="space-y-6">
                 <div className="space-y-1">
-                  <span className="text-[10px] px-2.5 py-0.5 rounded bg-purple-500/10 text-purple-400 font-bold uppercase tracking-wider">{isFa ? "هلدینگ‌ها و رهبران" : "ENTERPRISE"}</span>
-                  <h3 className="text-xl font-black text-[var(--text-primary)] font-display">{isFa ? "پلن سازمانی" : "Enterprise"}</h3>
-                  <p className="text-xs text-[var(--text-muted)]">{isFa ? "کلاستر اختصاصی و سیستم‌های امنیتی کامل." : "For market leaders demanding absolute data isolation SLAs."}</p>
+                  <span className="text-[10px] px-2.5 py-0.5 rounded bg-purple-500/10 text-purple-400 font-bold uppercase tracking-wider">
+                    {isFa ? "هلدینگ‌ها و رهبران" : "ENTERPRISE"}
+                  </span>
+                  <h3 className="text-xl font-black text-[var(--text-primary)] font-display">
+                    {isFa ? "پلن سازمانی" : "Enterprise"}
+                  </h3>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {isFa
+                      ? "کلاستر اختصاصی و سیستم‌های امنیتی کامل."
+                      : "For market leaders demanding absolute data isolation SLAs."}
+                  </p>
                 </div>
 
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black font-display text-[var(--text-primary)]">{isFa ? "تماس با ما" : "Custom / SLA"}</span>
+                  <span className="text-3xl font-black font-display text-[var(--text-primary)]">
+                    {isFa ? "تماس با ما" : "Custom / SLA"}
+                  </span>
                 </div>
 
                 <ul className="space-y-3 text-xs text-[var(--text-secondary)] font-bold">
                   <li className="flex items-center gap-2">
                     <Check size={14} className="text-[#38bdf8]" />
-                    <span>{isFa ? "پایش نامحدود واژگان و موجودیت‌ها" : "Unlimited search term extraction"}</span>
+                    <span>
+                      {isFa
+                        ? "پایش نامحدود واژگان و موجودیت‌ها"
+                        : "Unlimited search term extraction"}
+                    </span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check size={14} className="text-[#38bdf8]" />
-                    <span>{isFa ? "کلاستر اختصاصی خزش با Firecrawl" : "Dedicated private crawling instances"}</span>
+                    <span>
+                      {isFa
+                        ? "کلاستر اختصاصی خزش با Firecrawl"
+                        : "Dedicated private crawling instances"}
+                    </span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check size={14} className="text-[#38bdf8]" />
-                    <span>{isFa ? "سیستم امنیتی SSO و MFA اختصاصی" : "SAML SSO, custom data retention SLAs"}</span>
+                    <span>
+                      {isFa
+                        ? "سیستم امنیتی SSO و MFA اختصاصی"
+                        : "SAML SSO, custom data retention SLAs"}
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -914,7 +1623,9 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-[#38bdf8]/5 rounded-full blur-[140px] pointer-events-none" />
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10 space-y-8">
           <h2 className="font-display font-black text-4xl md:text-5xl tracking-tight text-[var(--text-primary)] leading-tight text-balance">
-            {isFa ? "آماده تغییر قواعد بازی در عصر هوش پاسخگو هستید؟" : "Supercharge Your Brand Inside conversational search"}
+            {isFa
+              ? "آماده تغییر قواعد بازی در عصر هوش پاسخگو هستید؟"
+              : "Supercharge Your Brand Inside conversational search"}
           </h2>
           <p className="text-base md:text-lg text-[var(--text-secondary)] font-medium leading-relaxed max-w-2xl mx-auto">
             {isFa
@@ -928,12 +1639,18 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
               className="w-full sm:w-auto px-8 py-4 rounded-xl text-white text-base font-bold bg-gradient-to-r from-[#38bdf8] to-[#f97316] shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
             >
               <Sparkles size={16} className="animate-pulse" />
-              <span>{isFa ? "شروع آنالیز رایگان وب‌سایت" : "Start Free Audit Scanner"}</span>
+              <span>
+                {isFa
+                  ? "شروع آنالیز رایگان وب‌سایت"
+                  : "Start Free Audit Scanner"}
+              </span>
             </button>
 
             <Link href={`/${locale}/contact`} className="w-full sm:w-auto">
               <button className="w-full px-8 py-4 rounded-xl text-base font-bold bg-slate-900/40 hover:bg-[#38bdf8]/10 text-[var(--text-primary)] border border-[var(--glass-border)] transition-all flex items-center justify-center gap-2 cursor-pointer">
-                <span>{isFa ? "تماس با کارشناسان ما" : "Contact Sales Unit"}</span>
+                <span>
+                  {isFa ? "تماس با کارشناسان ما" : "Contact Sales Unit"}
+                </span>
               </button>
             </Link>
           </div>
