@@ -1,35 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight, ShieldCheck, Activity, Brain, Server } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { useTheme } from "@/components/ThemeProvider";
 import { Input } from "@/components/Input";
 import TextLoop from "@/components/ui/TextLoop";
 import MoltenMetal from "@/components/ui/MoltenMetal";
+import { motion } from "framer-motion";
 
 /**
  * Ultra-minimal, high-contrast, Apple-like Hero component.
- * Utilizes the MoltenMetal WebGL animated background.
+ * Utilizes the MoltenMetal WebGL animated background with an abstract Dashboard Wireframe.
  */
 export function Hero() {
   const { session } = useAuth();
   const { language } = useTheme();
-  const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const isFa = language === "fa";
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setIsLoading(true);
-    // Redirect to auth page with email as query param
-    window.location.href = `/${language}/register?email=${encodeURIComponent(email)}`;
-  };
-
   return (
-    <section className="relative isolate min-h-[100svh] flex flex-col items-center justify-center pt-24 pb-16 overflow-hidden">
+    <section className="relative isolate min-h-[100svh] flex flex-col items-center justify-center pt-28 pb-16 overflow-hidden">
       {/* WebGL Animated Background */}
       <div className="absolute inset-0 -z-20">
         <MoltenMetal
@@ -38,21 +29,26 @@ export function Hero() {
           color3="#105cd9"
           backgroundColor="#000000"
           lightMode={false}
-          className="opacity-70 dark:opacity-100"
+          className="opacity-40 dark:opacity-70 mix-blend-screen"
           colorMode="default"
         />
       </div>
 
       {/* Fallback gradient / overlay to ensure contrast and Apple-like vignette */}
-      <div className="absolute inset-0 -z-10 bg-white/60 dark:bg-black/60 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.2)_100%)] dark:bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)] backdrop-blur-[2px]" />
+      <div className="absolute inset-0 -z-10 bg-white/70 dark:bg-black/80 bg-[radial-gradient(ellipse_at_top,transparent_0%,rgba(0,0,0,0.1)_100%)] dark:bg-[radial-gradient(ellipse_at_top,transparent_0%,rgba(0,0,0,0.9)_100%)] backdrop-blur-[2px]" />
 
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 w-full flex flex-col items-center justify-center relative z-10 flex-1">
-        {/* Copy column */}
-        <div className="text-center max-w-3xl mx-auto space-y-8 mb-16">
-          <span className="inline-flex items-center gap-2 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md px-4 py-1.5 text-xs font-semibold text-zinc-900 dark:text-zinc-100 shadow-sm transition-transform hover:scale-105">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 w-full relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+        {/* Copy Column */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="space-y-8 text-center lg:text-start"
+        >
+          <span className="inline-flex items-center gap-2 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md px-4 py-1.5 text-xs font-medium text-zinc-900 dark:text-zinc-100 shadow-sm">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75 animate-ping" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500" />
+              <span className="absolute inline-flex h-full w-full rounded-full bg-zinc-500 opacity-75 animate-ping" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-zinc-500" />
             </span>
             {isFa
               ? "پلتفرم نسل‌بعدی AEO و GEO"
@@ -88,6 +84,7 @@ export function Hero() {
               </button>
             </Link>
           </div>
+        </motion.div>
 
           <p className="text-xs text-zinc-500 dark:text-zinc-400 text-center mt-4 font-medium">
             شروع آزمایشی به مدت یک هفته کاملا رایگان.
@@ -152,58 +149,33 @@ export function Hero() {
           <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[var(--orange-500)]/20 rounded-full blur-3xl -z-10" />
         </div>
 
-        {/* Email Capture & Access card column */}
-        <div className="w-full max-w-md mx-auto relative z-10 mt-auto">
-          <div className="bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800/50 p-6 sm:p-8 rounded-[2rem] shadow-2xl">
-            {session.status === "authenticated" ? (
-              <div className="space-y-6 text-center">
-                <div className="mx-auto grid place-items-center w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white">
-                  <ShieldCheck size={24} />
-                </div>
+            {/* Fake Sidebar */}
+            <div className="w-20 hidden sm:flex flex-col items-center py-6 border-r border-zinc-200/50 dark:border-zinc-800/50 bg-white/20 dark:bg-zinc-950/20 space-y-6">
+              <div className="w-8 h-8 rounded-md bg-zinc-300 dark:bg-zinc-700 animate-pulse" />
+              <div className="w-8 h-8 rounded-md bg-zinc-200 dark:bg-zinc-800" />
+              <div className="w-8 h-8 rounded-md bg-zinc-200 dark:bg-zinc-800" />
+              <div className="w-8 h-8 rounded-md bg-zinc-200 dark:bg-zinc-800" />
+            </div>
+
+            {/* Fake Content Area */}
+            <div className="flex-1 p-6 sm:p-8 flex flex-col gap-6">
+
+              {/* Header Skeleton */}
+              <div className="flex justify-between items-center">
                 <div className="space-y-2">
-                  <h2 className="font-display font-bold text-xl text-zinc-900 dark:text-white">
-                    {isFa ? "نشست شما فعال است" : "Your session is active"}
-                  </h2>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400 break-all font-medium">
-                    {session.user?.email}
-                  </p>
+                  <div className="w-32 h-4 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                  <div className="w-24 h-3 rounded-full bg-zinc-200 dark:bg-zinc-800" />
                 </div>
-                <Link href={`/${language}/dashboard`} className="block pt-2">
-                  <button className="w-full py-3.5 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98]">
-                    {isFa ? "ورود به پیشخوان کاربری" : "Enter admin console"}
-                    <ArrowRight size={16} className="rtl:-scale-x-100" />
-                  </button>
-                </Link>
+                <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800" />
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-5 text-start">
-                <div className="space-y-2">
-                  <h2 className="font-display font-bold text-xl text-zinc-900 dark:text-white">
-                    {isFa ? "ورود سریع به میز کار" : "Access the workspace"}
-                  </h2>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-[1.8] font-medium">
-                    {isFa
-                      ? "ایمیل سازمانی خود را برای مشاهده‌ی نسخه‌ی نمایشی وارد کنید."
-                      : "Enter your business email to open the live sandbox demo."}
-                  </p>
-                </div>
 
-                <div className="pt-2">
-                  <Input
-                    type="email"
-                    placeholder={isFa ? "you@company.com" : "you@company.com"}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    aria-label={isFa ? "ایمیل سازمانی" : "Business email"}
-                    className="w-full h-12 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm px-4"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full py-3.5 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 mt-2"
+              {/* Floating Stat Cards Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.8 }}
+                  className="p-4 rounded-xl bg-white/60 dark:bg-zinc-900/60 border border-white/50 dark:border-zinc-800/50 backdrop-blur-md shadow-sm space-y-3"
                 >
                   {isLoading
                     ? isFa
@@ -217,15 +189,31 @@ export function Hero() {
                   )}
                 </button>
 
-                <p className="text-[11px] text-zinc-400 dark:text-zinc-500 text-center pt-2 font-medium">
-                  {isFa
-                    ? "بدون نیاز به کارت اعتباری — محیط آزمایشی امن"
-                    : "No credit card required — secure sandbox environment"}
-                </p>
-              </form>
-            )}
+              {/* Server Terminal Mock */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.9, duration: 0.8 }}
+                className="flex-1 rounded-xl bg-zinc-950/80 border border-zinc-800 p-4 font-mono text-[10px] sm:text-xs text-zinc-400 space-y-2 backdrop-blur-md overflow-hidden relative"
+              >
+                <div className="flex items-center gap-2 border-b border-zinc-800 pb-2 mb-2">
+                  <Server size={12} className="text-zinc-500" />
+                  <span className="text-zinc-500">terminal_session</span>
+                </div>
+                <p><span className="text-emerald-400">~/system $</span> initiating crawl sequence...</p>
+                <p className="opacity-70"><span className="text-emerald-400">~/system $</span> mapping semantic triples: [BRAND] -&gt; [PRODUCT]...</p>
+                <p className="opacity-50"><span className="text-emerald-400">~/system $</span> syncing to vector database...</p>
+
+                {/* Overlay gradient to fade out bottom */}
+                <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-zinc-950/80 to-transparent" />
+              </motion.div>
+            </div>
           </div>
-        </div>
+
+          {/* Decorative Blur Orbs */}
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-zinc-400/20 dark:bg-white/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-zinc-400/20 dark:bg-white/5 rounded-full blur-3xl pointer-events-none" />
+        </motion.div>
       </div>
     </section>
   );
