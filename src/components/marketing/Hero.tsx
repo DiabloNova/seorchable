@@ -24,9 +24,9 @@ export function Hero() {
       {/* WebGL Animated Background */}
       <div className="absolute inset-0 -z-20">
         <MoltenMetal
-          color1="#0a0a0a"
-          color2="#171717"
-          color3="#262626"
+          color1="#0bddef"
+          color2="#64748b"
+          color3="#105cd9"
           backgroundColor="#000000"
           lightMode={false}
           className="opacity-40 dark:opacity-70 mix-blend-screen"
@@ -50,43 +50,37 @@ export function Hero() {
               <span className="absolute inline-flex h-full w-full rounded-full bg-zinc-500 opacity-75 animate-ping" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-zinc-500" />
             </span>
-            {isFa ? "پلتفرم نسل‌بعدی AEO و GEO" : "Next-generation AEO & GEO platform"}
+            {isFa
+              ? "پلتفرم نسل‌بعدی AEO و GEO"
+              : "Next-generation AEO & GEO platform"}
           </span>
 
-          <h1 className="font-display font-black tracking-tight text-balance text-5xl sm:text-6xl md:text-7xl leading-tight md:leading-[1.1] text-zinc-900 dark:text-white drop-shadow-sm">
-            {isFa ? "معرفی برند شما در هوش مصنوعی" : "Command Your Brand in AI Search"}
+          <h1 className="font-display font-black tracking-tight text-balance max-w-4xl mx-auto text-5xl sm:text-6xl md:text-7xl leading-[1.2] md:leading-[1.1] text-white drop-shadow-lg">
+            اندازه گیری، پایش و ارتقای حضور برند شما در موتورهای جستجو و هوش
+            مصنوعی
           </h1>
 
-          <p className="text-lg md:text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-xl mx-auto lg:mx-0 text-pretty font-medium">
-            {isFa
-              ? "آنالیز داده‌های هوش مصنوعی برای تثبیت سهم استناد برند شما در پاسخ‌های مدل‌های زبانی بزرگ به میلیون‌ها کاربر."
-              : "Analyze and dominate AI generative responses. Secure your entity relationships inside LLM indexes with enterprise-grade GEO tools."}
+          <p className="text-lg md:text-xl text-white drop-shadow-lg leading-loose max-w-4xl mx-auto text-balance font-medium">
+            مجموعه نرم افزاری یکپارچه مدیریت رتبه‌بندی، سهم استناد و برطرف کردن
+            توهم‌های هوش مصنوعی در معرفی برند شما در موتورهای جستجو و مدل‌های
+            زبانی
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center mt-10">
-            {session.status === "authenticated" ? (
-              <Link href={`/${language}/dashboard`} className="w-full sm:w-auto">
-                <button className="w-full sm:w-auto px-8 py-3.5 rounded-full text-white text-sm font-semibold bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer active:scale-95">
-                  <ShieldCheck size={18} />
-                  <span>{isFa ? "ورود به پیشخوان" : "Enter Dashboard"}</span>
-                </button>
-              </Link>
-            ) : (
-              <button
-                className="w-full sm:w-auto px-8 py-3.5 rounded-full text-white text-sm font-semibold bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
-                onClick={() => {
-                  const ref = document.getElementById("free-audit");
-                  if (ref) ref.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-              >
-                <span>{isFa ? "شروع آنالیز رایگان" : "Start Free Audit"}</span>
-              </button>
-            )}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10">
+            <button
+              className="bg-blue-600 hover:bg-blue-700 text-white border-none shadow-lg shadow-blue-500/30 w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+              onClick={() => {
+                const ref = document.getElementById("free-audit");
+                if (ref)
+                  ref.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            >
+              <span>{isFa ? "شروع رایگان" : "Start Free"}</span>
+            </button>
 
             <Link href={`/${language}/contact`} className="w-full sm:w-auto">
-              <button className="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-semibold bg-white/50 dark:bg-zinc-900/50 hover:bg-white dark:hover:bg-zinc-900 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-800 backdrop-blur-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm">
-                <span>{isFa ? "درخواست دمو سازمانی" : "Request Enterprise Demo"}</span>
-                <ArrowRight size={16} className="rtl:-scale-x-100 opacity-70" />
+              <button className="bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm">
+                <span>{isFa ? "تماس با ما" : "Contact Us"}</span>
               </button>
             </Link>
           </div>
@@ -104,7 +98,10 @@ export function Hero() {
                   key={i}
                   className="inline-flex items-center gap-2 rounded-[var(--radius-full)] neu-surface px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] shadow-sm"
                 >
-                  <Icon size={16} className="text-[var(--color-primary-600)] rtl:-scale-x-100" />
+                  <Icon
+                    size={16}
+                    className="text-[var(--color-primary-600)] rtl:-scale-x-100"
+                  />
                   {isFa ? chip.fa : chip.en}
                 </span>
               );
@@ -180,32 +177,17 @@ export function Hero() {
                   transition={{ delay: 0.5, duration: 0.8 }}
                   className="p-4 rounded-xl bg-white/60 dark:bg-zinc-900/60 border border-white/50 dark:border-zinc-800/50 backdrop-blur-md shadow-sm space-y-3"
                 >
-                  <div className="flex items-center gap-2 text-zinc-500">
-                    <Activity size={14} />
-                    <span className="text-[10px] uppercase font-bold tracking-wider">{isFa ? "سهم استناد" : "Citation Share"}</span>
-                  </div>
-                  <div className="text-2xl font-black text-zinc-900 dark:text-white font-display">84.2%</div>
-                  <div className="w-full bg-zinc-200 dark:bg-zinc-800 rounded-full h-1.5">
-                    <div className="bg-zinc-800 dark:bg-zinc-200 h-1.5 rounded-full" style={{ width: "84%" }} />
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.7, duration: 0.8 }}
-                  className="p-4 rounded-xl bg-white/60 dark:bg-zinc-900/60 border border-white/50 dark:border-zinc-800/50 backdrop-blur-md shadow-sm space-y-3"
-                >
-                  <div className="flex items-center gap-2 text-zinc-500">
-                    <Brain size={14} />
-                    <span className="text-[10px] uppercase font-bold tracking-wider">{isFa ? "امتیاز توهم" : "Hallucination"}</span>
-                  </div>
-                  <div className="text-2xl font-black text-zinc-900 dark:text-white font-display">2.1%</div>
-                  <div className="w-full bg-zinc-200 dark:bg-zinc-800 rounded-full h-1.5">
-                    <div className="bg-red-500 dark:bg-red-400 h-1.5 rounded-full" style={{ width: "12%" }} />
-                  </div>
-                </motion.div>
-              </div>
+                  {isLoading
+                    ? isFa
+                      ? "در حال اعتبارسنجی..."
+                      : "Validating secure session..."
+                    : isFa
+                      ? "ورود به نسخه‌ی دمو"
+                      : "Access live sandbox demo"}
+                  {!isLoading && (
+                    <ArrowRight size={16} className="rtl:-scale-x-100" />
+                  )}
+                </button>
 
               {/* Server Terminal Mock */}
               <motion.div
