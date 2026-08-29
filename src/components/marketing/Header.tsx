@@ -63,7 +63,7 @@ export function Header() {
           aria-label={isFa ? "باز کردن منوی ناوبری" : "Open navigation menu"}
           className={`xl:hidden h-12 w-12 flex items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-zinc-500/20 cursor-pointer shrink-0 ${
             scrolled
-              ? "bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm text-zinc-600 dark:text-zinc-400"
+              ? "bg-transparent border-white/10 shadow-none text-zinc-700 dark:text-zinc-200"
               : "bg-transparent border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
           }`}
         >
@@ -74,7 +74,7 @@ export function Header() {
         <div
           className={`flex-1 flex items-center justify-between gap-4 rounded-full px-4 sm:px-6 h-14 transition-all duration-500 ease-out ${
             scrolled
-              ? "bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]"
+              ? "bg-transparent backdrop-blur-[2px] border-white/10 shadow-none"
               : "bg-transparent border-transparent"
           }`}
         >

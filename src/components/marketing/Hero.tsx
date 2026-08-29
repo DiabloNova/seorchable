@@ -27,13 +27,13 @@ export function Hero() {
           color1="#0bddef"
           color2="#64748b"
           color3="#105cd9"
-          backgroundColor="#000000"
-          lightMode={false}
+          backgroundColor="#f6fbff"
+          lightMode={true}
           className="mix-blend-screen opacity-40 dark:opacity-70"
           colorMode="default"
         />
       </div>
-      <div className="absolute inset-0 -z-10 bg-black/70 backdrop-blur-[2px]" />
+      <div className="absolute inset-0 -z-10 bg-transparent" />
 
       <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-16 lg:grid-cols-2">
         <motion.div
@@ -42,27 +42,31 @@ export function Hero() {
           transition={{ duration: 0.8 }}
           className="space-y-8 text-center lg:text-start"
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-md">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium text-slate-800 backdrop-blur-md">
             <span className="h-2 w-2 rounded-full bg-cyan-400" />
             {isFa ? "پلتفرم نسل‌بعدی AEO و GEO" : "Next-generation AEO & GEO platform"}
           </span>
-          <h1 className="text-balance text-5xl font-black leading-[1.2] tracking-tight text-white sm:text-6xl md:text-7xl">
+          <motion.h1
+            animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            className="bg-[length:220%_auto] bg-gradient-to-r from-slate-900 via-cyan-600 to-rose-500 bg-clip-text text-balance text-5xl font-black leading-[1.2] tracking-tight text-transparent drop-shadow-[0_2px_14px_rgba(0,0,0,0.35)] sm:text-6xl md:text-7xl"
+          >
             اندازه گیری، پایش و ارتقای حضور برند شما در موتورهای جستجو و هوش مصنوعی
-          </h1>
-          <p className="mx-auto max-w-3xl text-balance text-lg font-medium leading-loose text-white/85 md:text-xl lg:mx-0">
+          </motion.h1>
+          <p className="mx-auto max-w-3xl text-balance text-lg font-medium leading-loose text-slate-700/90 md:text-xl lg:mx-0">
             مجموعه نرم افزاری یکپارچه مدیریت رتبه‌بندی، سهم استناد و برطرف کردن توهم‌های هوش مصنوعی در معرفی برند شما در موتورهای جستجو و مدل‌های زبانی
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
             <Link
               href={`/${language}/#free-audit`}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-8 py-3.5 text-sm font-bold text-white shadow-lg transition-all hover:bg-blue-700 active:scale-95 sm:w-auto"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/30 transition-all hover:bg-cyan-500 hover:shadow-cyan-400/40 active:scale-95 sm:w-auto"
             >
               {isFa ? "شروع رایگان" : "Start Free"}
               <ArrowRight size={16} className="rtl:-scale-x-100" />
             </Link>
             <Link
               href={`/${language}/contact`}
-              className="w-full rounded-full border border-white/20 bg-white/10 px-8 py-3.5 text-center text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/20 sm:w-auto"
+              className="w-full rounded-full border border-white/40 bg-transparent px-8 py-3.5 text-center text-sm font-bold text-white shadow-lg shadow-rose-300/20 backdrop-blur-sm transition-all hover:border-rose-200 hover:bg-rose-300/20 hover:shadow-cyan-300/30 sm:w-auto"
             >
               {isFa ? "تماس با ما" : "Contact Us"}
             </Link>
