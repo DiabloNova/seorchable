@@ -42,20 +42,8 @@ export function Header() {
   ];
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 overflow-hidden px-4 pt-4 sm:px-6">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-44 overflow-hidden opacity-95">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-transparent" />
-        <div className="absolute -inset-x-24 top-12 h-32 rotate-[-4deg] rounded-[50%] bg-cyan-200/35 blur-2xl dark:bg-cyan-900/25" />
-        <div className="absolute -inset-x-20 top-20 h-28 rotate-[5deg] rounded-[45%] bg-indigo-200/45 blur-xl dark:bg-indigo-900/30" />
-        <div className="absolute -inset-x-16 top-24 h-24 rotate-[-7deg] rounded-[42%] bg-rose-200/35 blur-xl dark:bg-rose-900/25" />
-        <svg className="absolute inset-x-0 bottom-0 h-28 w-full text-indigo-100/70 dark:text-indigo-950/50" viewBox="0 0 1200 180" preserveAspectRatio="none" fill="none">
-          <path d="M0 105C150 38 230 78 350 110C500 150 555 8 700 62C850 118 895 155 1010 92C1090 48 1140 78 1200 110V180H0V105Z" fill="currentColor" />
-        </svg>
-        <svg className="absolute inset-x-0 bottom-[-2px] h-24 w-full text-cyan-100/65 dark:text-cyan-950/45" viewBox="0 0 1200 150" preserveAspectRatio="none" fill="none">
-          <path d="M0 72C125 28 238 115 365 72C510 24 575 126 720 83C850 45 920 112 1035 65C1110 34 1160 58 1200 80V150H0V72Z" fill="currentColor" />
-        </svg>
-      </div>
-      <div className="relative z-10 mx-auto flex max-w-7xl items-center justify-between gap-3">
+    <header className="fixed top-0 inset-x-0 z-50 px-4 sm:px-6 pt-4">
+      <div className="mx-auto max-w-7xl flex items-center justify-between gap-3">
         {/* Mobile: Hamburger Button */}
         <button
           type="button"
@@ -63,7 +51,7 @@ export function Header() {
           aria-label={isFa ? "باز کردن منوی ناوبری" : "Open navigation menu"}
           className={`xl:hidden h-12 w-12 flex items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-zinc-500/20 cursor-pointer shrink-0 ${
             scrolled
-              ? "bg-transparent border-white/10 shadow-none text-zinc-700 dark:text-zinc-200"
+              ? "bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm text-zinc-600 dark:text-zinc-400"
               : "bg-transparent border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
           }`}
         >
@@ -74,7 +62,7 @@ export function Header() {
         <div
           className={`flex-1 flex items-center justify-between gap-4 rounded-full px-4 sm:px-6 h-14 transition-all duration-500 ease-out ${
             scrolled
-              ? "bg-transparent backdrop-blur-[2px] border-white/10 shadow-none"
+              ? "bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]"
               : "bg-transparent border-transparent"
           }`}
         >
