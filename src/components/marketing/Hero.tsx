@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
+import TextLoop from "@/components/ui/TextLoop";
 
 /**
  * Award-grade hero: aurora + dotted grid backdrop, Peyda display headline with
@@ -95,6 +96,15 @@ export function Hero() {
               );
             })}
           </div>
+        </div>
+
+        {/* TextLoop (Marquee) Component */}
+        <div className="w-full relative z-20 mb-16">
+          <TextLoop
+            text="SEOrchable ✦ SEO ✦ AEO ✦ GEO ✦ AI"
+            shape="line"
+            className="-mx-4 sm:-mx-6 md:-mx-8 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] md:w-[calc(100%+4rem)]"
+          />
         </div>
 
         {/* Dashboard Showcase Video/Slideshow Placeholder */}
