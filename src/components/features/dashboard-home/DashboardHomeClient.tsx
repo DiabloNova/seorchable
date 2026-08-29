@@ -200,13 +200,13 @@ export default function DashboardHomeClient({
           {isRtl ? "شاخص‌های کلیدی عملکرد اجرایی" : "Executive KPI Layer"}
         </h2>
         <DashboardKpiGrid
-          seoHealth={realStats?.seoHealth ?? data.seoHealth}
-          aiVisibility={realStats?.aiVisibility ?? data.aiVisibility}
-          brandAuthority={realStats?.brandAuthority ?? data.brandAuthority}
-          citationVisibility={realStats?.citationVisibility ?? data.citationVisibility}
-          technicalHealth={realStats?.technicalHealth ?? data.technicalHealth}
-          contentHealth={realStats?.contentHealth ?? data.contentHealth}
-          competitivePosition={realStats?.competitivePosition ?? data.competitivePosition}
+          seoHealth={realStats?.seoHealth ?? "N/A"}
+          aiVisibility={realStats?.aiVisibility ?? "N/A"}
+          brandAuthority={realStats?.brandAuthority ?? "N/A"}
+          citationVisibility={realStats?.citationVisibility ?? "N/A"}
+          technicalHealth={realStats?.technicalHealth ?? "N/A"}
+          contentHealth={realStats?.contentHealth ?? "N/A"}
+          competitivePosition={realStats?.competitivePosition ?? "N/A"}
           loading={isRefreshing || !realStats}
         />
       </div>
