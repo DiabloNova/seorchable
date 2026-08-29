@@ -108,13 +108,13 @@ Use pnpm only.
 
 Allowed commands include:
 
-```bash
-pnpm install
-pnpm install --frozen-lockfile
-pnpm add <package>
-pnpm add -D <package>
-pnpm exec <command>
-pnpm run <script>
+
+- `pnpm install`
+- `pnpm install --frozen-lockfile`
+- `pnpm add <package>`
+- `pnpm add -D <package>`
+- `pnpm exec <command>`
+- `pnpm run <script>`
 
 
 Never use npm or yarn to modify the dependency graph.
@@ -127,7 +127,8 @@ Before adding a dependency:
 5. Update package.json and pnpm-lock.yaml together.
 
 Never claim a dependency is installed merely because it appears in pnpm-lock.yaml. Runtime dependencies must be declared in package.json.
-6. TypeScript and Code Quality
+
+## 6. TypeScript and Code Quality
 
 Strict TypeScript is mandatory.
 
@@ -155,7 +156,8 @@ pnpm exec tsc --noEmit
 
 
 Only add a typecheck script when the assigned task explicitly permits package-script changes.
-7. Next.js Server and Client Boundaries
+
+## 7. Next.js Server and Client Boundaries
 
 Use server-first rendering.
 
@@ -184,7 +186,8 @@ find node_modules/next/dist/docs -type f | sort
 
 
 Read the relevant installed documentation before using new framework APIs.
-8. Authentication and Authorization
+
+## 8. Authentication and Authorization
 
 Authentication and authorization are different controls.
 
@@ -222,7 +225,8 @@ Never:
 • Treat authentication as proof of workspace authorization
 
 Authorization must fail closed.
-9. Tenant Isolation
+
+## 9. Tenant Isolation
 
 Tenant isolation must be enforced at every layer:
 • Session resolution
@@ -249,7 +253,8 @@ Every tenant-scoped query must include a verified tenant boundary or execute und
 Never use a tenant ID supplied only by the browser.
 
 Never use a global mutable tenant variable.
-10. PostgreSQL and Drizzle Rules
+
+## 10. PostgreSQL and Drizzle Rules
 
 Use Drizzle ORM for application database access where the existing architecture uses Drizzle.
 
@@ -303,7 +308,8 @@ If any item is unknown, stop with:
 BLOCKED - INSUFFICIENT EVIDENCE
 
 Do not invent tables, columns, relations, repositories, migration behavior, or RLS policies.
-11. Schema and Migration Protection
+
+## 11. Schema and Migration Protection
 
 Database and migration changes are high-risk.
 
@@ -321,7 +327,8 @@ Never apply a migration to production from an autonomous coding session.
 Never delete migration history to make Drizzle generate a clean migration.
 
 Never modify an existing applied migration unless the task explicitly authorizes a controlled migration repair.
-12. Background Jobs and External Services
+
+## 12. Background Jobs and External Services
 
 Long-running work MUST NOT execute synchronously inside a request when it includes:
 • Website crawling
@@ -351,7 +358,8 @@ Do not send an event unless a registered worker can consume it.
 Do not report a job as completed before the result is persisted.
 
 External-service failures must remain distinguishable from valid empty results.
-13. URL Acquisition and SSRF
+
+## 13. URL Acquisition and SSRF
 
 Any server-side request to a user-provided URL is security-sensitive.
 
@@ -375,7 +383,8 @@ Reject:
 Validate every redirect target, not only the original URL.
 
 Respect robots policy according to the established product rules.
-14. API Route Rules
+
+## 14. API Route Rules
 
 Every route must define:
 • Supported HTTP methods
@@ -397,7 +406,8 @@ Use stable public error contracts.
 Never return stack traces, secrets, SQL, provider credentials, or internal infrastructure details.
 
 Do not accept an unbounded JSON body.
-15. Localization and UI
+
+## 15. Localization and UI
 
 The application supports:
 • /fa with RTL
@@ -417,7 +427,8 @@ Preserve:
 Do not hard-code user-facing text when the existing localization architecture provides a suitable mechanism.
 
 Invalid locales must not silently render duplicate content.
-16. Performance
+
+## 16. Performance
 
 Protect the critical rendering path.
 
@@ -437,7 +448,8 @@ Prefer:
 Do not optimize by weakening security or data correctness.
 
 Do not promise a performance target without measuring it against a defined device, network, and Lighthouse profile.
-17. Scope Control
+
+## 17. Scope Control
 
 Modify only files explicitly listed in the current task.
 
@@ -452,7 +464,8 @@ Do not:
 • Fix unrelated technical debt
 
 If a required dependency is outside scope, stop and report BLOCKED.
-18. Verification
+
+## 18. Verification
 
 Run the repository's actual scripts from package.json.
 
@@ -474,7 +487,8 @@ curl -i -X POST http://localhost:3000/api/v1/audit/free \
 
 
 Do not claim a command passed unless it was executed and its exit status was verified.
-19. Final Diff Review
+
+## 19. Final Diff Review
 
 Before completion:
 git status --short
@@ -494,7 +508,8 @@ Verify:
 • No unreviewed migration
 • No unused imports
 • No accidental API contract changes
-20. Required Completion Report
+
+## 20. Required Completion Report
 
 Report:
 • Summary of implementation
@@ -518,7 +533,8 @@ For blocked work, use this exact heading:
 BLOCKED - INSUFFICIENT EVIDENCE
 
 Never claim completion when only compilation succeeded.
-21. Acknowledgement
+
+## 21. Acknowledgement
 
 When explicitly asked to read this file, begin the response with:
 
@@ -651,6 +667,7 @@ Final report must include:
 • Inngest producer and consumer
 • Exact validation commands and exit statuses
 • Remaining blocked work
+```
 
 ### Milestone 2 prompt: Core business logic and user flow
 
@@ -806,6 +823,7 @@ Final report must identify:
 • Authorization boundary
 • Tests and exit statuses
 • Any unavailable infrastructure
+```
 
 ### Milestone 3 prompt: Speed optimization and SEO hardening
 
@@ -976,6 +994,7 @@ Final report must include:
 • Sitemap and robots coverage
 • Accessibility changes
 • Remaining performance limitations
+```
 
 ### Milestone 4 prompt: Deployment and production readiness
 
@@ -1169,6 +1188,7 @@ Final report must include:
 • Smoke-test results and exit statuses
 • Security checks
 • Remaining operational risks
+```
 
 The key rule across all four prompts is intentional: **Jules must block instead of inventing schema, tenant behavior, authentication behavior, or infrastructure.** That is the difference between a refactor and four increasingly expensive layers of fake confidence.
 
