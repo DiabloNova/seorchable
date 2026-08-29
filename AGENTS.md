@@ -106,13 +106,12 @@ Use pnpm only.
 
 Allowed commands include:
 
-```bash
-pnpm install
-pnpm install --frozen-lockfile
-pnpm add <package>
-pnpm add -D <package>
-pnpm exec <command>
-pnpm run <script>
+- `pnpm install`
+- `pnpm install --frozen-lockfile`
+- `pnpm add <package>`
+- `pnpm add -D <package>`
+- `pnpm exec <command>`
+- `pnpm run <script>`
 
 
 Never use npm or yarn to modify the dependency graph.
