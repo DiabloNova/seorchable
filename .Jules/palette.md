@@ -1,0 +1,3 @@
+## 2024-05-24 - Form Input Accessibility with Error States
+**Learning:** Components with error states (like custom Inputs) must explicitly map screen reader expectations. Using `aria-invalid="true"` informs the user an error occurred, while `aria-describedby` linked to the error element's ID (with `role="alert"`) ensures the error text is announced when the input receives focus.
+**Action:** Always ensure that any reusable form control with inline validation visually displays the error and programmatically links it to the input control using ARIA attributes (`aria-invalid`, `aria-describedby`, and `role="alert"`).

@@ -18,6 +18,8 @@ export const Input: React.FC<InputProps> = ({
   const generatedId = useId();
   const inputId = id || generatedId;
 
+  const errorId = `${inputId}-error`;
+
   return (
     <div className="w-full flex flex-col gap-1.5">
       {label && (
@@ -28,6 +30,8 @@ export const Input: React.FC<InputProps> = ({
       <input
         type={type}
         id={inputId}
+        aria-invalid={!!error}
+        aria-describedby={error ? errorId : undefined}
         className={`
           w-full px-3 py-2 text-sm rounded-[var(--radius-md)] outline-none
           bg-[var(--card)] text-[var(--text-primary)] border transition-all duration-200
@@ -42,7 +46,7 @@ export const Input: React.FC<InputProps> = ({
         {...props}
       />
       {error && (
-        <span className="text-xs text-[var(--color-error)] font-medium mt-0.5">
+        <span id={errorId} role="alert" className="text-xs text-[var(--color-error)] font-medium mt-0.5">
           {error}
         </span>
       )}
