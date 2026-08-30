@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { TenantContextManager } from "../../../core/database/tenant-context";
 import { monitoringAlerts } from "../../../../database/schema";
 import { MonitoringAlert } from "../domain/entities/monitoring-alert";
+import { randomUUID } from "crypto";
 
 export class MonitoringAlertRepository {
   public async findOpenByFingerprint(
@@ -44,30 +45,32 @@ export class MonitoringAlertRepository {
     };
   }
 
-  public async create(alert: MonitoringAlert): Promise<MonitoringAlert> {
+  public async create(alert: Partial<MonitoringAlert>): Promise<MonitoringAlert> {
     const tenantId = TenantContextManager.getRequiredTenantId();
     const ctx = TenantContextManager.getContext();
     const db = drizzle(ctx?.dbClient || (global as any).pgClient);
 
+    const snapshotIdStr = alert.snapshotId ?? alert.crawlSnapshotId ?? null;
+
     const rows = await db
       .insert(monitoringAlerts)
       .values({
-        id: alert.id,
+        id: alert.id || randomUUID(),
         organizationId: tenantId,
-        monitoringConfigId: alert.monitoringConfigId,
-        snapshotId: alert.snapshotId,
-        category: alert.category,
-        severity: alert.severity,
-        type: alert.type,
-        fingerprint: alert.fingerprint,
-        url: alert.url,
-        message: alert.message,
+        monitoringConfigId: alert.monitoringConfigId!,
+        snapshotId: snapshotIdStr,
+        category: alert.category || "availability",
+        severity: alert.severity || "info",
+        type: alert.type || alert.alertType || "unknown",
+        fingerprint: alert.fingerprint || alert.dedupKey || "unknown",
+        url: alert.url || null,
+        message: alert.message!,
         previousValue: alert.previousValue,
         currentValue: alert.currentValue,
-        status: alert.status,
-        createdAt: alert.createdAt,
-        resolvedAt: alert.resolvedAt
-      })
+        status: alert.status || "open",
+        createdAt: alert.createdAt || new Date(),
+        resolvedAt: alert.resolvedAt || null
+      } as any)
       .returning();
 
     const row = rows[0];
@@ -102,7 +105,7 @@ export class MonitoringAlertRepository {
       .update(monitoringAlerts)
       .set({
         status: "resolved",
-        resolvedAt
+            resolvedAt: new Date(),
       })
       .where(and(
         eq(monitoringAlerts.id, id),

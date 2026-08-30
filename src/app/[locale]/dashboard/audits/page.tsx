@@ -1,47 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Dialog } from "@/components/Dialog";
 import { useAuth } from "@/components/AuthProvider";
 import {
-  FileText, Search, Plus, Calendar, Shield, Globe, Award, Sparkles, AlertCircle, ArrowRight, ArrowLeft
+  FileText, Search, Plus, Calendar, Globe, Sparkles, AlertCircle, ArrowRight, ArrowLeft, Loader2
 } from "lucide-react";
+import { getAuditsListAction, triggerAuditAction } from "@/app/actions/audit";
 
-// Initial set of high fidelity mock audits
-const initialAudits = [
-  {
-    id: "aud-001",
-    url: "https://seorchable.ir",
-    score: 88,
-    grade: "A",
-    createdAt: "2024-11-20T14:30:00.000Z",
-    crawledPages: 18,
-    status: "completed"
-  },
-  {
-    id: "aud-002",
-    url: "https://digikala.com",
-    score: 74,
-    grade: "B",
-    createdAt: "2024-11-18T10:15:00.000Z",
-    crawledPages: 45,
-    status: "completed"
-  },
-  {
-    id: "aud-003",
-    url: "https://snapp.ir",
-    score: 62,
-    grade: "C",
-    createdAt: "2024-11-15T18:45:00.000Z",
-    crawledPages: 32,
-    status: "completed"
-  }
-];
+type AuditRecord = {
+  id: string;
+  url: string;
+  status: string;
+  createdAt: Date;
+  aiInsights: unknown;
+  score?: number;
+  grade?: string;
+  crawledPages?: number;
+};
 
 export default function AuditsPage() {
   const router = useRouter();
@@ -49,19 +30,59 @@ export default function AuditsPage() {
   const { session } = useAuth();
   const isRtl = language === "fa";
 
-  const [audits, setAudits] = useState(initialAudits);
+  const [audits, setAudits] = useState<AuditRecord[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isNewAuditOpen, setIsNewAuditOpen] = useState(false);
   const [newUrl, setNewUrl] = useState("");
   const [newUrlError, setNewUrlError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadAudits() {
+      setIsLoading(true);
+      try {
+        const result = await getAuditsListAction();
+        if (result && Array.isArray(result)) {
+          const formattedAudits = result.map(audit => {
+            let score = 0;
+            let grade = "C";
+            if (audit.aiInsights && typeof audit.aiInsights === 'object' && audit.aiInsights !== null) {
+              const insights = audit.aiInsights as Record<string, unknown>;
+              score = typeof insights.overallScore === 'number' ? insights.overallScore : 0;
+              grade = score >= 85 ? "A" : score >= 75 ? "B" : "C";
+            }
+            return {
+              id: audit.id,
+              url: audit.url,
+              status: audit.status,
+              createdAt: new Date(audit.createdAt),
+              aiInsights: audit.aiInsights,
+              score,
+              grade,
+              crawledPages: 0 // Real db doesn't track this easily here without relations or insights data, fallback to 0
+            };
+          });
+          setAudits(formattedAudits);
+        }
+      } catch (error) {
+        console.error("Failed to load audits", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (session?.user) {
+      loadAudits();
+    }
+  }, [session]);
 
   // Filtered audits
   const filteredAudits = audits.filter(audit =>
     audit.url.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleStartAudit = (e: React.FormEvent) => {
+  const handleStartAudit = async (e: React.FormEvent) => {
     e.preventDefault();
     setNewUrlError("");
 
@@ -82,42 +103,48 @@ export default function AuditsPage() {
 
     setIsSubmitting(true);
 
-    // Simulate creation and redirect to [id]
-    setTimeout(() => {
-      const newId = `aud-${Math.floor(100 + Math.random() * 900)}`;
-      const randomScore = Math.floor(Math.random() * 26) + 65; // 65-90
-      const randomGrade = randomScore >= 85 ? "A" : randomScore >= 75 ? "B" : "C";
+    try {
+      const result = await triggerAuditAction(trimmed);
 
-      // Insert new audit into local state
-      const newAudit = {
-        id: newId,
-        url: trimmed,
-        score: randomScore,
-        grade: randomGrade as "A" | "B" | "C",
-        createdAt: new Date().toISOString(),
-        crawledPages: 12,
-        status: "completed"
-      };
+      if (result && result.auditId) {
+        const newId = result.auditId;
+        const newAudit: AuditRecord = {
+          id: newId,
+          url: trimmed,
+          score: 0,
+          grade: "C",
+          createdAt: new Date(),
+          crawledPages: 0,
+          status: "pending",
+          aiInsights: null
+        };
 
-      setAudits([newAudit, ...audits]);
+        setAudits([newAudit, ...audits]);
+        setIsNewAuditOpen(false);
+        setNewUrl("");
+
+        router.push(`/${language}/dashboard/audits/${newId}`);
+      } else {
+        setNewUrlError(isRtl ? "خطا در ایجاد پایش." : "Error creating audit.");
+      }
+    } catch (error) {
+      console.error(error);
+      setNewUrlError(isRtl ? "خطا در ایجاد پایش." : "Error creating audit.");
+    } finally {
       setIsSubmitting(false);
-      setIsNewAuditOpen(false);
-      setNewUrl("");
-
-      // Redirect to the newly created audit details
-      router.push(`/${language}/dashboard/audits/${newId}?url=${encodeURIComponent(trimmed)}&score=${randomScore}`);
-    }, 1500);
+    }
   };
 
-  const formatDate = (isoStr: string) => {
-    const d = new Date(isoStr);
+  const formatDate = (date: Date) => {
+    const d = new Date(date);
     if (isRtl) {
       return d.toLocaleDateString("fa-IR", { year: "numeric", month: "long", day: "numeric" });
     }
     return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
   };
 
-  const getScoreColor = (score: number) => {
+  const getScoreColor = (score?: number) => {
+    if (score === undefined) return "text-gray-500 bg-gray-500/10 border-gray-500/20";
     if (score >= 85) return "text-emerald-500 bg-emerald-500/10 border-emerald-500/20";
     if (score >= 70) return "text-amber-500 bg-amber-500/10 border-amber-500/20";
     return "text-rose-500 bg-rose-500/10 border-rose-500/20";
@@ -159,7 +186,14 @@ export default function AuditsPage() {
       </div>
 
       {/* Audits List Grid */}
-      {filteredAudits.length === 0 ? (
+      {isLoading ? (
+        <Card className="p-12 text-center flex flex-col items-center justify-center space-y-4 border border-[var(--border)] bg-[var(--card)]">
+          <Loader2 size={36} className="text-[var(--sky-blue-500)] animate-spin" />
+          <p className="text-xs text-[var(--text-secondary)]">
+            {isRtl ? "در حال دریافت اطلاعات..." : "Loading audits..."}
+          </p>
+        </Card>
+      ) : filteredAudits.length === 0 ? (
         <Card className="p-8 text-center flex flex-col items-center justify-center space-y-4 border border-[var(--border)] bg-[var(--card)]">
           <div className="p-4 bg-[var(--muted-surface)] rounded-full text-[var(--text-muted)]">
             <FileText size={36} />
@@ -181,10 +215,16 @@ export default function AuditsPage() {
             <Card key={audit.id} className="border border-[var(--border)] bg-[var(--card)] hover:border-[var(--sky-blue-500)]/40 transition-all duration-300 flex flex-col justify-between">
               <CardHeader className="pb-3 text-start">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-mono text-[var(--text-muted)]">{audit.id}</span>
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-black border ${getScoreColor(audit.score)}`}>
-                    {isRtl ? `امتیاز: ${audit.score}` : `Score: ${audit.score}`}
-                  </span>
+                  <span className="text-[10px] font-mono text-[var(--text-muted)] truncate max-w-[120px]">{audit.id}</span>
+                  {audit.status === "completed" ? (
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-black border ${getScoreColor(audit.score)}`}>
+                      {isRtl ? `امتیاز: ${audit.score}` : `Score: ${audit.score}`}
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black border text-amber-500 bg-amber-500/10 border-amber-500/20">
+                      {isRtl ? "در حال پردازش" : "Pending"}
+                    </span>
+                  )}
                 </div>
                 <CardTitle className="text-sm font-black truncate text-[var(--text-primary)]" title={audit.url}>
                   {audit.url}
@@ -206,7 +246,7 @@ export default function AuditsPage() {
                   <Button
                     variant="outline"
                     className="w-full text-xs font-bold gap-2 flex items-center justify-center cursor-pointer hover:bg-[var(--sky-blue-500)]/10 hover:text-[var(--text-primary)]"
-                    onClick={() => router.push(`/${language}/dashboard/audits/${audit.id}?url=${encodeURIComponent(audit.url)}&score=${audit.score}`)}
+                    onClick={() => router.push(`/${language}/dashboard/audits/${audit.id}${audit.score ? `?url=${encodeURIComponent(audit.url)}&score=${audit.score}` : ''}`)}
                   >
                     <span>{isRtl ? "مشاهده گزارش کامل" : "View Full Report"}</span>
                     {isRtl ? <ArrowLeft size={13} /> : <ArrowRight size={13} />}

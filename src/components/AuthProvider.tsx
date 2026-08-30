@@ -28,12 +28,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     getServerSessionAction()
       .then((serverSession) => {
         if (serverSession.status === "authenticated" && serverSession.user) {
-          // Synchronize local storage with the authoritative server identity
-          localStorage.setItem("auth_session_user", JSON.stringify(serverSession.user));
           setSession(serverSession);
         } else {
-          // If no server session, clear client-controlled identity completely (fail closed)
-          localStorage.removeItem("auth_session_user");
+          // If no server session, fail closed
           setSession({
             user: null,
             expiresAt: null,
@@ -44,7 +41,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .catch((err) => {
         console.error("Failed to fetch authoritative server session:", err);
         // Fallback safely to unauthenticated to prevent unauthorized layout bypass
-        localStorage.removeItem("auth_session_user");
         setSession({
           user: null,
           expiresAt: null,
@@ -63,8 +59,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Secure server-side login strictly on the server to prevent client-controlled spoofing
     const user = await loginAction(email);
 
-    localStorage.setItem("auth_session_user", JSON.stringify(user));
-
     setSession({
       user,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -82,8 +76,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Secure server-side registration strictly on the server to prevent client-controlled spoofing
     const user = await registerAction(name, email);
 
-    localStorage.setItem("auth_session_user", JSON.stringify(user));
-
     setSession({
       user,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -94,8 +86,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     setSession((prev) => ({ ...prev, status: "loading" }));
     await new Promise((resolve) => setTimeout(resolve, 400));
-
-    localStorage.removeItem("auth_session_user");
 
     // Clear secure server-side cookies
     await logoutAction();

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { use } from "react";
-import { LandingHeader } from "@/components/marketing/LandingHeader";
+import { Header } from "@/components/marketing/Header";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
 import AppSidebar from "@/components/navigation/AppSidebar";
 import { Sparkles, BookOpen, FileText, Video, Code, ArrowRight } from "lucide-react";
@@ -45,7 +45,7 @@ export default function ResourcesPage({ params }: { params: Promise<{ locale: st
   return (
     <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--text-primary)]" style={{ direction: isFa ? "rtl" : "ltr" }}>
       <AppSidebar />
-      <LandingHeader />
+      <Header />
 
       <main className="flex-1 pt-32 pb-24 relative overflow-hidden">
         {/* Background elements */}

@@ -9,6 +9,7 @@ import { ContentChangeDetectionService } from "../../features/monitoring/service
 import { AlertGenerationService } from "../../features/monitoring/services/alert-generation-service";
 import { FirecrawlCrawlProvider } from "../../features/acquisition/infrastructure/providers/firecrawl/firecrawl-crawl-provider";
 import { RecommendationEngineService } from "../../features/recommendations/services/recommendation-engine-service";
+import { AIVisibilityMonitoringService } from "../../features/monitoring/services/ai-visibility-monitoring-service";
 
 export const helloWorld = inngest.createFunction(
   { id: "hello-world", triggers: [{ event: "test/hello.world" }] },

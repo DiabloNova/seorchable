@@ -6,7 +6,12 @@ import { requireSession } from "@/services/auth/session";
 import { requireWorkspaceMembership } from "@/services/auth/authorization";
 import { PromptIntelligenceService } from "@/features/ai-intelligence/services/prompt-intelligence-service";
 import { PromptIntelligenceRepository } from "@/features/ai-intelligence/repositories";
-import { PositionObservation } from "@/features/ai-intelligence/domain/types";
+import {
+  PositionObservation,
+  PromptCategory,
+  PromptIntentType,
+  PromptVariable,
+} from "@/features/ai-intelligence/domain/types";
 
 // Zod Enums based on your domain types to ensure runtime type-safety
 const PromptCategoryEnum = z.enum([
@@ -34,6 +39,7 @@ const PromptIntentTypeEnum = z.enum([
   "Transactional",
   "Navigational",
 ]);
+
 
 // Schema validations
 const createDefSchema = z.object({
@@ -120,7 +126,7 @@ export async function createPromptDefinitionAction(
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Unauthorized" };
+    return { success: false, error: err instanceof Error ? (err.message || "Unauthorized") : "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -138,10 +144,10 @@ export async function createPromptDefinitionAction(
           parsed.data.brandId,
           parsed.data.name,
           parsed.data.promptTemplate,
-          parsed.data.category, // No 'as' needed anymore, natively typed by Zod
-          parsed.data.intent,   // No 'as' needed anymore
+          parsed.data.category,
+          parsed.data.intent,
           parsed.data.locale,
-          parsed.data.variables, // Structurally matches PromptVariable[] natively
+          parsed.data.variables,
           parsed.data.competitors,
           parsed.data.tags,
           parsed.data.notes,
@@ -151,7 +157,7 @@ export async function createPromptDefinitionAction(
       },
     );
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message };
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
 }
 
@@ -159,7 +165,7 @@ export async function createPromptDefinitionAction(
  * Updates a prompt definition.
  */
 export async function updatePromptDefinitionAction(
-data: z.infer<typeof updateDefSchema>,
+  data: z.infer<typeof updateDefSchema>,
 ) {
   const parsed = updateDefSchema.safeParse(data);
   if (!parsed.success) {
@@ -176,7 +182,7 @@ data: z.infer<typeof updateDefSchema>,
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Unauthorized" };
+    return { success: false, error: err instanceof Error ? (err.message || "Unauthorized") : "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -201,7 +207,7 @@ data: z.infer<typeof updateDefSchema>,
       },
     );
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message };
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
 }
 
@@ -215,7 +221,7 @@ export async function getPromptDefinitionsAction(brandId: string) {
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Unauthorized" };
+    return { success: false, error: err instanceof Error ? (err.message || "Unauthorized") : "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -241,8 +247,8 @@ export async function getPromptDefinitionsAction(brandId: string) {
             brandId,
             "سهم صدای برند کلی (Brand Discovery)",
             "معرفی کامل برند {brand} به زبان فارسی چیست و چه مزیتی نسبت به رقبای سنتی دارد؟",
-            "Brand Discovery", // Safe native literal string
-            "Discovery",       // Safe native literal string
+            "Brand Discovery",
+            "Discovery",
             "fa",
             [
               {
@@ -262,7 +268,7 @@ export async function getPromptDefinitionsAction(brandId: string) {
       },
     );
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message };
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
 }
 
@@ -281,7 +287,7 @@ export async function getPromptDetailsAction(promptId: string) {
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Unauthorized" };
+    return { success: false, error: err instanceof Error ? (err.message || "Unauthorized") : "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -332,7 +338,7 @@ export async function getPromptDetailsAction(promptId: string) {
       },
     );
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message };
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
 }
 
@@ -357,7 +363,7 @@ export async function executePromptAction(
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Unauthorized" };
+    return { success: false, error: err instanceof Error ? (err.message || "Unauthorized") : "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -387,7 +393,7 @@ export async function executePromptAction(
       },
     );
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message };
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
 }
 
@@ -412,7 +418,7 @@ export async function executeModelComparisonAction(
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Unauthorized" };
+    return { success: false, error: err instanceof Error ? (err.message || "Unauthorized") : "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -448,7 +454,7 @@ export async function executeModelComparisonAction(
       },
     );
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message };
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
 }
 
@@ -473,7 +479,7 @@ export async function schedulePromptAction(
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Unauthorized" };
+    return { success: false, error: err instanceof Error ? (err.message || "Unauthorized") : "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -497,7 +503,7 @@ export async function schedulePromptAction(
       },
     );
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message };
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
 }
 
@@ -518,7 +524,7 @@ export async function unschedulePromptAction(
     if (!session.user) throw new Error("Unauthorized");
     await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Unauthorized" };
+    return { success: false, error: err instanceof Error ? (err.message || "Unauthorized") : "Unauthorized" };
   }
 
   const tenantId = session.user.workspaceId;
@@ -533,155 +539,12 @@ export async function unschedulePromptAction(
         const service = new PromptIntelligenceService();
         const success = await service.unschedulePrompt(
           tenantId,
-          parsed.data.promptId,
+          parsed.data.promptId
         );
         return { success };
-      },
-    );
-  } catch (err: unknown) {
-    return { success: false, error: (err as Error).message };
-  }
-}
-
-// =========================================================================
-// AI VISIBILITY MONITORING ACTIONS
-// =========================================================================
-
-/**
- * Retrieves the monitoring schedule history for a prompt.
- */
-export async function getScheduleHistoryAction(promptId: string) {
-  let session;
-  try {
-    session = await requireSession();
-    if (!session.user) throw new Error("Unauthorized");
-    await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Unauthorized" };
-  }
-
-  const tenantId = session.user.workspaceId;
-  const userId = session.user.id;
-
-  try {
-    return await TenantContextManager.runWithTenantContext(
-      tenantId,
-      userId,
-      "ctx-get-schedule-history",
-      async () => {
-        const repo = new PromptIntelligenceRepository();
-        const history = await repo.findExecutionsByPromptId(tenantId, promptId, { limit: 50 });
-        return { success: true, result: history.data };
       }
     );
   } catch (err: unknown) {
-    return { success: false, error: (err as Error).message };
-  }
-}
-
-/**
- * Retrieves historical brand/competitor visibility observations for a prompt.
- */
-export async function getVisibilityHistoryAction(promptId: string) {
-  let session;
-  try {
-    session = await requireSession();
-    if (!session.user) throw new Error("Unauthorized");
-    await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Unauthorized" };
-  }
-
-  const tenantId = session.user.workspaceId;
-  const userId = session.user.id;
-
-  try {
-    return await TenantContextManager.runWithTenantContext(
-      tenantId,
-      userId,
-      "ctx-get-visibility-history",
-      async () => {
-        const { ObservationRepository } = require("../../features/ai-intelligence/repositories/index");
-        const obsRepo = new ObservationRepository();
-        const paginated = await obsRepo.findByPromptId(tenantId, promptId, { limit: 50 });
-        return { success: true, result: paginated.data || paginated.items || [] };
-      }
-    );
-  } catch (err: unknown) {
-    return { success: false, error: (err as Error).message };
-  }
-}
-
-/**
- * Retrieves historical citations detected for a prompt over time.
- */
-export async function getCitationHistoryAction(promptId: string) {
-  let session;
-  try {
-    session = await requireSession();
-    if (!session.user) throw new Error("Unauthorized");
-    await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Unauthorized" };
-  }
-
-  const tenantId = session.user.workspaceId;
-  const userId = session.user.id;
-
-  try {
-    return await TenantContextManager.runWithTenantContext(
-      tenantId,
-      userId,
-      "ctx-get-citation-history",
-      async () => {
-        const { ObservationRepository } = require("../../features/ai-intelligence/repositories/index");
-        const obsRepo = new ObservationRepository();
-        const paginated = await obsRepo.findByPromptId(tenantId, promptId, { limit: 50 });
-        const obsList = paginated.data || paginated.items || [];
-
-        const citations = [];
-        for (const obs of obsList) {
-           const obsCitations = await obsRepo.findCitationsByObservationId(tenantId, obs.id);
-           citations.push(...obsCitations);
-        }
-
-        return { success: true, result: citations };
-      }
-    );
-  } catch (err: unknown) {
-    return { success: false, error: (err as Error).message };
-  }
-}
-
-/**
- * Retrieves recent visibility alerts (score drops, disappearances, etc).
- */
-export async function getVisibilityAlertsAction() {
-  let session;
-  try {
-    session = await requireSession();
-    if (!session.user) throw new Error("Unauthorized");
-    await requireWorkspaceMembership(session.user.id, session.user.workspaceId);
-  } catch (err: unknown) {
-    return { success: false, error: (err as Error).message || "Unauthorized" };
-  }
-
-  const tenantId = session.user.workspaceId;
-  const userId = session.user.id;
-
-  try {
-    return await TenantContextManager.runWithTenantContext(
-      tenantId,
-      userId,
-      "ctx-get-visibility-alerts",
-      async () => {
-        const { db } = require("../../features/ai-intelligence/repositories/index");
-        // For memory fallback we use the array if the repo handles alerts, but here we query directly or use the mock array
-        const alerts = db.monitoringAlerts ? Array.from(db.monitoringAlerts.values()).filter((a: any) => a.organizationId === tenantId) : [];
-        return { success: true, result: alerts };
-      }
-    );
-  } catch (err: unknown) {
-    return { success: false, error: (err as Error).message };
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
 }
