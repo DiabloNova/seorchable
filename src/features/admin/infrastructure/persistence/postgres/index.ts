@@ -26,6 +26,55 @@ import {
   TenantContextViolationException,
 } from "../../../../../core/database/tenant-context";
 
+/**
+ * Raised when the database cannot be reached (connection refused, pool exhausted,
+ * DNS failure, socket timeout, admin shutdown).
+ *
+ * API-route boundaries MUST translate this into HTTP 503, distinct from a 500. It exists
+ * so that infrastructure unavailability is never confused with an empty result set.
+ */
+export class DatabaseUnavailableError extends Error {
+  public readonly statusCode = 503;
+
+  constructor(message: string, public readonly cause?: unknown) {
+    super(message);
+    this.name = "DatabaseUnavailableError";
+  }
+}
+
+/** Postgres/libpq error codes and messages that indicate loss of connectivity. */
+const CONNECTIVITY_ERROR_CODES = new Set([
+  "ECONNREFUSED",
+  "ECONNRESET",
+  "ETIMEDOUT",
+  "EHOSTUNREACH",
+  "ENOTFOUND",
+  "EPIPE",
+  "57P01", // admin_shutdown
+  "57P02", // crash_shutdown
+  "57P03", // cannot_connect_now
+  "08000", // connection_exception
+  "08003", // connection_does_not_exist
+  "08006", // connection_failure
+  "08001", // sqlclient_unable_to_establish_sqlconnection
+  "08004", // sqlserver_rejected_establishment_of_sqlconnection
+]);
+
+export function isConnectivityError(code: string | undefined, message: string): boolean {
+  if (code && CONNECTIVITY_ERROR_CODES.has(code)) {
+    return true;
+  }
+
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("econnrefused") ||
+    normalized.includes("connection terminated") ||
+    normalized.includes("timeout exceeded when trying to connect") ||
+    normalized.includes("database connection failed") ||
+    normalized.includes("getaddrinfo")
+  );
+}
+
 export class OptimisticLockingError extends Error {
   constructor(
     entityName: string,
@@ -80,10 +129,29 @@ export class PostgresClient {
 
     try {
       client = await this.pool.connect();
-    } catch {
-      // Fallback driver for local offline environments (simulates PoolClient query bindings)
+    } catch (err: unknown) {
+      // FAIL LOUD. A connection failure must never be converted into a driver that
+      // returns fabricated empty results: that turns an outage into what looks like
+      // "no data" (and silently no-op writes) for the end user.
+      //
+      // The offline simulation driver remains available for local development only and
+      // must be opted into explicitly. It is unreachable in a production build.
+      const offlineDriverEnabled =
+        process.env.NODE_ENV !== "production" &&
+        process.env.ALLOW_OFFLINE_DB_SIMULATION === "true";
+
+      if (!offlineDriverEnabled) {
+        const message = err instanceof Error ? err.message : "Unknown connection error";
+        console.error("[Postgres] Failed to lease a connection from the pool:", message);
+        throw new DatabaseUnavailableError(
+          "Database connection could not be established.",
+          err
+        );
+      }
+
       console.warn(
-        "[Postgres Telemetry] Database connection failed. Initialising offline simulation driver."
+        "[Postgres Telemetry] DEVELOPMENT ONLY: connection failed and ALLOW_OFFLINE_DB_SIMULATION=true. " +
+          "Initialising offline simulation driver. Results from this driver are NOT real data."
       );
       client = new MockPoolClient();
     }
@@ -208,21 +276,34 @@ export class PostgresClient {
       `[Postgres SQL] Executing Parameterised Query: "${sql}" with values: [${params.join(", ")}]`
     );
 
+    // FAIL LOUD. Query errors propagate to the caller. API routes are responsible for
+    // translating DatabaseUnavailableError into a 503 and any other error into a 500.
+    // A fabricated empty result set here is indistinguishable from a legitimately empty
+    // table, which is the worst possible failure mode for a paid SaaS product.
     try {
       return await this.pool.query(sql, params);
-    } catch {
-      return {
-        rows: [] as T[],
-        command: "SELECT",
-        rowCount: 0,
-        oid: 0,
-        fields: [],
-      };
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code;
+      const message = err instanceof Error ? err.message : "Unknown query error";
+
+      if (isConnectivityError(code, message)) {
+        console.error("[Postgres] Connectivity failure while executing query:", message);
+        throw new DatabaseUnavailableError("Database is unreachable.", err);
+      }
+
+      console.error("[Postgres] Query execution failed:", message);
+      throw err;
     }
   }
 }
 
 /**
+ * DEVELOPMENT-ONLY offline simulation client.
+ *
+ * Only instantiated when NODE_ENV !== "production" AND ALLOW_OFFLINE_DB_SIMULATION="true".
+ * It still surfaces connectivity errors as DatabaseUnavailableError so that even in
+ * development a failure is visibly a failure and not an empty result set.
+ *
  * Mock Pool Client for offline tsx testing contexts
  */
 class MockPoolClient {
@@ -239,19 +320,13 @@ class MockPoolClient {
         .getPool()
         .query(sql, params);
     } catch (err: unknown) {
-      if (
-        (err as { code?: string }).code === "ECONNREFUSED" ||
-        (err instanceof Error &&
-          (err.message.includes("connect ECONNREFUSED") ||
-            err.message.includes("Database connection failed")))
-      ) {
-        return {
-          rows: [] as QueryResultRow[],
-          command: "BEGIN",
-          rowCount: 0,
-          oid: 0,
-          fields: [],
-        };
+      const code = (err as { code?: string }).code;
+      const message = err instanceof Error ? err.message : "Unknown query error";
+
+      if (isConnectivityError(code, message)) {
+        // Even in the development simulation path, an unreachable database is reported
+        // as unavailable. It is never downgraded to a successful empty result.
+        throw new DatabaseUnavailableError("Database is unreachable (offline simulation driver).", err);
       }
 
       throw err;
