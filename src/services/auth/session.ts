@@ -7,17 +7,77 @@ let cookiesFn = nextCookies;
 /**
  * Utility to override cookies function for unit testing environments.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function setCookiesMock(mockFn: any) {
   cookiesFn = mockFn;
 }
 
-// Resolve the session secret safely.
-// Generates a cryptographically secure random key if SESSION_SECRET is not configured in the environment.
-// This prevents silent use of any guessable, insecure hard-coded fallback secrets,
-// and ensures Next.js "pnpm run build" can execute page data collection successfully.
-const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex");
 const COOKIE_NAME = "seorchable_session";
 const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+const MIN_SECRET_LENGTH = 32;
+
+/**
+ * SESSION_SECRET resolution.
+ *
+ * A per-process random secret is unusable in any horizontally scaled or serverless
+ * deployment: a cookie signed by one instance fails verification on every other
+ * instance, producing random logouts. Therefore:
+ *
+ * - Runtime + production  -> SESSION_SECRET is MANDATORY. Missing or too short throws.
+ * - Production build step -> an ephemeral secret is allowed so that `next build` page
+ *   data collection can run without a real secret. Nothing signed during build is served.
+ * - Development / test    -> falls back to an ephemeral secret with a loud warning.
+ */
+let cachedSecret: string | null = null;
+
+function isBuildPhase(): boolean {
+  return process.env.NEXT_PHASE === "phase-production-build";
+}
+
+function resolveSessionSecret(): string {
+  if (cachedSecret) {
+    return cachedSecret;
+  }
+
+  const configured = process.env.SESSION_SECRET;
+
+  if (configured && configured.length >= MIN_SECRET_LENGTH) {
+    cachedSecret = configured;
+    return cachedSecret;
+  }
+
+  const isProduction = process.env.NODE_ENV === "production";
+
+  if (isProduction && !isBuildPhase()) {
+    throw new Error(
+      "Configuration error: SESSION_SECRET is required in production and must be at least " +
+        `${MIN_SECRET_LENGTH} characters. Set it in the deployment environment before serving traffic.`
+    );
+  }
+
+  if (configured && configured.length < MIN_SECRET_LENGTH) {
+    console.warn(
+      `[Auth] SESSION_SECRET is shorter than the required ${MIN_SECRET_LENGTH} characters. ` +
+        "Using an ephemeral secret for this process. Sessions will not survive a restart."
+    );
+  } else {
+    console.warn(
+      "[Auth] SESSION_SECRET is not set. Using an ephemeral per-process secret. " +
+        "Sessions will not survive a restart and will not validate across instances."
+    );
+  }
+
+  cachedSecret = crypto.randomBytes(32).toString("hex");
+  return cachedSecret;
+}
+
+/**
+ * Asserts session configuration at boot / health-check time so a misconfigured
+ * deployment fails fast instead of on the first user login.
+ */
+export function assertSessionConfiguration(): void {
+  resolveSessionSecret();
+}
 
 interface SessionPayload {
   user: User;
@@ -25,7 +85,7 @@ interface SessionPayload {
 }
 
 export function signPayload(payloadStr: string): string {
-  return crypto.createHmac("sha256", SESSION_SECRET).update(payloadStr).digest("hex");
+  return crypto.createHmac("sha256", resolveSessionSecret()).update(payloadStr).digest("hex");
 }
 
 export function verifyPayload(payloadStr: string, signature: string): boolean {
@@ -64,7 +124,8 @@ export async function createSession(user: User): Promise<void> {
     expires: expiresAt,
   });
 
-  // Keep setting plain cookies for legacy compatibility, but they are NOT treated as authoritative on the server
+  // Legacy convenience cookies. NOT authoritative on the server: every authorization
+  // decision resolves identity from the signed session cookie above.
   cookieStore.set("tenant_id", user.workspaceId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -114,7 +175,7 @@ export async function getSession(): Promise<Session | null> {
       expiresAt: payload.expiresAt,
       status: "authenticated",
     };
-  } catch (err) {
+  } catch {
     return null;
   }
 }
