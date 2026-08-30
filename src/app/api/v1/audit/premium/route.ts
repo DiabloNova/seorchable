@@ -1,17 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { firecrawlApp } from "@/lib/firecrawl";
 import { getLLMClient } from "@/services/ai/llm-client";
 import { TenantContextManager } from "@/core/database/tenant-context";
 import { PostgresClient } from "@/features/admin/infrastructure/persistence/postgres";
+import { authorizeApiRequest, AuthorizationError } from "@/services/auth/authorization";
+import { enforceRateLimit, rateLimitHeaders, RateLimitError, RATE_LIMIT_RULES } from "@/lib/rate-limit";
 
-// Validator schema
+/**
+ * POST /api/v1/audit/premium
+ *
+ * Paid, tenant-scoped deep audit. Crawls the target site via Firecrawl, runs an LLM
+ * semantic-gap analysis, computes heuristic scores, and persists the result.
+ *
+ * Hardening applied to this route:
+ * 1. Identity comes from authorizeApiRequest() only. The raw `x-tenant-id` header is
+ *    never treated as authorization.
+ * 2. Rate limited per verified tenant; the limiter fails closed.
+ * 3. NO FABRICATED RESULTS. If Firecrawl is unconfigured or fails, the route returns
+ *    502/503 instead of inventing crawl pages. If the LLM fails, the semantic section
+ *    is reported as unavailable rather than replaced with invented Persian copy.
+ * 4. Persistence failures are surfaced as 500, not swallowed. A stored audit is part of
+ *    the paid deliverable, so a silent write loss is a correctness bug, not a warning.
+ */
 const requestSchema = z.object({
   url: z.string().url("لطفاً یک آدرس وب‌سایت معتبر وارد کنید"),
   depth: z.number().min(1).max(50).optional().default(10),
 });
 
+export interface PremiumAuditIssue {
+  severity: "critical" | "warning" | "info";
+  category: "technical" | "content" | "structure";
+  description: string;
+  recommendation: string;
+}
+
+export interface PremiumAuditRecommendation {
+  priority: "high" | "medium" | "low";
+  insight: string;
+  estimatedImpact: string;
+}
+
 export interface PremiumAuditResponse {
+  auditId: string;
   score: number;
   grade: "A" | "B" | "C" | "D" | "F";
   pagesAnalyzed: number;
@@ -21,297 +53,335 @@ export interface PremiumAuditResponse {
     internalLinking: number;
     semanticCoverage: number;
   };
-  issues: Array<{
-    severity: "critical" | "warning" | "info";
-    category: "technical" | "content" | "structure";
-    description: string;
-    recommendation: string;
-  }>;
-  recommendations: Array<{
-    priority: "high" | "medium" | "low";
-    insight: string;
-    estimatedImpact: string;
-  }>;
-  competitorComparison: {
-    yourSite: number;
-    industryAverage: number;
-    topCompetitor: number;
-  };
+  issues: PremiumAuditIssue[];
+  recommendations: PremiumAuditRecommendation[];
+  /**
+   * Present and true when the semantic/LLM portion of the audit could not be produced.
+   * The frontend MUST surface this instead of presenting a partial audit as complete.
+   */
+  semanticAnalysisUnavailable?: boolean;
+}
+
+interface CrawledPage {
+  url: string;
+  markdown?: string;
+  metadata?: { title?: string; description?: string };
+}
+
+const RECOMMENDATION_PRIORITIES = new Set(["high", "medium", "low"]);
+
+function isConfiguredApiKey(key: string | undefined): boolean {
+  if (!key || key.trim() === "") return false;
+  const normalized = key.trim().toLowerCase();
+  return !normalized.includes("your-api-key") && !normalized.startsWith("fc-your-");
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    // 1. Authenticate Tenant (Paid feature check)
-    const tenantId = req.headers.get("x-tenant-id");
-    const userId = req.headers.get("x-user-id") || "usr-premium-default";
+  let limitHeaders: Record<string, string> = {};
 
-    if (!tenantId) {
+  try {
+    // 1. Authoritative identity resolution. Paid feature: fails closed.
+    const { userId, tenantId } = await authorizeApiRequest(req);
+
+    // 2. Spend protection (Firecrawl crawl + LLM tokens), keyed by verified tenant.
+    const { rejection, result } = await enforceRateLimit(RATE_LIMIT_RULES.auditPremium, tenantId);
+    limitHeaders = rateLimitHeaders(result);
+    if (rejection) {
+      return rejection;
+    }
+
+    // 3. Validate the request body.
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
       return NextResponse.json(
-        { error: "Unauthorized", message: "شناسه مستأجر معتبر ارسال نشده است. این ویژگی نیاز به اشتراک فعال دارد." },
-        { status: 401 }
+        { error: "Bad Request", message: "ساختار درخواست نامعتبر است." },
+        { status: 400, headers: limitHeaders }
       );
     }
 
-    // 2. Parse and Validate Request
-    const body = await req.json();
     const parsed = requestSchema.safeParse(body);
-
     if (!parsed.success) {
       const errorMsg = parsed.error.issues[0]?.message || "درخواست نامعتبر است.";
       return NextResponse.json(
         { error: "Bad Request", message: errorMsg },
-        { status: 400 }
+        { status: 400, headers: limitHeaders }
       );
     }
 
     const { url, depth } = parsed.data;
 
-    // Run within Tenant Context
-    return await TenantContextManager.runWithTenantContext(tenantId, userId, "req-premium-audit", async () => {
-      const apiKey = process.env.FIRECRAWL_API_KEY || "";
-      const isMockMode = !apiKey || apiKey === "" || apiKey.includes("your-api-key") || apiKey.startsWith("fc-your-");
+    // 4. Refuse to run a paid audit without a real crawl provider. No mock data path.
+    if (!isConfiguredApiKey(process.env.FIRECRAWL_API_KEY)) {
+      console.error("[Premium Audit] FIRECRAWL_API_KEY is not configured. Refusing to serve a paid audit.");
+      return NextResponse.json(
+        {
+          error: "Service Unavailable",
+          message: "سرویس خزش وب در حال حاضر در دسترس نیست. لطفاً بعداً تلاش کنید.",
+        },
+        { status: 503, headers: limitHeaders }
+      );
+    }
 
-      let crawlResults: any[] = [];
-
-      // 3. Firecrawl entire site crawl simulation/execution
-      if (isMockMode) {
-        console.log(`[Premium SEO Audit API] Mock/Simulation mode for crawling URL: ${url}`);
-        // Simulate a crawl of a few pages
-        crawlResults = [
-          {
-            url: `${url}/`,
-            markdown: "# Welcome to Optimus AI\nWe provide advanced semantic search and AI optimization. Digikala and Snapp are our competitors.",
-            metadata: { title: "صفحه اصلی - خانه خلاق هوش مصنوعی", description: "پلتفرم پیشرفته تحلیل هوشمند سئو معنایی" }
-          },
-          {
-            url: `${url}/blog`,
-            markdown: "# مقالات و بینش‌ها\nچگونه ساختار گراف دانش را در وب‌سایت بهبود دهیم؟ لینک‌سازی داخلی نقش حیاتی دارد.",
-            metadata: { title: "وبلاگ - مقالات آموزشی سئو معنایی", description: "آموزش گام به گام بهینه‌سازی معنایی" }
-          },
-          {
-            url: `${url}/about`,
-            markdown: "# درباره ما\nتیم متخصص سئو فنی و گراف دانش.",
-            metadata: { title: "درباره ما - پلتفرم هوشمند", description: "" } // Missing description to trigger issue
-          }
-        ];
-      } else {
+    return await TenantContextManager.runWithTenantContext(
+      tenantId,
+      userId,
+      `req-premium-audit-${randomUUID()}`,
+      async () => {
+        // 5. Real crawl. A failure here is an upstream failure and is reported as such.
+        let crawlResults: CrawledPage[] = [];
         try {
-          // Attempt actual crawl with firecrawl
-          // Since crawlUrl initiates a crawl and returns a crawl job status or document list:
-          // Under firecrawl-js SDK v4+, crawlUrl returns job details. Let's use scrapeUrl or safely handle mock if needed.
-          // Note: To avoid long-running timeouts (>30s) or job waiting in serverless functions, we simulate or run in parallel.
-          // If firecrawlApp.crawlUrl is used, let's call it and await results.
           const crawlResponse = await firecrawlApp.crawlUrl(url, {
             limit: depth,
-            scrapeOptions: {
-              formats: ["markdown"]
-            }
+            scrapeOptions: { formats: ["markdown"] },
           });
 
-          if (crawlResponse && 'success' in crawlResponse && crawlResponse.success && 'data' in crawlResponse) {
-            crawlResults = (crawlResponse as any).data || [];
+          if (
+            crawlResponse &&
+            typeof crawlResponse === "object" &&
+            "success" in crawlResponse &&
+            (crawlResponse as { success: boolean }).success &&
+            "data" in crawlResponse
+          ) {
+            crawlResults = ((crawlResponse as { data?: CrawledPage[] }).data ?? []) as CrawledPage[];
           } else {
-            // Fallback to simulation if crawl API response is incomplete or pending
-            crawlResults = [
+            console.error("[Premium Audit] Firecrawl returned an unsuccessful or incomplete response for", url);
+            return NextResponse.json(
               {
-                url: `${url}/`,
-                markdown: "# Home Page\nSemantic graph is important.",
-                metadata: { title: "صفحه اصلی" }
-              }
-            ];
+                error: "Bad Gateway",
+                message: "خزش وب‌سایت هدف تکمیل نشد. لطفاً آدرس را بررسی و دوباره تلاش کنید.",
+              },
+              { status: 502, headers: limitHeaders }
+            );
           }
         } catch (crawlErr: unknown) {
-          console.error("[Firecrawl Crawl Error]:", crawlErr);
-          // Graceful fallback to rich mock data to avoid breaking the paid premium user experience
-          crawlResults = [
+          console.error("[Premium Audit] Firecrawl crawl error:", crawlErr);
+          return NextResponse.json(
             {
-              url: `${url}/`,
-              markdown: "# Home Page\nSemantic graph is important.",
-              metadata: { title: "صفحه اصلی" }
-            }
-          ];
+              error: "Bad Gateway",
+              message: "ارتباط با سرویس خزش وب برقرار نشد. اعتبار مصرف نشد؛ لطفاً دوباره تلاش کنید.",
+            },
+            { status: 502, headers: limitHeaders }
+          );
         }
-      }
 
-      const pagesAnalyzed = Math.min(crawlResults.length || 1, depth);
+        if (crawlResults.length === 0) {
+          return NextResponse.json(
+            {
+              error: "Unprocessable Entity",
+              message: "هیچ صفحه‌ی قابل تحلیلی در آدرس ارسالی یافت نشد.",
+            },
+            { status: 422, headers: limitHeaders }
+          );
+        }
 
-      // 4. LLM Semantic Analysis & Content Recommendations
-      const llmClient = getLLMClient();
-      let semanticAnalysisRaw = "";
+        const pagesAnalyzed = Math.min(crawlResults.length, depth);
 
-      const prompt = `
+        // 6. LLM semantic analysis. Failure degrades the response explicitly; it never fabricates.
+        let semanticAnalysisUnavailable = false;
+        let llmRecommendations: PremiumAuditRecommendation[] = [];
+        let gapAnalysis: string | null = null;
+
+        const prompt = `
         You are an expert SEO Specialist.
         Analyze the following crawled pages markdown data from website "${url}":
-        ${crawlResults.map(p => `Page: ${p.url}\nMetadata: ${JSON.stringify(p.metadata)}\nContent Snippet: ${p.markdown?.substring(0, 500)}\n---`).join("\n")}
+        ${crawlResults
+          .map(
+            (p) =>
+              `Page: ${p.url}\nMetadata: ${JSON.stringify(p.metadata ?? {})}\nContent Snippet: ${
+                p.markdown?.substring(0, 500) ?? ""
+              }\n---`
+          )
+          .join("\n")}
 
         Generate a premium semantic gap analysis and content recommendations in professional fluent Persian.
         Format the response strictly as a JSON object containing two fields:
-        "gapAnalysis": "A string describing semantic topic gaps and industry opportunities compared to major players (e.g., missed entity associations, knowledge graph suggestions)."
+        "gapAnalysis": "A string describing semantic topic gaps and industry opportunities."
         "recommendations": Array of objects: { "priority": "high"|"medium"|"low", "insight": "Actionable content strategy in Persian", "estimatedImpact": "e.g., +25% visibility" }
 
-        Do not output markdown code blocks (like \`\`\`json) or conversational text around the JSON, just return the raw stringified JSON object.
+        Return raw JSON only. No markdown code fences, no conversational text.
       `;
 
-      try {
-        semanticAnalysisRaw = await llmClient.generateText(prompt, {
-          temperature: 0.2,
-          systemPrompt: "You always return output strictly as valid JSON with keys gapAnalysis and recommendations in Persian."
-        });
-      } catch (llmErr: unknown) {
-        console.error("[LLM Premium Audit Error]:", llmErr);
-      }
+        try {
+          const raw = await getLLMClient().generateText(prompt, {
+            temperature: 0.2,
+            systemPrompt:
+              "You always return output strictly as valid JSON with keys gapAnalysis and recommendations in Persian.",
+          });
 
-      let parsedLlm: { gapAnalysis?: string; recommendations?: Array<{ priority: string; insight: string; estimatedImpact: string }> } = {};
-      try {
-        // Clean JSON formatting if LLM wrapped it in markdown code blocks
-        let cleanJson = semanticAnalysisRaw.trim();
-        if (cleanJson.startsWith("```json")) {
-          cleanJson = cleanJson.substring(7, cleanJson.length - 3).trim();
-        } else if (cleanJson.startsWith("```")) {
-          cleanJson = cleanJson.substring(3, cleanJson.length - 3).trim();
+          let cleanJson = (raw ?? "").trim();
+          if (cleanJson.startsWith("```")) {
+            cleanJson = cleanJson.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+          }
+
+          const parsedLlm = JSON.parse(cleanJson) as {
+            gapAnalysis?: unknown;
+            recommendations?: unknown;
+          };
+
+          if (typeof parsedLlm.gapAnalysis === "string" && parsedLlm.gapAnalysis.trim() !== "") {
+            gapAnalysis = parsedLlm.gapAnalysis;
+          }
+
+          if (Array.isArray(parsedLlm.recommendations)) {
+            llmRecommendations = parsedLlm.recommendations
+              .filter((r): r is PremiumAuditRecommendation => {
+                if (!r || typeof r !== "object") return false;
+                const candidate = r as Record<string, unknown>;
+                return (
+                  typeof candidate.priority === "string" &&
+                  RECOMMENDATION_PRIORITIES.has(candidate.priority) &&
+                  typeof candidate.insight === "string" &&
+                  typeof candidate.estimatedImpact === "string"
+                );
+              })
+              .slice(0, 20);
+          }
+
+          if (!gapAnalysis || llmRecommendations.length === 0) {
+            semanticAnalysisUnavailable = true;
+          }
+        } catch (llmErr: unknown) {
+          console.error("[Premium Audit] LLM semantic analysis failed:", llmErr);
+          semanticAnalysisUnavailable = true;
+          gapAnalysis = null;
+          llmRecommendations = [];
         }
-        parsedLlm = JSON.parse(cleanJson);
-      } catch {
-        // Fallback robust default Persian recommendations if JSON parse failed or we used MockLLMClient
-        parsedLlm = {
-          gapAnalysis: "عدم اتصال به گراف دانش مرجع و نبود محتوای کلاستر پیرامون کلیدواژه‌های اصلی در مقایسه با رقبا.",
-          recommendations: [
-            { priority: "high", insight: "ایجاد کلاسترهای محتوایی جدید پیرامون مفاهیم گراف دانش برند", estimatedImpact: "بهبود رتبه کلی تا ۳۵٪" },
-            { priority: "medium", insight: "بهینه‌سازی تگ‌های توضیحات متاداده صفحات وبلاگ برای بهبود نرخ کلیک", estimatedImpact: "افزایش ترافیک ارگانیک تا ۱۵٪" },
-            { priority: "low", insight: "افزودن لینک‌های داخلی متقابل میان صفحات خدمات و مقالات مرتبط", estimatedImpact: "تقویت ساختار پیوندهای داخلی" }
-          ]
-        };
-      }
 
-      // 5. Calculate Heuristic Scores
-      // Content Quality Metrics
-      let contentQuality = 85;
-      const missingDescriptions = crawlResults.filter(p => !p.metadata?.description || p.metadata.description.trim() === "").length;
-      if (missingDescriptions > 0) {
-        contentQuality -= Math.min(missingDescriptions * 10, 20);
-      }
+        // 7. Deterministic heuristic scoring over the real crawl output.
+        const missingDescriptions = crawlResults.filter(
+          (p) => !p.metadata?.description || p.metadata.description.trim() === ""
+        ).length;
 
-      // Technical Health Metrics
-      let technicalHealth = 90;
-      const isHttps = url.toLowerCase().startsWith("https://");
-      if (!isHttps) {
-        technicalHealth -= 30;
-      }
+        let contentQuality = 85;
+        if (missingDescriptions > 0) {
+          contentQuality -= Math.min(missingDescriptions * 10, 20);
+        }
 
-      // Internal Linking Metrics
-      let internalLinking = 80;
-      // Evaluate if links exist in markdown
-      const totalMarkdownLength = crawlResults.reduce((acc, p) => acc + (p.markdown?.length || 0), 0);
-      if (totalMarkdownLength < 1000) {
-        internalLinking -= 15;
-      }
+        const isHttps = url.toLowerCase().startsWith("https://");
+        let technicalHealth = 90;
+        if (!isHttps) {
+          technicalHealth -= 30;
+        }
 
-      // Semantic Coverage Metrics
-      const semanticCoverage = parsedLlm.gapAnalysis ? 75 : 60;
+        const totalMarkdownLength = crawlResults.reduce((acc, p) => acc + (p.markdown?.length ?? 0), 0);
+        let internalLinking = 80;
+        if (totalMarkdownLength < 1000) {
+          internalLinking -= 15;
+        }
 
-      // Overall Score
-      // Content Quality (30%), Technical Health (25%), Internal Linking (20%), Semantic Coverage (25%)
-      const score = Math.round(
-        (contentQuality * 0.3) +
-        (technicalHealth * 0.25) +
-        (internalLinking * 0.2) +
-        (semanticCoverage * 0.25)
-      );
+        // Semantic coverage is only scored when a real semantic analysis exists.
+        const semanticCoverage = gapAnalysis ? 75 : 0;
 
-      // Assign Grade
-      let grade: "A" | "B" | "C" | "D" | "F" = "F";
-      if (score >= 90) grade = "A";
-      else if (score >= 80) grade = "B";
-      else if (score >= 70) grade = "C";
-      else if (score >= 60) grade = "D";
+        const weightedSum = contentQuality * 0.3 + technicalHealth * 0.25 + internalLinking * 0.2;
+        // When the semantic component is unavailable, renormalise over the available
+        // weights instead of scoring the missing component as zero.
+        const score = gapAnalysis
+          ? Math.round(weightedSum + semanticCoverage * 0.25)
+          : Math.round(weightedSum / 0.75);
 
-      // Build Issues List
-      const issues: any[] = [];
-      if (!isHttps) {
-        issues.push({
-          severity: "critical",
-          category: "technical",
-          description: "عدم استفاده از پروتکل امن HTTPS برای ارتباطات رمزنگاری شده.",
-          recommendation: "یک گواهی SSL معتبر بر روی دامنه نصب کرده و ریدایرکت ۳۰۱ را به HTTPS فعال کنید."
-        });
-      }
-      if (missingDescriptions > 0) {
-        issues.push({
-          severity: "warning",
-          category: "content",
-          description: `تعداد ${missingDescriptions} صفحه فاقد تگ توضیحات متاداده (Meta Description) مناسب هستند.`,
-          recommendation: "برای تمامی صفحات شناسایی شده، توضیحات منحصربه‌فرد بین ۱۵۰ تا ۱۶۰ کاراکتر بنویسید."
-        });
-      }
-      if (totalMarkdownLength < 500) {
-        issues.push({
-          severity: "info",
-          category: "structure",
-          description: "تعداد واژگان و حجم محتوای وب‌سایت شما پایین‌تر از حد استاندارد است.",
-          recommendation: "محتوای غنی و کاربردی منطبق با گراف دانش برای صفحات خدمات یا بلاگ تولید کنید."
-        });
-      }
+        let grade: PremiumAuditResponse["grade"] = "F";
+        if (score >= 90) grade = "A";
+        else if (score >= 80) grade = "B";
+        else if (score >= 70) grade = "C";
+        else if (score >= 60) grade = "D";
 
-      const recommendations = parsedLlm.recommendations || [
-        { priority: "high", insight: "بهینه‌سازی چگالی موجودیت‌ها در تگ‌های هدر صفحات", estimatedImpact: "افزایش ۲۰ درصدی رتبه" }
-      ];
+        const issues: PremiumAuditIssue[] = [];
+        if (!isHttps) {
+          issues.push({
+            severity: "critical",
+            category: "technical",
+            description: "عدم استفاده از پروتکل امن HTTPS برای ارتباطات رمزنگاری شده.",
+            recommendation: "یک گواهی SSL معتبر بر روی دامنه نصب کرده و ریدایرکت ۳۰۱ را به HTTPS فعال کنید.",
+          });
+        }
+        if (missingDescriptions > 0) {
+          issues.push({
+            severity: "warning",
+            category: "content",
+            description: `تعداد ${missingDescriptions} صفحه فاقد تگ توضیحات متاداده (Meta Description) مناسب هستند.`,
+            recommendation: "برای تمامی صفحات شناسایی شده، توضیحات منحصربه‌فرد بین ۱۵۰ تا ۱۶۰ کاراکتر بنویسید.",
+          });
+        }
+        if (totalMarkdownLength < 500) {
+          issues.push({
+            severity: "info",
+            category: "structure",
+            description: "حجم محتوای شناسایی‌شده وب‌سایت شما پایین‌تر از حد استاندارد است.",
+            recommendation: "محتوای غنی و منطبق با گراف دانش برای صفحات خدمات یا بلاگ تولید کنید.",
+          });
+        }
 
-      const metrics = { contentQuality, technicalHealth, internalLinking, semanticCoverage };
+        const metrics = { contentQuality, technicalHealth, internalLinking, semanticCoverage };
+        const auditId = randomUUID();
 
-      // 6. Database Persistence
-      const id = crypto.randomUUID();
-      const dbClient = PostgresClient.getInstance();
-
-      const sql = `
+        // 8. Persistence. A failure here fails the request: the stored audit is part of
+        //    the paid deliverable and must not be silently lost.
+        const insertSql = `
         INSERT INTO premium_audits (
-          id, organization_id, url, score, grade, pages_analyzed, metrics, issues, recommendations, created_at, updated_at, created_by, updated_by, version
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW(), 'system', 'system', 1);
+          id, organization_id, url, score, grade, pages_analyzed, metrics, issues, recommendations,
+          created_at, updated_at, created_by, updated_by, version
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW(), $10, $10, 1);
       `;
 
-      try {
-        await dbClient.query(sql, [
-          id,
-          tenantId,
-          url,
+        try {
+          await PostgresClient.getInstance().query(insertSql, [
+            auditId,
+            tenantId,
+            url,
+            score,
+            grade,
+            pagesAnalyzed,
+            JSON.stringify(metrics),
+            JSON.stringify(issues),
+            JSON.stringify(llmRecommendations),
+            userId,
+          ]);
+        } catch (dbErr: unknown) {
+          console.error("[Premium Audit] Failed to persist audit result:", dbErr);
+          return NextResponse.json(
+            {
+              error: "Internal Server Error",
+              message: "نتیجه ارزیابی ذخیره نشد. لطفاً دوباره تلاش کنید.",
+            },
+            { status: 500, headers: limitHeaders }
+          );
+        }
+
+        const responsePayload: PremiumAuditResponse = {
+          auditId,
           score,
           grade,
           pagesAnalyzed,
-          JSON.stringify(metrics),
-          JSON.stringify(issues),
-          JSON.stringify(recommendations)
-        ]);
-      } catch (dbErr: unknown) {
-        console.error("[Database Save Premium Audit Error]:", dbErr);
-        // Do not fail the endpoint if saving is blocked due to local schema migrations
+          metrics,
+          issues,
+          recommendations: llmRecommendations,
+          ...(semanticAnalysisUnavailable ? { semanticAnalysisUnavailable: true } : {}),
+        };
+
+        return NextResponse.json(responsePayload, { status: 200, headers: limitHeaders });
       }
-
-      const responsePayload: PremiumAuditResponse = {
-        score,
-        grade,
-        pagesAnalyzed,
-        metrics,
-        issues,
-        recommendations: recommendations.map((r: any) => ({
-          priority: r.priority as "high" | "medium" | "low",
-          insight: r.insight,
-          estimatedImpact: r.estimatedImpact
-        })),
-        competitorComparison: {
-          yourSite: score,
-          industryAverage: 68,
-          topCompetitor: 88
-        }
-      };
-
-      return NextResponse.json(responsePayload);
-    });
-
+    );
   } catch (error: unknown) {
+    if (error instanceof AuthorizationError) {
+      return NextResponse.json(
+        { error: error.statusCode === 401 ? "Unauthorized" : "Forbidden", message: error.message },
+        { status: error.statusCode, headers: limitHeaders }
+      );
+    }
+
+    if (error instanceof RateLimitError) {
+      return NextResponse.json(
+        { error: "Service Unavailable", message: error.message },
+        { status: error.statusCode, headers: limitHeaders }
+      );
+    }
+
     console.error("[Premium SEO Audit Route Error]:", error);
-    const message = error instanceof Error ? error.message : "خطای ناشناخته در ارزیابی پریمیوم رخ داد.";
     return NextResponse.json(
-      { error: "Internal Server Error", message },
-      { status: 500 }
+      { error: "Internal Server Error", message: "خطای ناشناخته در ارزیابی پریمیوم رخ داد." },
+      { status: 500, headers: limitHeaders }
     );
   }
 }
