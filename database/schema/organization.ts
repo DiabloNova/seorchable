@@ -46,6 +46,16 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey().default(defaultUuid),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
+  /**
+   * scrypt credential in the format: scrypt$N$r$p$keylen$saltB64$hashB64
+   * NULL means the account has no password credential and CANNOT authenticate via
+   * email/password. Application code must never interpret NULL as "any password valid".
+   * See src/lib/password.ts and migration 0019.
+   */
+  passwordHash: text("password_hash"),
+  passwordUpdatedAt: timestamp("password_updated_at", { withTimezone: true }),
+  failedLoginAttempts: integer("failed_login_attempts").notNull().default(0),
+  lockedUntil: timestamp("locked_until", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
