@@ -10666,17 +10666,3 @@
     "tables": {}
   }
 }
-
-Summary of corrections applied:
-
-crawlsnapshots foreignKeys — The crawlsnapshotscrawljobidcrawljobsid_fk FK definition was truncated. The orphaned ], and dangling "columnsTo", "onDelete", "onUpdate" properties (which belonged inside the FK object) were re-integrated into the correct FK structure.
-
-monitoringalerts columns — Removed stray duplicate properties ("type", "primaryKey", "notNull") and a malformed ]  } artifact that appeared after the alerttype column definition, leaving the column object properly closed.
-
-monitoringalerts columns — Removed an extra }, (double comma/brace) between the message column and the createdat column.
-
-monitoringalerts indexes — Removed duplicated column-definition content (severity, message, eventmetadata, createdat, dedupkey as raw properties) that had been incorrectly pasted inside the idxmonitoringalertsorg index definition. Restored the three proper index objects (idxmonitoringalertsorg, idxmonitoringalertsconfig, idxmonitoringalertsdedup) with correct column-reference structures.
-
-competitiveseofindings check constraint — Fixed the malformed value string that contained a stray space in 'brandmention gap' → 'brandmentiongap'.
-
-All table schemas, columns, relations, indexes, and policies are preserved intact. The resulting file is syntactically valid JSON.
