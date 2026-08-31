@@ -1,13 +1,18 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Session, UserRole } from "@/types/auth";
-import { loginAction, logoutAction, getServerSessionAction, registerAction } from "@/app/actions/auth";
+import {
+  getServerSessionAction,
+  loginAction,
+  logoutAction,
+  registerAction,
+} from "@/app/actions/auth";
 
 interface AuthContextType {
   session: Session;
-  login: (email: string, password?: string) => Promise<void>;
-  register: (name: string, email: string, password?: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   hasPermission: (requiredRole: UserRole) => boolean;
 }
@@ -20,46 +25,38 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children, initialSession }: AuthProviderProps) {
-  const [session, setSession] = useState<Session>(() => initialSession ?? ({
-    user: null,
-    expiresAt: null,
-    status: "loading",
-  }));
+  const [session, setSession] = useState<Session>(() =>
+    initialSession ?? {
+      user: null,
+      expiresAt: null,
+      status: "loading",
+    },
+  );
 
   useEffect(() => {
-    // The locale layout already resolved the session on the server. Avoid a duplicate
-    // request and the resulting loading flash on hard navigation.
+    // The locale layout can provide the authoritative session on the server. Avoid a
+    // duplicate request and loading flash when it does.
     if (initialSession) return;
 
-    // Check the authoritative server-side session first
     getServerSessionAction()
       .then((serverSession) => {
-        if (serverSession.status === "authenticated" && serverSession.user) {
-          setSession(serverSession);
-        } else {
-          // If no server session, fail closed
-          setSession({
-            user: null,
-            expiresAt: null,
-            status: "unauthenticated",
-          });
-        }
+        setSession(
+          serverSession.status === "authenticated" && serverSession.user
+            ? serverSession
+            : { user: null, expiresAt: null, status: "unauthenticated" },
+        );
       })
-      .catch((err) => {
-        console.error("Failed to fetch authoritative server session:", err);
-        // Fallback safely to unauthenticated to prevent unauthorized layout bypass
-        setSession({
-          user: null,
-          expiresAt: null,
-          status: "unauthenticated",
-        });
+      .catch((error: unknown) => {
+        console.error("Failed to fetch authoritative server session:", error);
+        setSession({ user: null, expiresAt: null, status: "unauthenticated" });
       });
   }, [initialSession]);
 
-  const login = async (email: string, password?: string) => {
-    setSession((prev) => ({ ...prev, status: "loading" }));
+  const login = async (email: string, password: string): Promise<void> => {
+    setSession((previous) => ({ ...previous, status: "loading" }));
 
-    // Secure server-side login strictly on the server to prevent client-controlled spoofing
+    // Password is required by the server action. It is never stored in browser
+    // storage, placed in a URL, or logged.
     const user = await loginAction(email, password);
 
     setSession({
@@ -69,10 +66,11 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
     });
   };
 
-  const register = async (name: string, email: string, password?: string) => {
-    setSession((prev) => ({ ...prev, status: "loading" }));
+  const register = async (name: string, email: string, password: string): Promise<void> => {
+    setSession((previous) => ({ ...previous, status: "loading" }));
 
-    // Secure server-side registration strictly on the server to prevent client-controlled spoofing
+    // Password is required by the server action and is sent only through the
+    // server-action request boundary.
     const user = await registerAction(name, email, password);
 
     setSession({
@@ -82,16 +80,10 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
     });
   };
 
-  const logout = async () => {
-    setSession((prev) => ({ ...prev, status: "loading" }));
-    // Clear secure server-side cookies
+  const logout = async (): Promise<void> => {
+    setSession((previous) => ({ ...previous, status: "loading" }));
     await logoutAction();
-
-    setSession({
-      user: null,
-      expiresAt: null,
-      status: "unauthenticated",
-    });
+    setSession({ user: null, expiresAt: null, status: "unauthenticated" });
   };
 
   const hasPermission = (requiredRole: UserRole): boolean => {
@@ -103,10 +95,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
       viewer: 1,
     };
 
-    const userRoleValue = roleHierarchy[session.user.role];
-    const requiredRoleValue = roleHierarchy[requiredRole];
-
-    return userRoleValue >= requiredRoleValue;
+    return roleHierarchy[session.user.role] >= roleHierarchy[requiredRole];
   };
 
   return (
@@ -116,9 +105,9 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
   );
 }
 
-export function useAuth() {
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
