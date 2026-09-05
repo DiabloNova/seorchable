@@ -290,7 +290,14 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
           <div className="px-3 pt-4">
             <Dropdown
               trigger={
-                <button className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover:border-[var(--sky-blue-500)]/35 transition-colors shadow-sm">
+                <button
+                  className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] hover:border-[var(--sky-blue-500)]/35 transition-colors shadow-sm"
+                  aria-label={
+                    language === "fa"
+                      ? `تغییر فضای کاری، فضای کاری فعلی: ${activeWorkspace}`
+                      : `Switch workspace, current workspace: ${activeWorkspace}`
+                  }
+                >
                   <span className="flex items-center gap-2 min-w-0">
                     <Building2
                       size={16}
@@ -409,7 +416,14 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
               <div className="px-3 pt-4">
                 <Dropdown
                   trigger={
-                    <button className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)]">
+                    <button
+                      className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)]"
+                      aria-label={
+                        language === "fa"
+                          ? `تغییر فضای کاری، فضای کاری فعلی: ${activeWorkspace}`
+                          : `Switch workspace, current workspace: ${activeWorkspace}`
+                      }
+                    >
                       <span className="flex items-center gap-2 min-w-0">
                         <Building2
                           size={16}
@@ -529,7 +543,14 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
             <Dropdown
               align="right"
               trigger={
-                <button className="flex items-center gap-2 p-1 pe-2 rounded-[var(--radius-full)] hover:bg-[var(--muted-surface)] transition-colors">
+                <button
+                  className="flex items-center gap-2 p-1 pe-2 rounded-[var(--radius-full)] hover:bg-[var(--muted-surface)] transition-colors"
+                  aria-label={
+                    language === "fa"
+                      ? "منوی کاربری"
+                      : "User menu"
+                  }
+                >
                   <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--sky-blue-500)] to-[var(--orange-500)] text-white flex items-center justify-center text-xs font-bold">
                     U
                   </span>
