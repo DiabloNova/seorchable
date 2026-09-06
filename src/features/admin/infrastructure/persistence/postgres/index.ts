@@ -78,15 +78,7 @@ export class PostgresClient {
   public async connectClient(): Promise<PoolClient> {
     let client: any;
 
-    try {
-      client = await this.pool.connect();
-    } catch {
-      // Fallback driver for local offline environments (simulates PoolClient query bindings)
-      console.warn(
-        "[Postgres Telemetry] Database connection failed. Initialising offline simulation driver."
-      );
-      client = new MockPoolClient();
-    }
+    client = await this.pool.connect();
 
     // Wrap the leased client using Object.create to preserve the prototype chain, event emitters, and other methods of PoolClient
     const wrappedClient = Object.create(client);
@@ -225,44 +217,8 @@ export class PostgresClient {
 /**
  * Mock Pool Client for offline tsx testing contexts
  */
-class MockPoolClient {
-  public async query(
-    sql: string,
-    params: unknown[] = []
-  ): Promise<QueryResult<QueryResultRow>> {
-    console.debug(
-      `[Postgres Transacted SQL] Executing Parameterised Query: "${sql}" with values: [${params.join(", ")}]`
-    );
-
-    try {
-      return await PostgresClient.getInstance()
-        .getPool()
-        .query(sql, params);
-    } catch (err: unknown) {
-      if (
-        (err as { code?: string }).code === "ECONNREFUSED" ||
-        (err instanceof Error &&
-          (err.message.includes("connect ECONNREFUSED") ||
-            err.message.includes("Database connection failed")))
-      ) {
-        return {
-          rows: [] as QueryResultRow[],
-          command: "BEGIN",
-          rowCount: 0,
-          oid: 0,
-          fields: [],
-        };
-      }
-
-      throw err;
-    }
-  }
-
-  public release(): void {}
-}
-
 /**
- * PostgreSQL Implementation of Tenant Repository
+ * Common IPgExecutor interface for PostgresClient
  */
 interface IPgExecutor {
   query(
