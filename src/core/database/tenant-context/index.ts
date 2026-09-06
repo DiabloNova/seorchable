@@ -120,13 +120,58 @@ export class TenantContextManager {
     requestId: string | null,
     work: () => Promise<T>
   ): Promise<T> {
-    const ctx: TenantContext = Object.freeze({
-      tenantId: null,
-      userId,
-      requestId,
-      executionMode: "system"
-    });
-    return this.storage.run(ctx, work);
+    // Check if there is already an active transaction in the current async scope
+    const parentCtx = this.getContext();
+    if (parentCtx && parentCtx.dbClient && parentCtx.executionMode === "system") {
+      const depth = (parentCtx.transactionDepth || 1) + 1;
+      const nestedCtx = Object.freeze({
+        ...parentCtx,
+        transactionDepth: depth
+      });
+      return this.storage.run(nestedCtx, work);
+    }
+
+    let leasedClient: any = null;
+
+    // Dynamically import PostgresClient to avoid circular dependencies
+    const { PostgresClient } = await import("../../../features/admin/infrastructure/persistence/postgres");
+    const pgClient = PostgresClient.getInstance();
+    leasedClient = await pgClient.connectClient();
+
+    try {
+      if (leasedClient) {
+        await leasedClient.query("BEGIN");
+      }
+
+      const ctx: TenantContext = Object.freeze({
+        tenantId: null,
+        userId,
+        requestId,
+        executionMode: "system",
+        dbClient: leasedClient,
+        transactionDepth: 1
+      });
+
+      const result = await this.storage.run(ctx, work);
+
+      if (leasedClient) {
+        await leasedClient.query("COMMIT");
+      }
+      return result;
+    } catch (err) {
+      if (leasedClient) {
+        try {
+          await leasedClient.query("ROLLBACK");
+        } catch (rollbackErr) {
+          console.error("[TenantContextManager] System ROLLBACK error:", rollbackErr);
+        }
+      }
+      throw err;
+    } finally {
+      if (leasedClient && typeof leasedClient.release === "function") {
+        leasedClient.release();
+      }
+    }
   }
 
   /**
@@ -183,15 +228,10 @@ export class TenantContextManager {
 
     let leasedClient: any = null;
 
-    try {
-      // Dynamically import PostgresClient to avoid circular dependencies
-      const { PostgresClient } = await import("../../../features/admin/infrastructure/persistence/postgres");
-      const pgClient = PostgresClient.getInstance();
-      leasedClient = await pgClient.connectClient();
-    } catch (err) {
-      console.warn("[TenantContextManager] DB connection failed, creating fallback mock client.", err);
-      // Fallback
-    }
+    // Dynamically import PostgresClient to avoid circular dependencies
+    const { PostgresClient } = await import("../../../features/admin/infrastructure/persistence/postgres");
+    const pgClient = PostgresClient.getInstance();
+    leasedClient = await pgClient.connectClient();
 
     // Execute the transaction lifecycle
     try {
