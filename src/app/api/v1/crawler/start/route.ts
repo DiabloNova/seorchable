@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { CrawlerOrchestrator } from "@/services/crawler/crawler-orchestrator";
+import { authorizeApiRequest, AuthorizationError } from "@/services/auth/authorization";
+import { isSafeUrlAsync } from "@/services/crawler/url-validator";
 
 // Request body validation schema
 const requestSchema = z.object({
@@ -12,17 +14,11 @@ const requestSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Authenticate check: Extract tenant ID from request headers
-    const tenantId = req.headers.get("x-tenant-id");
-    if (!tenantId || tenantId.trim() === "") {
-      return NextResponse.json(
-        { error: "Unauthorized", message: "Tenant isolation violation: missing valid x-tenant-id header." },
-        { status: 401 }
-      );
-    }
+    // 1. Authenticate and extract identity securely
+    const identity = await authorizeApiRequest(req);
+    const { tenantId, userId } = identity;
 
-    // 2. Extract optional user ID and request ID from request headers
-    const userId = req.headers.get("x-user-id") || "system_crawler";
+    // 2. Extract request ID from request headers
     const requestId = req.headers.get("x-request-id") || randomUUID();
 
     // 3. Parse and validate JSON request body
@@ -46,6 +42,17 @@ export async function POST(req: NextRequest) {
 
     const { seedUrls } = parsed.data;
 
+    // Validate SSRF safely with async DNS resolution
+    for (const url of seedUrls) {
+      const isSafe = await isSafeUrlAsync(url);
+      if (!isSafe) {
+         return NextResponse.json(
+           { error: "Bad Request", message: `URL ${url} is not allowed. Unsafe SSRF targets are blocked.` },
+           { status: 400 }
+         );
+      }
+    }
+
     // 4. Initialize the Crawler Orchestrator and run the campaign
     const orchestrator = new CrawlerOrchestrator();
     const result = await orchestrator.runCrawlerCampaign(
@@ -58,6 +65,12 @@ export async function POST(req: NextRequest) {
     // 5. Return success result with status 200 OK
     return NextResponse.json(result, { status: 200 });
   } catch (error: unknown) {
+    if (error instanceof AuthorizationError) {
+      return NextResponse.json(
+        { error: "Unauthorized", message: error.message },
+        { status: error.statusCode }
+      );
+    }
     console.error("[API Crawler Campaign Start Route Error]:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
