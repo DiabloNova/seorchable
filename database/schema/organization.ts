@@ -4,6 +4,7 @@ import {
   text,
   timestamp,
   integer,
+  boolean,
   uniqueIndex,
   index,
   pgPolicy
@@ -46,6 +47,9 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey().default(defaultUuid),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
+  passwordHash: text("password_hash"),
+  passwordResetRequired: boolean("password_reset_required").notNull().default(true),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
@@ -54,6 +58,21 @@ export const users = pgTable("users", {
 export const usersRelations = relations(users, ({ many }) => ({
   organizationMembers: many(organizationMembers),
 }));
+
+// ----------------------------------------------------------------------
+// Auth Locks
+// ----------------------------------------------------------------------
+export const authLocks = pgTable("auth_locks", {
+  id: uuid("id").primaryKey().default(defaultUuid),
+  normalizedEmail: text("normalized_email").notNull(),
+  trustedSourceIp: text("trusted_source_ip").notNull(),
+  failureCount: integer("failure_count").notNull().default(0),
+  lockExpiration: timestamp("lock_expiration", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(defaultNow),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(defaultNow),
+}, (table) => [
+  uniqueIndex("idx_auth_locks_email_ip").on(table.normalizedEmail, table.trustedSourceIp)
+]);
 
 // ----------------------------------------------------------------------
 // Organizations (Workspaces / Tenants)
