@@ -101,8 +101,8 @@ While files like `tests/services/auth/session.test.ts` and `tests/features/admin
 **Finding: Authentication Implementation Violates Contract**
 - ID: SEC-01
 - Severity: Critical
-- File Path(s): `src/app/actions/auth.ts`, `AGENTS.md`
-- Symbol/Configuration: `loginAction`, `AGENTS.md` (Sections 18-21)
+- Exact File Path(s): `src/app/actions/auth.ts`, `AGENTS.md`
+- Relevant Symbol / Configuration: `loginAction`, `AGENTS.md` (Sections 18-21)
 - Concrete Evidence: `AGENTS.md` mandates strict IP locking, progressive password-failure delays, and Argon2 password hashing. The implementation in `loginAction` performs a raw SQL string query (`SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL`) without any password hash checking, delay mechanisms, or challenge requests.
 - Production Impact: Attackers can trivially bypass security measures meant to prevent brute-forcing or credential stuffing.
 - Confidence: Confirmed
@@ -111,8 +111,8 @@ While files like `tests/services/auth/session.test.ts` and `tests/features/admin
 **Finding: Secret Hygiene Script Unused**
 - ID: SEC-02
 - Severity: Medium
-- File Path(s): `package.json`, `.circleci/config.yml`, `scripts/security/secret-hygiene.ts`
-- Symbol/Configuration: `security:secrets` script
+- Exact File Path(s): `package.json`, `.circleci/config.yml`, `scripts/security/secret-hygiene.ts`
+- Relevant Symbol / Configuration: `security:secrets` script
 - Concrete Evidence: `scripts/security/secret-hygiene.ts` is configured as `security:secrets` in `package.json`, but the `build-node` job in `.circleci/config.yml` does not call this script.
 - Production Impact: Secrets committed to Git are not automatically prevented in CI, increasing the risk of credential exposure.
 - Confidence: Confirmed
@@ -121,8 +121,8 @@ While files like `tests/services/auth/session.test.ts` and `tests/features/admin
 **Finding: Potential Account Enumeration via Password Reset**
 - ID: SEC-03
 - Severity: Low
-- File Path(s): `src/app/actions/auth.ts`
-- Symbol/Configuration: `requestPasswordResetAction`
+- Exact File Path(s): `src/app/actions/auth.ts`
+- Relevant Symbol / Configuration: `requestPasswordResetAction`
 - Concrete Evidence: The function silently returns if the user is not found, meaning the DB is queried but no mock delay or mock token generation occurs if the user does not exist. This can lead to timing discrepancies.
 - Production Impact: Could allow an attacker to enumerate valid user accounts based on timing attacks.
 - Confidence: Likely
@@ -130,21 +130,21 @@ While files like `tests/services/auth/session.test.ts` and `tests/features/admin
 
 ## 7. Database / Tenant-Isolation Risks
 
-**Finding: RLS Coverage Completeness verification needed**
+**Finding: RLS Coverage Completeness Verification Needed**
 - ID: DB-01
 - Severity: High
-- File Path(s): `src/core/database/tenant-context/index.ts`, `database/migrations/*`
-- Symbol/Configuration: `TENANT_SCOPED_TABLES`, Migration files.
+- Exact File Path(s): `src/core/database/tenant-context/index.ts`, `database/migrations/*`
+- Relevant Symbol / Configuration: `TENANT_SCOPED_TABLES`, Migration files.
 - Concrete Evidence: While `0016_website_monitoring.sql` correctly implements `ENABLE ROW LEVEL SECURITY` and `FORCE ROW LEVEL SECURITY`, `TENANT_SCOPED_TABLES` lists 35 tables. It was not comprehensively verified if all 35 tables have RLS enforced in migrations.
 - Production Impact: Any missing RLS enforcement on a tenant-scoped table could lead to cross-tenant data leaks.
-- Confidence: Unknown (Requires exhaustive manual check)
+- Confidence: Unknown
 - Recommended Remediation Direction: Verify that all 35 tables listed in `TENANT_SCOPED_TABLES` have active `FORCE ROW LEVEL SECURITY` and correct policies applied.
 
 **Finding: Authentication Query Scope Bypass**
 - ID: DB-02
 - Severity: Medium
-- File Path(s): `src/app/actions/auth.ts`, `src/core/database/tenant-context/index.ts`
-- Symbol/Configuration: `loginAction`, `TenantContextManager.runWithSystemContext`
+- Exact File Path(s): `src/app/actions/auth.ts`, `src/core/database/tenant-context/index.ts`
+- Relevant Symbol / Configuration: `loginAction`, `TenantContextManager.runWithSystemContext`
 - Concrete Evidence: In `loginAction`, `TenantContextManager.runWithSystemContext` is used to query `users` and `organization_members`. This relies entirely on the correctness of the SQL WHERE clauses, completely bypassing RLS.
 - Production Impact: While typical for authentication, any misuse of `runWithSystemContext` to query other tenant-scoped data bypasses intended security controls.
 - Confidence: Confirmed
@@ -155,8 +155,8 @@ While files like `tests/services/auth/session.test.ts` and `tests/features/admin
 **Finding: Mocked Deployment Pipeline**
 - ID: OPS-01
 - Severity: High
-- File Path(s): `.circleci/config.yml`
-- Symbol/Configuration: `deploy` job
+- Exact File Path(s): `.circleci/config.yml`
+- Relevant Symbol / Configuration: `deploy` job
 - Concrete Evidence: In the `deploy` job, the deployment command is mocked as `command: "#e.g. ./deploy.sh"`, and simply marks the CircleCI release as RUNNING then SUCCESS.
 - Production Impact: Code merged to the deployment branch is not actually deployed automatically by the pipeline.
 - Confidence: Confirmed
@@ -165,8 +165,8 @@ While files like `tests/services/auth/session.test.ts` and `tests/features/admin
 **Finding: CI Lack of Verification**
 - ID: OPS-02
 - Severity: High
-- File Path(s): `.circleci/config.yml`
-- Symbol/Configuration: `build-node` job
+- Exact File Path(s): `.circleci/config.yml`
+- Relevant Symbol / Configuration: `build-node` job
 - Concrete Evidence: The `build-node` job only runs `npm run build`. Tests (`tsx`), typechecking (`tsc --noEmit`), and linting (`eslint`) are entirely absent from the CI configuration.
 - Production Impact: Code can be merged and theoretically deployed even if it contains failing tests, type errors, or lint violations.
 - Confidence: Confirmed
@@ -175,8 +175,8 @@ While files like `tests/services/auth/session.test.ts` and `tests/features/admin
 **Finding: Package Manager Ambiguity**
 - ID: DEP-01
 - Severity: Low
-- File Path(s): `package-lock.json`, `pnpm-lock.yaml`, `.circleci/config.yml`
-- Symbol/Configuration: Root directory lockfiles
+- Exact File Path(s): `package-lock.json`, `pnpm-lock.yaml`, `.circleci/config.yml`
+- Relevant Symbol / Configuration: Root directory lockfiles
 - Concrete Evidence: Both `pnpm-lock.yaml` and `package-lock.json` exist. The CI pipeline hardcodes `npm` (`pkg-manager: npm`), but local development may use `pnpm`.
 - Production Impact: Could lead to "works on my machine" bugs due to divergent dependency resolution between local and CI environments.
 - Confidence: Confirmed
@@ -189,7 +189,7 @@ While files like `tests/services/auth/session.test.ts` and `tests/features/admin
 - **High:**
   - OPS-02: CI Lack of Verification
   - OPS-01: Mocked Deployment Pipeline
-  - DB-01: RLS Coverage Completeness verification needed
+  - DB-01: RLS Coverage Completeness Verification Needed
 - **Medium:**
   - SEC-02: Secret Hygiene Script Unused
   - DB-02: Authentication Query Scope Bypass
