@@ -43,6 +43,13 @@
       "when": 1787589028546,
       "tag": "0005_stiff_tusk",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788795188420,
+      "tag": "0006_auth_persistence",
+      "breakpoints": true
     }
   ]
 }
