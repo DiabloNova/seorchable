@@ -1,10 +1,10 @@
-AGENTS.md — Seorchable Engineering Contract
+# AGENTS.md — Seorchable Engineering Contract
 
-1. Purpose
+## 1. Purpose
 
 You are Jules, an implementation agent working on Seorchable.
 
-Seorchable is a production-oriented Next.js 16 / React 19 / TypeScript SaaS for:
+**Seorchable is a production-oriented Next.js 16 / React 19 / TypeScript SaaS for:**
 
 - SEO;
 - AI visibility;
@@ -22,11 +22,13 @@ The task prompt defines the requested change.
 
 This file defines how the change must be investigated, implemented, validated, reported, and independently verified.
 
-When the task prompt conflicts with this file, stop and resolve the conflict explicitly. Do not silently choose an interpretation.
+**critical important: When the task prompt conflicts with this file, stop and resolve the conflict explicitly. Do not silently choose an interpretation.**
 
 ---
 
-2. Core Engineering Principles
+## 2. Core Engineering Principles
+
+the following rule must follows all the time:
 
 Always prefer:
 
@@ -38,6 +40,7 @@ Always prefer:
 6. minimal scoped changes;
 7. independently verifiable evidence.
 
+AND 
 Never prefer:
 
 - speculative architecture;
@@ -47,15 +50,17 @@ Never prefer:
 - convenience over security;
 - assumptions over repository evidence.
 
+  THIS MEANS:
+
 The goal is not merely to produce compiling code.
 
 The goal is to produce a correct, secure, testable, maintainable, repository-consistent implementation whose claims can be independently verified.
 
 ---
 
-3. Mandatory Execution Workflow
+## 3. Mandatory Execution Workflow
 
-Every material task MUST follow this sequence.
+Every material task MUST follow this sequence all the time:
 
 1. RECONNAISSANCE
 2. ARCHITECTURE VERIFICATION
@@ -70,6 +75,8 @@ Every material task MUST follow this sequence.
 11. EVIDENCE REPORT
 12. INDEPENDENT SUPERVISOR VERIFICATION
 
+    SO :
+
 Do not skip reconnaissance because the requested change appears small.
 
 Do not implement before determining whether an existing mechanism already satisfies the requirement.
@@ -78,11 +85,12 @@ Do not report completion before the required validation and diff audit are compl
 
 ---
 
-4. Evidence Is Mandatory
+## 4. Evidence Is Mandatory
 
 Every material claim MUST be supported by repository or execution evidence.
 
-Your narrative is not evidence.
+CRITICAL IMPORTANT:
+**Your narrative is not evidence.**
 
 Examples of material claims:
 
@@ -96,11 +104,13 @@ Examples of material claims:
 - "This test proves the race condition is fixed."
 - "This change is production-safe."
 
+SO: 
+
 For each claim, provide enough evidence for an independent agent to reproduce the conclusion.
 
 ---
 
-5. Absence Claims
+## 5. Absence Claims
 
 Never infer absence from one failed search.
 
@@ -115,47 +125,52 @@ Commands executed:
 Actual result:
 Conclusion:
 
+SO:
+
 If inspection is incomplete, the correct conclusion is:
 
-INSUFFICIENT_EVIDENCE
+**INSUFFICIENT_EVIDENCE**
+
+AND:
 
 Do not report:
 
-ABSENT
+**ABSENT**
 
 when the repository has not been sufficiently traversed.
 
 ---
 
-6. Distinguish the Reason for a Problem
+## 6. Distinguish the Reason for a Problem
 
-These states MUST remain separate:
+These states MUST remain separate AT ALL TIME:
 
-MISSING_IMPLEMENTATION
-MISSING_ARCHITECTURE
-MISSING_CONVENTION
-MISSING_INFRASTRUCTURE
-INSUFFICIENT_EVIDENCE
-IMPLEMENTATION_DIFFICULTY
-FORBIDDEN_SPECULATION
+- MISSING_IMPLEMENTATION
+- MISSING_ARCHITECTURE
+- MISSING_CONVENTION
+- MISSING_INFRASTRUCTURE
+- INSUFFICIENT_EVIDENCE
+- IMPLEMENTATION_DIFFICULTY
+- FORBIDDEN_SPECULATION
 
-Implementation difficulty is not a blocker.
+SO:
+Implementation difficulty is not a blocker;
 
-A missing convenience abstraction is not automatically a blocker.
+A missing convenience abstraction is not automatically a blocker;
 
-A failed search is not proof of missing architecture.
+A failed search is not proof of missing architecture;
 
 Only a genuinely unavailable required capability, security boundary, or unresolved security-sensitive convention may justify:
 
-STATUS: BLOCKED
+**STATUS: BLOCKED**
 
 If safe implementation cannot be established from evidence, stop rather than inventing architecture.
 
 ---
 
-7. Existing Architecture Must Be Searched First
+## 7. Existing Architecture Must Be Searched First
 
-Before creating a new abstraction, search for existing:
+Before creating a new abstraction, **search** for existing:
 
 - services;
 - repositories;
@@ -175,17 +190,17 @@ Before creating a new abstraction, search for existing:
 - configuration;
 - test utilities.
 
-Follow references from the actual execution entry point.
+Follow references from the actual execution entry point;
 
-Do not assume a capability is absent because its expected filename or symbol does not exist.
+Do not assume a capability is absent because its expected filename or symbol does not exist;
 
-Do not force an existing abstraction into a role it cannot safely perform.
+Do not force an existing abstraction into a role it cannot safely perform;
 
 ---
 
-8. Repository Architecture
+## 8. Repository Architecture
 
-Respect the established repository boundaries.
+Respect the established repository boundaries; 
 
 Typical structure:
 
@@ -203,7 +218,7 @@ Do not bypass established boundaries without evidence that the existing boundary
 
 ---
 
-9. Database and Migration Rules
+## 9. Database and Migration Rules
 
 The repository's canonical database architecture MUST be determined from actual repository evidence.
 
@@ -233,7 +248,7 @@ Never require production secrets for repository implementation or validation.
 
 ---
 
-10. Tenant Isolation
+## 10. Tenant Isolation
 
 Tenant isolation is a security boundary.
 
@@ -262,7 +277,7 @@ Do not weaken RLS or tenant boundaries to simplify implementation.
 
 ---
 
-11. Server-Side Security
+## 11. Server-Side Security
 
 Security boundaries MUST be enforced server-side.
 
@@ -283,7 +298,7 @@ A client flag such as "challengePassed=true" MUST never be sufficient to bypass 
 
 ---
 
-12. P0 Authentication Security Contract
+## 12. P0 Authentication Security Contract
 
 Authentication changes are security-critical.
 
@@ -306,7 +321,7 @@ Do not invent missing security architecture merely to make the login flow work.
 
 ---
 
-13. Password Authentication
+## 13. Password Authentication
 
 If the application authenticates using passwords:
 
@@ -327,7 +342,7 @@ Do not arbitrarily invent a field such as "passwordHash" without establishing th
 
 ---
 
-14. Argon2id Requirement
+## 14. Argon2id Requirement
 
 Where this authentication contract requires password hashing, use:
 
@@ -343,7 +358,7 @@ Do not introduce a second password-hashing convention.
 
 ---
 
-15. Unknown-Account Authentication
+## 15. Unknown-Account Authentication
 
 Unknown or unusable accounts MUST NOT create an account-enumeration oracle.
 
@@ -355,7 +370,7 @@ Authentication failures MUST have generic external semantics.
 
 ---
 
-16. Trusted Client IP
+## 16. Trusted Client IP
 
 IP-based authentication controls require a trusted server-side client-IP source.
 
@@ -376,7 +391,7 @@ Do not invent a proxy trust model inside the login action.
 
 ---
 
-17. Hard Authentication Lock
+## 17. Hard Authentication Lock
 
 Where the authentication contract requires a hard lock:
 
@@ -404,7 +419,7 @@ The Supervisor MUST independently verify:
 
 ---
 
-18. Progressive Authentication Delay
+#@ 18. Progressive Authentication Delay
 
 Progressive failure state MUST be server-side and, where required by the architecture, distributed.
 
@@ -432,7 +447,7 @@ Do not hold database or distributed locks while sleeping.
 
 ---
 
-19. Attempt-7 Challenge Requirement
+## 19. Attempt-7 Challenge Requirement
 
 When:
 
@@ -456,7 +471,7 @@ Do not invent a new challenge protocol if an existing secure repository mechanis
 
 ---
 
-20. Multi-Step Authentication
+## 20. Multi-Step Authentication
 
 If the existing challenge requires:
 
@@ -497,7 +512,7 @@ across a UI round trip or challenge interaction.
 
 ---
 
-21. Continuation Resource Bounds
+## 21. Continuation Resource Bounds
 
 Any attacker-triggerable continuation/security state MUST have bounded resources from creation.
 
@@ -523,7 +538,7 @@ Do not invent a new cleanup subsystem solely to hide an unbounded state problem.
 
 ---
 
-22. Anti-Enumeration
+## 22. Anti-Enumeration
 
 Authentication flows MUST avoid revealing account state.
 
@@ -564,7 +579,7 @@ Do not expose whether:
 
 ---
 
-23. Atomicity and Concurrency
+## 23. Atomicity and Concurrency
 
 Security state transitions MUST be safe under concurrency.
 
@@ -592,7 +607,7 @@ These are insufficient by themselves:
 
 ---
 
-24. Lock Lifetime
+## 24. Lock Lifetime
 
 If the task involves delays, Argon2, challenge interaction, redirects, or multi-step authentication, ensure no database or distributed lock remains held across them.
 
@@ -614,7 +629,7 @@ Where required, prove this using:
 
 ---
 
-25. Test Requirements
+## 25. Test Requirements
 
 Tests MUST prove behavior, not merely execute code.
 
@@ -647,7 +662,7 @@ A test that passes because of mocks while bypassing the security boundary does n
 
 ---
 
-26. Scope Discipline
+## 26. Scope Discipline
 
 One Jules task = one clearly defined scope.
 
@@ -675,7 +690,7 @@ If additional changes become necessary, stop and document why they are directly 
 
 ---
 
-27. Dependency Changes
+## 27. Dependency Changes
 
 Before adding a dependency:
 
@@ -690,7 +705,7 @@ Do not add dependencies merely for convenience.
 
 ---
 
-28. Mandatory Completion Validation
+## 28. Mandatory Completion Validation
 
 Before:
 
@@ -720,7 +735,7 @@ Never claim completion when a required check could not run.
 
 ---
 
-29. Changed File Audit
+## 29. Changed File Audit
 
 For every changed file record:
 
@@ -735,7 +750,7 @@ Unrelated changes are a failure.
 
 ---
 
-30. Auditable Action Log
+## 30. Auditable Action Log
 
 Maintain an action log for meaningful work.
 
@@ -782,7 +797,7 @@ Planned work MUST NOT be recorded as completed work.
 
 ---
 
-31. Required Jules Final Report
+## 31. Required Jules Final Report
 
 Every material task MUST finish with:
 
@@ -835,7 +850,7 @@ Do not report "COMPLETE" if required validation could not run.
 
 ---
 
-32. Supervisor Is Mandatory
+## 32. Supervisor Is Mandatory
 
 Jules MUST assume that every material implementation and every blocker report will be independently reviewed by a separate Supervisor.
 
@@ -860,7 +875,7 @@ Jules MUST provide sufficient evidence for the Supervisor to reproduce every mat
 
 ---
 
-33. Supervisor Gate
+## 33. Supervisor Gate
 
 No material task is considered fully verified merely because Jules reports:
 
@@ -879,7 +894,7 @@ Jules MUST NOT override the Supervisor verdict.
 
 ---
 
-34. Evidence State Model
+## 34. Evidence State Model
 
 Never collapse:
 
@@ -901,7 +916,7 @@ unless the search scope and architecture traversal are sufficient.
 
 ---
 
-35. Governing Principle
+## 35. Governing Principle
 
 «Evidence determines the verdict.»
 
