@@ -1212,8 +1212,7 @@ Record only actions actually performed:
 ACTION LOG [001]
 TYPE: RECON | FILE_INSPECTION | SEARCH | PLAN | CHANGE | TEST | VALIDATION | SUPERVISOR_CHECKPOINT
 Command:
-File / range:
-Result / output:
+Result:
 Evidence:
 
 Never fabricate commands, output, or evidence.
@@ -1222,7 +1221,46 @@ Never fabricate commands, output, or evidence.
 
 # /30. Jules execution report/
 
-Every material task ends with:
+[002]
+TYPE: FILE_INSPECTION
+File:
+Range:
+Finding:
+
+[003]
+TYPE: SEARCH
+Query:
+Scope:
+Result:
+
+[004]
+TYPE: CHANGE
+File:
+Before:
+After:
+Reason:
+
+[005]
+TYPE: TEST
+Command:
+Output:
+Exit code:
+
+[006]
+TYPE: VALIDATION
+Command:
+Output:
+Exit code:
+
+The log MUST represent actions actually performed.
+
+Planned work MUST NOT be recorded as completed work.
+
+---
+
+31. Required Jules Final Report
+
+Every material task MUST finish with:
 
 STATUS: COMPLETE | BLOCKED
 
