@@ -2,30 +2,141 @@
 
 import { User, Session, UserRole } from "@/types/auth";
 import { createSession, invalidateSession, getSession } from "@/services/auth/session";
-import { db } from "@/features/ai-intelligence/repositories";
-import { users, organizationMembers, organizations } from "../../../database/schema";
-import { eq, and } from "drizzle-orm";
 import { TenantContextManager } from "@/core/database/tenant-context";
 import { randomUUID } from "crypto";
 import { sendVerificationEmail, sendPasswordResetEmail } from "@/lib/email";
+import * as argon2 from "argon2";
+import { headers } from "next/headers";
+
+const ARGON2_OPTIONS: any = {
+  type: argon2.argon2id,
+  memoryCost: 19456,
+  timeCost: 2
+};
+
+async function progressiveDelay(attempts: number): Promise<void> {
+  if (attempts >= 6) {
+    return; // Challenge handled elsewhere
+  }
+  let delay = 0;
+  if (attempts === 3) delay = 2000;
+  else if (attempts === 4) delay = 4000;
+  else if (attempts >= 5) delay = 8000;
+
+  if (delay > 0) {
+    await new Promise(r => setTimeout(r, delay));
+  }
+}
+
+/**
+ * Generates a dummy hash using Argon2id with required parameters.
+ * We cache it globally per process to ensure constant time execution without overhead.
+ */
+let dummyHash: string | null = null;
+async function getDummyHash(): Promise<string> {
+  if (!dummyHash) {
+    dummyHash = await argon2.hash("dummy_password_for_timing", ARGON2_OPTIONS as any) as unknown as string;
+  }
+  return dummyHash!;
+}
 
 /**
  * Authenticates user, resolves identity/workspace strictly on the server, and establishes a secure signed session.
  */
-export async function loginAction(email: string): Promise<User> {
-  const result = await TenantContextManager.runWithSystemContext(null, "sys-login", async () => {
+export async function loginAction(email: string, password?: string): Promise<User> {
+  if (!password) {
+    throw new Error("Password is required");
+  }
+
+  const reqHeaders = await headers();
+  // Using x-forwarded-for for testing.
+  // Trusted IP checks should ideally rely on gateway headers, but we extract a base IP here.
+  const ip = reqHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+  // Step 1: Pre-auth data fetch. No locks held.
+  let userRecord: any = null;
+  await TenantContextManager.runWithSystemContext(null, "sys-login", async () => {
     const client = TenantContextManager.getDbClient();
-    if (!client) {
-        throw new Error("Failed to get DB client in system context");
+    if (!client) throw new Error("Failed to get DB client in system context");
+
+    // Fetch the user
+    const { rows } = await client.query("SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL", [email]);
+    userRecord = rows[0];
+  });
+
+  if (!userRecord) {
+    // Unknown account anti-enumeration: Run dummy hash, simulate a basic user delay (0 attempts = 0 delay)
+    await getDummyHash();
+    await argon2.verify(dummyHash!, password);
+    throw new Error("Invalid credentials or user not found.");
+  }
+
+  // Check hard locks
+  if (userRecord.locked_until && new Date(userRecord.locked_until) > new Date()) {
+    throw new Error("Account is temporarily locked due to too many failed attempts. Please try again later.");
+  }
+
+  // Trusted IP check
+  if (userRecord.trusted_ips && userRecord.trusted_ips.length > 0) {
+    if (!userRecord.trusted_ips.includes(ip) && ip !== "unknown") {
+      throw new Error("Login from untrusted IP address requires verification.");
+    }
+  }
+
+  // Enforce Challenge
+  if (userRecord.failed_login_attempts >= 6 || userRecord.challenge_required) {
+    throw new Error("Challenge required before password verification.");
+  }
+
+  // Progressive Delays
+  await progressiveDelay(userRecord.failed_login_attempts);
+
+  // Argon2 Verification (outside of any DB lock/transaction)
+  let isValid = false;
+  if (userRecord.password_hash) {
+    isValid = await argon2.verify(userRecord.password_hash, password);
+  } else {
+    // If user exists but has no hash (e.g. legacy/SSO only), still run dummy for anti-enumeration
+    await getDummyHash();
+    await argon2.verify(dummyHash!, password);
+  }
+
+  // Step 2: Post-auth state update
+  return await TenantContextManager.runWithSystemContext(null, "sys-login-update", async () => {
+    const client = TenantContextManager.getDbClient();
+
+    if (!isValid) {
+      // True Atomic increment of failure accounting using Postgres concurrency
+      const { rows } = await client.query(
+        `UPDATE users
+         SET failed_login_attempts = failed_login_attempts + 1
+         WHERE id = $1
+         RETURNING failed_login_attempts`,
+        [userRecord.id]
+      );
+
+      const newFailures = rows[0]?.failed_login_attempts || 0;
+
+      if (newFailures >= 6) {
+        const lockedUntil = new Date(Date.now() + 15 * 60000).toISOString();
+        await client.query(
+          `UPDATE users
+           SET challenge_required = 1, locked_until = $1
+           WHERE id = $2`,
+          [lockedUntil, userRecord.id]
+        );
+      }
+
+      throw new Error("Invalid credentials or user not found.");
     }
 
-    const { rows: userRows } = await client.query("SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL", [email]);
-    const userRecord = userRows[0];
+    // Successful login: Reset failures and set last IP
+    await client.query(
+      "UPDATE users SET failed_login_attempts = 0, challenge_required = 0, locked_until = NULL, last_login_ip = $1 WHERE id = $2",
+      [ip, userRecord.id]
+    );
 
-    if (!userRecord) {
-        throw new Error("Invalid credentials or user not found.");
-    }
-
+    // Fetch tenant membership
     const { rows: memberRows } = await client.query(`
         SELECT m.organization_id as "workspaceId", m.role, o.name as "workspaceName"
         FROM organization_members m
@@ -39,17 +150,17 @@ export async function loginAction(email: string): Promise<User> {
         throw new Error("User does not belong to any active workspace.");
     }
 
-    return {
+    const authResult: User = {
         id: userRecord.id,
         name: userRecord.name,
         email: userRecord.email,
         role: memberRecord.role as UserRole,
         workspaceId: memberRecord.workspaceId,
     };
-  });
 
-  await createSession(result);
-  return result;
+    await createSession(authResult);
+    return authResult;
+  });
 }
 
 /**
@@ -65,26 +176,31 @@ export async function requestPasswordResetAction(email: string): Promise<void> {
     const { rows: userRows } = await client.query("SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL", [email]);
     const userRecord = userRows[0];
 
-    // Avoid revealing whether the user exists or not
-    if (!userRecord) {
-        return;
-    }
-
     // Mock reset token generation
     const resetToken = randomUUID();
     const resetLink = `https://app.seorchable.com/reset-password?token=${resetToken}`;
 
-    // Fire and forget email sending
-    sendPasswordResetEmail(email, resetLink).catch((err) => {
-      console.error("Failed to send password reset email:", err);
-    });
+    if (userRecord) {
+      sendPasswordResetEmail(email, resetLink).catch((err) => {
+        console.error("Failed to send password reset email:", err);
+      });
+    } else {
+      // Mock constant time for anti-enumeration
+      await new Promise(r => setTimeout(r, 50));
+    }
   });
 }
 
 /**
  * Registers user, resolves identity/workspace strictly on the server, and establishes a secure signed session.
  */
-export async function registerAction(name: string, email: string): Promise<User> {
+export async function registerAction(name: string, email: string, password?: string): Promise<User> {
+  if (!password) {
+    throw new Error("Password is required");
+  }
+
+  const hashedPassword = await argon2.hash(password, ARGON2_OPTIONS as any) as unknown as string;
+
   const result = await TenantContextManager.runWithSystemContext(null, "sys-register", async () => {
     const client = TenantContextManager.getDbClient();
     if (!client) {
@@ -100,7 +216,7 @@ export async function registerAction(name: string, email: string): Promise<User>
     const userId = `usr-${randomUUID().slice(0,8)}`;
 
     // Create User
-    await client.query("INSERT INTO users (id, name, email) VALUES ($1, $2, $3)", [userId, name, email]);
+    await client.query("INSERT INTO users (id, name, email, password_hash) VALUES ($1, $2, $3, $4)", [userId, name, email, hashedPassword]);
 
     // Create Organization (Workspace)
     const orgId = randomUUID();
@@ -125,7 +241,6 @@ export async function registerAction(name: string, email: string): Promise<User>
   const verificationToken = randomUUID();
   const verificationLink = `https://app.seorchable.com/verify-email?token=${verificationToken}`;
 
-  // Fire and forget email sending
   sendVerificationEmail(email, name, verificationLink).catch((err) => {
     console.error("Failed to send verification email:", err);
   });

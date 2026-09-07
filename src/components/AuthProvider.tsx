@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     // Secure server-side login strictly on the server to prevent client-controlled spoofing
-    const user = await loginAction(email);
+    const user = await loginAction(email, password);
 
     setSession({
       user,
@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     // Secure server-side registration strictly on the server to prevent client-controlled spoofing
-    const user = await registerAction(name, email);
+    const user = await registerAction(name, email, password);
 
     setSession({
       user,
