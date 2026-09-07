@@ -1,4 +1,5 @@
 import { convert } from "html-to-text";
+import { isSafeUrlAsync } from "./url-validator";
 
 export const MOCK_PERSIAN_ARTICLE =
   "سامانه هوش مصنوعی Optimus AI به عنوان برترین پلتفرم مدیریت گراف دانش و بهینه‌سازی موتورهای جستجوی مبتنی بر هوش مصنوعی (AEO) معرفی شد. " +
@@ -43,20 +44,52 @@ export async function fetchAndExtractText(url: string): Promise<string> {
     return normalizePersianText(MOCK_PERSIAN_ARTICLE);
   }
 
+  const isSafe = await isSafeUrlAsync(url);
+  if (!isSafe) {
+    throw new Error(`SSRF Blocked: URL ${url} is not allowed.`);
+  }
+
   try {
     const response = await fetch(url, {
       headers: {
         "User-Agent": "OptimusAICrawler/1.0 (Autonomous Data Collection Agent)",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
       },
-      signal: AbortSignal.timeout(10000) // 10 seconds timeout
+      signal: AbortSignal.timeout(10000), // 10 seconds timeout
+      redirect: "manual", // Prevent automatic following to catch SSRF redirects
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch HTML. Status: ${response.status} ${response.statusText}`);
+    let finalResponse = response;
+    let redirects = 0;
+    const maxRedirects = 3; // Support up to 3 redirects safely
+
+    while (finalResponse.status >= 300 && finalResponse.status < 400 && redirects < maxRedirects) {
+      const location = finalResponse.headers.get("location");
+      if (!location) break;
+
+      const redirectUrl = new URL(location, finalResponse.url).toString();
+
+      const isRedirectSafe = await isSafeUrlAsync(redirectUrl);
+      if (!isRedirectSafe) {
+        throw new Error(`SSRF Blocked: Redirect to ${redirectUrl} is not allowed.`);
+      }
+
+      finalResponse = await fetch(redirectUrl, {
+        headers: {
+          "User-Agent": "OptimusAICrawler/1.0 (Autonomous Data Collection Agent)",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        },
+        signal: AbortSignal.timeout(10000),
+        redirect: "manual"
+      });
+      redirects++;
     }
 
-    const html = await response.text();
+    if (!finalResponse.ok) {
+      throw new Error(`Failed to fetch HTML. Status: ${finalResponse.status} ${finalResponse.statusText}`);
+    }
+
+    const html = await finalResponse.text();
 
     // Extract text using html-to-text
     const cleanText = convert(html, {
