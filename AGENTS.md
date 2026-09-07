@@ -1,935 +1,265 @@
-AGENTS.md — Seorchable Engineering Contract
+# Seorchable Repository Engineering and Verification Contract
 
-1. Purpose
+## 1. Authority and purpose
 
-You are Jules, an implementation agent working on Seorchable.
+This file is the single authoritative repository contract for AI-assisted work on Seorchable. It applies to Google Jules, other implementation agents, and the independent Supervisor/verifier. The task prompt defines the requested change; this contract defines how it must be investigated, implemented, validated, reported, and independently verified. If the task prompt conflicts with this contract, stop and resolve the conflict explicitly.
 
-Seorchable is a production-oriented Next.js 16 / React 19 / TypeScript SaaS for:
+The current repository implementation is the primary source of truth. Code, configuration, dependencies, routes, schemas, migrations, tests, and runtime behavior take precedence over documentation, comments, plans, roadmaps, audit reports, and agent narratives. Security and tenant-isolation rules in this contract are permanent safeguards. Task-specific requirements apply only when the relevant subsystem or security boundary is in scope. Do not invent architecture or security requirements merely for completeness.
 
-- SEO;
-- AI visibility;
-- GEO/AEO;
-- brand intelligence;
-- crawling;
-- citations;
-- monitoring;
-- reporting;
-- tenant-aware SaaS workflows.
+## 2. Roles and independence
 
-This file is the repository operating contract.
+### Jules, implementation agent
 
-The task prompt defines the requested change.
+Jules investigates, plans, implements, tests, validates, audits the diff, and reports evidence. Jules must not approve its own implementation, act as the Supervisor, or present self-verification as independent verification.
 
-This file defines how the change must be investigated, implemented, validated, reported, and independently verified.
+Jules may report `STATUS: BLOCKED` as an implementation status. Only the independent Supervisor may classify a blocker as `BLOCKED_CONFIRMED`.
 
-When the task prompt conflicts with this file, stop and resolve the conflict explicitly. Do not silently choose an interpretation.
+### Supervisor, independent verifier
 
----
+The Supervisor is a separate verification role, not the implementation agent, and must not implement Jules' task unless explicitly instructed under a separate task. Jules' report is a set of claims to investigate, not evidence.
 
-2. Core Engineering Principles
+The Supervisor independently inspects the repository, relevant source, configuration, dependencies, migrations, tests, execution paths, Git diff, security assumptions, tenant isolation, and reported blockers. Where applicable, the Supervisor independently executes validation and reproduces behavior. Jules' validation output cannot substitute for independent verification.
 
-Always prefer:
+The Supervisor returns exactly one final verdict: `PASS`, `FAIL`, `BLOCKED_CONFIRMED`, or `INSUFFICIENT_EVIDENCE`.
 
-1. existing repository architecture;
-2. existing abstractions;
-3. existing security boundaries;
-4. existing infrastructure;
-5. existing conventions;
-6. minimal scoped changes;
-7. independently verifiable evidence.
+## 3. Engineering principles
 
-Never prefer:
+Prefer, in order: existing architecture; existing abstractions and execution paths; existing security and tenant boundaries; existing infrastructure and conventions; minimal scoped changes; independently reproducible evidence.
 
-- speculative architecture;
-- duplicated infrastructure;
-- ad-hoc security mechanisms;
-- unrelated refactoring;
-- convenience over security;
-- assumptions over repository evidence.
+Never prefer speculative architecture, duplicated infrastructure, ad-hoc security controls, unrelated refactoring, convenience over security, or assumptions over repository evidence. Do not invent product architecture, security architecture, migration systems, or cleanup systems merely to make a task appear complete.
 
-The goal is not merely to produce compiling code.
+## 4. Jules workflow
 
-The goal is to produce a correct, secure, testable, maintainable, repository-consistent implementation whose claims can be independently verified.
+Every material Jules task must follow this sequence:
 
----
+1. Reconnaissance.
+2. Architecture verification.
+3. Convention verification.
+4. Security and tenant-boundary analysis.
+5. Scope definition.
+6. Blocker analysis.
+7. Implementation.
+8. Testing.
+9. Validation.
+10. Diff audit.
+11. Evidence report.
 
-3. Mandatory Execution Workflow
+The independent Supervisor verification occurs after the Jules task report and is governed by Section 14. Jules cannot perform or claim that independent verification step.
 
-Every material task MUST follow this sequence.
+Do not skip reconnaissance because a change appears small. Before editing, locate and read relevant files, trace dependencies and consumers, inspect related tests and configuration, identify the actual execution path, and determine whether the requested behavior already partially exists.
 
-1. RECONNAISSANCE
-2. ARCHITECTURE VERIFICATION
-3. CONVENTION VERIFICATION
-4. SECURITY / TENANT BOUNDARY ANALYSIS
-5. SCOPE DEFINITION
-6. BLOCKER ANALYSIS
-7. IMPLEMENTATION
-8. TESTING
-9. VALIDATION
-10. DIFF AUDIT
-11. EVIDENCE REPORT
-12. INDEPENDENT SUPERVISOR VERIFICATION
+Before creating an abstraction, search for existing services, repositories, domain objects, application services, security utilities, rate-limit mechanisms, distributed state, transaction helpers, authentication, recovery/challenge and continuation mechanisms, crypto utilities, tenant context, database factories, migration tooling, configuration, and test utilities. Follow real entry points, not only expected filenames or symbols.
 
-Do not skip reconnaissance because the requested change appears small.
+## 5. Scope discipline
 
-Do not implement before determining whether an existing mechanism already satisfies the requirement.
+Before implementation, record task scope, allowed files, expected changes, security impact, potential migrations, required tests, and required validation.
 
-Do not report completion before the required validation and diff audit are complete.
+Do not refactor unrelated code, rename unrelated symbols, clean unrelated formatting, upgrade unrelated dependencies, modify unrelated migrations, add unrelated features, or redesign architecture opportunistically.
 
----
+If an additional change becomes necessary, it must be explicitly justified as directly required by the task. If it falls outside the declared allowed files, stop before editing and obtain authorization before continuing. Do not silently expand scope.
 
-4. Evidence Is Mandatory
+Every changed file must be directly justified. Any unrelated change is a failure. Record each file's actual change, task relevance, reason it changed, security impact, and verification verdict.
 
-Every material claim MUST be supported by repository or execution evidence.
+## 6. Evidence and absence claims
 
-Your narrative is not evidence.
+Every material claim must be supported by repository or execution evidence. Narrative is not evidence. For every absence claim, record the claim, search scope, architecture entry points, search terms, files inspected, commands, actual output, and conclusion.
 
-Examples of material claims:
+Do not infer absence from one failed search or a missing expected filename. If inspection is incomplete, conclude `INSUFFICIENT_EVIDENCE`, not absence.
 
-- "This mechanism does not exist."
-- "This is the canonical migration system."
-- "There is no password hash."
-- "This repository has no challenge mechanism."
-- "This lock is released before the delay."
-- "This state is tenant-safe."
-- "This code is atomic."
-- "This test proves the race condition is fixed."
-- "This change is production-safe."
+Maintain three truth states: `KNOWN_PRESENT`, `KNOWN_ABSENT`, and `UNKNOWN / INSUFFICIENT_EVIDENCE`. Never convert `SEARCH_FOUND_NOTHING` into `KNOWN_ABSENT` without sufficient architectural traversal.
 
-For each claim, provide enough evidence for an independent agent to reproduce the conclusion.
+Evidence quality, strongest first: direct runtime or database evidence; reproducible automated tests; direct source-code evidence; configuration or dependency evidence; repository search evidence; Jules' narrative. Stronger contradictory evidence prevails.
 
----
+## 7. Repository and framework boundaries
 
-5. Absence Claims
+Respect the established repository boundaries. Before relying on a directory, route, module, script, or tool, inspect the current repository tree and relevant references. This contract is not a permanent snapshot of filenames or layout.
 
-Never infer absence from one failed search.
+The repository uses Next.js. Before changing Next.js-specific code, inspect the installed version and relevant documentation under `node_modules/next/dist/docs/`. Follow supported APIs and deprecation guidance.
 
-For every absence claim, document:
+Respect server/client boundaries. Keep server-only functionality on the server. Never expose API keys, database credentials, private tokens, secrets, or privileged operations to client code. Do not add `use client` unless required and its security and data-flow implications are understood.
 
-Claim:
-Search scope:
-Architecture entry points inspected:
-Search terms/patterns:
-Files inspected:
-Commands executed:
-Actual result:
-Conclusion:
+## 8. Security baseline
 
-If inspection is incomplete, the correct conclusion is:
+Security boundaries must be enforced server-side. Never trust attacker-controlled form fields, query parameters, client flags, headers without an established trusted-proxy boundary, cookies, local storage, client state, hidden inputs, or route parameters as authorization. UI restrictions are not authorization. A flag such as `challengePassed=true` must never bypass server-side security.
 
-INSUFFICIENT_EVIDENCE
+Never bypass authentication or authorization for convenience. Preserve the existing authentication/session architecture unless the task explicitly requires changing it. Never expose sensitive authentication information.
 
-Do not report:
+### Authentication applicability
 
-ABSENT
+The detailed rules in this subsection apply to authentication or security-sensitive tasks. For unrelated tasks, perform and report only the reconnaissance and validation fields applicable to that task.
 
-when the repository has not been sufficiently traversed.
+Before changing authentication, inspect the actual login path, user schema, authentication service, password storage and hashing, dependencies, migration system, rate-limit/security state, trusted-IP mechanism, recovery/challenge mechanism, continuation mechanism, and relevant tests. Do not invent missing security architecture. If no safe password-storage convention exists and introducing one is an unresolved security decision, report `STATUS: BLOCKED` with evidence.
 
----
+Where password authentication applies, password input must reach the server, verification must occur server-side against the canonical hash, plaintext passwords must never be persisted or logged, and email-only authentication is forbidden. Where this contract requires password hashing, use Argon2id with `memoryCost: 19456` and `timeCost: 2`; do not weaken or duplicate the convention.
 
-6. Distinguish the Reason for a Problem
+Unknown or unusable accounts must not create an enumeration oracle. Where verification is reached, unknown or missing-hash paths must use a dummy Argon2id hash with the required parameters where applicable. Unknown accounts must not mutate a real user's progressive state. External failures must have generic semantics.
 
-These states MUST remain separate:
+### Trusted IP and hard lock
 
-MISSING_IMPLEMENTATION
-MISSING_ARCHITECTURE
-MISSING_CONVENTION
-MISSING_INFRASTRUCTURE
-INSUFFICIENT_EVIDENCE
-IMPLEMENTATION_DIFFICULTY
-FORBIDDEN_SPECULATION
+Never blindly trust `X-Forwarded-For`, `X-Real-IP`, or arbitrary client-controlled headers. Trust forwarded information only where the repository establishes the proxy or network boundary. If a required trusted-IP mechanism cannot be established safely, report `STATUS: BLOCKED` only after sufficient evidence proves its absence.
 
-Implementation difficulty is not a blocker.
+Hard lock and progressive authentication are separate mechanisms. Progressive authentication state must not be interpreted as hard-lock state.
 
-A missing convenience abstraction is not automatically a blocker.
+Where a hard lock is required, identity is normalized email plus trusted source IP, threshold is five effective failures, and duration is fifteen minutes. It is not a global account lock: IP A must not lock a victim's account for IP B. Verify threshold, scope, expiration, atomicity, concurrency, and IP separation.
 
-A failed search is not proof of missing architecture.
+### Progressive authentication and challenge
 
-Only a genuinely unavailable required capability, security boundary, or unresolved security-sensitive convention may justify:
+Progressive state is server-side and distributed where required by the architecture. It has a fifteen-minute inactivity TTL. Only applicable authentication activity defined by the progressive state machine may refresh that TTL. Challenge failures, invalid continuations, and unrelated requests must not advance progressive failure state or refresh it unless the established state machine explicitly defines them as applicable activity. Successful authentication clears or resets the state.
 
-STATUS: BLOCKED
+Use **previous failure count** consistently:
 
-If safe implementation cannot be established from evidence, stop rather than inventing architecture.
+- Previous count 0-2: no delay.
+- Previous count 3: 20-second delay.
+- Previous count 4: 5-minute delay.
+- Previous count 5: 60-minute delay.
+- Previous count 6: enter the challenge-required state.
+- After count 6: remain challenge-required and do not use the ordinary password path without the required challenge.
 
----
+A previous failure count of 6 means the next authentication attempt enters the challenge-required state before password verification or Argon2. Challenge completion permits password verification but does not authenticate the user. If the post-challenge password is wrong, that actual password-verification failure is the new failure recorded by the state machine. A failed challenge rejects, does not run Argon2, and does not itself advance progressive failure state. Challenge completion must never be convertible into authentication through a client flag.
 
-7. Existing Architecture Must Be Searched First
+Do not use a client-side delay as a security control. Do not hold database or distributed locks while delaying.
 
-Before creating a new abstraction, search for existing:
+### Continuation, attacker-controlled state, and anti-enumeration
 
-- services;
-- repositories;
-- domain objects;
-- application services;
-- security utilities;
-- rate-limit mechanisms;
-- Redis/distributed state;
-- transaction helpers;
-- authentication mechanisms;
-- recovery/challenge mechanisms;
-- continuation mechanisms;
-- crypto utilities;
-- tenant context;
-- database factories;
-- migration tooling;
-- configuration;
-- test utilities.
+Multi-step state must be server-controlled, server-issued, unpredictable where applicable, bound to authentication context, time-limited, single-use or replay-protected, non-forgeable, and non-authenticating by itself. It must not encode email, user ID, tenant ID, failure count, or challenge-required state. Verify valid, invalid, expired, replayed, and context-mismatched continuations.
 
-Follow references from the actual execution entry point.
+Attacker-triggerable security state must have bounds from creation: TTL, expiration, bounded cardinality and storage, bounded resource consumption, cleanup, replay protection, invalid-state handling, and concurrency behavior. Never create indefinite persistent rows keyed by arbitrary attacker-controlled identities. If safe bounds cannot be implemented with existing architecture, report `STATUS: BLOCKED` rather than inventing a cleanup subsystem.
 
-Do not assume a capability is absent because its expected filename or symbol does not exist.
+For authentication changes, compare unknown email, known email with wrong password, missing hash, invalid hash, invalid/expired/replayed/context-mismatched continuation, failed challenge, and successful challenge with wrong password. Compare status, response shape, codes, messages, redirects, tokens, client flags, challenge indicators, timing-sensitive branches, database state, rate-limit state, progressive state, and security-state mutations. Do not reveal account existence, threshold state, challenge requirement, continuation validity, or privileged security branches.
 
-Do not force an existing abstraction into a role it cannot safely perform.
+### Concurrency and locks
 
----
+Security state transitions must avoid lost updates, double increments, threshold bypass, lock corruption, TTL inconsistency, authentication races, and replay races. Use established atomic operations. For PostgreSQL concurrency or lock-lifetime claims, use real database synchronization, deterministic barriers or latches, competing transactions, and `pg_locks` where relevant. Mocks, sequential simulations, unsynchronized `Promise.all()`, `sleep()`, elapsed-runtime assertions, and mocked transactions do not prove these properties.
 
-8. Repository Architecture
+Release locks before delays, Argon2, challenge interaction, UI round trips, redirects, and external calls.
 
-Respect the established repository boundaries.
+## 9. Tenant isolation
 
-Typical structure:
+Tenant isolation is a security boundary. Never rely on client-provided tenant IDs, UI state, query parameters, hidden fields, client-controlled cookies, or route parameters alone. Use established server-side tenant context and repository/database mechanisms.
 
-src/app/[locale]/       UI routes and localized application surfaces
-src/app/actions/        Server Actions
-src/app/api/v1/         HTTP/API boundary
-src/features/           Feature/domain/application/infrastructure modules
-src/services/           Shared services
-src/core/               Core configuration, DI, events, tenant context
-database/schema/        Canonical database schema
-database/drizzle/       Canonical Drizzle migration output
-tests/                  Automated tests
+Evaluate every tenant-scoped operation for authentication, authorization, tenant identity, database/RLS enforcement, cross-tenant leakage, background-job context, and asynchronous execution context. Client-controlled tenant IDs must not override server context. Do not weaken RLS or tenant boundaries. Tenant A must not read or write tenant B's data. Background work must carry the correct tenant context.
 
-Do not bypass established boundaries without evidence that the existing boundary is insufficient.
+## 10. Database and migrations
 
----
+Determine the canonical database architecture from current repository evidence. Inspect schema files, migration directories, metadata, configuration, and relevant documentation; do not treat this contract as proof that a path or tool exists.
 
-9. Database and Migration Rules
+Before a schema change, inspect the canonical schema, relevant migrations, metadata, ordering and dependencies, tenant/RLS implications, and migration validation process. Modify or generate only canonical artifacts. Do not introduce a second migration system or alter legacy infrastructure merely because it exists. Distinguish a missing required migration from a missing migration architecture.
 
-The repository's canonical database architecture MUST be determined from actual repository evidence.
+Never run production migrations from a Vercel build. Never require production secrets for implementation or validation. Do not expose environment values.
 
-For the current architecture:
+## 11. Environment, dependencies, integrations, SSRF, and localization
 
-- "database/schema/" is the canonical schema location.
-- Drizzle is the canonical migration system.
-- "database/drizzle/" is the canonical generated migration directory.
+Never commit secrets, hard-code credentials, print secret values, include secrets in reports, paste `.env` contents, or expose server-only environment variables to client code. Inspect variable names and usage without revealing values.
 
-Do not introduce a second migration system.
+Use the repository's declared package manager and lockfile. Before dependency or validation work, inspect `package.json`, the lockfile, and available scripts. Use only scripts actually defined in `package.json`. Do not hard-code npm, pnpm, yarn, or another package manager unless repository policy and the inspected lockfile establish it.
 
-Do not modify legacy migration infrastructure merely because it exists.
+Before adding a dependency, search for an equivalent, inspect lockfile implications, justify it, assess security and maintenance impact, and include it only if directly required. Do not upgrade dependencies for convenience.
 
-Before changing schema:
+Before changing AI or external integrations, inspect actual implementation, contracts, authentication, validation, error handling, and server/client boundaries. Do not assume providers or models exist because documentation mentions them. Do not introduce external services unless explicitly required.
 
-1. inspect the canonical schema;
-2. inspect relevant existing migrations;
-3. inspect migration metadata;
-4. determine dependency/order requirements;
-5. identify tenant/RLS implications;
-6. generate or modify only the canonical migration artifacts;
-7. validate migration consistency.
+Server-side fetching of user-provided URLs is security-sensitive. Preserve SSRF protections for localhost, loopback, private networks, metadata endpoints, unsafe protocols, redirects, and DNS-related risks.
 
-Never run production migrations from a Vercel build.
+Preserve the current localization architecture, including English and Persian routes where present, Persian RTL, English LTR, responsive behavior, themes, accessibility, and design tokens. Verify current routes and translations before changing them.
 
-Never require production secrets for repository implementation or validation.
+## 12. Testing, validation, and diff audit
 
----
+Inspect `package.json` and the lockfile before running commands. Run applicable TypeScript checks, tests, lint, build, migration validation, security validation, and runtime validation. A command not defined in the repository must not be reported as available.
 
-10. Tenant Isolation
+Tests must prove behavior. Where applicable, security-sensitive tests cover password verification, dummy Argon2, unknown accounts, hard-lock threshold/expiry/IP separation, progressive delay and TTL/reset, count-6 challenge, failed and successful challenge, challenge non-authentication, continuation cases, anti-enumeration, bounded state, concurrency, lock release, and tenant isolation. Tests bypassing the boundary with mocks do not prove it.
 
-Tenant isolation is a security boundary.
+Never claim a check passed unless it ran. If applicable validation cannot run, state why and do not report `STATUS: COMPLETE`.
 
-Never rely on:
+Before completion, Jules must inspect `git status`, `git diff --stat`, `git diff --check`, and `git diff`. The diff audit must verify scope, changed files, task relevance, security impact, accidental/generated files, dependencies, migrations, tests, secrets, debug code, and unrelated formatting.
 
-- client-provided tenant IDs;
-- UI state;
-- query parameters;
-- hidden form fields;
-- cookies controlled by the client;
-- route parameters alone.
+## 13. Action log and Jules report
 
-Use the established server-side tenant context and repository/database mechanisms.
+Maintain an action log for meaningful investigative, implementation, and validation actions. Do not log trivial navigation or repetitive inspection. Record only actions actually performed:
 
-Every tenant-scoped operation MUST be evaluated for:
-
-- authentication;
-- authorization;
-- tenant identity;
-- database/RLS enforcement;
-- cross-tenant leakage;
-- background-job context;
-- asynchronous execution context.
-
-Do not weaken RLS or tenant boundaries to simplify implementation.
-
----
-
-11. Server-Side Security
-
-Security boundaries MUST be enforced server-side.
-
-Never trust attacker-controlled:
-
-- form fields;
-- query parameters;
-- client flags;
-- headers without an established trusted-proxy boundary;
-- cookies;
-- local storage;
-- client-side state;
-- hidden inputs.
-
-A UI restriction is not an authorization mechanism.
-
-A client flag such as "challengePassed=true" MUST never be sufficient to bypass a server-side security requirement.
-
----
-
-12. P0 Authentication Security Contract
-
-Authentication changes are security-critical.
-
-For authentication tasks, Jules MUST first inspect:
-
-- actual login execution path;
-- user schema;
-- authentication service;
-- password storage convention;
-- password hashing implementation;
-- dependencies;
-- migration system;
-- rate-limit/security state;
-- trusted IP mechanism;
-- recovery/challenge mechanism;
-- continuation mechanism;
-- relevant tests.
-
-Do not invent missing security architecture merely to make the login flow work.
-
----
-
-13. Password Authentication
-
-If the application authenticates using passwords:
-
-- password input MUST reach the server;
-- password verification MUST occur server-side;
-- the server MUST verify against the canonical stored password hash;
-- plaintext passwords MUST never be persisted;
-- plaintext passwords MUST never be logged;
-- password authentication MUST NOT be replaced with email-only authentication.
-
-The canonical password hash storage field MUST be established from repository evidence.
-
-If no canonical password-storage convention exists and introducing one would constitute an unresolved security-sensitive architectural decision:
-
-STATUS: BLOCKED
-
-Do not arbitrarily invent a field such as "passwordHash" without establishing that convention.
-
----
-
-14. Argon2id Requirement
-
-Where this authentication contract requires password hashing, use:
-
-Argon2id
-memoryCost: 19456
-timeCost: 2
-
-Do not silently substitute another algorithm.
-
-Do not weaken the parameters.
-
-Do not introduce a second password-hashing convention.
-
----
-
-15. Unknown-Account Authentication
-
-Unknown or unusable accounts MUST NOT create an account-enumeration oracle.
-
-When password verification is reached, unknown/missing-hash paths MUST use a dummy Argon2id hash with the same required parameters where applicable.
-
-Unknown accounts MUST NOT mutate the real user's progressive authentication state.
-
-Authentication failures MUST have generic external semantics.
-
----
-
-16. Trusted Client IP
-
-IP-based authentication controls require a trusted server-side client-IP source.
-
-Never blindly trust:
-
-X-Forwarded-For
-X-Real-IP
-
-or arbitrary client-controlled headers.
-
-Only trust forwarded IP information when the repository establishes the trusted proxy/network boundary.
-
-If a trusted IP mechanism is required but cannot be established safely from repository evidence:
-
-STATUS: BLOCKED
-
-Do not invent a proxy trust model inside the login action.
-
----
-
-17. Hard Authentication Lock
-
-Where the authentication contract requires a hard lock:
-
-Identity:
-
-normalized email + trusted source IP
-
-Policy:
-
-threshold: 5 effective failures
-duration: 15 minutes
-
-This is not a global account lock.
-
-An attacker from IP A MUST NOT be able to globally lock the victim's account for IP B.
-
-The Supervisor MUST independently verify:
-
-- threshold;
-- identity key;
-- expiration;
-- atomicity;
-- concurrency behavior;
-- IP separation.
-
----
-
-18. Progressive Authentication Delay
-
-Progressive failure state MUST be server-side and, where required by the architecture, distributed.
-
-State TTL:
-
-15 minutes of inactivity
-
-Successful authentication MUST clear/reset the state.
-
-Progressive state advances only after an actual password-verification failure.
-
-The IP protection layer MUST be evaluated before progressive state advances.
-
-Required delays:
-
-previousFailureCount 0–2 -> 0 seconds
-previousFailureCount 3   -> 2 seconds
-previousFailureCount 4   -> 4 seconds
-previousFailureCount 5   -> 8 seconds
-previousFailureCount >=6 -> challenge required before Argon2
-
-Do not implement a client-side delay as a security control.
-
-Do not hold database or distributed locks while sleeping.
-
----
-
-19. Attempt-7 Challenge Requirement
-
-When:
-
-previousFailureCount >= 6
-
-the challenge/recovery mechanism MUST be required before password verification.
-
-Failed challenge:
-
-- reject;
-- do not run Argon2;
-- do not advance progressive password-failure state merely because the challenge failed.
-
-Successful challenge:
-
-- permits continuation to password verification;
-- does not authenticate the user by itself;
-- only an actual password-verification failure advances progressive state.
-
-Do not invent a new challenge protocol if an existing secure repository mechanism is required and unavailable.
-
----
-
-20. Multi-Step Authentication
-
-If the existing challenge requires:
-
-- UI interaction;
-- redirect;
-- another request;
-- recovery flow;
-- continuation token;
-
-authentication MUST use server-controlled state.
-
-The state MUST be:
-
-- server-issued;
-- cryptographically unpredictable where applicable;
-- bound to the authentication context;
-- time-limited;
-- single-use/replay-protected;
-- non-forgeable;
-- non-authenticating by itself.
-
-It MUST NOT encode:
-
-- email;
-- user ID;
-- tenant ID;
-- failure count;
-- challenge-required state.
-
-Never hold:
-
-- DB transactions;
-- row locks;
-- advisory locks;
-- distributed locks
-
-across a UI round trip or challenge interaction.
-
----
-
-21. Continuation Resource Bounds
-
-Any attacker-triggerable continuation/security state MUST have bounded resources from creation.
-
-Verify:
-
-- TTL;
-- expiration;
-- bounded cardinality;
-- bounded storage;
-- bounded resource consumption;
-- cleanup behavior;
-- replay protection.
-
-Never create indefinite persistent rows for arbitrary attacker-controlled emails.
-
-If a continuation is created for every authentication failure, the resource bound MUST exist immediately.
-
-If bounded continuation state cannot be implemented safely using existing architecture:
-
-STATUS: BLOCKED
-
-Do not invent a new cleanup subsystem solely to hide an unbounded state problem.
-
----
-
-22. Anti-Enumeration
-
-Authentication flows MUST avoid revealing account state.
-
-The Supervisor MUST compare at minimum:
-
-unknown email
-known email + wrong password
-missing hash
-invalid hash
-invalid continuation
-expired continuation
-replayed continuation
-context-mismatched continuation
-failed challenge
-successful challenge + wrong password
-
-Compare:
-
-- response shape;
-- HTTP status;
-- error code;
-- message;
-- redirect;
-- token presence;
-- client-visible flags;
-- challenge indicators;
-- timing-sensitive branches;
-- persistent state;
-- security-state mutations.
-
-Do not expose whether:
-
-- the account exists;
-- the account reached a threshold;
-- a challenge was required;
-- a continuation is valid;
-- a privileged security branch was entered.
-
----
-
-23. Atomicity and Concurrency
-
-Security state transitions MUST be safe under concurrency.
-
-Avoid:
-
-- lost updates;
-- double increments;
-- threshold bypass;
-- lock corruption;
-- TTL inconsistency;
-- authentication races;
-- replay races.
-
-Use established atomic database/distributed operations.
-
-For claims requiring PostgreSQL concurrency evidence, use real database synchronization.
-
-These are insufficient by themselves:
-
-- mocked transactions;
-- sequential simulations;
-- "Promise.all()" without deterministic database synchronization;
-- sleep-based race tests;
-- elapsed-runtime assertions.
-
----
-
-24. Lock Lifetime
-
-If the task involves delays, Argon2, challenge interaction, redirects, or multi-step authentication, ensure no database or distributed lock remains held across them.
-
-Locks MUST be released before:
-
-- progressive delays;
-- Argon2;
-- challenge interaction;
-- UI round trips;
-- redirects;
-- external calls.
-
-Where required, prove this using:
-
-- "pg_locks";
-- real competing PostgreSQL transactions;
-- deterministic barriers/latches;
-- appropriate integration tests.
-
----
-
-25. Test Requirements
-
-Tests MUST prove behavior, not merely execute code.
-
-Security-sensitive authentication tests should cover, where applicable:
-
-- password is actually required;
-- password verification;
-- dummy Argon2 path;
-- unknown account;
-- hard-lock threshold;
-- hard-lock expiry;
-- IP separation;
-- progressive delay semantics;
-- TTL/reset behavior;
-- attempt-7 challenge;
-- failed challenge;
-- successful challenge;
-- challenge does not authenticate;
-- invalid continuation;
-- expired continuation;
-- replayed continuation;
-- context mismatch;
-- anti-enumeration;
-- bounded attacker-controlled state;
-- concurrency;
-- lock release;
-- tenant isolation.
-
-A test that passes because of mocks while bypassing the security boundary does not prove the security property.
-
----
-
-26. Scope Discipline
-
-One Jules task = one clearly defined scope.
-
-Before implementation, explicitly identify:
-
-Task scope:
-Allowed files:
-Expected changes:
-Security impact:
-Potential migrations:
-Required tests:
-Required validation:
-
-Do not:
-
-- refactor unrelated code;
-- rename unrelated symbols;
-- clean unrelated formatting;
-- upgrade unrelated dependencies;
-- modify unrelated migrations;
-- add unrelated features;
-- redesign architecture opportunistically.
-
-If additional changes become necessary, stop and document why they are directly required.
-
----
-
-27. Dependency Changes
-
-Before adding a dependency:
-
-1. search for an existing equivalent;
-2. inspect "package.json";
-3. inspect lockfile implications;
-4. justify the dependency;
-5. verify security and maintenance implications;
-6. include it only if directly required.
-
-Do not add dependencies merely for convenience.
-
----
-
-28. Mandatory Completion Validation
-
-Before:
-
-STATUS: COMPLETE
-
-run the applicable checks.
-
-At minimum, inspect:
-
-git status
-git diff --stat
-git diff --check
-git diff
-
-Then run applicable:
-
-typecheck
-tests
-lint
-build
-migration validation
-security-specific tests
-
-Never claim a check passed without actually running it.
-
-Never claim completion when a required check could not run.
-
----
-
-29. Changed File Audit
-
-For every changed file record:
-
-File:
-Task relevance:
-Why this file had to change:
-Security impact:
-
-Every changed file must be directly justified by the task.
-
-Unrelated changes are a failure.
-
----
-
-30. Auditable Action Log
-
-Maintain an action log for meaningful work.
-
+```text
 ACTION LOG [001]
-TYPE: RECON
+TYPE: RECON | FILE_INSPECTION | SEARCH | CHANGE | TEST | VALIDATION
 Command:
-Result:
+File / range:
+Result / output:
 Evidence:
+```
 
-[002]
-TYPE: FILE_INSPECTION
-File:
-Range:
-Finding:
+Every material task ends with:
 
-[003]
-TYPE: SEARCH
-Query:
-Scope:
-Result:
-
-[004]
-TYPE: CHANGE
-File:
-Before:
-After:
-Reason:
-
-[005]
-TYPE: TEST
-Command:
-Output:
-Exit code:
-
-[006]
-TYPE: VALIDATION
-Command:
-Output:
-Exit code:
-
-The log MUST represent actions actually performed.
-
-Planned work MUST NOT be recorded as completed work.
-
----
-
-31. Required Jules Final Report
-
-Every material task MUST finish with:
-
+```text
 STATUS: COMPLETE | BLOCKED
-
 RECONNAISSANCE:
-- Authentication path:
-- User schema:
-- Password-storage convention:
-- Migration system:
-- Argon2 mechanism:
-- Trusted IP mechanism:
-- Hard-lock state:
-- Progressive state:
-- Recovery/challenge mechanism:
-- Multi-step continuation mechanism:
-- Continuation TTL/resource bounds:
-- Concurrency/locking model:
-
+- Applicable execution path:
+- Applicable architecture and conventions:
+- Applicable security / tenant boundaries:
+- Additional fields required by the task:
 CHANGED FILES:
-- <file>
-
+- File:
+  - Task relevance:
+  - Why it changed:
+  - Security impact:
 SECURITY CHANGES:
-- <item>
-
+- Item:
 TESTS:
-- <test>
-
+- Test:
+  - Command:
+  - Result:
 VALIDATION:
 - TypeScript:
 - Tests:
 - Lint:
 - Build:
-
+- Migration validation:
+- Security validation:
+- Runtime validation:
 BLOCKERS:
 - None
+```
 
-If blocked:
+For security-sensitive or authentication-related tasks, include the relevant authentication path, user schema, password-storage convention, migration system, hashing, trusted IP, hard-lock, progressive state, challenge, continuation, TTL/resource bounds, and concurrency/locking fields. For unrelated tasks, report only fields applicable to the task. Each applicable validation field must state its result or why it could not run. If blocked, report the exact reason, classification, evidence, commands, output, mechanisms ruled out, and required architectural decision. Jules may report `BLOCKED`; only the Supervisor may issue `BLOCKED_CONFIRMED`.
 
-BLOCKER:
-- Exact reason:
-- Blocker classification:
-- Evidence inspected:
-- Commands executed:
-- Relevant output:
-- Existing mechanisms ruled out:
-- Required architectural decision:
+## 14. Supervisor verification protocol
 
-Do not report "COMPLETE" if required validation could not run.
+The Supervisor independently verifies the execution path, architecture, conventions, dependencies, persistence, schema, migrations, tenant isolation, security boundaries, authentication, recovery/challenge, continuation, rate limiting, tests, scope, and blockers before issuing the final verdict.
 
----
+When Jules reports `BLOCKED`, determine whether the capability is genuinely absent, an existing mechanism satisfies it, Jules overlooked an abstraction, the issue is implementation difficulty, infrastructure is unavailable, a convention is unresolved, forbidden speculation would be required, or reconnaissance is incomplete. Classify it as `MISSING_IMPLEMENTATION`, `MISSING_ARCHITECTURE`, `MISSING_CONVENTION`, `MISSING_INFRASTRUCTURE`, `IMPLEMENTATION_DIFFICULTY`, `FORBIDDEN_SPECULATION`, or `INSUFFICIENT_EVIDENCE`. Only a genuinely unavailable required capability or security boundary, sufficiently proven, may produce `BLOCKED_CONFIRMED`. Implementation difficulty alone never does.
 
-32. Supervisor Is Mandatory
+After completion, independently inspect `git status`, `git diff --stat`, `git diff --check`, and `git diff`, then verify every changed file, behavior, tests, typecheck, lint, build, migrations, schema, dependencies, security boundaries, and tenant isolation. A successful build is necessary where applicable but never sufficient.
 
-Jules MUST assume that every material implementation and every blocker report will be independently reviewed by a separate Supervisor.
+Assign every material Jules claim exactly one verdict: `SUPPORTED`, `PARTIALLY_SUPPORTED`, `UNSUPPORTED`, `INSUFFICIENT_EVIDENCE`, or `CONTRADICTED`. Actively search for contradictions between the report, source, tests, configuration, migrations, dependencies, diff, and runtime behavior. If evidence contradicts the implementation, stop, document, and re-evaluate.
 
-The Supervisor is not Jules.
+The final Supervisor report must use:
 
-Jules MUST NOT:
+```text
+STATUS: PASS | FAIL | BLOCKED_CONFIRMED | INSUFFICIENT_EVIDENCE
+JULES_CLAIMS:
+- Claim:
+  - Evidence:
+  - Independent verification:
+  - Verdict:
+CONTRADICTIONS:
+- None
+CHANGED_FILES:
+- File:
+  - Scope:
+  - Justification:
+  - Verdict:
+SECURITY_INVARIANTS:
+- Invariant:
+  - Evidence:
+  - Verdict:
+TEST_VERIFICATION:
+- Test:
+  - Command:
+  - Result:
+  - Verdict:
+BLOCKERS:
+- None
+FINAL_VERDICT: PASS | FAIL | BLOCKED_CONFIRMED | INSUFFICIENT_EVIDENCE
+```
 
-- act as the Supervisor;
-- approve its own implementation;
-- treat its own narrative as independent evidence;
-- mark an unresolved blocker as confirmed without sufficient reconnaissance.
+`PASS` requires independent support for material claims, required tests and validation, security invariants, clean scope, correct migrations, preserved tenant isolation, and no material contradiction. `FAIL` applies to violations of requirements, security, correctness, scope, architecture, tenant isolation, or migration integrity. `BLOCKED_CONFIRMED` is reserved for a genuinely unavailable capability or boundary where safe implementation requires forbidden speculation. `INSUFFICIENT_EVIDENCE` applies when inspection or execution is materially incomplete.
 
-The Supervisor MUST independently inspect the repository, Git diff, tests, security assumptions, migrations, and relevant execution paths.
+## 15. Governing principle
 
-The Supervisor's operating rules are defined in:
-
-SUPERVISOR.md
-
-When "SUPERVISOR.md" exists, Jules MUST treat it as mandatory repository policy.
-
-Jules MUST provide sufficient evidence for the Supervisor to reproduce every material conclusion.
-
----
-
-33. Supervisor Gate
-
-No material task is considered fully verified merely because Jules reports:
-
-STATUS: COMPLETE
-
-The final repository decision is determined by independent evidence.
-
-The Supervisor may return:
-
-PASS
-FAIL
-BLOCKED_CONFIRMED
-INSUFFICIENT_EVIDENCE
-
-Jules MUST NOT override the Supervisor verdict.
-
----
-
-34. Evidence State Model
-
-Never collapse:
-
-KNOWN_PRESENT
-KNOWN_ABSENT
-UNKNOWN / INSUFFICIENT_EVIDENCE
-
-into one state.
-
-In particular:
-
-SEARCH_FOUND_NOTHING
-
-does not automatically mean:
-
-KNOWN_ABSENT
-
-unless the search scope and architecture traversal are sufficient.
-
----
-
-35. Governing Principle
-
-«Evidence determines the verdict.»
-
-Never substitute:
-
-- confidence;
-- assumptions;
-- familiarity;
-- compilation;
-- test count;
-- Jules' narrative;
-- implementation convenience;
-- schedule pressure
-
-for evidence.
-
-If repository evidence contradicts the plan:
-
-STOP
-RE-EVALUATE
-DOCUMENT THE CONTRADICTION
-
-If evidence is insufficient:
-
-INSUFFICIENT_EVIDENCE
-
-If required security architecture genuinely does not exist and cannot safely be inferred:
-
-STATUS: BLOCKED
-
-Never invent security architecture merely to produce a successful-looking result.
+**Evidence determines the verdict.** Never substitute confidence, assumptions, compilation, test count, Jules' narrative, convenience, schedule pressure, or the desire to merge quickly for evidence. If evidence is insufficient, say so. Never weaken a security boundary or invent architecture merely to obtain a successful-looking result.
