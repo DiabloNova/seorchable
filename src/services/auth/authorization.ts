@@ -2,6 +2,9 @@ import { NextRequest } from "next/server";
 import { requireSession, getSession } from "./session";
 import { UserRole } from "@/types/auth";
 import { TenantContextManager } from "@/core/database/tenant-context";
+import { ApiService } from "@/features/public-api/services/api-service";
+
+const apiService = new ApiService();
 
 export class AuthorizationError extends Error {
   constructor(public statusCode: number, message: string) {
@@ -102,7 +105,7 @@ export async function requireRole(requiredRole: UserRole, targetWorkspaceId?: st
 /**
  * Validates and resolves the authoritative user and tenant identity for API routes.
  * If an active signed server session is present, its identity overrides all client-provided headers.
- * Otherwise, falls closed if neither valid session nor proper headers are present.
+ * Otherwise, requires signed API credentials (Bearer token) validated via ApiService.
  */
 export async function authorizeApiRequest(req: NextRequest): Promise<{ userId: string; tenantId: string }> {
   const session = await getSession();
@@ -114,33 +117,23 @@ export async function authorizeApiRequest(req: NextRequest): Promise<{ userId: s
     };
   }
 
-  // Fallback to headers for developer API integration, with validation
-  const headerUserId = req.headers.get("x-user-id");
-  const headerTenantId = req.headers.get("x-tenant-id");
-
-  if (!headerUserId || headerUserId.trim() === "" || !headerTenantId || headerTenantId.trim() === "") {
-    throw new AuthorizationError(401, "Unauthorized: Valid session or API headers required.");
+  const authHeader = req.headers.get("authorization");
+  if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
+    throw new AuthorizationError(401, "Unauthorized: Valid session or signed API credentials required.");
   }
 
-  // To keep developer API integrations secure, we verify the user belongs to the requested header tenant
-  const hasAccess = await TenantContextManager.runWithSystemContext(headerUserId, "sys-auth-api-check", async () => {
-      const client = TenantContextManager.getDbClient();
-      if (!client) {
-          throw new Error("Failed to get DB client in system context");
-      }
-      const { rows } = await client.query(
-          "SELECT 1 FROM organization_members m JOIN organizations o ON m.organization_id = o.id WHERE m.user_id = $1 AND m.organization_id = $2 AND o.deleted_at IS NULL",
-          [headerUserId, headerTenantId]
-      );
-      return rows.length > 0;
-  });
+  const token = authHeader.substring(7).trim();
+  if (!token) {
+    throw new AuthorizationError(401, "Unauthorized: Missing API credentials.");
+  }
 
-  if (!hasAccess) {
-      throw new AuthorizationError(403, "Forbidden: User is not a member of the requested workspace.");
+  const apiKey = await apiService.authenticateKey(token);
+  if (!apiKey) {
+    throw new AuthorizationError(401, "Unauthorized: Invalid or expired API credentials.");
   }
 
   return {
-    userId: headerUserId,
-    tenantId: headerTenantId
+    userId: apiKey.id,
+    tenantId: apiKey.organizationId
   };
 }
