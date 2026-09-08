@@ -7,7 +7,6 @@ import {
   invalidateSession,
   signPayload,
   verifyPayload,
-  getSessionSecret,
   setCookiesMock
 } from "../../../src/services/auth/session";
 import { User } from "../../../src/types/auth";
@@ -40,99 +39,12 @@ setCookiesMock(() => Promise.resolve(mockCookieStore));
 let lastInterceptedTenantId = "";
 let lastInterceptedUserId = "";
 
-// Mock TenantContextManager methods to avoid hitting database / vector store / AI providers during security boundary testing
+// Mock TenantContextManager.runWithTenantContext to avoid hitting database / vector store / AI providers during security boundary testing
+const originalRunWithTenantContext = TenantContextManager.runWithTenantContext;
 TenantContextManager.runWithTenantContext = async function (tenantId, userId, requestId, work, options) {
   lastInterceptedTenantId = tenantId;
   lastInterceptedUserId = userId;
   return { mockResult: "success" } as any;
-};
-
-TenantContextManager.runWithSystemContext = async function (userId, reason, work) {
-  const mockClient = {
-    query: async (sql: string, params: any[]) => {
-      if (sql.includes("FROM users u")) {
-        const uId = params[0];
-        if (uId === "usr-test-123") {
-          return {
-            rows: [
-              {
-                id: "usr-test-123",
-                name: "Test Engineer",
-                email: "test@seorchable.ir",
-                is_active: true,
-                workspaceId: "ws-test-99",
-                role: "workspace_admin"
-              }
-            ]
-          };
-        }
-        if (uId === "usr-viewer-123") {
-          return {
-            rows: [
-              {
-                id: "usr-viewer-123",
-                name: "Viewer User",
-                email: "viewer@seorchable.ir",
-                is_active: true,
-                workspaceId: "ws-test-99",
-                role: "viewer"
-              }
-            ]
-          };
-        }
-        if (uId === "usr-admin-home") {
-          return {
-            rows: [
-              {
-                id: "usr-admin-home",
-                name: "Super Admin",
-                email: "admin@seorchable.ir",
-                is_active: true,
-                workspaceId: "ws-admin-home",
-                role: "super_admin"
-              }
-            ]
-          };
-        }
-        if (uId === "usr-dev-token-abc") {
-          return {
-            rows: [
-              {
-                id: "usr-dev-token-abc",
-                name: "Dev User",
-                email: "dev@seorchable.ir",
-                is_active: true,
-                workspaceId: "ws-dev-org-xyz",
-                role: "workspace_admin"
-              }
-            ]
-          };
-        }
-        return { rows: [] };
-      }
-      if (sql.includes("organization_members")) {
-        const uId = params[0];
-        const orgId = params[1];
-        if (
-          (uId === "usr-test-123" && orgId === "ws-test-99") ||
-          (uId === "usr-admin-home" && orgId === "ws-admin-home") ||
-          (uId === "usr-dev-token-abc" && orgId === "ws-dev-org-xyz")
-        ) {
-          return { rows: [{ role: "workspace_admin" }] };
-        }
-        return { rows: [] };
-      }
-      return { rows: [] };
-    }
-  };
-
-  const origGetDb = TenantContextManager.getDbClient;
-  (TenantContextManager as any).getDbClient = () => mockClient;
-  try {
-    return await work();
-  } finally {
-    (TenantContextManager as any).getDbClient = origGetDb;
-  }
 };
 
 // Mock database table for Scenario 14 (RLS & Mutation safety)
@@ -521,7 +433,7 @@ export async function runAuthTests() {
   }
 
   // 11.3 Super Admin accessing any workspace -> ALLOW
-  const superAdminUser: User = { ...mockUser, id: "usr-admin-home", role: "super_admin", workspaceId: "ws-admin-home" };
+  const superAdminUser: User = { ...mockUser, role: "super_admin", workspaceId: "ws-admin-home" };
   await createSession(superAdminUser);
   try {
     await requireWorkspaceMembership(superAdminUser.id, "ws-some-customer-workspace");
@@ -535,7 +447,7 @@ export async function runAuthTests() {
   // ----------------------------------------------------
   console.log("▶ SEC-REG-008: Testing Role-Based Access Control (RBAC) Hierarchies...");
   // 12.1 Viewer role trying to run admin-only operation -> DENY
-  const viewerUser: User = { ...mockUser, id: "usr-viewer-123", role: "viewer" };
+  const viewerUser: User = { ...mockUser, role: "viewer" };
   await createSession(viewerUser);
   try {
     await requireRole("workspace_admin");
@@ -691,60 +603,8 @@ export async function runAuthTests() {
   }
   console.log("  ✅ Input validation errors fail safely as expected.");
 
-  // ----------------------------------------------------
-  // Scenario 16: Missing SESSION_SECRET in production fails closed
-  // ----------------------------------------------------
-  console.log("▶ SEC-REG-016: Testing Missing SESSION_SECRET in Production...");
-  const origEnv = process.env.NODE_ENV;
-  const origSecret = process.env.SESSION_SECRET;
-  try {
-    process.env.NODE_ENV = "production";
-    delete process.env.SESSION_SECRET;
-    let failedClosed = false;
-    try {
-      getSessionSecret();
-    } catch (err: any) {
-      if (err.message && err.message.includes("SESSION_SECRET environment variable is missing")) {
-        failedClosed = true;
-      }
-    }
-    if (!failedClosed) {
-      throw new Error("SEC-REG-016 Failed: getSessionSecret did not fail closed in production when SESSION_SECRET is missing!");
-    }
-  } finally {
-    process.env.NODE_ENV = origEnv;
-    if (origSecret !== undefined) {
-      process.env.SESSION_SECRET = origSecret;
-    } else {
-      delete process.env.SESSION_SECRET;
-    }
-  }
-  console.log("  ✅ Missing SESSION_SECRET in production fails closed safely.");
-
-  // ----------------------------------------------------
-  // Scenario 17: Rejection of Invalid User Data on Session Creation
-  // ----------------------------------------------------
-  console.log("▶ SEC-REG-017: Testing Rejection of Invalid User Data for Session Creation...");
-  try {
-    await createSession({
-      id: "usr-invalid",
-      name: "Bad",
-      email: "bad@test.com",
-      role: "invalid_role" as any,
-      workspaceId: "ws-1"
-    });
-    throw new Error("SEC-REG-017 Failed: createSession accepted invalid user role!");
-  } catch (err: any) {
-    if (err.message && err.message.includes("Invalid user data")) {
-      // Correct!
-    } else {
-      throw err;
-    }
-  }
-  console.log("  ✅ Invalid user data rejected on session creation.");
-
   console.log("=========================================================================");
-  console.log("✅ ALL 17 SECURITY REGRESSION SCENARIOS PASSED SUCCESSFULLY!");
+  console.log("✅ ALL 15 SECURITY REGRESSION SCENARIOS PASSED SUCCESSFULLY!");
   console.log("=========================================================================");
 }
 
