@@ -112,11 +112,11 @@ async function setupDatabase() {
 }
 
 
+export async function runAuthTests() {
   let advancedTime = 0;
   const originalSetTimeout = global.setTimeout;
-
-export async function runAuthTests() {
   global.setTimeout = ((cb: any, ms: any) => { advancedTime += ms as number; (cb as () => void)(); }) as unknown as typeof global.setTimeout;
+  try {
 
   setCookiesMock(() => ({
   set: () => {},
@@ -215,7 +215,7 @@ export async function runAuthTests() {
   try {
     const newUser = await import("../../../../src/app/actions/auth").then(m => m.registerAction("New User", "new@test.com", "newpassword123"));
     assert.equal(newUser.role, "viewer", "Default role must be viewer");
-    assert.ok(newUser.id.startsWith("usr-"), "User ID generated");
+    assert.ok(newUser.id.length > 30, "User ID generated as UUID");
 
     // Attempt to login should fail since they are unverified
     try {
@@ -253,7 +253,10 @@ export async function runAuthTests() {
     assert.fail("Concurrency test failed unexpectedly: " + err);
   }
 
-  console.log("All Authentication Security Tests Passed!"); global.setTimeout = originalSetTimeout;
+  console.log("All Authentication Security Tests Passed!");
+  } finally {
+    global.setTimeout = originalSetTimeout;
+  }
 }
 
 if (require.main === module) {

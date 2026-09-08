@@ -206,7 +206,7 @@ export async function requestPasswordResetAction(email: string): Promise<void> {
 }
 
 /**
- * Registers user, resolves identity/workspace strictly on the server, and establishes a secure signed session.
+ * Registers user and resolves identity/workspace strictly on the server.
  */
 export async function registerAction(name: string, email: string, password?: string): Promise<User> {
   const normalizedEmail = email.trim().toLowerCase();
@@ -228,7 +228,7 @@ export async function registerAction(name: string, email: string, password?: str
         throw new Error("User already exists.");
     }
 
-    const userId = `usr-${randomUUID().slice(0,8)}`;
+    const userId = randomUUID();
 
     // Create User
     await client.query("INSERT INTO users (id, name, email, password_hash, is_active, email_verified, email_verified_at) VALUES ($1, $2, $3, $4, true, false, null)", [userId, name, normalizedEmail, hashedPassword]);
