@@ -11,7 +11,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/core/database/migrator.ts",
     "db:push": "tsx scripts/database/db-push-guard.ts && drizzle-kit push",
-    "security:secrets": "tsx scripts/security/secret-hygiene.ts"
+    "security:secrets": "tsx scripts/security/secret-hygiene.ts",
+    "supervisor:check": "tsx scripts/supervisor/boundary.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.24",
