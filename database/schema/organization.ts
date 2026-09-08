@@ -7,6 +7,7 @@ import {
   boolean,
   uniqueIndex,
   index,
+  check,
   pgPolicy
 } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
@@ -47,10 +48,11 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey().default(defaultUuid),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
   passwordHash: text("password_hash"),
   passwordResetRequired: boolean("password_reset_required").notNull().default(true),
   isActive: boolean("is_active").notNull().default(true),
-  isActive: integer("is_active").notNull().default(1),
   failedLoginAttempts: integer("failed_login_attempts").notNull().default(0),
   lockedUntil: timestamp("locked_until", { withTimezone: true }),
   challengeRequired: integer("challenge_required").notNull().default(0),
@@ -118,6 +120,7 @@ export const organizationMembers = pgTable("organization_members", {
 }, (table) => [
   uniqueIndex("idx_org_members_user_org").on(table.organizationId, table.userId),
   index("idx_org_members_user_id").on(table.userId),
+  check("org_members_role_check", sql`role IN ('super_admin', 'workspace_admin', 'viewer')`),
   ...tenantPolicy("organization_id")
 ]);
 
