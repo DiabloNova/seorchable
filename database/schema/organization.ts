@@ -50,7 +50,6 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   passwordResetRequired: boolean("password_reset_required").notNull().default(true),
   isActive: boolean("is_active").notNull().default(true),
-  isActive: integer("is_active").notNull().default(1),
   failedLoginAttempts: integer("failed_login_attempts").notNull().default(0),
   lockedUntil: timestamp("locked_until", { withTimezone: true }),
   challengeRequired: integer("challenge_required").notNull().default(0),
