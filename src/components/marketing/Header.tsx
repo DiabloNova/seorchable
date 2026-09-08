@@ -81,7 +81,10 @@ export function Header() {
             {/* Platform Dropdown */}
             <Dropdown
               trigger={
-                <button className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors rounded-[var(--radius-md)]">
+                <button
+                  aria-haspopup="menu"
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors rounded-[var(--radius-md)]"
+                >
                   <span>{isFa ? "پلتفرم" : "Platform"}</span>
                   <ChevronDown size={14} />
                 </button>
@@ -96,7 +99,10 @@ export function Header() {
             {/* Solutions Dropdown */}
             <Dropdown
               trigger={
-                <button className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors rounded-[var(--radius-md)]">
+                <button
+                  aria-haspopup="menu"
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors rounded-[var(--radius-md)]"
+                >
                   <span>{isFa ? "راهکارها" : "Solutions"}</span>
                   <ChevronDown size={14} />
                 </button>

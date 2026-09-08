@@ -134,7 +134,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme, direction, language, setLanguage } = useTheme();
-  const { logout } = useAuth();
+  const { session, logout } = useAuth();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -529,16 +529,19 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
             <Dropdown
               align="right"
               trigger={
-                <button className="flex items-center gap-2 p-1 pe-2 rounded-[var(--radius-full)] hover:bg-[var(--muted-surface)] transition-colors">
+                <button
+                  aria-label={language === "fa" ? `منوی کاربر: ${session?.user?.email ?? ''}` : `User menu: ${session?.user?.email ?? ''}`}
+                  className="flex items-center gap-2 p-1 pe-2 rounded-[var(--radius-full)] hover:bg-[var(--muted-surface)] transition-colors"
+                >
                   <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--sky-blue-500)] to-[var(--orange-500)] text-white flex items-center justify-center text-xs font-bold">
-                    U
+                    {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'U'}
                   </span>
                   <span className="hidden lg:flex flex-col items-start leading-none">
                     <span className="text-xs font-semibold text-[var(--text-primary)]">
-                      User Admin
+                      {session?.user?.name || "User"}
                     </span>
                     <span className="text-[10px] text-[var(--text-muted)]">
-                      tehran@brandgraph.ai
+                      {session?.user?.email || ""}
                     </span>
                   </span>
                   <ChevronDown
