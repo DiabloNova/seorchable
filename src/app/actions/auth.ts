@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { User, Session, UserRole } from "@/types/auth";
@@ -19,9 +20,9 @@ async function progressiveDelay(attempts: number): Promise<void> {
     return; // Challenge handled elsewhere
   }
   let delay = 0;
-  if (attempts === 3) delay = 2000;
-  else if (attempts === 4) delay = 4000;
-  else if (attempts >= 5) delay = 8000;
+  if (attempts === 3) delay = 20000;
+  else if (attempts === 4) delay = 5 * 60 * 1000;
+  else if (attempts >= 5) delay = 60 * 60 * 1000;
 
   if (delay > 0) {
     await new Promise(r => setTimeout(r, delay));
@@ -44,6 +45,7 @@ async function getDummyHash(): Promise<string> {
  * Authenticates user, resolves identity/workspace strictly on the server, and establishes a secure signed session.
  */
 export async function loginAction(email: string, password?: string): Promise<User> {
+  const normalizedEmail = email.trim().toLowerCase();
   if (!password) {
     throw new Error("Password is required");
   }
@@ -60,12 +62,24 @@ export async function loginAction(email: string, password?: string): Promise<Use
     if (!client) throw new Error("Failed to get DB client in system context");
 
     // Fetch the user
-    const { rows } = await client.query("SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL", [email]);
+    const { rows } = await client.query("SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL", [normalizedEmail]);
     userRecord = rows[0];
   });
 
   if (!userRecord) {
     // Unknown account anti-enumeration: Run dummy hash, simulate a basic user delay (0 attempts = 0 delay)
+    await getDummyHash();
+    await argon2.verify(dummyHash!, password);
+    throw new Error("Invalid credentials or user not found.");
+  }
+
+  if (userRecord.is_active === 0 || userRecord.is_active === false) {
+    await getDummyHash();
+    await argon2.verify(dummyHash!, password);
+    throw new Error("Invalid credentials or user not found.");
+  }
+
+  if (userRecord.email_verified === 0 || userRecord.email_verified === false) {
     await getDummyHash();
     await argon2.verify(dummyHash!, password);
     throw new Error("Invalid credentials or user not found.");
@@ -118,7 +132,7 @@ export async function loginAction(email: string, password?: string): Promise<Use
       const newFailures = rows[0]?.failed_login_attempts || 0;
 
       if (newFailures >= 6) {
-        const lockedUntil = new Date(Date.now() + 15 * 60000).toISOString();
+        const lockedUntil = new Date(Date.now() + 60 * 60 * 1000).toISOString();
         await client.query(
           `UPDATE users
            SET challenge_required = 1, locked_until = $1
@@ -147,7 +161,7 @@ export async function loginAction(email: string, password?: string): Promise<Use
 
     const memberRecord = memberRows[0];
     if (!memberRecord) {
-        throw new Error("User does not belong to any active workspace.");
+        throw new Error("Invalid credentials or user not found.");
     }
 
     const authResult: User = {
@@ -195,6 +209,7 @@ export async function requestPasswordResetAction(email: string): Promise<void> {
  * Registers user, resolves identity/workspace strictly on the server, and establishes a secure signed session.
  */
 export async function registerAction(name: string, email: string, password?: string): Promise<User> {
+  const normalizedEmail = email.trim().toLowerCase();
   if (!password) {
     throw new Error("Password is required");
   }
@@ -208,7 +223,7 @@ export async function registerAction(name: string, email: string, password?: str
     }
 
     // Check if user exists
-    const { rows: existingUser } = await client.query("SELECT id FROM users WHERE email = $1", [email]);
+    const { rows: existingUser } = await client.query("SELECT id FROM users WHERE email = $1", [normalizedEmail]);
     if (existingUser.length > 0) {
         throw new Error("User already exists.");
     }
@@ -216,7 +231,7 @@ export async function registerAction(name: string, email: string, password?: str
     const userId = `usr-${randomUUID().slice(0,8)}`;
 
     // Create User
-    await client.query("INSERT INTO users (id, name, email, password_hash) VALUES ($1, $2, $3, $4)", [userId, name, email, hashedPassword]);
+    await client.query("INSERT INTO users (id, name, email, password_hash, is_active, email_verified, email_verified_at) VALUES ($1, $2, $3, $4, true, false, null)", [userId, name, normalizedEmail, hashedPassword]);
 
     // Create Organization (Workspace)
     const orgId = randomUUID();
@@ -226,13 +241,13 @@ export async function registerAction(name: string, email: string, password?: str
     await client.query("INSERT INTO organizations (id, name, slug) VALUES ($1, $2, $3)", [orgId, orgName, orgSlug]);
 
     // Create Membership
-    await client.query("INSERT INTO organization_members (organization_id, user_id, role) VALUES ($1, $2, $3)", [orgId, userId, "workspace_admin"]);
+    await client.query("INSERT INTO organization_members (organization_id, user_id, role) VALUES ($1, $2, $3)", [orgId, userId, "viewer"]);
 
     return {
         id: userId,
         name,
         email,
-        role: "workspace_admin" as UserRole,
+        role: "viewer" as UserRole,
         workspaceId: orgId,
     };
   });
@@ -245,7 +260,6 @@ export async function registerAction(name: string, email: string, password?: str
     console.error("Failed to send verification email:", err);
   });
 
-  await createSession(result);
   return result;
 }
 

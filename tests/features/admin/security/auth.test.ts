@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports */
 import assert from "node:assert/strict";
 import { loginAction } from "../../../../src/app/actions/auth";
 import { TenantContextManager } from "../../../../src/core/database/tenant-context";
@@ -30,6 +31,19 @@ TenantContextManager.runWithSystemContext = async (userId: any, requestId: any, 
           const o = dbOrgs.find(o => o.id === m.organization_id);
           return { rows: [{ workspaceId: m.organization_id, role: m.role, workspaceName: o?.name }] };
         }
+        if (sql.includes("INSERT INTO users")) {
+          dbUsers.push({ id: params[0], name: params[1], email: params[2], password_hash: params[3], is_active: 1, email_verified: 0, failed_login_attempts: 0, challenge_required: 0, trusted_ips: null });
+          return { rows: [] };
+        }
+        if (sql.includes("INSERT INTO organizations")) {
+          dbOrgs.push({ id: params[0], name: params[1], slug: params[2] });
+          return { rows: [] };
+        }
+        if (sql.includes("INSERT INTO organization_members")) {
+          dbMembers.push({ organization_id: params[0], user_id: params[1], role: params[2] });
+          return { rows: [] };
+        }
+
         // Allow any update string
         if (sql.includes("UPDATE users")) {
           // UPDATE failures logic
@@ -75,12 +89,14 @@ async function setupDatabase() {
   const hash = await argon2.hash("validpassword", { type: argon2.argon2id, memoryCost: 19456, timeCost: 2 } as any);
 
   dbUsers = [
-    { id: 'usr-test-1', name: 'Valid User', email: 'valid@test.com', password_hash: hash, is_active: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: ['127.0.0.1'] },
-    { id: 'usr-test-2', name: 'Locked User', email: 'locked@test.com', password_hash: hash, is_active: 1, failed_login_attempts: 6, challenge_required: 1, trusted_ips: null },
-    { id: 'usr-test-3', name: 'Delay User 1', email: 'delay1@test.com', password_hash: hash, is_active: 1, failed_login_attempts: 3, challenge_required: 0, trusted_ips: null },
-    { id: 'usr-test-4', name: 'Delay User 2', email: 'delay2@test.com', password_hash: hash, is_active: 1, failed_login_attempts: 5, challenge_required: 0, trusted_ips: null },
-    { id: 'usr-test-5', name: 'Untrusted User', email: 'untrusted@test.com', password_hash: hash, is_active: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: ['192.168.1.1'] },
-    { id: 'usr-test-6', name: 'Concurrent User', email: 'concurrent@test.com', password_hash: hash, is_active: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: null }
+    { id: 'usr-test-1', name: 'Valid User', email: 'valid@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: ['127.0.0.1'] },
+    { id: 'usr-test-2', name: 'Locked User', email: 'locked@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 6, challenge_required: 1, trusted_ips: null },
+    { id: 'usr-test-3', name: 'Delay User 1', email: 'delay1@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 3, challenge_required: 0, trusted_ips: null },
+    { id: 'usr-test-8', name: 'Delay User 4', email: 'delay_test4@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 4, challenge_required: 0, trusted_ips: null },
+    { id: 'usr-test-4', name: 'Delay User 2', email: 'delay2@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 5, challenge_required: 0, trusted_ips: null },
+    { id: 'usr-test-5', name: 'Untrusted User', email: 'untrusted@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: ['192.168.1.1'] },
+    { id: 'usr-test-7', name: 'Unverified User', email: 'unverified@test.com', password_hash: hash, is_active: 1, email_verified: 0, failed_login_attempts: 0, challenge_required: 0, trusted_ips: null },
+    { id: 'usr-test-6', name: 'Concurrent User', email: 'concurrent@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: null }
   ];
 
   dbOrgs = [{ id: 'org-test-1', name: 'Test Org', slug: 'test-org' }];
@@ -95,7 +111,13 @@ async function setupDatabase() {
   ];
 }
 
+
+  let advancedTime = 0;
+  const originalSetTimeout = global.setTimeout;
+
 export async function runAuthTests() {
+  global.setTimeout = ((cb: any, ms: any) => { advancedTime += ms as number; (cb as () => void)(); }) as unknown as typeof global.setTimeout;
+
   setCookiesMock(() => ({
   set: () => {},
   get: () => ({ value: "mock" })
@@ -125,33 +147,33 @@ export async function runAuthTests() {
   }
 
   // Test 3: Unknown Account (Anti-enumeration timing check)
-  const startUnknown = Date.now();
+  const startUnknown = Date.now(); // real clock
   try {
     await loginAction("doesnotexist@test.com", "wrongpassword");
     assert.fail("Unknown account should throw");
   } catch (err: any) {
-    const endUnknown = Date.now();
+    const endUnknown = Date.now(); // real clock
     assert.match(err.message, /Invalid credentials or user not found/);
     assert.ok((endUnknown - startUnknown) >= 10, "Unknown account verification should take time (dummy hash)");
     console.log("  ✅ Unknown account does not reveal existence");
   }
 
   // Test 4: Progressive Delays
-  const startDelay1 = Date.now();
+  const startDelay1 = advancedTime;
   try {
     await loginAction("delay1@test.com", "wrongpassword");
   } catch {}
-  const endDelay1 = Date.now();
-  assert.ok((endDelay1 - startDelay1) >= 2000, "3 attempts should delay ~2 seconds");
-  console.log("  ✅ Progressive delays enforced (3 attempts -> 2s)");
+  const endDelay1 = advancedTime;
+  assert.ok((endDelay1 - startDelay1) >= 20000, "3 attempts should delay ~20 seconds");
+  console.log("  ✅ Progressive delays enforced (3 attempts -> 20s)");
 
-  const startDelay2 = Date.now();
+  const startDelay2 = advancedTime;
   try {
     await loginAction("delay2@test.com", "wrongpassword");
   } catch {}
-  const endDelay2 = Date.now();
-  assert.ok((endDelay2 - startDelay2) >= 8000, "5 attempts should delay ~8 seconds");
-  console.log("  ✅ Progressive delays enforced (5 attempts -> 8s)");
+  const endDelay2 = advancedTime;
+  assert.ok((endDelay2 - startDelay2) >= 60 * 60 * 1000 - 1000, "5 attempts should delay ~60 minutes");
+  console.log("  ✅ Progressive delays enforced (5 attempts -> 60m)");
 
   // Test 5: Hard Lockout / Challenge
   try {
@@ -169,6 +191,46 @@ export async function runAuthTests() {
   } catch (err: any) {
     assert.match(err.message, /Login from untrusted IP/);
     console.log("  ✅ Untrusted IP logic enforced");
+  }
+
+  // Test 4b: Attempt 4 -> 5 minutes
+  const startDelay4 = advancedTime;
+  try {
+    await loginAction("delay_test4@test.com", "wrongpassword");
+  } catch {}
+  const endDelay4 = advancedTime;
+  assert.ok((endDelay4 - startDelay4) >= 5 * 60 * 1000 - 1000, "4 attempts should delay ~5 minutes");
+  console.log("  ✅ Progressive delays enforced (4 attempts -> 5m)");
+
+  // Test 8: Unverified Account
+  try {
+    await loginAction("unverified@test.com", "validpassword");
+    assert.fail("Unverified account should throw");
+  } catch (err: any) {
+    assert.match(err.message, /Invalid credentials or user not found/);
+    console.log("  ✅ Unverified account login rejected");
+  }
+
+  // Test 9: Successful Registration
+  try {
+    const newUser = await import("../../../../src/app/actions/auth").then(m => m.registerAction("New User", "new@test.com", "newpassword123"));
+    assert.equal(newUser.role, "viewer", "Default role must be viewer");
+    assert.ok(newUser.id.startsWith("usr-"), "User ID generated");
+
+    // Attempt to login should fail since they are unverified
+    try {
+      await loginAction("new@test.com", "newpassword123");
+      assert.fail("Should not allow login for unverified user");
+    } catch (e: any) {
+      if(e.code === "ERR_ASSERTION") throw e;
+      assert.match(e.message, /Invalid credentials or user not found/);
+      console.log("  ✅ Registration creates unverified user, login blocked");
+    }
+  } catch (err: any) {
+    if (err.code === 'ERR_ASSERTION') {
+        throw err;
+    }
+    assert.fail("Registration should not throw: " + err.message);
   }
 
   // Test 7: Concurrency
@@ -191,7 +253,7 @@ export async function runAuthTests() {
     assert.fail("Concurrency test failed unexpectedly: " + err);
   }
 
-  console.log("All Authentication Security Tests Passed!");
+  console.log("All Authentication Security Tests Passed!"); global.setTimeout = originalSetTimeout;
 }
 
 if (require.main === module) {
