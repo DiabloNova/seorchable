@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { firecrawlApp } from "@/lib/firecrawl";
+import { FreeAuditLimiter } from "@/services/rate-limit/free-audit-limiter";
 
 // Request validator schema
 const requestSchema = z.object({
@@ -34,6 +35,31 @@ export interface FreeAuditResponse {
 
 export async function POST(req: NextRequest) {
   try {
+    // 0. Enforce Server-Side Rate Limits and Usage Quotas upfront before parsing body or audit execution
+    const rateLimit = await FreeAuditLimiter.checkAndConsume(req);
+
+    if (!rateLimit.allowed) {
+      const isQuota = rateLimit.reason === "quota";
+      const message = isQuota
+        ? "سقف مجاز روزانه تحلیل رایگان (۱۰ درخواست در ۲۴ ساعت) تکمیل شده است. لطفاً زمان دیگری مراجعه کنید."
+        : "تعداد درخواست‌های شما بیش از حد مجاز است. لطفاً ۱ دقیقه دیگر تلاش کنید.";
+
+      const headers = new Headers();
+      headers.set("X-RateLimit-Limit", rateLimit.limit.toString());
+      headers.set("X-RateLimit-Remaining", "0");
+      headers.set("X-RateLimit-Reset", Math.floor(rateLimit.resetAt / 1000).toString());
+      headers.set("Retry-After", rateLimit.retryAfterSeconds.toString());
+
+      return NextResponse.json(
+        {
+          error: "Too Many Requests",
+          message,
+          reason: rateLimit.reason,
+        },
+        { status: 429, headers }
+      );
+    }
+
     // 1. Parse and Validate Request Body
     const body = await req.json();
     const parsed = requestSchema.safeParse(body);
@@ -297,7 +323,12 @@ export async function POST(req: NextRequest) {
       },
     };
 
-    return NextResponse.json(responsePayload);
+    const responseHeaders = new Headers();
+    responseHeaders.set("X-RateLimit-Limit", rateLimit.limit.toString());
+    responseHeaders.set("X-RateLimit-Remaining", rateLimit.remaining.toString());
+    responseHeaders.set("X-RateLimit-Reset", Math.floor(rateLimit.resetAt / 1000).toString());
+
+    return NextResponse.json(responsePayload, { headers: responseHeaders });
   } catch (error: unknown) {
     console.error("[Free SEO Audit API Route Error]:", error);
     const message = error instanceof Error ? error.message : "خطای ناشناخته رخ داده است.";

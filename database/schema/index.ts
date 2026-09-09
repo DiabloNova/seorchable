@@ -5,6 +5,7 @@ export * from "./audits";
 export * from "./credits";
 export * from "./credit-transactions";
 export * from "./audits";
+export * from "./unauthenticated-rate-limits";
 import {
   pgTable,
   AnyPgColumn,
