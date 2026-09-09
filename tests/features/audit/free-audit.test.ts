@@ -1,31 +1,37 @@
 /**
  * Automated Test Suite for Free SEO Audit (Firecrawl Lead Magnet Module)
  * Verifies precise scoring heuristics, Persian quick-tip generation,
- * Grade boundaries, and mock-based Firecrawl App scraping.
+ * Grade boundaries, mock-based Firecrawl App scraping,
+ * Server-Side Rate Limits & Usage Quotas, and Security Boundary Contracts.
  */
 
 import { NextRequest } from "next/server";
 import { POST, FreeAuditResponse } from "../../../src/app/api/v1/audit/free/route";
 import { firecrawlApp } from "../../../src/lib/firecrawl";
+import { FreeAuditLimiter, FREE_AUDIT_LIMITS } from "../../../src/services/rate-limit/free-audit-limiter";
 
 export async function testFreeAudit() {
-  console.log("▶ Running Free SEO Audit Lead Magnet Tests...");
-
-  // Save original scrapeUrl method
+  const originalEnv = process.env.NODE_ENV;
+  const originalKey = process.env.FIRECRAWL_API_KEY;
   const originalScrapeUrl = firecrawlApp.scrapeUrl;
 
   try {
+    process.env.NODE_ENV = "test";
+    console.log("▶ Running Free SEO Audit Lead Magnet Tests...");
+
+    // ----------------------------------------------------
     // 1. Scenario A: Perfect Scrape (Score 100, Grade A)
+    // ----------------------------------------------------
+    FreeAuditLimiter.resetTestStore();
     console.log("  * Scenario A: Testing Perfect Score (100) & Grade A...");
     (firecrawlApp as any).scrapeUrl = async (url: string, options?: any): Promise<any> => {
-      // Avoid unused variable warnings
       if (!url || !options) return null;
       return {
         success: true,
         markdown: "# Welcome to Optimus AI\nThis is a beautiful page content.",
         metadata: {
-          title: "تحلیل پیشرفته سئو معنایی و هوشمندسازی کسب‌وکار آنلاین", // Exactly 53 chars (between 50 and 60)
-          description: "تحلیل جامع ساختار سئو معنایی، پایش سلامت احساسات برند، استخراج تخصصی گراف دانش و بررسی بهینه‌سازی موتورهای پاسخ‌دهی هوشمند به زبان فارسی انجام می‌گردد.", // Exactly 152 chars (between 150 and 160)
+          title: "تحلیل پیشرفته سئو معنایی و هوشمندسازی کسب‌وکار آنلاین", // 53 chars
+          description: "تحلیل جامع ساختار سئو معنایی، پایش سلامت احساسات برند، استخراج تخصصی گراف دانش و بررسی بهینه‌سازی موتورهای پاسخ‌دهی هوشمند به زبان فارسی انجام می‌گردد.", // 152 chars
           language: "fa",
           robots: "index, follow",
         },
@@ -34,6 +40,7 @@ export async function testFreeAudit() {
 
     const reqA = new NextRequest("http://localhost/api/v1/audit/free", {
       method: "POST",
+      headers: { "x-forwarded-for": "198.51.100.1" },
       body: JSON.stringify({ url: "https://optimus.ai" }),
     });
 
@@ -58,10 +65,12 @@ export async function testFreeAudit() {
 
     console.log(`  * Success: Perfect page scored ${perfectPayload.score} with Grade ${perfectPayload.grade} and perfect general Persian tips.`);
 
+    // ----------------------------------------------------
     // 2. Scenario B: Imperfect/Poor Scrape (Missing tags, HTTP, noindex -> score 0, Grade F)
+    // ----------------------------------------------------
+    FreeAuditLimiter.resetTestStore();
     console.log("  * Scenario B: Testing Poor Score & Grade F...");
     (firecrawlApp as any).scrapeUrl = async (url: string, options?: any): Promise<any> => {
-      // Avoid unused variable warnings
       if (!url || !options) return null;
       return {
         success: true,
@@ -77,7 +86,8 @@ export async function testFreeAudit() {
 
     const reqB = new NextRequest("http://localhost/api/v1/audit/free", {
       method: "POST",
-      body: JSON.stringify({ url: "http://poor-site.com" }), // HTTP (not HTTPS)
+      headers: { "x-forwarded-for": "198.51.100.2" },
+      body: JSON.stringify({ url: "http://poor-site.com" }),
     });
 
     const resB = await POST(reqB);
@@ -95,13 +105,11 @@ export async function testFreeAudit() {
       throw new Error(`Scenario B Failed: Expected grade F, got ${poorPayload.grade}`);
     }
 
-    // Verify checks are all false
     const { checks } = poorPayload;
     if (checks.hasTitle || checks.hasMetaDescription || checks.hasH1 || checks.isHttps || checks.hasLanguage || checks.isIndexable) {
       throw new Error(`Scenario B Failed: Expected all checks to be false, got ${JSON.stringify(checks)}`);
     }
 
-    // Verify correct custom tips mapping exists for sliced high priority issues (Title, Meta Description, H1)
     const hasTitleTip = (poorPayload.quickTips as Array<{ issue: string; recommendation: string }>).some((tip) => tip.issue.includes("عنوان"));
     const hasMetaTip = (poorPayload.quickTips as Array<{ issue: string; recommendation: string }>).some((tip) => tip.issue.includes("توضیحات"));
     const hasH1Tip = (poorPayload.quickTips as Array<{ issue: string; recommendation: string }>).some((tip) => tip.issue.includes("H1"));
@@ -111,10 +119,14 @@ export async function testFreeAudit() {
 
     console.log(`  * Success: Non-optimized page scored ${poorPayload.score} with Grade ${poorPayload.grade} and custom warning tips.`);
 
+    // ----------------------------------------------------
     // 3. Scenario C: Invalid URL rejection
+    // ----------------------------------------------------
+    FreeAuditLimiter.resetTestStore();
     console.log("  * Scenario C: Testing Invalid URL rejection...");
     const reqC = new NextRequest("http://localhost/api/v1/audit/free", {
       method: "POST",
+      headers: { "x-forwarded-for": "198.51.100.3" },
       body: JSON.stringify({ url: "not-a-valid-url" }),
     });
 
@@ -131,9 +143,194 @@ export async function testFreeAudit() {
 
     console.log("  * Success: Invalid URL rejected correctly with Persian instructions.");
 
+    // ----------------------------------------------------
+    // 4. Scenario D: Rate Limiting & Daily Quota Deterministic Clock Control
+    // ----------------------------------------------------
+    FreeAuditLimiter.resetTestStore();
+    process.env.FIRECRAWL_API_KEY = "fc-real-test-key";
+    console.log("  * Scenario D: Testing Short-Window Rate Limits, Daily Quotas & Reset Semantics...");
+
+    let scrapeCalls = 0;
+    (firecrawlApp as any).scrapeUrl = async (): Promise<any> => {
+      scrapeCalls++;
+      return {
+        success: true,
+        markdown: "# Title\nContent",
+        metadata: { title: "Title", description: "Desc", language: "fa", robots: "index" },
+      };
+    };
+
+    const testClientIp = "203.0.113.100";
+    const T0 = 1700000000000; // Fixed base timestamp (ms)
+
+    // Helper to send POST request with simulated clock
+    const sendRequestAt = async (nowMs: number) => {
+      FreeAuditLimiter.setTestTime(nowMs);
+      const req = new NextRequest("http://localhost/api/v1/audit/free", {
+        method: "POST",
+        headers: { "x-forwarded-for": testClientIp },
+        body: JSON.stringify({ url: "https://limiter-test.com" }),
+      });
+      const routeRes = await POST(req);
+      return {
+        status: routeRes.status,
+        headers: routeRes.headers,
+        body: await routeRes.json(),
+      };
+    };
+
+    // Step D1: Send requests 1 to 5 at T0
+    console.log("    - Testing Batch 1 (Requests 1 to 5 at T0)...");
+    for (let i = 1; i <= 5; i++) {
+      const res = await sendRequestAt(T0);
+      if (res.status !== 200) {
+        throw new Error(`Scenario D1 Failed: Request ${i} expected 200, got ${res.status}`);
+      }
+      const remainingHeader = res.headers.get("X-RateLimit-Remaining");
+      const expectedRemaining = (5 - i).toString();
+      if (remainingHeader !== expectedRemaining) {
+        throw new Error(`Scenario D1 Failed: Request ${i} expected X-RateLimit-Remaining ${expectedRemaining}, got ${remainingHeader}`);
+      }
+    }
+    if (scrapeCalls !== 5) {
+      throw new Error(`Scenario D1 Failed: Expected 5 scrape calls, got ${scrapeCalls}`);
+    }
+
+    // Step D2: 6th request sent immediately at T0 is rejected by short window
+    console.log("    - Testing 6th request at T0 (Short-window breach)...");
+    const res6 = await sendRequestAt(T0);
+    if (res6.status !== 429) {
+      throw new Error(`Scenario D2 Failed: Expected 429 for 6th request, got ${res6.status}`);
+    }
+    if (res6.body.reason !== "rate_limit") {
+      throw new Error(`Scenario D2 Failed: Expected reason 'rate_limit', got ${res6.body.reason}`);
+    }
+    if (res6.headers.get("X-RateLimit-Limit") !== "5") {
+      throw new Error(`Scenario D2 Failed: Expected X-RateLimit-Limit 5, got ${res6.headers.get("X-RateLimit-Limit")}`);
+    }
+    if (res6.headers.get("X-RateLimit-Remaining") !== "0") {
+      throw new Error(`Scenario D2 Failed: Expected X-RateLimit-Remaining 0, got ${res6.headers.get("X-RateLimit-Remaining")}`);
+    }
+    if (res6.headers.get("Retry-After") !== "60") {
+      throw new Error(`Scenario D2 Failed: Expected Retry-After 60, got ${res6.headers.get("Retry-After")}`);
+    }
+    if (scrapeCalls !== 5) {
+      throw new Error(`Scenario D2 Failed: Rejected request 6 should NOT call scrape. Scrape calls is ${scrapeCalls}`);
+    }
+
+    // Step D3: Advance fake clock by 61 seconds (T0 + 61,000ms) -> Short window resets, daily count stays 5/10
+    console.log("    - Testing Batch 2 (Requests 6 to 10 at T0 + 61s)...");
+    const T1 = T0 + 61 * 1000;
+    for (let i = 6; i <= 10; i++) {
+      const res = await sendRequestAt(T1);
+      if (res.status !== 200) {
+        throw new Error(`Scenario D3 Failed: Request ${i} expected 200, got ${res.status}`);
+      }
+    }
+    if (scrapeCalls !== 10) {
+      throw new Error(`Scenario D3 Failed: Expected 10 scrape calls total, got ${scrapeCalls}`);
+    }
+
+    // Step D4: Advance fake clock by another 61 seconds (T0 + 122,000ms) -> Short window resets to 0, but daily count is 10/10
+    console.log("    - Testing 11th request at T0 + 122s (Daily Quota breach)...");
+    const T2 = T0 + 122 * 1000;
+    const res11 = await sendRequestAt(T2);
+
+    if (res11.status !== 429) {
+      throw new Error(`Scenario D4 Failed: Expected status 429 for 11th request, got ${res11.status}`);
+    }
+    if (res11.body.reason !== "quota") {
+      throw new Error(`Scenario D4 Failed: Expected reason 'quota', got ${res11.body.reason}`);
+    }
+    if (res11.headers.get("X-RateLimit-Limit") !== "10") {
+      throw new Error(`Scenario D4 Failed: Expected X-RateLimit-Limit 10 for daily quota breach, got ${res11.headers.get("X-RateLimit-Limit")}`);
+    }
+    if (res11.headers.get("X-RateLimit-Remaining") !== "0") {
+      throw new Error(`Scenario D4 Failed: Expected X-RateLimit-Remaining 0, got ${res11.headers.get("X-RateLimit-Remaining")}`);
+    }
+
+    // Verify resetAt and Retry-After reflect daily window reset (T0 + 24 hours = T0 + 86,400,000ms)
+    const expectedDailyResetSec = Math.floor((T0 + FREE_AUDIT_LIMITS.DAILY_WINDOW_MS) / 1000);
+    const actualResetSec = Number(res11.headers.get("X-RateLimit-Reset"));
+    if (actualResetSec !== expectedDailyResetSec) {
+      throw new Error(`Scenario D4 Failed: Expected X-RateLimit-Reset ${expectedDailyResetSec}, got ${actualResetSec}`);
+    }
+
+    const expectedRetryAfterSec = Math.ceil((T0 + FREE_AUDIT_LIMITS.DAILY_WINDOW_MS - T2) / 1000);
+    const actualRetryAfterSec = Number(res11.headers.get("Retry-After"));
+    if (actualRetryAfterSec !== expectedRetryAfterSec) {
+      throw new Error(`Scenario D4 Failed: Expected Retry-After ${expectedRetryAfterSec}, got ${actualRetryAfterSec}`);
+    }
+
+    if (scrapeCalls !== 10) {
+      throw new Error(`Scenario D4 Failed: Rejected 11th request should NOT call scrape. Scrape calls is ${scrapeCalls}`);
+    }
+
+    // Step D5: Advance fake clock by 24 hours + 1 second (T0 + 86,401,000ms) -> Daily quota resets to 0
+    console.log("    - Testing 12th request after 24h reset (T0 + 24h + 1s)...");
+    const T3 = T0 + FREE_AUDIT_LIMITS.DAILY_WINDOW_MS + 1000;
+    const res12 = await sendRequestAt(T3);
+
+    if (res12.status !== 200) {
+      throw new Error(`Scenario D5 Failed: Request 12 expected 200 after 24h reset, got ${res12.status}`);
+    }
+    if (scrapeCalls !== 11) {
+      throw new Error(`Scenario D5 Failed: Expected 11 scrape calls total after 12th request, got ${scrapeCalls}`);
+    }
+
+    console.log("  * Success: Short-window rate limit, daily quota enforcement, reset headers & deterministic clock control verified.");
+
+    // ----------------------------------------------------
+    // 5. Scenario E: Security Boundary & Production Identity Contract
+    // ----------------------------------------------------
+    console.log("  * Scenario E: Testing Security Boundary & Production Identity Contracts...");
+    process.env.NODE_ENV = "production";
+
+    // E1: Production request with client-supplied x-forwarded-for but missing req.ip -> fails closed safely
+    const reqE1 = new NextRequest("http://localhost/api/v1/audit/free", {
+      method: "POST",
+      headers: { "x-forwarded-for": "1.2.3.4" },
+      body: JSON.stringify({ url: "https://production-test.com" }),
+    });
+
+    let e1ErrorCaught = false;
+    try {
+      FreeAuditLimiter.getClientIdentifier(reqE1);
+    } catch (err) {
+      if ((err as Error).message === "UNIDENTIFIABLE_CLIENT") {
+        e1ErrorCaught = true;
+      }
+    }
+    if (!e1ErrorCaught) {
+      throw new Error("Scenario E1 Failed: Production request without req.ip must throw UNIDENTIFIABLE_CLIENT and fail closed.");
+    }
+
+    const resE1 = await POST(reqE1);
+    if (resE1.status !== 400) {
+      throw new Error(`Scenario E1 Failed: Expected status 400 for unidentifiable production request, got ${resE1.status}`);
+    }
+
+    // E2: Production request with req.ip set directly ignores client-supplied x-forwarded-for
+    const reqE2 = new NextRequest("http://localhost/api/v1/audit/free", {
+      method: "POST",
+      headers: { "x-forwarded-for": "10.0.0.1" },
+      body: JSON.stringify({ url: "https://production-test.com" }),
+    });
+    (reqE2 as unknown as { ip: string }).ip = "203.0.113.50";
+
+    const derivedIpE2 = FreeAuditLimiter.getClientIdentifier(reqE2);
+    if (derivedIpE2 !== "203.0.113.50") {
+      throw new Error(`Scenario E2 Failed: Expected req.ip '203.0.113.50', got '${derivedIpE2}'`);
+    }
+
+    console.log("  * Success: Production identity security contract & fail-closed behavior verified.");
+
   } finally {
-    // Restore original scrape implementation
+    // Restore original process environment and scrape implementation
+    process.env.NODE_ENV = originalEnv;
+    process.env.FIRECRAWL_API_KEY = originalKey;
     firecrawlApp.scrapeUrl = originalScrapeUrl;
+    FreeAuditLimiter.resetTestStore();
   }
 
   console.log("✅ Free SEO Audit Lead Magnet Tests Passed Successfully!");
