@@ -62,7 +62,7 @@ export class AIVisibilityAuditEngine {
       version: 1
     };
 
-    let audit: AIVisibilityAudit = {
+    const audit: AIVisibilityAudit = {
       id: auditId,
       organizationId,
       brandId,
@@ -687,12 +687,12 @@ export class AIVisibilityAuditEngine {
    * - Answer Inclusion: 20%
    */
   private computeOverallScore(metrics: AIVisibilityAuditMetrics): number {
-    let visWeight = 0.20;
-    let mentionWeight = 0.15;
-    let entityWeight = 0.15;
+    const visWeight = 0.20;
+    const mentionWeight = 0.15;
+    const entityWeight = 0.15;
     let citationWeight = 0.15;
     let authorityWeight = 0.15;
-    let inclusionWeight = 0.20;
+    const inclusionWeight = 0.20;
 
     // Redribute Source Authority weight to Citation Presence if authority data is missing (Score is 0)
     if (metrics.sourceAuthorityScore === 0) {

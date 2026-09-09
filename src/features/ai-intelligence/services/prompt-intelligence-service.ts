@@ -419,7 +419,7 @@ export class PromptIntelligenceService {
       // 1. Numbered List Analysis (e.g. "1. Rasha Gostar" or "1- Rasha Gostar" or "1 - رشا گستر")
       const numberedRegex = /(?:^|\n)\s*(\d+)[\.\-\)]\s*([^?\n]+)/gi;
       let match;
-      let listIndex = 1;
+      const listIndex = 1;
       let matchedInList = false;
 
       while ((match = numberedRegex.exec(text)) !== null) {

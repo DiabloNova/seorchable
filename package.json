@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "npx tsx scripts/generate-docs-data.ts && next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "node lint-wrapper.js",
     "test:acquisition": "tsx tests/features/acquisition/run-all.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/core/database/migrator.ts",

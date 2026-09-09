@@ -16,7 +16,20 @@ async function main(): Promise<void> {
   await testProviders();
   await testRouter();
   await testHttpProviderLimits();
-  console.log("✅ acquisition suites passed");
+
+  // Dynamically count the number of test suites called
+  const suiteCount = [
+    testUrl,
+    testPolicyIdentity,
+    testSecurity,
+    testStateMachine,
+    testFetcher,
+    testProviders,
+    testRouter,
+    testHttpProviderLimits
+  ].length;
+
+  console.log(`✅ acquisition suites passed (${suiteCount} suites collected)`);
 }
 
 main().catch((error: unknown) => {
