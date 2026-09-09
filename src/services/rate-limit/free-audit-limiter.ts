@@ -3,7 +3,7 @@ import { PostgresClient } from "../../features/admin/infrastructure/persistence/
 
 export interface RateLimitResult {
   allowed: boolean;
-  reason?: "rate_limit" | "quota";
+  reason?: "rate_limit" | "quota" | "unidentifiable";
   limit: number;
   remaining: number;
   resetAt: number; // Unix timestamp in ms
@@ -53,15 +53,16 @@ export class FreeAuditLimiter {
    * Extracts trusted client IP identifier.
    * In production (NODE_ENV === "production"):
    *   Strictly uses req.ip (provided authoritatively by Next.js edge platform runtime).
-   *   Client-supplied X-Forwarded-For is NOT trusted in production.
-   *   If req.ip is undefined, falls back safely to "127.0.0.1" (server socket local fallback).
+   *   Client-supplied X-Forwarded-For is NEVER trusted in production.
+   *   If req.ip is undefined or blank in production, throws UNIDENTIFIABLE_CLIENT to fail closed safely
+   *   and prevent unsafe client collapse into a shared bucket.
    * In test environment (NODE_ENV === "test"):
-   *   If req.ip is undefined, permits reading x-forwarded-for to allow Node test runner multi-client tests.
+   *   If req.ip is undefined, permits reading x-forwarded-for or falling back to "127.0.0.1" for Node unit tests.
    */
   public static getClientIdentifier(req: NextRequest): string {
     const isTestEnv = process.env.NODE_ENV === "test";
 
-    // Standard NextRequest req.ip
+    // Standard NextRequest req.ip (server-derived from trusted platform runtime socket/edge)
     const reqIp = (req as unknown as { ip?: string }).ip;
     if (reqIp && reqIp.trim().length > 0) {
       return reqIp.trim();
@@ -75,9 +76,11 @@ export class FreeAuditLimiter {
           return firstIp;
         }
       }
+      return "127.0.0.1";
     }
 
-    return "127.0.0.1";
+    // In production, missing req.ip fails closed to prevent unsafe IP collapse
+    throw new Error("UNIDENTIFIABLE_CLIENT");
   }
 
   /**
@@ -87,9 +90,25 @@ export class FreeAuditLimiter {
     req: NextRequest,
     options?: LimiterOptions
   ): Promise<RateLimitResult> {
-    const identifier = this.getClientIdentifier(req);
     const now = options?.nowMs ?? this.testNowMs ?? Date.now();
     const isTestEnv = process.env.NODE_ENV === "test";
+
+    let identifier: string;
+    try {
+      identifier = this.getClientIdentifier(req);
+    } catch (err) {
+      if ((err as Error).message === "UNIDENTIFIABLE_CLIENT") {
+        return {
+          allowed: false,
+          reason: "unidentifiable",
+          limit: FREE_AUDIT_LIMITS.SHORT_LIMIT,
+          remaining: 0,
+          resetAt: now + FREE_AUDIT_LIMITS.SHORT_WINDOW_MS,
+          retryAfterSeconds: Math.ceil(FREE_AUDIT_LIMITS.SHORT_WINDOW_MS / 1000),
+        };
+      }
+      throw err;
+    }
 
     // In unit testing environment, use atomic memory store logic
     if (isTestEnv) {
@@ -201,19 +220,7 @@ export class FreeAuditLimiter {
   ): Promise<RateLimitResult> {
     const pg = PostgresClient.getInstance();
 
-    // Ensure table exists defensively
-    await pg.query(`
-      CREATE TABLE IF NOT EXISTS unauthenticated_audit_rate_limits (
-        identifier VARCHAR(255) PRIMARY KEY,
-        short_window_start TIMESTAMPTZ NOT NULL,
-        short_window_count INTEGER NOT NULL DEFAULT 0,
-        daily_window_start TIMESTAMPTZ NOT NULL,
-        daily_window_count INTEGER NOT NULL DEFAULT 0,
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      );
-    `);
-
-    // Execute single atomic SQL transaction
+    // Execute single atomic SQL transaction (no runtime DDL)
     const client = await pg.getPool().connect();
     try {
       await client.query("BEGIN;");

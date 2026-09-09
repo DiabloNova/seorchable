@@ -39,6 +39,17 @@ export async function POST(req: NextRequest) {
     const rateLimit = await FreeAuditLimiter.checkAndConsume(req);
 
     if (!rateLimit.allowed) {
+      if (rateLimit.reason === "unidentifiable") {
+        return NextResponse.json(
+          {
+            error: "Bad Request",
+            message: "امکان شناسایی مبدأ درخواست وجود ندارد.",
+            reason: rateLimit.reason,
+          },
+          { status: 400 }
+        );
+      }
+
       const isQuota = rateLimit.reason === "quota";
       const message = isQuota
         ? "سقف مجاز روزانه تحلیل رایگان (۱۰ درخواست در ۲۴ ساعت) تکمیل شده است. لطفاً زمان دیگری مراجعه کنید."

@@ -2,7 +2,7 @@
  * Automated Test Suite for Free SEO Audit (Firecrawl Lead Magnet Module)
  * Verifies precise scoring heuristics, Persian quick-tip generation,
  * Grade boundaries, mock-based Firecrawl App scraping,
- * and Server-Side Rate Limits & Usage Quotas.
+ * Server-Side Rate Limits & Usage Quotas, and Security Boundary Contracts.
  */
 
 import { NextRequest } from "next/server";
@@ -11,13 +11,14 @@ import { firecrawlApp } from "../../../src/lib/firecrawl";
 import { FreeAuditLimiter, FREE_AUDIT_LIMITS } from "../../../src/services/rate-limit/free-audit-limiter";
 
 export async function testFreeAudit() {
-  process.env.NODE_ENV = "test";
-  console.log("▶ Running Free SEO Audit Lead Magnet Tests...");
-
-  // Save original scrapeUrl method
+  const originalEnv = process.env.NODE_ENV;
+  const originalKey = process.env.FIRECRAWL_API_KEY;
   const originalScrapeUrl = firecrawlApp.scrapeUrl;
 
   try {
+    process.env.NODE_ENV = "test";
+    console.log("▶ Running Free SEO Audit Lead Magnet Tests...");
+
     // ----------------------------------------------------
     // 1. Scenario A: Perfect Scrape (Score 100, Grade A)
     // ----------------------------------------------------
@@ -279,9 +280,57 @@ export async function testFreeAudit() {
 
     console.log("  * Success: Short-window rate limit, daily quota enforcement, reset headers & deterministic clock control verified.");
 
+    // ----------------------------------------------------
+    // 5. Scenario E: Security Boundary & Production Identity Contract
+    // ----------------------------------------------------
+    console.log("  * Scenario E: Testing Security Boundary & Production Identity Contracts...");
+    process.env.NODE_ENV = "production";
+
+    // E1: Production request with client-supplied x-forwarded-for but missing req.ip -> fails closed safely
+    const reqE1 = new NextRequest("http://localhost/api/v1/audit/free", {
+      method: "POST",
+      headers: { "x-forwarded-for": "1.2.3.4" },
+      body: JSON.stringify({ url: "https://production-test.com" }),
+    });
+
+    let e1ErrorCaught = false;
+    try {
+      FreeAuditLimiter.getClientIdentifier(reqE1);
+    } catch (err) {
+      if ((err as Error).message === "UNIDENTIFIABLE_CLIENT") {
+        e1ErrorCaught = true;
+      }
+    }
+    if (!e1ErrorCaught) {
+      throw new Error("Scenario E1 Failed: Production request without req.ip must throw UNIDENTIFIABLE_CLIENT and fail closed.");
+    }
+
+    const resE1 = await POST(reqE1);
+    if (resE1.status !== 400) {
+      throw new Error(`Scenario E1 Failed: Expected status 400 for unidentifiable production request, got ${resE1.status}`);
+    }
+
+    // E2: Production request with req.ip set directly ignores client-supplied x-forwarded-for
+    const reqE2 = new NextRequest("http://localhost/api/v1/audit/free", {
+      method: "POST",
+      headers: { "x-forwarded-for": "10.0.0.1" },
+      body: JSON.stringify({ url: "https://production-test.com" }),
+    });
+    (reqE2 as unknown as { ip: string }).ip = "203.0.113.50";
+
+    const derivedIpE2 = FreeAuditLimiter.getClientIdentifier(reqE2);
+    if (derivedIpE2 !== "203.0.113.50") {
+      throw new Error(`Scenario E2 Failed: Expected req.ip '203.0.113.50', got '${derivedIpE2}'`);
+    }
+
+    console.log("  * Success: Production identity security contract & fail-closed behavior verified.");
+
   } finally {
-    // Restore original scrape implementation
+    // Restore original process environment and scrape implementation
+    process.env.NODE_ENV = originalEnv;
+    process.env.FIRECRAWL_API_KEY = originalKey;
     firecrawlApp.scrapeUrl = originalScrapeUrl;
+    FreeAuditLimiter.resetTestStore();
   }
 
   console.log("✅ Free SEO Audit Lead Magnet Tests Passed Successfully!");
