@@ -8,17 +8,7 @@ import { testStateMachine } from "./state-machine.test";
 import { testUrl } from "./url.test";
 
 async function main(): Promise<void> {
-  testUrl();
-  testPolicyIdentity();
-  await testSecurity();
-  testStateMachine();
-  await testFetcher();
-  await testProviders();
-  await testRouter();
-  await testHttpProviderLimits();
-
-  // Dynamically count the number of test suites called
-  const suiteCount = [
+  const suites = [
     testUrl,
     testPolicyIdentity,
     testSecurity,
@@ -27,9 +17,15 @@ async function main(): Promise<void> {
     testProviders,
     testRouter,
     testHttpProviderLimits
-  ].length;
+  ];
 
-  console.log(`✅ acquisition suites passed (${suiteCount} suites collected)`);
+  let executedCount = 0;
+  for (const suite of suites) {
+    await suite();
+    executedCount++;
+  }
+
+  console.log(`✅ acquisition suites passed (${executedCount} suites collected)`);
 }
 
 main().catch((error: unknown) => {

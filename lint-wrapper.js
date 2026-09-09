@@ -15,6 +15,11 @@ const { ESLint } = require("eslint");
 
   const filesRead = results.length;
 
+  if (filesRead === 0) {
+    console.error("Lint failure: 0 files scanned (empty run).");
+    process.exit(1);
+  }
+
   const formatter = await eslint.loadFormatter("stylish");
   const resultText = await formatter.format(results);
 
@@ -29,4 +34,7 @@ const { ESLint } = require("eslint");
   if (errorCount > 0) {
       process.exit(1);
   }
-})().catch(console.error);
+})().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

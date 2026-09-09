@@ -16,9 +16,12 @@ jobs:
           command: mkdir -p ~/artifacts
       - run:
           name: Copy artifacts
-          # Swallowing exit code (|| true) here is justified because not all projects generate all these artifact directories; failing here would fail the build for a legitimate absence of an optional output directory.
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts
-            2>/dev/null || true
+          command: |
+            for dir in build dist public .output .next .docusaurus; do
+              if [ -d "$dir" ]; then
+                cp -R "$dir" ~/artifacts/
+              fi
+            done
       - store_artifacts:
           path: ~/artifacts
           destination: node-build
