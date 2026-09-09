@@ -40,12 +40,14 @@ function runCheck() {
     const files = gitFilesOutput.split('\n').filter(Boolean);
 
     let hasSecrets = false;
+    let filesScanned = 0;
 
     for (const file of files) {
       // Check for tracked runtime .env variants
       if (file.match(/(^|\/)\.env($|\.(local|development|test|production))/)) {
         console.error(`Secret hygiene check: FAIL\n\nPotential secret detected:\n  file: ${file}\n  type: populated-runtime-env`);
         hasSecrets = true;
+        filesScanned++;
         continue;
       }
 
@@ -65,6 +67,7 @@ function runCheck() {
       let content: string;
       try {
         content = readFileSync(join(process.cwd(), file), 'utf-8');
+        filesScanned++;
       } catch (err) {
         // File might have been deleted but still in git index, skip
         continue;
@@ -79,11 +82,16 @@ function runCheck() {
       }
     }
 
+    if (filesScanned === 0) {
+      console.error("Secret hygiene check: FAIL (0 files scanned, empty run detected)");
+      process.exit(1);
+    }
+
     if (hasSecrets) {
-      console.log(`Secret hygiene check: FAIL (scanned ${files.length} files)`);
+      console.log(`Secret hygiene check: FAIL (scanned ${filesScanned} files)`);
       process.exit(1);
     } else {
-      console.log(`Secret hygiene check: PASS (scanned ${files.length} files)`);
+      console.log(`Secret hygiene check: PASS (scanned ${filesScanned} files)`);
       process.exit(0);
     }
   } catch (error) {
