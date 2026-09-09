@@ -268,7 +268,7 @@ export const ContentStudio: React.FC = () => {
                   {keywords.map((kw, i) => (
                     <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-lg bg-sky-500/10 border border-sky-500/25 text-sky-400 animate-fade-in">
                       <span>{kw}</span>
-                      <button type="button" onClick={() => handleRemoveKeyword(i)} className="hover:text-red-400 transition-colors">
+                      <button type="button" aria-label={isRtl ? "حذف کلمه کلیدی" : "Remove keyword"} onClick={() => handleRemoveKeyword(i)} className="hover:text-red-400 transition-colors">
                         <X size={10} />
                       </button>
                     </span>
