@@ -220,6 +220,7 @@ export default function ServiceMarketplaceClient({
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
+              aria-label={isRtl ? "پاک کردن جستجو" : "Clear search"}
               className={`absolute top-1/2 -translate-y-1/2 ${
                 isRtl ? "left-4" : "right-4"
               } text-[var(--text-muted)] hover:text-[var(--text-primary)] p-0.5 rounded-full hover:bg-[var(--muted-surface)]`}

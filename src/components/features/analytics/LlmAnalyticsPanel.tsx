@@ -317,6 +317,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
                       {!isPending && (
                         <button
                           type="button"
+                          aria-label={isRtl ? "حذف رقیب" : "Remove competitor"}
                           onClick={() => removeCompetitor(comp)}
                           className="hover:text-[var(--text-primary)] transition-colors"
                         >

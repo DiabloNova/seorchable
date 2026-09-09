@@ -252,6 +252,7 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                   />
                   <button
                     type="button"
+                    aria-label={isRtl ? "حذف رقیب" : "Remove competitor"}
                     onClick={() => handleRemoveCompetitor(idx)}
                     disabled={isLoading}
                     className="p-2.5 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all"
