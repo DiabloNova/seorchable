@@ -80,9 +80,10 @@ function runCheck() {
     }
 
     if (hasSecrets) {
+      console.log(`Secret hygiene check: FAIL (scanned ${files.length} files)`);
       process.exit(1);
     } else {
-      console.log('Secret hygiene check: PASS');
+      console.log(`Secret hygiene check: PASS (scanned ${files.length} files)`);
       process.exit(0);
     }
   } catch (error) {

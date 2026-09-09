@@ -17,7 +17,7 @@ export function generateRecommendations(
     let category: "technical" | "content" | "entity" | "structured_data" = "technical";
     let priority: "high" | "medium" | "low" = "medium";
     let recommendationText = "";
-    let issueText = c.description;
+    const issueText = c.description;
 
     // Map Category & Priorities
     if (c.name.toLowerCase().includes("technical")) {

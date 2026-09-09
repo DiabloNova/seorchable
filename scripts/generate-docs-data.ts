@@ -107,7 +107,7 @@ export const DOCS_INDEX: DocMeta[] = [\n`;
   indexOutput += `];\n`;
   fs.writeFileSync(path.join(process.cwd(), "src/lib/docsIndex.ts"), indexOutput);
 
-  console.log("Generated docs index metadata with content snippets.");
+  console.log(`Generated docs index metadata with content snippets. (${docs.length} files scanned)`);
 }
 
 generate();

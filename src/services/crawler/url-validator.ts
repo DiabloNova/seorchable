@@ -27,7 +27,7 @@ export async function isSafeUrlAsync(urlString: string): Promise<boolean> {
   }
 
   // 3. Resolve DNS to get actual IP addresses
-  let addresses: string[] = [];
+  const addresses: string[] = [];
 
   // If it's already an IP, we can just check it, but dns.lookup handles IPs natively
   try {

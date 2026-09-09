@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
         const isMockMode = !apiKey || apiKey === "" || apiKey.includes("your-api-key") || apiKey.startsWith("fc-your-");
 
         let userPageCountHeuristic = 120;
-        let userFreshnessHeuristic = 85;
+        const userFreshnessHeuristic = 85;
 
         if (!isMockMode) {
           try {

@@ -96,9 +96,9 @@ export const dashboardHomeService = {
         let technicalHealth: number | "N/A" = "N/A";
         let contentHealth: number | "N/A" = "N/A";
         let aiVisibility: number | "N/A" = "N/A";
-        let brandAuthority: number | "N/A" = "N/A";
-        let citationVisibility: number | "N/A" = "N/A";
-        let competitivePosition: string | "N/A" = "N/A";
+        const brandAuthority: number | "N/A" = "N/A";
+        const citationVisibility: number | "N/A" = "N/A";
+        const competitivePosition: string | "N/A" = "N/A";
 
         if (latestAudit) {
           seoHealth = latestAudit.score;
