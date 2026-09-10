@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { TenantContextManager } from "@/core/database/tenant-context";
 import { CrawlError } from "@/features/acquisition/domain/errors";
+import { resolveCrawlPolicy } from "@/features/acquisition/domain/policy";
 import { CrawlOrchestrator } from "@/features/acquisition/application/orchestrator";
 import { CrawlJobRepository } from "@/features/acquisition/infrastructure/persistence/postgres";
 import { getSession } from "@/services/auth/session";
@@ -91,6 +92,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         { status: 400 }
       );
     }
+    const resolvedPolicy = resolveCrawlPolicy(body.data.policy);
     const requestId = request.headers.get("x-request-id") ?? randomUUID();
     const orchestrator = new CrawlOrchestrator();
     const submission = await TenantContextManager.runWithTenantContext(
@@ -101,7 +103,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         orchestrator.submit(
           identity.tenantId,
           body.data.requestedUrl,
-          body.data.policy ?? {},
+          resolvedPolicy,
           body.data.priority ?? 0,
           requestId,
           body.data.correlationId,
