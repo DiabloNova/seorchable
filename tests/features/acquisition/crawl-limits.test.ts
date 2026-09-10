@@ -79,7 +79,7 @@ export async function testCrawlPolicyLimits(): Promise<void> {
   assert.equal(legitimate.maxDepth, 2);
   assert.equal(legitimate.robotsPolicy, "ignore");
 
-  // 5. Verify server boundary (CrawlOrchestrator.submit) enforces policy resolution directly
+  // 5. Verify server boundary (CrawlOrchestrator.submit) enforces policy resolution directly for oversized inputs
   let capturedJobPolicy: any = null;
   const fakeJobsRepo: any = {
     createOrGetByDedupWithOutcome: async ({ request }: any) => {
@@ -122,6 +122,55 @@ export async function testCrawlPolicyLimits(): Promise<void> {
   assert.equal(submission.job.policy.maxPages, CRAWL_POLICY_CEILINGS.maxPages);
   assert.equal(submission.job.policy.maxDepth, CRAWL_POLICY_CEILINGS.maxDepth);
   assert.equal(submission.job.policy.maxConcurrency, CRAWL_POLICY_CEILINGS.maxConcurrency);
+
+  // 6. Verify direct CrawlOrchestrator.submit() boundary enforcement for malformed/nested policy inputs
+  let malformedCapturedPolicy: any = null;
+  const fakeJobsRepoMalformed: any = {
+    createOrGetByDedupWithOutcome: async ({ request }: any) => {
+      malformedCapturedPolicy = request.policy;
+      return {
+        created: true,
+        job: { id: "job-456", policy: request.policy, version: 1, status: "PENDING" }
+      };
+    },
+    transition: async (id: string, fromStatus: string, version: number, toStatus: string) => {
+      return { id, policy: malformedCapturedPolicy, status: toStatus, version: version + 1 };
+    }
+  };
+
+  const orchestratorMalformed = new CrawlOrchestrator(
+    fakeJobsRepoMalformed,
+    fakeCacheRepo,
+    fakeResultsRepo,
+    fakeRouter,
+    fakeValidateHost as any
+  );
+
+  const malformedSubmission = await orchestratorMalformed.submit(
+    "tenant-1",
+    "https://example.com",
+    {
+      maxPages: { $gt: 0 } as any,
+      maxDepth: [1000] as any,
+      robotsPolicy: { override: true } as any,
+      stripTrackingParams: "false" as any
+    }
+  );
+
+  assert.ok(malformedSubmission.job);
+  assert.ok(malformedCapturedPolicy);
+
+  // Assert malformed numeric/enum/boolean values resolve to trusted defaults
+  assert.equal(malformedCapturedPolicy.maxPages, DEFAULT_CRAWL_POLICY.maxPages);
+  assert.equal(malformedCapturedPolicy.maxDepth, DEFAULT_CRAWL_POLICY.maxDepth);
+  assert.equal(malformedCapturedPolicy.robotsPolicy, DEFAULT_CRAWL_POLICY.robotsPolicy);
+  assert.equal(malformedCapturedPolicy.stripTrackingParams, DEFAULT_CRAWL_POLICY.stripTrackingParams);
+
+  // Assert no nested objects, arrays, or invalid primitive types survived into the stored/request policy
+  assert.equal(typeof malformedCapturedPolicy.maxPages, "number");
+  assert.equal(typeof malformedCapturedPolicy.maxDepth, "number");
+  assert.equal(typeof malformedCapturedPolicy.robotsPolicy, "string");
+  assert.equal(typeof malformedCapturedPolicy.stripTrackingParams, "boolean");
 }
 
 if (require.main === module) {
