@@ -190,8 +190,177 @@ export function validateCrawlPolicy(
     : { ok: true, policy };
 }
 
-export function resolveCrawlPolicy(partial: Partial<CrawlPolicy>): CrawlPolicy {
-  const policy = { ...DEFAULT_CRAWL_POLICY, ...partial };
+export function resolveCrawlPolicy(
+  partial?: Partial<CrawlPolicy> | null
+): CrawlPolicy {
+  const input = partial && typeof partial === "object" ? partial : {};
+
+  const sanitizeInt = (
+    val: unknown,
+    min: number,
+    ceiling: number,
+    fallback: number
+  ): number => {
+    if (
+      typeof val !== "number" ||
+      !Number.isInteger(val) ||
+      !Number.isFinite(val)
+    ) {
+      return fallback;
+    }
+    if (val < min) {
+      return min;
+    }
+    if (val > ceiling) {
+      return ceiling;
+    }
+    return val;
+  };
+
+  const maxPages = sanitizeInt(
+    input.maxPages,
+    1,
+    CRAWL_POLICY_CEILINGS.maxPages,
+    DEFAULT_CRAWL_POLICY.maxPages
+  );
+  const maxDepth = sanitizeInt(
+    input.maxDepth,
+    0,
+    CRAWL_POLICY_CEILINGS.maxDepth,
+    DEFAULT_CRAWL_POLICY.maxDepth
+  );
+  const maxDurationMs = sanitizeInt(
+    input.maxDurationMs,
+    1,
+    CRAWL_POLICY_CEILINGS.maxDurationMs,
+    DEFAULT_CRAWL_POLICY.maxDurationMs
+  );
+  const maxResponseBytes = sanitizeInt(
+    input.maxResponseBytes,
+    1,
+    CRAWL_POLICY_CEILINGS.maxResponseBytes,
+    DEFAULT_CRAWL_POLICY.maxResponseBytes
+  );
+  const maxRedirects = sanitizeInt(
+    input.maxRedirects,
+    0,
+    CRAWL_POLICY_CEILINGS.maxRedirects,
+    DEFAULT_CRAWL_POLICY.maxRedirects
+  );
+  const maxConcurrency = sanitizeInt(
+    input.maxConcurrency,
+    1,
+    CRAWL_POLICY_CEILINGS.maxConcurrency,
+    DEFAULT_CRAWL_POLICY.maxConcurrency
+  );
+  const requestTimeoutMs = sanitizeInt(
+    input.requestTimeoutMs,
+    1,
+    CRAWL_POLICY_CEILINGS.requestTimeoutMs,
+    DEFAULT_CRAWL_POLICY.requestTimeoutMs
+  );
+  const connectTimeoutMs = sanitizeInt(
+    input.connectTimeoutMs,
+    1,
+    CRAWL_POLICY_CEILINGS.connectTimeoutMs,
+    DEFAULT_CRAWL_POLICY.connectTimeoutMs
+  );
+  const maxAttempts = sanitizeInt(
+    input.maxAttempts,
+    1,
+    CRAWL_POLICY_CEILINGS.maxAttempts,
+    DEFAULT_CRAWL_POLICY.maxAttempts
+  );
+  const retryBaseDelayMs = sanitizeInt(
+    input.retryBaseDelayMs,
+    0,
+    CRAWL_POLICY_CEILINGS.retryBaseDelayMs,
+    DEFAULT_CRAWL_POLICY.retryBaseDelayMs
+  );
+  let retryMaxDelayMs = sanitizeInt(
+    input.retryMaxDelayMs,
+    0,
+    CRAWL_POLICY_CEILINGS.retryMaxDelayMs,
+    DEFAULT_CRAWL_POLICY.retryMaxDelayMs
+  );
+
+  if (retryMaxDelayMs < retryBaseDelayMs) {
+    retryMaxDelayMs = Math.min(
+      retryBaseDelayMs,
+      CRAWL_POLICY_CEILINGS.retryMaxDelayMs
+    );
+  }
+
+  const perHostRequestsPerSecond = sanitizeInt(
+    input.perHostRequestsPerSecond,
+    1,
+    CRAWL_POLICY_CEILINGS.perHostRequestsPerSecond,
+    DEFAULT_CRAWL_POLICY.perHostRequestsPerSecond
+  );
+  const cacheTtlMs = sanitizeInt(
+    input.cacheTtlMs,
+    0,
+    CRAWL_POLICY_CEILINGS.cacheTtlMs,
+    DEFAULT_CRAWL_POLICY.cacheTtlMs
+  );
+
+  let allowedSchemes = DEFAULT_CRAWL_POLICY.allowedSchemes;
+  if (Array.isArray(input.allowedSchemes)) {
+    const filtered = input.allowedSchemes
+      .filter((s): s is string => typeof s === "string")
+      .map(s => s.toLowerCase())
+      .filter(s => ["http", "https"].includes(s));
+    if (filtered.length > 0) {
+      allowedSchemes = Array.from(new Set(filtered));
+    }
+  }
+
+  let allowedContentTypes = DEFAULT_CRAWL_POLICY.allowedContentTypes;
+  if (Array.isArray(input.allowedContentTypes)) {
+    const filtered = input.allowedContentTypes.filter(
+      (c): c is string => typeof c === "string" && c.trim().length > 0
+    );
+    if (filtered.length > 0) {
+      allowedContentTypes = Array.from(new Set(filtered));
+    }
+  }
+
+  const robotsPolicy: RobotsPolicy =
+    input.robotsPolicy === "respect" || input.robotsPolicy === "ignore"
+      ? input.robotsPolicy
+      : DEFAULT_CRAWL_POLICY.robotsPolicy;
+
+  const stripTrackingParams =
+    typeof input.stripTrackingParams === "boolean"
+      ? input.stripTrackingParams
+      : DEFAULT_CRAWL_POLICY.stripTrackingParams;
+
+  const followRedirects =
+    typeof input.followRedirects === "boolean"
+      ? input.followRedirects
+      : DEFAULT_CRAWL_POLICY.followRedirects;
+
+  const policy: CrawlPolicy = {
+    maxPages,
+    maxDepth,
+    maxDurationMs,
+    maxResponseBytes,
+    maxRedirects,
+    maxConcurrency,
+    requestTimeoutMs,
+    connectTimeoutMs,
+    maxAttempts,
+    retryBaseDelayMs,
+    retryMaxDelayMs,
+    allowedSchemes,
+    allowedContentTypes,
+    robotsPolicy,
+    perHostRequestsPerSecond,
+    stripTrackingParams,
+    cacheTtlMs,
+    followRedirects
+  };
+
   const result = validateCrawlPolicy(policy);
   if (!result.ok) {
     throw result.error;
