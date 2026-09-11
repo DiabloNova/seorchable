@@ -44,9 +44,24 @@ export const Dropdown: React.FC<DropdownProps> = ({
     setIsOpen(false);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setIsOpen(!isOpen);
+    }
+  };
+
   return (
     <div className="relative inline-block text-left" ref={containerRef}>
-      <div onClick={() => setIsOpen(!isOpen)} className="cursor-pointer">
+      <div
+        role="button"
+        tabIndex={0}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={handleKeyDown}
+        className="cursor-pointer"
+      >
         {trigger}
       </div>
 
