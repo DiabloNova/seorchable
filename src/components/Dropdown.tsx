@@ -51,19 +51,55 @@ export const Dropdown: React.FC<DropdownProps> = ({
     }
   };
 
+  const isInteractive = (element: React.ReactNode): boolean => {
+    if (React.isValidElement(element)) {
+      const type = element.type;
+      return typeof type === "string" && ["button", "a", "input", "select", "textarea"].includes(type);
+    }
+    return false;
+  };
+
   return (
     <div className="relative inline-block text-left" ref={containerRef}>
-      <div
-        role="button"
-        tabIndex={0}
-        aria-haspopup="menu"
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen(!isOpen)}
-        onKeyDown={handleKeyDown}
-        className="cursor-pointer"
-      >
-        {trigger}
-      </div>
+      {isInteractive(trigger) ? (
+        <div
+          onClick={() => setIsOpen(!isOpen)}
+          onKeyDown={handleKeyDown}
+          // Note: we don't apply role="button" or tabIndex here
+          // to avoid nested interactive elements. The trigger itself
+          // is assumed to handle its own focus/semantics. We just
+          // add the state wrapper.
+          className="cursor-pointer inline-block"
+        >
+          {React.cloneElement(trigger as React.ReactElement<{
+            onClick?: (e: React.MouseEvent) => void;
+            "aria-haspopup"?: string;
+            "aria-expanded"?: boolean;
+          }>, {
+            "aria-haspopup": "menu",
+            "aria-expanded": isOpen,
+            onClick: (e: React.MouseEvent) => {
+               setIsOpen(!isOpen);
+               const triggerProps = (trigger as React.ReactElement<{onClick?: (e: React.MouseEvent) => void}>).props;
+               if (triggerProps.onClick) {
+                  triggerProps.onClick(e);
+               }
+            }
+          })}
+        </div>
+      ) : (
+        <div
+          role="button"
+          tabIndex={0}
+          aria-haspopup="menu"
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen(!isOpen)}
+          onKeyDown={handleKeyDown}
+          className="cursor-pointer inline-block"
+        >
+          {trigger}
+        </div>
+      )}
 
       {isOpen && (
         <div
