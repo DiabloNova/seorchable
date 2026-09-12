@@ -44,11 +44,62 @@ export const Dropdown: React.FC<DropdownProps> = ({
     setIsOpen(false);
   };
 
-  return (
-    <div className="relative inline-block text-left" ref={containerRef}>
-      <div onClick={() => setIsOpen(!isOpen)} className="cursor-pointer">
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setIsOpen(!isOpen);
+    }
+  };
+
+  const isInteractive = (element: React.ReactNode): boolean => {
+    if (React.isValidElement(element)) {
+      const type = element.type;
+      return typeof type === "string" && ["button", "a", "input", "select", "textarea"].includes(type);
+    }
+    return false;
+  };
+
+  const renderTrigger = () => {
+    if (isInteractive(trigger) && React.isValidElement<{
+      onClick?: (e: React.MouseEvent) => void;
+      onKeyDown?: (e: React.KeyboardEvent) => void;
+      "aria-haspopup"?: string;
+      "aria-expanded"?: boolean;
+    }>(trigger)) {
+      // For native interactive elements like <button>, Enter and Space
+      // automatically trigger the onClick event. We don't need to add
+      // our own onKeyDown handler for Enter/Space to avoid double-toggling.
+      return React.cloneElement(trigger, {
+        "aria-haspopup": "menu",
+        "aria-expanded": isOpen,
+        onClick: (e: React.MouseEvent) => {
+          setIsOpen(!isOpen);
+          if (trigger.props.onClick) {
+            trigger.props.onClick(e);
+          }
+        }
+      });
+    }
+
+    // For non-interactive elements, we must provide full keyboard semantics
+    return (
+      <div
+        role="button"
+        tabIndex={0}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={handleKeyDown}
+        className="cursor-pointer inline-block"
+      >
         {trigger}
       </div>
+    );
+  };
+
+  return (
+    <div className="relative inline-block text-left" ref={containerRef}>
+      {renderTrigger()}
 
       {isOpen && (
         <div
