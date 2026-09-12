@@ -59,47 +59,47 @@ export const Dropdown: React.FC<DropdownProps> = ({
     return false;
   };
 
+  const renderTrigger = () => {
+    if (isInteractive(trigger) && React.isValidElement<{
+      onClick?: (e: React.MouseEvent) => void;
+      onKeyDown?: (e: React.KeyboardEvent) => void;
+      "aria-haspopup"?: string;
+      "aria-expanded"?: boolean;
+    }>(trigger)) {
+      // For native interactive elements like <button>, Enter and Space
+      // automatically trigger the onClick event. We don't need to add
+      // our own onKeyDown handler for Enter/Space to avoid double-toggling.
+      return React.cloneElement(trigger, {
+        "aria-haspopup": "menu",
+        "aria-expanded": isOpen,
+        onClick: (e: React.MouseEvent) => {
+          setIsOpen(!isOpen);
+          if (trigger.props.onClick) {
+            trigger.props.onClick(e);
+          }
+        }
+      });
+    }
+
+    // For non-interactive elements, we must provide full keyboard semantics
+    return (
+      <div
+        role="button"
+        tabIndex={0}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={handleKeyDown}
+        className="cursor-pointer inline-block"
+      >
+        {trigger}
+      </div>
+    );
+  };
+
   return (
     <div className="relative inline-block text-left" ref={containerRef}>
-      {isInteractive(trigger) ? (
-        <div
-          onClick={() => setIsOpen(!isOpen)}
-          onKeyDown={handleKeyDown}
-          // Note: we don't apply role="button" or tabIndex here
-          // to avoid nested interactive elements. The trigger itself
-          // is assumed to handle its own focus/semantics. We just
-          // add the state wrapper.
-          className="cursor-pointer inline-block"
-        >
-          {React.cloneElement(trigger as React.ReactElement<{
-            onClick?: (e: React.MouseEvent) => void;
-            "aria-haspopup"?: string;
-            "aria-expanded"?: boolean;
-          }>, {
-            "aria-haspopup": "menu",
-            "aria-expanded": isOpen,
-            onClick: (e: React.MouseEvent) => {
-               setIsOpen(!isOpen);
-               const triggerProps = (trigger as React.ReactElement<{onClick?: (e: React.MouseEvent) => void}>).props;
-               if (triggerProps.onClick) {
-                  triggerProps.onClick(e);
-               }
-            }
-          })}
-        </div>
-      ) : (
-        <div
-          role="button"
-          tabIndex={0}
-          aria-haspopup="menu"
-          aria-expanded={isOpen}
-          onClick={() => setIsOpen(!isOpen)}
-          onKeyDown={handleKeyDown}
-          className="cursor-pointer inline-block"
-        >
-          {trigger}
-        </div>
-      )}
+      {renderTrigger()}
 
       {isOpen && (
         <div

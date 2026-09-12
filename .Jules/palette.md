@@ -8,6 +8,3 @@
 ## 2023-11-04 - Icon-only buttons accessibility
 **Learning:** Icon-only buttons without an explicit `aria-label` attribute cannot be identified by screen readers, rendering them inaccessible to visually impaired users. This was observed in `DashboardShell.tsx` for the mobile drawer toggle and sidebar collapse buttons.
 **Action:** When implementing buttons that only contain icons (such as SVG elements), always include a descriptive `aria-label` attribute. If the component supports multiple languages (like Persian and English), ensure the `aria-label` dynamically reflects the active language.
-## 2024-05-18 - Keyboard Navigation in Custom Dropdowns
-**Learning:** Custom interactive overlays (like Dropdown components) that wrap triggers in a `div` must implement proper keyboard navigation (handling Enter/Space keys) and appropriate ARIA states (`aria-haspopup`, `aria-expanded`, `role="button"`, `tabIndex={0}`) to ensure full accessibility. The wrapper should only apply these to non-interactive elements, or if it wraps an interactive element like `<button>`, it should clone the element and pass these properties so we don't have invalid nested interactive elements.
-**Action:** Always ensure dropdown and menu triggers handle `Enter` and `Space` for activation, and accurately reflect their open/closed state via `aria-expanded`.
