@@ -1,53 +1,63 @@
-## Phase 10 — Website Monitoring Foundation Final Report
+# Documentation Claims Report
 
-### Implemented
-- `database/migrations/0016_website_monitoring.sql`: Added the three required schema models (Configs, Snapshots, Alerts) enforcing strict Row-Level Security zero-trust isolation on `organization_id`.
-- `database/schema/index.ts`: Integrated the models securely under Drizzle using identical table shapes.
-- `src/features/monitoring/domain/types.ts`: Created the interfaces bridging database tables to application layers.
-- `src/features/monitoring/services/change-detection-service.ts`: Implemented `ChangeDetectionService`, providing snapshot change checking logic through deterministic SHA-256 hashes.
-- `src/features/monitoring/services/regression-detection-service.ts`: Implemented `RegressionDetectionService`, providing a strict threshold logic (e.g. 40% reduction rules boundary edge-case handling) to calculate if an alert triggers.
-- `src/features/monitoring/repositories/monitoring-config-repository.ts`: Loads & saves configurations strictly enforcing context manager IDs.
-- `src/features/monitoring/repositories/crawl-snapshot-repository.ts`: Loads the `previous` matching configuration snapshots.
-- `src/features/monitoring/repositories/monitoring-alert-repository.ts`: Secure alert persistence enforcing ID/tenant logic and handling exact deduplication via `onConflictDoNothing()`.
-- `src/core/database/tenant-context/index.ts`: Registered all new tables into the `TENANT_SCOPED_TABLES` map enforcing zero-trust contexts natively.
+| ID | Source | Claim | Verdict | Evidence |
+|---|---|---|---|---|
+| 1 | README.md:89 | Argon2id in src/services/auth | **False** | Found in src/app/actions/auth.ts (Not in src/services/auth) |
+| 2 | README.md:93 | SSRF in src/services/crawler/url-validator.ts | **Verified** | File exists |
+| 3 | README.md:72 | Background Function in src/inngest/ | **Verified** | Directory exists and contains functions.ts |
+| 4 | README.md:83 | database/schema/ and database/schema/index.ts | **Verified** | File exists |
+| 5 | README.md:84 | database/drizzle/ and src/core/database/migrator.ts | **Verified** | File exists |
+| 6 | README.md:106 | npm install | **Verified** | Will run in quickstart |
+| 7 | README.md:112 | env vars: DATABASE_URL, MIGRATION_DATABASE_URL, UPSTASH_REDIS_REST_URL, FIRECRAWL_API_KEY | **Verified** | Vars exist in .env.example |
+| 8 | README.md:126 | npm run db:push | **False** | Command fails due to missing env vars |
+| 9 | README.md:131 | npm run dev & | **Verified** | Script exists |
+| 10 | README.md:136 | npm run build && npm run start & | **Verified** | Scripts exist |
+| 11 | README.md:162 | secureServerAction | **Verified** | Found in src/app/actions/ and src/lib/safe-action.ts |
+| 12 | README.md:171 | npm run test:acquisition | **Verified** | Script exists |
+| 13 | README.md:173 | tests/services/auth/ and tests/features/acquisition/ | **Verified** | Both exist |
+| 14 | README.md:188 | CircleCI in .circleci/config.yml | **Verified** | File exists |
+| 15 | README.md:98 | Node.js (نسخه ۲۰ یا بالاتر) | **Verified** | package.json @types/node is ^20 |
+| 16 | README.md:29 | Drizzle ORM & PostgreSQL | **Verified** | drizzle-orm and pg found |
+| 17 | README.md:31 | Firecrawl & Cheerio | **Verified** | @mendable/firecrawl-js and cheerio found |
+| 18 | README.md:32 | Vercel AI SDK | **Verified** | ai and @ai-sdk/google found |
+| 19 | README.md:28 | Tailwind CSS | **Verified** | tailwindcss found |
+| 20 | README.md:26 | Next.js (App Router) | **Verified** | next 16.2.11 and src/app directory found |
+| 21 | README.md:27 | TypeScript | **Verified** | typescript found |
+| 22 | README.md:188 | استقرار خودکار پس از Push در شاخه اصلی (Main) توسط Vercel | **Unverifiable** | No explicit Vercel config file to verify deployment workflow locally without Vercel account context, though it's standard Next.js behavior. Suggestion: Remove this claim or add vercel.json / github action file that does deployment. |
 
-### Tests Added
-- `tests/services/monitoring/website-monitoring.test.ts`:
-  - Enforced correct handling between duplicate objects (ignoring metadata variance if identical representation logic is used).
-  - Asserts that hashes detect proper structural changes (e.g., content reduction or complete deletion).
-  - Ensured Initial Snapshot creates successfully without triggering false regression flags.
-  - Regression threshold limit is mathematically validated strictly to limit boundary points.
-- `tests/services/monitoring/tenant-isolation.test.ts`:
-  - Verified `isQueryTenantScoped()` captures table access.
-  - Test verifying `TenantContextManager` handles contexts appropriately when unauthorized access occurs, throwing exceptions on out-of-context extraction.
-- `tests/services/monitoring/repository.test.ts`:
-  - Regex checks repository files securely abstracting parameters without trusting user supplied UUIDs.
+## Summary
+- **Claims Examined**: 22
+- **Verified**: 19
+- **False**: 2
+- **Unverifiable**: 1
 
-### Verification Results
-1. **Verify the database migration**: **PASS**
-   *Migration explicitly implements `organization_id` foreign keys natively bound with enforced `current_setting('app.current_tenant_id')` Row Level Security.*
-2. **Verify Drizzle schema consistency**: **PASS**
-   *Exported schema perfectly mimics constraints generated manually inside raw SQL schema logic.*
-3. **Verify tenant isolation with an actual test**: **PASS**
-   *Tests execute strict tenant scoping. Drizzle wrappers in newly built repos do not pass direct ID, requiring system leasing exclusively.*
-4. **Verify ChangeDetectionService**: **PASS**
-   *Added deterministic hash generation mapping explicitly 5 targeted snapshot verification cases.*
-5. **Verify RegressionDetectionService**: **PASS**
-   *Explicitly bound limit checks resolving exact 40% threshold verification points against string content logic bounds.*
-6. **Verify repository behavior**: **PASS**
-   *Checked parameter passing constraints enforcing `TenantContextManager.getRequiredTenantId()` logic. Repo APIs forbid injecting UUID directly.*
-7. **Verify alert persistence**: **PASS**
-   *The `monitoring-alert-repository` maps IDs successfully using exact unique multi-table constraint strategies.*
 
-### Known Pre-existing Failures
-*(These exist exclusively in legacy code/tests and are completely unrelated to our Website Monitoring Foundation task)*
+# Quickstart Execution Transcript
 
-* `npm run lint` threw warnings and errors:
-   - `tests/services/audit-engine/*.test.ts`: Missing Competitor properties, any types, unassigned values.
-   - `tests/services/auth/session.test.ts` & `cache.test.ts`: Unexpected any, assigned values unused, missing arguments.
-* `npx typescript --noEmit` threw errors:
-   - File tests lack TS Node configuration types (`Cannot find name 'assert'`, `'process'`, `'module'`) due to `@types/node` missing from root level package constraints for specific test-only TS references.
-   - Mismatched Competitor typings missing properties in `/tests/services/audit-engine/` due to previous changes in competitor schema unrelated to Monitoring Configs.
+```bash
+$ mkdir -p /tmp/qs_test
+$ cp -r . /tmp/qs_test/
+$ cd /tmp/qs_test
+$ npm install
+199 packages are looking for funding
+  run `npm fund` for details
 
-### Remaining Work
-**Complete**. The core capabilities defining models, saving scopes, diffing values, triggering regression logic safely within zero-trust limits are successfully built without expanding into untested scheduled logic routines. The `scheduledMonitoring` run handler is ready for independent implementation in the next phase.
+7 vulnerabilities (4 moderate, 2 high, 1 critical)
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+$ cp .env.example .env
+$ npm run db:push
+
+> ai-branding-platform@0.1.0 db:push
+> tsx scripts/database/db-push-guard.ts && drizzle-kit push
+
+db:push blocked: NODE_ENV must be explicitly set to 'development' or 'test'. Current: 'undefined'.
+```
+
+## Missing Steps / Failures Found:
+1. `npm run db:push` command fails because `scripts/database/db-push-guard.ts` enforces strict conditions (`NODE_ENV=development`, `ALLOW_DB_PUSH=true`, `DISPOSABLE_DB=true`). The documentation fails to instruct the user to set these environment variables, or it should instruct them to run `npm run db:migrate` instead.
+
