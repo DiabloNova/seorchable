@@ -54,18 +54,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 9
 
       - name: Install Dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Run Linter
-        run: pnpm run lint || true # Temporary allow failure to pass CI until issues are fixed
+        run: pnpm run lint
+        continue-on-error: true # Temporary allow failure to pass CI until issues are fixed
 
       - name: Database Push
         run: pnpm run db:push
@@ -76,7 +77,7 @@ jobs:
         run: pnpm run build
 
       - name: Run Unit/Integration Tests & Coverage
-        run: pnpm run test:coverage || true # Assuming more tests will be added
+        run: pnpm run test:coverage
 
       - name: Run Playwright Tests (Smoke & A11y)
         run: |
@@ -87,10 +88,22 @@ jobs:
         run: |
           npm i -g lighthouse
           pnpm run start &
-          sleep 5
-          lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html --chrome-flags="--headless"
+          # Wait until the server is responsive
+          until curl -s http://localhost:3000 > /dev/null; do
+            echo "Waiting for server to start..."
+            sleep 1
+          done
+          lighthouse http://localhost:3000 --output html --output json --output-path ./lighthouse-report --chrome-flags="--headless"
         env:
           NODE_ENV: production
+
+      - name: Upload Lighthouse Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: |
+            lighthouse-report.report.html
+            lighthouse-report.report.json
 
   deploy:
     name: Manual Deploy

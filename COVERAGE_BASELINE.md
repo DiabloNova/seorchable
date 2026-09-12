@@ -1,5 +1,11 @@
 ## Test Coverage Baseline
-Coverage for tests/features/acquisition/run-all.ts using c8:
+
+This document captures the initial test coverage for the **Acquisition Domain**.
+
+**Note:** This coverage report specifically represents the acquisition domain logic (`tests/features/acquisition/run-all.ts`) and is not a whole-repository coverage report. Future tasks will expand coverage to other domains.
+
+### Summary (c8 text output)
+```text
 ✅ acquisition suites passed (8 suites collected)
 ---------------------------------------|---------|----------|---------|---------|-------------------
 File                                   | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
@@ -26,3 +32,4 @@ All files                              |    84.8 |       73 |      95 |    84.8 
  services/jobs                         |     100 |    83.33 |     100 |     100 |
   retry.ts                             |     100 |    83.33 |     100 |     100 | 1,24
 ---------------------------------------|---------|----------|---------|---------|-------------------
+```

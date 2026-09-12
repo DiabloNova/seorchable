@@ -1,16 +1,20 @@
 ## Lighthouse Baseline
 
-A Lighthouse audit was run against the local production build (http://localhost:3000) using Chrome Headless.
-The detailed HTML report is saved as `lighthouse-report.html`.
+This document captures the initial baseline metrics for the application.
 
-Overall, the baseline performance, accessibility, best practices, and SEO scores are captured in the report.
+**Date:** 2026-09-12T07:19:44.031Z
+**Environment:** Local CI (Production Build)
+**Target URL:** http://localhost:3000
 
-### Key Accessibility Violations (from axe-core)
+### Category Scores (Lighthouse)
 
-* Some page content is not contained by landmarks. (e.g., Elements like `.border-2 > .space-y-6 > ul > .gap-2:nth-child(1) > span`).
+| Category | Score |
+| :--- | :--- |
+| **Performance** | 78 |
+| **Accessibility** | 94 |
+| **Best Practices** | 96 |
+| **SEO** | 91 |
 
-The complete list of violations is logged during the Playwright smoke test.
+### Note on Accessibility
 
-### Summary
-
-The initial baseline reveals a solid foundation but identifies several areas for improvement, primarily concerning ARIA landmarks in the main landing and pricing sections. These have been documented as high-priority tasks in `TASKS.md`.
+The initial baseline reveals a solid foundation but identifies several areas for improvement, primarily concerning ARIA landmarks in the main landing and pricing sections. These have been documented as high-priority tasks in `TASKS.md`. The complete list of violations is logged during the Playwright smoke test.
