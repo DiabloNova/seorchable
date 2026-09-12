@@ -1622,3 +1622,22 @@ When independent verification is required:
 JULES IMPLEMENTS.
 SUPERVISOR VERIFIES.
 NEITHER ROLE SUBSTITUTES FOR THE OTHER.
+
+## Installation and Testing
+
+To prepare the local environment reliably, a `setup.sh` script is provided in the repository root. This script installs all necessary dependencies and sets up `.env` defaults.
+
+1. **Run the setup script**:
+   ```bash
+   ./setup.sh
+   ```
+   This will:
+   - Create a `.env` file from `.env.example` if it does not exist.
+   - Install all required dependencies using `npm ci` (matching the CI workflow and lockfile).
+
+2. **Run Tests**:
+   Tests are written in native Node.js and executed via `tsx`. To run all tests, you can execute:
+   ```bash
+   find tests -name "*.test.ts" | xargs -n 1 npx tsx
+   ```
+   Note: Some tests interact with the database. If you see 'relation does not exist' or similar errors, you need a running PostgreSQL database configured in your `.env` (via `DATABASE_URL`) with migrations applied (`npm run db:push`). Ensure the setup requirements for tests are met.
