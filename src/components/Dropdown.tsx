@@ -44,11 +44,59 @@ export const Dropdown: React.FC<DropdownProps> = ({
     setIsOpen(false);
   };
 
-  return (
-    <div className="relative inline-block text-left" ref={containerRef}>
-      <div onClick={() => setIsOpen(!isOpen)} className="cursor-pointer">
+  const toggleDropdown = () => setIsOpen(!isOpen);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleDropdown();
+    } else if (e.key === "Escape") {
+      setIsOpen(false);
+    }
+  };
+
+  const renderTrigger = () => {
+    if (React.isValidElement(trigger) && (trigger.type === 'button' || trigger.type === 'a' || (trigger.props as any).onClick !== undefined)) {
+      return React.cloneElement(trigger as React.ReactElement<any>, {
+        onClick: (e: React.MouseEvent) => {
+          if ((trigger.props as any).onClick) {
+            (trigger.props as any).onClick(e);
+          }
+          toggleDropdown();
+        },
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if ((trigger.props as any).onKeyDown) {
+            (trigger.props as any).onKeyDown(e);
+          }
+          handleKeyDown(e);
+        },
+        "aria-haspopup": "menu",
+        "aria-expanded": isOpen,
+      });
+    }
+
+    return (
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={toggleDropdown}
+        onKeyDown={handleKeyDown}
+        className="cursor-pointer"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+      >
         {trigger}
       </div>
+    );
+  };
+
+  return (
+    <div className="relative inline-block text-left" ref={containerRef} onKeyDown={(e) => {
+        if (e.key === "Escape") {
+            setIsOpen(false);
+        }
+    }}>
+      {renderTrigger()}
 
       {isOpen && (
         <div
