@@ -123,9 +123,8 @@ RESEND_API_KEY=
 ### اجرای پروژه برای توسعه
 ابتدا پایگاه داده را به‌روزرسانی کنید:
 ```
-NODE_ENV=development ALLOW_DB_PUSH=true DISPOSABLE_DB=true npm run db:push
+npm run db:push
 ```
-(یا در صورت داشتن داده‌های قبلی از `npm run db:migrate` استفاده کنید)
 
 سپس سرور توسعه را اجرا کنید:
 ```
