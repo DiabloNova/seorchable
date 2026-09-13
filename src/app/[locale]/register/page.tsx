@@ -115,7 +115,12 @@ export default function RegisterPage({ params }: { params: Promise<{ locale: str
       }, 1500);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      setSubmitError(isFa ? "خطا در ثبت‌نام. احتمال دارد این ایمیل قبلاً ثبت شده باشد." : "Registration failed. This email may already exist.");
+      const isDuplicate = /already exists|duplicate key|unique constraint/i.test(msg);
+      setSubmitError(
+        isDuplicate
+          ? (isFa ? "این ایمیل قبلاً ثبت شده است." : "An account with this email already exists.")
+          : (isFa ? "ثبت‌نام موقتاً در دسترس نیست. لطفاً دوباره تلاش کنید." : "Registration is temporarily unavailable. Please try again.")
+      );
     } finally {
       setIsLoading(false);
     }
