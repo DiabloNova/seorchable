@@ -51,7 +51,14 @@ export class PostgresClient {
 
   private constructor() {
     const connectionString =
-      process.env.DATABASE_URL || "postgresql://localhost:5432/aeo_saas";
+      process.env.DATABASE_URL ||
+      process.env.POSTGRES_URL ||
+      process.env.POSTGRES_PRISMA_URL ||
+      process.env.POSTGRES_URL_NON_POOLING;
+
+    if (!connectionString) {
+      throw new Error("A PostgreSQL connection string is required (DATABASE_URL or POSTGRES_URL).");
+    }
 
     this.pool = new Pool({
       connectionString,
