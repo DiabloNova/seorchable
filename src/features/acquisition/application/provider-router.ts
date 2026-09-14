@@ -38,13 +38,15 @@ export interface ProviderRouterEvents {
 
 export class ProviderRouter {
   private readonly retryPolicy: ExponentialBackoffRetryPolicy;
+  private readonly providers: readonly CrawlProvider[];
 
   public constructor(
-    private readonly providers: readonly CrawlProvider[],
+    providers: readonly CrawlProvider[],
     retryBaseDelayMs = 500,
     retryMaxDelayMs = 30_000,
     private readonly events: ProviderRouterEvents = {}
   ) {
+    this.providers = providers;
     this.retryPolicy = new ExponentialBackoffRetryPolicy(
       retryBaseDelayMs,
       retryMaxDelayMs

@@ -26,19 +26,18 @@ export function PlatformsSection() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-8">
           {isFa
-            ? "پایش برند شما در موتورهای پیشرو هوش مصنوعی"
-            : "Monitoring your brand across the leading AI engines"}
+            ? "پایش برند شما در موتورهای پیشرو هوش مصنوعی" :"Monitoring your brand across the leading AI engines"}
         </p>
 
         <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
           <div className="marquee-track py-2" dir="ltr">
-            {loop.map((p, i) => (
+            {loop?.map((p, i) => (
               <span
-                key={`${p.slug}-${i}`}
+                key={`${p?.slug}-${i}`}
                 className="mx-7 flex items-center gap-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors shrink-0"
               >
-                <BrandLogo slug={p.slug} label={p.label} className="h-7 w-7" />
-                <span className="text-sm font-semibold whitespace-nowrap">{p.label}</span>
+                <BrandLogo slug={p?.slug} label={p?.label} className="h-7 w-7" />
+                <span className="text-sm font-semibold whitespace-nowrap">{p?.label}</span>
               </span>
             ))}
           </div>

@@ -114,15 +114,6 @@ export async function runAIVisibilityMonitoringTests() {
             // Mock findByPromptId to simulate fetching history
     let isNoChangeTest = false;
 
-    observationService["obsRepo"].findByPromptId = async (orgId: string, promptId: string) => {
-      if (isNoChangeTest) {
-          return { data: [observationAggrNoChange.observation], items: [observationAggrNoChange.observation] } as any;
-      }
-      return {
-          data: [observationAggr1.observation], items: [observationAggr1.observation], totalCount: 1, limit: 10, offset: 0
-      } as any;
-    };
-
     const mentions1 = [ { id: "m1", organizationId: mockTenantId } as any ];
     const mentions2 = [] as any[];
     const compMentions1 = [ { id: "cm1", organizationId: mockTenantId } as any ];
@@ -188,6 +179,14 @@ export async function runAIVisibilityMonitoringTests() {
       mockTenantId, mockPromptId, "engine-default", mockExecutionNoChange.responseText || "", 80, 90
     );
 
+    observationService["obsRepo"].findByPromptId = async (orgId: string, promptId: string) => {
+      if (isNoChangeTest) {
+          return { data: [observationAggrNoChange.observation], items: [observationAggrNoChange.observation] } as any;
+      }
+      return {
+          data: [observationAggr1.observation], items: [observationAggr1.observation], totalCount: 1, limit: 10, offset: 0
+      } as any;
+    };
 
     promptIntelligenceService.executePrompt = async () => mockExecutionNoChange as any;
     await monitoringService.runScheduledMonitoring();

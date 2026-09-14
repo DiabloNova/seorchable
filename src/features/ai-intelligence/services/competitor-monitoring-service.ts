@@ -23,7 +23,11 @@ export function isValidTransition(from: CompetitorStatusType, to: CompetitorStat
  * and performing change detection against competitor observations.
  */
 export class CompetitorMonitoringService {
-  constructor(private readonly competitorRepo: ICompetitorRepository) {}
+  private readonly competitorRepo: ICompetitorRepository;
+
+  constructor(competitorRepo: ICompetitorRepository) {
+    this.competitorRepo = competitorRepo;
+  }
 
   /**
    * Transition competitor status safely.

@@ -14,15 +14,7 @@ import {
   CompetitiveSeoFindingRepository
 } from "../../../src/features/ai-intelligence/repositories";
 import { CompetitiveSeoService } from "../../../src/features/ai-intelligence/services/competitive-seo-service";
-import {
-  Competitor,
-  Website,
-  Page,
-  Keyword,
-  Topic,
-  CompetitiveSeoFinding,
-  AuditMetadata
-} from "../../../src/features/ai-intelligence/domain/types";
+import { Competitor, Website, Page, Keyword, Topic, AuditMetadata } from "../../../src/features/ai-intelligence/domain/types";
 import * as assert from "assert";
 
 function createAudit(createdBy = "test-system", version = 1): AuditMetadata {

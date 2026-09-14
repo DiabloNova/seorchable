@@ -8,15 +8,7 @@
 // -------------------------------------------------------------------------
 
 export type VisualizationType =
-  | "chart"
-  | "graph"
-  | "table"
-  | "radar"
-  | "timeline"
-  | "heatmap"
-  | "scorecard"
-  | "knowledge-graph"
-  | "simulator";
+  | "chart" |"graph" |"table" |"radar" |"timeline" |"heatmap" |"scorecard" |"knowledge-graph" |"simulator";
 
 export interface BaseVisualizationConfig {
   id: string;
@@ -57,16 +49,7 @@ export interface ChartDataset {
 // -------------------------------------------------------------------------
 
 export type NodeCategory =
-  | "brand"
-  | "organization"
-  | "person"
-  | "product"
-  | "topic"
-  | "location"
-  | "website"
-  | "publication"
-  | "ai_system"
-  | "entity";
+  | "brand" |"organization" |"person" |"product" |"topic" |"location" |"website" |"publication" |"ai_system" |"entity";
 
 export interface GraphNode {
   id: string;

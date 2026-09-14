@@ -3,12 +3,12 @@
 import React, { useState, use, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/components/AuthProvider";
+
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
 import { SeorchableLogo } from "@/components/marketing/SeorchableLogo";
-import { AlertCircle, CheckCircle2, ShieldAlert, ArrowLeft, ArrowRight, RotateCw } from "lucide-react";
+import { AlertCircle, CheckCircle2, ArrowLeft, ArrowRight, RotateCw } from "lucide-react";
 
 export default function VerifyEmailPage({ params }: { params: Promise<{ locale: string }> }) {
   const resolvedParams = use(params);
@@ -49,8 +49,7 @@ export default function VerifyEmailPage({ params }: { params: Promise<{ locale: 
       : `Resend code in ${resendCooldown}s`,
     successTitle: isFa ? "فعال‌سازی با موفقیت انجام شد!" : "Verification Complete!",
     successDesc: isFa
-      ? "ایمیل سازمانی شما تایید گردید. در حال انتقال به پیشخوان کاربری..."
-      : "Your workspace has been successfully verified. Entering the dashboard...",
+      ? "ایمیل سازمانی شما تایید گردید. در حال انتقال به پیشخوان کاربری..." :"Your workspace has been successfully verified. Entering the dashboard...",
     backToHome: isFa ? "بازگشت به صفحه اصلی" : "Back to landing page",
     validationCodeRequired: isFa ? "وارد کردن کد تایید الزامی است." : "Verification code is required.",
     validationCodeLength: isFa ? "کد تایید باید ۶ رقمی باشد." : "Code must be exactly 6 digits.",
@@ -92,8 +91,7 @@ export default function VerifyEmailPage({ params }: { params: Promise<{ locale: 
     // Simulate backend sending a new code
     setResendCooldown(60);
     alert(isFa
-      ? "کد تایید جدید مجدداً ارسال شد."
-      : "A new confirmation code has been dispatched."
+      ? "کد تایید جدید مجدداً ارسال شد." :"A new confirmation code has been dispatched."
     );
   };
 

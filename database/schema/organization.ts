@@ -50,6 +50,8 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   passwordResetRequired: boolean("password_reset_required").notNull().default(true),
   isActive: boolean("is_active").notNull().default(true),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
   failedLoginAttempts: integer("failed_login_attempts").notNull().default(0),
   lockedUntil: timestamp("locked_until", { withTimezone: true }),
   challengeRequired: integer("challenge_required").notNull().default(0),
@@ -277,3 +279,9 @@ CREATE POLICY delete_tenant_isolation_policy ON organizations
   USING (id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid);
   `
 };
+
+export function organizationsTable(...args) {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: organizationsTable is not implemented yet.', args);
+  return null;
+}

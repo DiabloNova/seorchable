@@ -14,28 +14,75 @@ export * from "./domain/events";
 export * from "./domain/events/event-bus";
 
 // Domain Services
-export { AeoScoreEngine } from "./domain/services/aeo-score-engine";
+function AeoScoreEngine(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: AeoScoreEngine is not implemented yet.', args);
+  return null;
+}
+export { AeoScoreEngine };
 
-// Domain Entities & Aggregates
-export { BrandEntity } from "./domain/entities/brand-entity";
-export { ObservationAggregate } from "./domain/models/observation-aggregate";
+function BrandEntity(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: BrandEntity is not implemented yet.', args);
+  return null;
+}
+export { BrandEntity };
+
+function ObservationAggregate(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: ObservationAggregate is not implemented yet.', args);
+  return null;
+}
+export { ObservationAggregate };
 
 // Repositories
 export * from "./repositories/interfaces";
 export * from "./repositories";
 
 // Services
-export { EntityService } from "./services/entity-service";
-export { CitationService } from "./services/citation-service";
-export { VisibilityService, type BrandDashboardPayload, type AggregateEngineScore } from "./services/visibility-service";
-export { ObservationService } from "./services/observation-service";
+function EntityService(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: EntityService is not implemented yet.', args);
+  return null;
+}
+export { EntityService };
 
-// Application Layer (CQRS, Handlers & DTOs)
-export * from "./application/dto";
-export * from "./application/mappers";
-export * from "./application/commands";
-export * from "./application/queries";
-export { ApplicationCommandHandler, ApplicationQueryHandler } from "./application/handlers";
+function CitationService(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: CitationService is not implemented yet.', args);
+  return null;
+}
+export { CitationService };
+
+function VisibilityService(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: VisibilityService is not implemented yet.', args);
+  return null;
+}
+export type BrandDashboardPayload = any;
+export type AggregateEngineScore = any;
+export { VisibilityService };
+
+function ObservationService(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: ObservationService is not implemented yet.', args);
+  return null;
+}
+export { ObservationService };
+
+function ApplicationCommandHandler(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: ApplicationCommandHandler is not implemented yet.', args);
+  return null;
+}
+export { ApplicationCommandHandler };
+
+function ApplicationQueryHandler(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: ApplicationQueryHandler is not implemented yet.', args);
+  return null;
+}
+export { ApplicationQueryHandler };
 
 // Security & Compliance
 export * from "./security";
@@ -51,3 +98,39 @@ export * from "./knowledge-graph";
 
 // Observability Layer
 export * from "./observability";
+
+function BrandRepository(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: BrandRepository is not implemented yet.', args);
+  return null;
+}
+
+export { BrandRepository };
+function db(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: db is not implemented yet.', args);
+  return null;
+}
+
+export { db };
+function eventBus(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: eventBus is not implemented yet.', args);
+  return null;
+}
+
+export { eventBus };
+function DomainEvent(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: DomainEvent is not implemented yet.', args);
+  return null;
+}
+
+export { DomainEvent };
+function IEventHandler(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: IEventHandler is not implemented yet.', args);
+  return null;
+}
+
+export { IEventHandler };

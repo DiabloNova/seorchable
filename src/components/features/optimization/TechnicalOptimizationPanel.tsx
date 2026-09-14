@@ -4,16 +4,10 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/Button";
-import { Badge } from "@/components/Badge";
+
 import { useTheme } from "@/components/ThemeProvider";
 import { useAuth } from "@/components/AuthProvider";
-import {
-  Zap, AlertTriangle, ShieldAlert, CheckCircle,
-  Settings, Award, RefreshCw, Layers, Layout,
-  Cpu, FileText, Download, Smartphone, Eye,
-  Globe, Accessibility, Shield, Sparkles, Loader2,
-  ChevronDown
-} from "lucide-react";
+import { Zap, AlertTriangle, ShieldAlert, CheckCircle, Award, RefreshCw, Layers, Layout, Cpu, FileText, Download, Smartphone, Globe, Accessibility, Shield, Sparkles, Loader2, ChevronDown } from "lucide-react";
 
 interface Category {
   score: number;
@@ -236,8 +230,7 @@ export const TechnicalOptimizationPanel: React.FC = () => {
             </h3>
             <p className="text-[11px] text-[var(--text-muted)] max-w-sm mx-auto">
               {isRtl
-                ? "فرآیند خزش عمیق و تحلیل کدهای وب‌سایت در حال انجام است. لطفاً منتظر بمانید."
-                : "Parsing HTML structures, auditing mobile rendering configurations, and generating solutions."}
+                ? "فرآیند خزش عمیق و تحلیل کدهای وب‌سایت در حال انجام است. لطفاً منتظر بمانید." :"Parsing HTML structures, auditing mobile rendering configurations, and generating solutions."}
             </p>
           </div>
 
@@ -255,8 +248,7 @@ export const TechnicalOptimizationPanel: React.FC = () => {
                   transition={{ delay: idx * 0.1 }}
                   className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
                     isActive ? 'bg-[var(--sky-blue-500)]/20 border border-[var(--sky-blue-500)]/40' :
-                    isCompleted ? 'bg-[var(--color-success)]/10 border border-[var(--color-success)]/20' :
-                    'bg-[var(--muted-surface)]/30 border border-transparent'
+                    isCompleted ? 'bg-[var(--color-success)]/10 border border-[var(--color-success)]/20': 'bg-[var(--muted-surface)]/30 border border-transparent'
                   }`}
                 >
                   <Icon size={18} className={isCompleted ? 'text-[var(--color-success)]' : isActive ? 'text-[var(--sky-blue-500)]' : 'text-[var(--text-muted)]'} />

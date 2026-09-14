@@ -21,8 +21,7 @@ export default function ContentIngestionPage() {
         </h1>
         <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-2xl">
           {isRtl
-            ? "بارگذاری اسناد، فایل‌های متنی و داده‌های ساختاریافته در پایگاه داده برداری جهت تحلیل‌های معنایی."
-            : "Upload internal reference corpora, PDFs, markdown, or JSON files to train tenant-isolated RAG index mappings."}
+            ? "بارگذاری اسناد، فایل‌های متنی و داده‌های ساختاریافته در پایگاه داده برداری جهت تحلیل‌های معنایی." :"Upload internal reference corpora, PDFs, markdown, or JSON files to train tenant-isolated RAG index mappings."}
         </p>
       </div>
 
@@ -34,15 +33,13 @@ export default function ContentIngestionPage() {
           </CardTitle>
           <CardDescription className="text-xs">
             {isRtl
-              ? "پوسته یکپارچه داشبورد با موفقیت بر روی این مسیر بارگذاری شده است."
-              : "The unified Dashboard Shell is actively rendering this route context with proper navigation parameters."}
+              ? "پوسته یکپارچه داشبورد با موفقیت بر روی این مسیر بارگذاری شده است." :"The unified Dashboard Shell is actively rendering this route context with proper navigation parameters."}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-xs text-[var(--text-secondary)] leading-relaxed space-y-2">
           <p>
             {isRtl
-              ? "مسیر فعال سایدبار: ابزارهای محتوایی > بارگذاری محتوا و مستندات"
-              : "Active Sidebar Navigation State: Content Tools > Content Ingestion"}
+              ? "مسیر فعال سایدبار: ابزارهای محتوایی > بارگذاری محتوا و مستندات" :"Active Sidebar Navigation State: Content Tools > Content Ingestion"}
           </p>
           <p className="text-[10px] text-[var(--text-muted)] font-mono">
             Route: /dashboard/content/ingestion

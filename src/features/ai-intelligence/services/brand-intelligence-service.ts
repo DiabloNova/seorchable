@@ -1,12 +1,4 @@
-import {
-  Brand,
-  Competitor,
-  BrandAssociation,
-  RecommendationObservation,
-  RecommendationStatusType,
-  AuditMetadata,
-  PromptExecution
-} from "../domain/types";
+import { Brand, BrandAssociation, RecommendationObservation, RecommendationStatusType, PromptExecution } from "../domain/types";
 import {
   BrandIntelligenceRepository,
   BrandRepository,

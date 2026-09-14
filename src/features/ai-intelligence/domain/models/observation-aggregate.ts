@@ -1,11 +1,19 @@
 import { AIObservation, BrandMention, Citation } from "../types";
 
 export class ObservationAggregate {
+  public readonly observation: AIObservation;
+  public readonly mentions: BrandMention[];
+  public readonly citations: Citation[];
+
   constructor(
-    public readonly observation: AIObservation,
-    public readonly mentions: BrandMention[],
-    public readonly citations: Citation[]
-  ) {}
+    observation: AIObservation,
+    mentions: BrandMention[],
+    citations: Citation[]
+  ) {
+    this.observation = observation;
+    this.mentions = mentions;
+    this.citations = citations;
+  }
 
   /**
    * Returns the count of brand mentions extracted in this observation.

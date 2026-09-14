@@ -78,8 +78,7 @@ export async function POST(req: NextRequest) {
 
     const centralLabel = `${entityName} (دمو / پیش‌فرض)`;
     const centralType = (normalizedQuery.includes("digikala") || normalizedQuery.includes("دیجی") || normalizedQuery.includes("snapp") || normalizedQuery.includes("اسنپ"))
-      ? "competitor"
-      : "brand";
+      ? "competitor" :"brand";
 
     const nodes: Array<{
       id: string;

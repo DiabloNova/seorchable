@@ -34,15 +34,13 @@ export default function SchemaPage() {
           </CardTitle>
           <CardDescription className="text-xs">
             {isRtl
-              ? "پوسته یکپارچه داشبورد با موفقیت بر روی این مسیر بارگذاری شده است."
-              : "The unified Dashboard Shell is actively rendering this route context with proper navigation parameters."}
+              ? "پوسته یکپارچه داشبورد با موفقیت بر روی این مسیر بارگذاری شده است." :"The unified Dashboard Shell is actively rendering this route context with proper navigation parameters."}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-xs text-[var(--text-secondary)] leading-relaxed space-y-2">
           <p>
             {isRtl
-              ? "مسیر فعال سایدبار: ابزارهای سئو > طرح‌واره و متا داتا"
-              : "Active Sidebar Navigation State: SEO Tools > Schema & Metadata"}
+              ? "مسیر فعال سایدبار: ابزارهای سئو > طرح‌واره و متا داتا" :"Active Sidebar Navigation State: SEO Tools > Schema & Metadata"}
           </p>
           <p className="text-[10px] text-[var(--text-muted)] font-mono">
             Route: /dashboard/seo/schema

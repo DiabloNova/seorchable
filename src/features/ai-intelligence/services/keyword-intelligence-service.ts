@@ -5,20 +5,7 @@
  */
 
 import { TenantContextManager } from "../../../core/database/tenant-context";
-import {
-  DiscoveredKeyword,
-  KeywordCluster,
-  KeywordGap,
-  KeywordIntelligenceResult,
-  KeywordSource,
-  SearchIntent,
-  Page,
-  Keyword,
-  Topic,
-  Entity,
-  Competitor,
-  CompetitiveSeoFinding
-} from "../domain/types";
+import { DiscoveredKeyword, KeywordCluster, KeywordGap, KeywordIntelligenceResult, KeywordSource, SearchIntent, Page, Keyword, Competitor } from "../domain/types";
 import {
   IKeywordRepository,
   IPageRepository,
@@ -119,16 +106,34 @@ export function calculateOpportunityScore(inputs: {
 }
 
 export class KeywordIntelligenceService {
+  private readonly keywordRepo: IKeywordRepository;
+  private readonly pageRepo: IPageRepository;
+  private readonly websiteRepo: IWebsiteRepository;
+  private readonly competitorRepo: ICompetitorRepository;
+  private readonly findingRepo: ICompetitiveSeoFindingRepository;
+  private readonly entityRepo: IEntityRepository;
+  private readonly topicRepo: ITopicRepository;
+  private readonly promptRepo: IPromptIntelligenceRepository;
+
   constructor(
-    private readonly keywordRepo: IKeywordRepository,
-    private readonly pageRepo: IPageRepository,
-    private readonly websiteRepo: IWebsiteRepository,
-    private readonly competitorRepo: ICompetitorRepository,
-    private readonly findingRepo: ICompetitiveSeoFindingRepository,
-    private readonly entityRepo: IEntityRepository,
-    private readonly topicRepo: ITopicRepository,
-    private readonly promptRepo: IPromptIntelligenceRepository
-  ) {}
+    keywordRepo: IKeywordRepository,
+    pageRepo: IPageRepository,
+    websiteRepo: IWebsiteRepository,
+    competitorRepo: ICompetitorRepository,
+    findingRepo: ICompetitiveSeoFindingRepository,
+    entityRepo: IEntityRepository,
+    topicRepo: ITopicRepository,
+    promptRepo: IPromptIntelligenceRepository
+  ) {
+    this.keywordRepo = keywordRepo;
+    this.pageRepo = pageRepo;
+    this.websiteRepo = websiteRepo;
+    this.competitorRepo = competitorRepo;
+    this.findingRepo = findingRepo;
+    this.entityRepo = entityRepo;
+    this.topicRepo = topicRepo;
+    this.promptRepo = promptRepo;
+  }
 
   /**
    * Main Entrypoint: Discovers, normalizes, clusters, classifies, scores, and analyzes keyword gaps for a tenant.
@@ -488,8 +493,7 @@ export class KeywordIntelligenceService {
             },
             searchIntent: intentRes.intent,
             recommendedAction: status === "semantic_coverage"
-              ? `Optimize existing page at ${matchingUrl} to explicitly incorporate query term "${targetKw}".`
-              : `Create new targeted article or section addressing "${targetKw}".`
+              ? `Optimize existing page at ${matchingUrl} to explicitly incorporate query term "${targetKw}".` : `Create new targeted article or section addressing"${targetKw}".`
           });
         }
       }

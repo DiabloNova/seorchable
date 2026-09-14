@@ -152,7 +152,7 @@ export function RadialPolarGraph({ className = "w-full h-full" }: RadialPolarGra
       ctx.save();
       ctx.lineWidth = 0.8;
       for (let i = 0; i < 12; i++) {
-        const angle = -Math.PI / 2 + (i * Math.PI / 6);
+        let angle = -Math.PI / 2 + (i * Math.PI / 6);
         const isSpokeHovered = hoveredSector !== null && (hoveredSector - 1 === i || (hoveredSector === 12 && i === 11));
 
         ctx.strokeStyle = isSpokeHovered ? "rgba(56, 189, 248, 0.4)" : "rgba(148, 163, 184, 0.12)";
@@ -220,7 +220,7 @@ export function RadialPolarGraph({ className = "w-full h-full" }: RadialPolarGra
 
       for (let i = 1; i <= 12; i++) {
         // Calculate coordinate outside of RIM
-        const angle = -Math.PI / 2 + (i * Math.PI / 6);
+        let angle = -Math.PI / 2 + (i * Math.PI / 6);
         const numR = R + 22;
         const nx = cx + numR * Math.cos(angle);
         const ny = cy + numR * Math.sin(angle);
@@ -408,18 +408,12 @@ export function RadialPolarGraph({ className = "w-full h-full" }: RadialPolarGra
         const tooltipY = mouseRef.current.y - 18;
 
         const textFa =
-          hoveredPointer === "p1"
-            ? "پایش سیگنال سهم صدای برند"
-            : hoveredPointer === "p2"
-            ? "ریسک کاذب و توهم هوش مصنوعی"
-            : "استناد معنایی به رقبای کلیدی";
+          hoveredPointer === "p1" ?"پایش سیگنال سهم صدای برند"
+            : hoveredPointer === "p2" ?"ریسک کاذب و توهم هوش مصنوعی" :"استناد معنایی به رقبای کلیدی";
 
         const textEn =
-          hoveredPointer === "p1"
-            ? "Brand Share of Voice Tracking"
-            : hoveredPointer === "p2"
-            ? "AI Hallucination & Factuality Risk"
-            : "Semantic Citation Outflow";
+          hoveredPointer === "p1" ?"Brand Share of Voice Tracking"
+            : hoveredPointer === "p2" ?"AI Hallucination & Factuality Risk" :"Semantic Citation Outflow";
 
         const label = isFa ? textFa : textEn;
 

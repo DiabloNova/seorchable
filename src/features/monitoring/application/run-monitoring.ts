@@ -9,16 +9,34 @@ import { CrawlSnapshot, SnapshotPage } from "../domain/entities/crawl-snapshot";
 import { randomUUID } from "crypto";
 
 export class RunMonitoring {
+  private configRepo: MonitoringConfigRepository;
+  private snapshotRepo: CrawlSnapshotRepository;
+  private alertRepo: MonitoringAlertRepository;
+  private changeDetection: ChangeDetectionService;
+  private regressionDetection: RegressionDetectionService;
+  private contentDetection: ContentChangeDetectionService;
+  private alertGeneration: AlertGenerationService;
+  private crawlProvider: any;
+
   constructor(
-    private configRepo: MonitoringConfigRepository,
-    private snapshotRepo: CrawlSnapshotRepository,
-    private alertRepo: MonitoringAlertRepository,
-    private changeDetection: ChangeDetectionService,
-    private regressionDetection: RegressionDetectionService,
-    private contentDetection: ContentChangeDetectionService,
-    private alertGeneration: AlertGenerationService,
-    private crawlProvider: any // Inject the real firecrawl provider here
-  ) {}
+    configRepo: MonitoringConfigRepository,
+    snapshotRepo: CrawlSnapshotRepository,
+    alertRepo: MonitoringAlertRepository,
+    changeDetection: ChangeDetectionService,
+    regressionDetection: RegressionDetectionService,
+    contentDetection: ContentChangeDetectionService,
+    alertGeneration: AlertGenerationService,
+    crawlProvider: any // Inject the real firecrawl provider here
+  ) {
+    this.configRepo = configRepo;
+    this.snapshotRepo = snapshotRepo;
+    this.alertRepo = alertRepo;
+    this.changeDetection = changeDetection;
+    this.regressionDetection = regressionDetection;
+    this.contentDetection = contentDetection;
+    this.alertGeneration = alertGeneration;
+    this.crawlProvider = crawlProvider;
+  }
 
   public async execute(input: { monitoringConfigId: string }): Promise<void> {
     const config = await this.configRepo.findById(input.monitoringConfigId);

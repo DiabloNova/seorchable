@@ -7,12 +7,7 @@ import { Button } from "@/components/Button";
 import { Badge } from "@/components/Badge";
 import { useTheme } from "@/components/ThemeProvider";
 import { useAuth } from "@/components/AuthProvider";
-import {
-  Globe, Zap, Shield, Sparkles, Loader2, Award,
-  RefreshCw, Layers, Layout, Download, Eye, Plus,
-  Trash2, AlertTriangle, Trophy, Users, CheckCircle,
-  TrendingUp, ShieldAlert, ChevronDown, BarChart3, ChevronUp
-} from "lucide-react";
+import { Globe, Zap, Sparkles, Loader2, Award, RefreshCw, Layers, Download, Plus, Trash2, AlertTriangle, Trophy, Users, CheckCircle, TrendingUp, ShieldAlert, ChevronDown, BarChart3 } from "lucide-react";
 import {
   ResponsiveContainer, RadarChart, PolarGrid,
   PolarAngleAxis, PolarRadiusAxis, Radar, Legend, Tooltip
@@ -315,8 +310,7 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
             </h3>
             <p className="text-[11px] text-[var(--text-muted)] max-w-sm mx-auto">
               {isRtl
-                ? "خزش کدهای HTML، ساختار محتوایی و بک‌لینک‌های رقبا به صورت موازی در حال انجام است."
-                : "Crawling competitors, matching text embeddings, and generating opportunity maps."}
+                ? "خزش کدهای HTML، ساختار محتوایی و بک‌لینک‌های رقبا به صورت موازی در حال انجام است." :"Crawling competitors, matching text embeddings, and generating opportunity maps."}
             </p>
           </div>
 
@@ -334,8 +328,7 @@ export const CompetitiveAnalysisPanel: React.FC = () => {
                   transition={{ delay: idx * 0.1 }}
                   className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
                     isActive ? 'bg-purple-500/20 border border-purple-500/40' :
-                    isCompleted ? 'bg-[var(--color-success)]/10 border border-[var(--color-success)]/20' :
-                    'bg-[var(--muted-surface)]/30 border border-transparent'
+                    isCompleted ? 'bg-[var(--color-success)]/10 border border-[var(--color-success)]/20': 'bg-[var(--muted-surface)]/30 border border-transparent'
                   }`}
                 >
                   <Icon size={18} className={isCompleted ? 'text-[var(--color-success)]' : isActive ? 'text-purple-400' : 'text-[var(--text-muted)]'} />

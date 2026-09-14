@@ -8,7 +8,7 @@ import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
 import { SeorchableLogo } from "@/components/marketing/SeorchableLogo";
-import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, UserPlus, ShieldCheck } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, UserPlus } from "lucide-react";
 
 export default function RegisterPage({ params }: { params: Promise<{ locale: string }> }) {
   const resolvedParams = use(params);
@@ -107,7 +107,7 @@ export default function RegisterPage({ params }: { params: Promise<{ locale: str
 
     setIsLoading(true);
     try {
-      await register(name, email, password);
+      await register(name, email, password, workspaceName || undefined);
       setIsSuccess(true);
       // Let the user proceed to verify email or directly to dashboard
       setTimeout(() => {

@@ -19,8 +19,7 @@ export default function ProfilePage() {
         </h1>
         <p className="text-sm text-[var(--text-secondary)] mt-1.5 max-w-3xl leading-relaxed">
           {isRtl
-            ? "اطلاعات حساب کاربری، جزئیات اشتراک سازمانی، و سهمیه کوئری مستأجر."
-            : "Manage your user account identity, organizational workspace defaults, and billing tokens."}
+            ? "اطلاعات حساب کاربری، جزئیات اشتراک سازمانی، و سهمیه کوئری مستأجر." :"Manage your user account identity, organizational workspace defaults, and billing tokens."}
         </p>
       </div>
 

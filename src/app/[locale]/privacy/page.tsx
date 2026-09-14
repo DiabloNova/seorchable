@@ -54,8 +54,7 @@ export default function PrivacyPage({ params }: { params: Promise<{ locale: stri
             </h3>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
               {isFa
-                ? "داده‌های مربوط به ردیابی رقبا و توصیه‌های بهینه‌سازی فنی به صورت کاملاً رمزنگاری‌شده بر مبنای استانداردهای نوین ابری نگهداری می‌شوند."
-                : "Your query histories, sentiment scores, and proprietary brand networks are encrypted in transit and at rest using banking-grade security protocols."}
+                ? "داده‌های مربوط به ردیابی رقبا و توصیه‌های بهینه‌سازی فنی به صورت کاملاً رمزنگاری‌شده بر مبنای استانداردهای نوین ابری نگهداری می‌شوند." :"Your query histories, sentiment scores, and proprietary brand networks are encrypted in transit and at rest using banking-grade security protocols."}
             </p>
 
             <h3 className="text-xl font-bold font-display flex items-center gap-2">
@@ -64,8 +63,7 @@ export default function PrivacyPage({ params }: { params: Promise<{ locale: stri
             </h3>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
               {isFa
-                ? "موتورهای خزش هوشمند ما قوانین موجود در فایل robots.txt دامنه‌ها را رعایت کرده و درخواست‌های متعددی را به سرورهای هدف جهت ایجاد ترافیک کاذب ارسال نخواهند کرد."
-                : "Our smart Firecrawl agents respect standard robots.txt configurations. We avoid spamming target web-servers during deep link discovery."}
+                ? "موتورهای خزش هوشمند ما قوانین موجود در فایل robots.txt دامنه‌ها را رعایت کرده و درخواست‌های متعددی را به سرورهای هدف جهت ایجاد ترافیک کاذب ارسال نخواهند کرد." :"Our smart Firecrawl agents respect standard robots.txt configurations. We avoid spamming target web-servers during deep link discovery."}
             </p>
           </div>
         </div>

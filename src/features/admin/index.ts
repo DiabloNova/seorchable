@@ -13,10 +13,10 @@ export * from "./application/commands";
 export * from "./application/queries";
 export * from "./application/dto";
 export * from "./application/mappers";
-export { ApplicationAdminCommandHandler, ApplicationAdminQueryHandler } from "./application/handlers";
+export * from "./application/handlers";
 
 // Infrastructure Layer
-export { AdminMockDatabase } from "./infrastructure/mock-db";
+export * from "./infrastructure/mock-db";
 
 // API Layer
 export * from "./api/v1/admin";

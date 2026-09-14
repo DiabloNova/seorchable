@@ -121,8 +121,7 @@ export function normalizeUrl(
   if (
     !hostIsIpv6 &&
     !asciiHost.includes(".") &&
-    asciiHost !== "localhost" &&
-    !asciiHost.endsWith(".localhost")
+    asciiHost !== "localhost"&& !asciiHost.endsWith(".localhost")
   ) {
     return invalid("Single-label host is not allowed");
   }

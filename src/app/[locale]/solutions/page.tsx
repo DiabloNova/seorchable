@@ -4,7 +4,7 @@ import React, { use } from "react";
 import { Header } from "@/components/marketing/Header";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
 import AppSidebar from "@/components/navigation/AppSidebar";
-import { Sparkles, Brain, Search, Activity, Network, CheckCircle, ShieldCheck, Cpu } from "lucide-react";
+import { Sparkles, Brain, Search, Activity, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 export default function SolutionsPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -72,8 +72,7 @@ export default function SolutionsPage({ params }: { params: Promise<{ locale: st
             </h1>
             <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
               {isFa
-                ? "مجموعه‌ای از ابزارها و استراتژی‌های اثبات‌شده برای تسلط بر دیده‌شدن در عصر هوش مصنوعی."
-                : "A suite of proven tools and strategies to master visibility in the era of Artificial Intelligence."}
+                ? "مجموعه‌ای از ابزارها و استراتژی‌های اثبات‌شده برای تسلط بر دیده‌شدن در عصر هوش مصنوعی." :"A suite of proven tools and strategies to master visibility in the era of Artificial Intelligence."}
             </p>
           </div>
 

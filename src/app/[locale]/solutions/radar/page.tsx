@@ -54,8 +54,7 @@ export default function RadarSolutionPage({ params }: { params: Promise<{ locale
             </h3>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
               {isFa
-                ? "استخراج و مهندسی معکوس ساختار مراجعی که مدل‌های زبانی از آن‌ها برای معرفی رقیب استفاده کرده‌اند، جهت اتخاذ تصمیمات استراتژیک."
-                : "We trace the references that LLMs cite when recommending your competitors, allowing you to intercept those vectors and optimize your brand coverage."}
+                ? "استخراج و مهندسی معکوس ساختار مراجعی که مدل‌های زبانی از آن‌ها برای معرفی رقیب استفاده کرده‌اند، جهت اتخاذ تصمیمات استراتژیک." :"We trace the references that LLMs cite when recommending your competitors, allowing you to intercept those vectors and optimize your brand coverage."}
             </p>
 
             <div className="p-4 rounded-xl border border-orange-500/20 bg-orange-500/5 space-y-2">

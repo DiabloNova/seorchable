@@ -3,24 +3,7 @@
 import React, { useState, useEffect, useTransition } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
-import {
-  Sparkles,
-  Link2,
-  TrendingUp,
-  Award,
-  AlertTriangle,
-  CheckCircle,
-  HelpCircle,
-  Share2,
-  List,
-  Layers,
-  ChevronRight,
-  TrendingDown,
-  ArrowUpRight,
-  ShieldCheck,
-  Percent,
-  Receipt
-} from "lucide-react";
+import { Link2, TrendingUp, AlertTriangle, CheckCircle, List, ArrowUpRight, ShieldCheck, Percent } from "lucide-react";
 import { getCitationsDashboardDataAction } from "@/app/actions/citation-intelligence";
 import { CitationSource, CitationOccurrence } from "@/features/ai-intelligence/domain/types";
 
@@ -101,8 +84,7 @@ export default function AeoCitationsPage() {
           </h1>
           <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-2xl leading-relaxed">
             {isRtl
-              ? "تحلیل دامنه‌های مرجع استناد شده، بررسی ارزش و نمره کیفیت مراجع، محاسبه خودکار سهم استنادات برند شما و شناسایی خلاهای رقابتی."
-              : "Enterprise citation engine to discover, classify, evaluate quality, and track domain authority trends across conversational answers."}
+              ? "تحلیل دامنه‌های مرجع استناد شده، بررسی ارزش و نمره کیفیت مراجع، محاسبه خودکار سهم استنادات برند شما و شناسایی خلاهای رقابتی." :"Enterprise citation engine to discover, classify, evaluate quality, and track domain authority trends across conversational answers."}
           </p>
         </div>
       </div>

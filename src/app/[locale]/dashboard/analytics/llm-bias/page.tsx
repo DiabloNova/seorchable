@@ -21,8 +21,7 @@ export default function LlmBiasPage() {
         </h1>
         <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-2xl">
           {isRtl
-            ? "تحلیل سهم پاسخ هر یک از هوش‌های مصنوعی از ترافیک جستجوی شما و ارزیابی جهت‌گیری‌های احتمالی در تذکره‌ها."
-            : "Evaluate conversational response share rates across distinct LLMs and analyze response biases."}
+            ? "تحلیل سهم پاسخ هر یک از هوش‌های مصنوعی از ترافیک جستجوی شما و ارزیابی جهت‌گیری‌های احتمالی در تذکره‌ها." :"Evaluate conversational response share rates across distinct LLMs and analyze response biases."}
         </p>
       </div>
 
@@ -34,15 +33,13 @@ export default function LlmBiasPage() {
           </CardTitle>
           <CardDescription className="text-xs">
             {isRtl
-              ? "پوسته یکپارچه داشبورد با موفقیت بر روی این مسیر بارگذاری شده است."
-              : "The unified Dashboard Shell is actively rendering this route context with proper navigation parameters."}
+              ? "پوسته یکپارچه داشبورد با موفقیت بر روی این مسیر بارگذاری شده است." :"The unified Dashboard Shell is actively rendering this route context with proper navigation parameters."}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-xs text-[var(--text-secondary)] leading-relaxed space-y-2">
           <p>
             {isRtl
-              ? "مسیر فعال سایدبار: تحلیل‌ها و گزارش‌دهی > سهم پاسخ و انحراف مدل‌ها"
-              : "Active Sidebar Navigation State: Analytics & Reporting > LLM Response Share & Bias"}
+              ? "مسیر فعال سایدبار: تحلیل‌ها و گزارش‌دهی > سهم پاسخ و انحراف مدل‌ها" :"Active Sidebar Navigation State: Analytics & Reporting > LLM Response Share & Bias"}
           </p>
           <p className="text-[10px] text-[var(--text-muted)] font-mono">
             Route: /dashboard/analytics/llm-bias

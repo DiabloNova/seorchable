@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+
 import { TenantContextManager, TenantContextViolationException } from "../../../core/database/tenant-context";
 import {
   ICompetitorRepository,
@@ -10,22 +10,7 @@ import {
   IHistoricalMetricRepository,
   IBrandRepository
 } from "../repositories/interfaces";
-import {
-  CompetitiveInsight,
-  CompetitiveRadarSnapshot,
-  TenantRadarData,
-  CompetitorRadarData,
-  RadarDimension,
-  DataAvailabilityStatus,
-  HistoricalMetric,
-  Competitor,
-  CompetitiveSeoFinding,
-  VisibilityScore,
-  PositionObservation,
-  RecommendationObservation,
-  BrandAssociation,
-  CitationSource
-} from "../domain/types";
+import { CompetitiveInsight, CompetitiveRadarSnapshot, TenantRadarData, CompetitorRadarData, RadarDimension, HistoricalMetric, Competitor, CompetitiveSeoFinding, RecommendationObservation, CitationSource } from "../domain/types";
 
 function enforceTenantContext(organizationId: string): void {
   if (TenantContextManager.isSystemMode()) {
@@ -51,25 +36,43 @@ function calculateMedian(values: number[]): number | null {
 
 function calculateRankAndPercentile(tenantVal: number, competitorVals: number[]): { rank: number; percentile: number } {
   const allVals = [tenantVal, ...competitorVals].sort((a, b) => b - a); // highest first
-  const rank = allVals.indexOf(tenantVal) + 1;
+  let rank = allVals.indexOf(tenantVal) + 1;
   const total = allVals.length;
   const belowCount = competitorVals.filter(v => v < tenantVal).length;
   const equalCount = competitorVals.filter(v => v === tenantVal).length + 1; // including tenant
-  const percentile = Math.round(((belowCount + 0.5 * equalCount) / total) * 100);
+  let percentile = Math.round(((belowCount + 0.5 * equalCount) / total) * 100);
   return { rank, percentile };
 }
 
 export class CompetitiveRadarService {
+  private readonly competitorRepo: ICompetitorRepository;
+  private readonly competitiveSeoFindingRepo: ICompetitiveSeoFindingRepository;
+  private readonly visibilityScoreRepo: IVisibilityScoreRepository;
+  private readonly citationRepo: ICitationIntelligenceRepository;
+  private readonly promptRepo: IPromptIntelligenceRepository;
+  private readonly brandIntelRepo: IBrandIntelligenceRepository;
+  private readonly historicalRepo: IHistoricalMetricRepository;
+  private readonly brandRepo: IBrandRepository;
+
   constructor(
-    private readonly competitorRepo: ICompetitorRepository,
-    private readonly competitiveSeoFindingRepo: ICompetitiveSeoFindingRepository,
-    private readonly visibilityScoreRepo: IVisibilityScoreRepository,
-    private readonly citationRepo: ICitationIntelligenceRepository,
-    private readonly promptRepo: IPromptIntelligenceRepository,
-    private readonly brandIntelRepo: IBrandIntelligenceRepository,
-    private readonly historicalRepo: IHistoricalMetricRepository,
-    private readonly brandRepo: IBrandRepository
-  ) {}
+    competitorRepo: ICompetitorRepository,
+    competitiveSeoFindingRepo: ICompetitiveSeoFindingRepository,
+    visibilityScoreRepo: IVisibilityScoreRepository,
+    citationRepo: ICitationIntelligenceRepository,
+    promptRepo: IPromptIntelligenceRepository,
+    brandIntelRepo: IBrandIntelligenceRepository,
+    historicalRepo: IHistoricalMetricRepository,
+    brandRepo: IBrandRepository
+  ) {
+    this.competitorRepo = competitorRepo;
+    this.competitiveSeoFindingRepo = competitiveSeoFindingRepo;
+    this.visibilityScoreRepo = visibilityScoreRepo;
+    this.citationRepo = citationRepo;
+    this.promptRepo = promptRepo;
+    this.brandIntelRepo = brandIntelRepo;
+    this.historicalRepo = historicalRepo;
+    this.brandRepo = brandRepo;
+  }
 
   /**
    * Helper to fetch and build radar dimensions for a tenant (Your Brand)

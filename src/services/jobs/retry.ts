@@ -6,10 +6,16 @@ export interface RetryPolicy {
 }
 
 export class ExponentialBackoffRetryPolicy implements RetryPolicy {
+  private baseDelayMs: number;
+  private maxDelayMs: number;
+
   constructor(
-    private baseDelayMs: number = 1000,
-    private maxDelayMs: number = 10000
-  ) {}
+    baseDelayMs: number = 1000,
+    maxDelayMs: number = 10000
+  ) {
+    this.baseDelayMs = baseDelayMs;
+    this.maxDelayMs = maxDelayMs;
+  }
 
   getDelay(attempt: number): number {
     return Math.min(

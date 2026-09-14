@@ -93,8 +93,7 @@ export const TopEntitiesList: React.FC<TopEntitiesListProps> = ({
         </CardTitle>
         <CardDescription>
           {isRtl
-            ? "بیشترین کلیدواژه‌ها و مفاهیمی که با نام برند پیوند یافته‌اند."
-            : "The most frequent semantic entities crawled and linked in recent observations."}
+            ? "بیشترین کلیدواژه‌ها و مفاهیمی که با نام برند پیوند یافته‌اند." :"The most frequent semantic entities crawled and linked in recent observations."}
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-4 space-y-5">

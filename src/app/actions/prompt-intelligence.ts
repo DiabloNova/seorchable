@@ -6,12 +6,7 @@ import { requireSession } from "@/services/auth/session";
 import { requireWorkspaceMembership } from "@/services/auth/authorization";
 import { PromptIntelligenceService } from "@/features/ai-intelligence/services/prompt-intelligence-service";
 import { PromptIntelligenceRepository } from "@/features/ai-intelligence/repositories";
-import {
-  PositionObservation,
-  PromptCategory,
-  PromptIntentType,
-  PromptVariable,
-} from "@/features/ai-intelligence/domain/types";
+import { PositionObservation,  } from "@/features/ai-intelligence/domain/types";
 
 // Zod Enums based on your domain types to ensure runtime type-safety
 const PromptCategoryEnum = z.enum([
@@ -385,7 +380,7 @@ export async function executePromptAction(
         );
 
         const repo = new PromptIntelligenceRepository();
-        const positions = await repo.findPositionsByExecutionId(
+        let positions = await repo.findPositionsByExecutionId(
           tenantId,
           exec.id,
         );

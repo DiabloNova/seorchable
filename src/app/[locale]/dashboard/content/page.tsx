@@ -20,8 +20,7 @@ export default function ContentStudioPage() {
         </h1>
         <p className="text-sm text-[var(--text-secondary)] mt-1.5 max-w-3xl leading-relaxed">
           {isRtl
-            ? "بستر یکپارچه تولید و بهینه‌سازی محتوا بر اساس دانش عمیق زبانی و داده‌های پایش شده."
-            : "Synthesize and optimize brand-aligned literature enriched by real-time conversational retrieval statistics."}
+            ? "بستر یکپارچه تولید و بهینه‌سازی محتوا بر اساس دانش عمیق زبانی و داده‌های پایش شده." :"Synthesize and optimize brand-aligned literature enriched by real-time conversational retrieval statistics."}
         </p>
       </div>
 

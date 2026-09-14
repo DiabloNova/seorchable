@@ -13,8 +13,7 @@ export async function extractSeedLinks(
   maxLinks: number = 5
 ): Promise<string[]> {
   const useMock =
-    process.env.USE_MOCK_CRAWLER === "true" ||
-    seedUrl.toLowerCase().includes("mock.com");
+    process.env.USE_MOCK_CRAWLER === "true" || seedUrl.toLowerCase().includes("mock.com");
 
   if (useMock) {
     // Generate realistic mock URLs based on the hostname of the seed URL

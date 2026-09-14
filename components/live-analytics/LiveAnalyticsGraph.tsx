@@ -341,9 +341,7 @@ export const LiveAnalyticsGraph: React.FC<LiveAnalyticsGraphProps> = ({
             {language === "fa" ? "پایش زنده آمارهای برند" : "Live Search Engine & Brand Analytics"}
           </h3>
           <p className="text-[10px] text-slate-400 mt-0.5">
-            {language === "fa"
-              ? "تحلیل بلادرنگ کانال‌های پایش پاسخ‌های هوش مصنوعی."
-              : "Real-time generative search engine metrics visualization."}
+            {language === "fa" ?"تحلیل بلادرنگ کانال‌های پایش پاسخ‌های هوش مصنوعی." :"Real-time generative search engine metrics visualization."}
           </p>
         </div>
         <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-[9px] font-bold border border-emerald-500/10">

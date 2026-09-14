@@ -9,7 +9,10 @@ export class JobExecutionManager implements IJobExecutor {
   constructor(
     private jobService: JobService,
     private retryPolicy: RetryPolicy
-  ) {}
+  ) {
+    this.jobService = jobService;
+    this.retryPolicy = retryPolicy;
+  }
 
   registerExecutor(type: string, handler: (job: Job) => Promise<void>) {
     this.executors.set(type, handler);

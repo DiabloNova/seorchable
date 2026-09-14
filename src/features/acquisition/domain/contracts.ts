@@ -3,13 +3,7 @@ import type { CrawlPolicy } from "./policy";
 import type { NormalizedUrl } from "./url/normalizer";
 
 export type CrawlJobStatus =
-  | "PENDING"
-  | "QUEUED"
-  | "RUNNING"
-  | "SUCCEEDED"
-  | "PARTIAL"
-  | "FAILED"
-  | "CANCELLED";
+  | "PENDING" |"QUEUED" |"RUNNING" |"SUCCEEDED" |"PARTIAL" |"FAILED" |"CANCELLED";
 
 export interface CrawlRequest {
   tenantId: string;

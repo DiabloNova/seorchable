@@ -9,11 +9,9 @@ awk '
   print "  description: text(\"description\"),"
   print "  referenceId: text(\"reference_id\"),"
   print "  createdAt: timestamp(\"created_at\", { withTimezone: true }).notNull().default(defaultNow),"
-  print "}, (table) => ["
-  print "  index(\"idx_credit_transactions_tenant\").on(table.tenantId),"
+  print "}, (table) => [" print"  index(\"idx_credit_transactions_tenant\").on(table.tenantId),"
   print "  ...tenantPolicy(\"tenant_id\")"
-  print "]);"
-  print ""
+  print "]);" print""
   print $0
   next
 }

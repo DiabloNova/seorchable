@@ -17,22 +17,19 @@ export function ProcessSection() {
       icon: Link2,
       title: isFa ? "اتصال منابع برند" : "Connect your brand sources",
       desc: isFa
-        ? "دامنه‌ها، محصولات و موجودیت‌های کلیدی خود را وارد کنید تا پایگاه دانش شکل بگیرد."
-        : "Add your domains, products, and key entities to build the knowledge base.",
+        ? "دامنه‌ها، محصولات و موجودیت‌های کلیدی خود را وارد کنید تا پایگاه دانش شکل بگیرد." :"Add your domains, products, and key entities to build the knowledge base.",
     },
     {
       icon: ScanSearch,
       title: isFa ? "پایش موتورهای هوش مصنوعی" : "Monitor the AI engines",
       desc: isFa
-        ? "پلتفرم به‌طور مداوم پاسخ‌های ChatGPT، Gemini، Claude و Perplexity را رصد می‌کند."
-        : "The platform continuously observes answers from ChatGPT, Gemini, Claude, and Perplexity.",
+        ? "پلتفرم به‌طور مداوم پاسخ‌های ChatGPT، Gemini، Claude و Perplexity را رصد می‌کند." :"The platform continuously observes answers from ChatGPT, Gemini, Claude, and Perplexity.",
     },
     {
       icon: SlidersHorizontal,
       title: isFa ? "بهینه‌سازی و محافظت" : "Optimize & protect",
       desc: isFa
-        ? "بر اساس توصیه‌های عملی، ارجاع‌ها را تقویت و توهم‌ها را اصلاح کنید."
-        : "Act on concrete recommendations to boost citations and correct hallucinations.",
+        ? "بر اساس توصیه‌های عملی، ارجاع‌ها را تقویت و توهم‌ها را اصلاح کنید." :"Act on concrete recommendations to boost citations and correct hallucinations.",
     },
   ];
 
@@ -49,8 +46,8 @@ export function ProcessSection() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-5">
-          {steps.map((s, i) => {
-            const Icon = s.icon;
+          {steps?.map((s, i) => {
+            const Icon = s?.icon;
             return (
               <div
                 key={i}
@@ -69,10 +66,10 @@ export function ProcessSection() {
                 </div>
                 <div className="space-y-2">
                   <h3 className="font-display font-bold text-lg text-[var(--text-primary)]">
-                    {s.title}
+                    {s?.title}
                   </h3>
                   <p className="text-sm text-[var(--text-secondary)] leading-relaxed text-pretty">
-                    {s.desc}
+                    {s?.desc}
                   </p>
                 </div>
               </div>

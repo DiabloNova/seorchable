@@ -15,19 +15,7 @@ import {
   Radar,
   Tooltip
 } from "recharts";
-import {
-  Sparkles,
-  Flame,
-  AlertTriangle,
-  Lightbulb,
-  Search,
-  RefreshCw,
-  Cpu,
-  Bookmark,
-  TrendingUp,
-  XCircle,
-  FileText
-} from "lucide-react";
+import { Sparkles, Flame, AlertTriangle, Lightbulb, Search, RefreshCw, Cpu, TrendingUp, XCircle } from "lucide-react";
 
 interface AuditMetric {
   entityDensity: number;
@@ -75,8 +63,7 @@ export const AeoAuditPanel: React.FC = () => {
   const strings = {
     panelTitle: isRtl ? "تحلیل عمیق و بهینه‌سازی معنایی برند (AEO)" : "Semantic AEO & SEO Brand Audit",
     panelDesc: isRtl
-      ? "تراکم مفاهیم، شبکه ارتباطات گراف معنایی و سلامت احساسات را ارزیابی کرده و نسخه‌های بهینه‌سازی موتورهای پاسخ‌گو را دریافت نمایید."
-      : "Audit entity density, relationship clarity, and sentiment scores. Receive automated AEO recommendations.",
+      ? "تراکم مفاهیم، شبکه ارتباطات گراف معنایی و سلامت احساسات را ارزیابی کرده و نسخه‌های بهینه‌سازی موتورهای پاسخ‌گو را دریافت نمایید." :"Audit entity density, relationship clarity, and sentiment scores. Receive automated AEO recommendations.",
     inputPlaceholder: isRtl ? "نام برند یا شرکت خود را وارد کنید (مثال: دیجی کالا)..." : "Enter brand or entity name (e.g., Optimus)...",
     btnAnalyze: isRtl ? "شروع تحلیل معنایی" : "Run Semantic Audit",
     btnAnalyzing: isRtl ? "در حال پایش گراف دانش..." : "Auditing Semantic Graph...",
@@ -85,8 +72,7 @@ export const AeoAuditPanel: React.FC = () => {
     metricsTitle: isRtl ? "شاخص‌های سه‌گانه حضور معنایی" : "Three Semantic Diagnostic Pillars",
     recommendationsTitle: isRtl ? "توصیه‌های استراتژیک هوش مصنوعی" : "AI Generated Strategic Insights",
     recsDesc: isRtl
-      ? "راهکارهای خودکار برای برطرف‌سازی نقص‌های معنایی در موتورهای پاسخ‌دهی:"
-      : "Automated steps to secure citation anchors and fix model representation gaps:",
+      ? "راهکارهای خودکار برای برطرف‌سازی نقص‌های معنایی در موتورهای پاسخ‌دهی:" :"Automated steps to secure citation anchors and fix model representation gaps:",
     priorityHigh: isRtl ? "اولویت حیاتی" : "High Priority",
     priorityMedium: isRtl ? "اولویت متوسط" : "Medium Priority",
     priorityLow: isRtl ? "اولویت عادی" : "Low Priority",
@@ -97,8 +83,7 @@ export const AeoAuditPanel: React.FC = () => {
     apiError: isRtl ? "خطا در بازیابی اطلاعات تحلیل. مطمئن شوید دیتابیس فعال است." : "Failed to retrieve semantic audit payload. Check database connectivity.",
     emptyResultTitle: isRtl ? "درگاه آزمایش سئو معنایی" : "Semantic SEO Diagnostic Center",
     emptyResultDesc: isRtl
-      ? "برای ارزیابی و استخراج اتوماتیک نقشه بهینه‌سازی، نام برند مورد نظر را جستجو کنید."
-      : "Enter your company name to scan database relationships and compile direct GEO/AEO recommendations.",
+      ? "برای ارزیابی و استخراج اتوماتیک نقشه بهینه‌سازی، نام برند مورد نظر را جستجو کنید." :"Enter your company name to scan database relationships and compile direct GEO/AEO recommendations.",
     entityDensityLabel: isRtl ? "تراکم موجودیت" : "Entity Density",
     relationshipClarityLabel: isRtl ? "وضوح روابط" : "Relationship Clarity",
     sentimentHealthLabel: isRtl ? "سلامت احساسات" : "Sentiment Health",

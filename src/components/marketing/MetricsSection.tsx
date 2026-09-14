@@ -22,13 +22,13 @@ export function MetricsSection() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="neu-surface rounded-[var(--radius-xl)] p-8 md:p-12">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {metrics.map((m, i) => (
+            {metrics?.map((m, i) => (
               <div key={i} className="text-center space-y-2">
                 <div className="font-display font-black text-4xl md:text-5xl text-gradient-brand leading-none">
-                  {isFa ? m.value : m.valueEn}
+                  {isFa ? m?.value : m?.valueEn}
                 </div>
                 <p className="text-xs md:text-sm text-[var(--text-secondary)] leading-relaxed text-balance">
-                  {isFa ? m.fa : m.en}
+                  {isFa ? m?.fa : m?.en}
                 </p>
               </div>
             ))}

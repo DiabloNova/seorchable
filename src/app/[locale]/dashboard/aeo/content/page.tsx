@@ -3,25 +3,7 @@
 import React, { useState, useEffect, useTransition } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
-import {
-  BookOpen,
-  RefreshCw,
-  Award,
-  HelpCircle,
-  AlertTriangle,
-  CheckCircle,
-  FileText,
-  HelpCircle as QuestionIcon,
-  Link2,
-  List,
-  GitBranch,
-  Network,
-  Compass,
-  ArrowLeftRight,
-  TrendingUp,
-  Clock,
-  Sparkles
-} from "lucide-react";
+import { BookOpen, RefreshCw, Award, AlertTriangle, CheckCircle, FileText, HelpCircle as QuestionIcon, Link2, List, GitBranch, Network, ArrowLeftRight, Clock } from "lucide-react";
 import {
   getAeoContentDashboardDataAction,
   runAeoAnalysisForPageAction
@@ -131,8 +113,7 @@ export default function AeoContentIntelligenceDashboard() {
           </h1>
           <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-2xl leading-relaxed">
             {isRtl
-              ? "پلتفرم پیشرفته تحلیل و ارزیابی آمادگی محتوای وب‌سایت برای هوش مصنوعی. بررسی قابلیت پاسخ‌دهی، جفت‌سازی سوالات، ساختاریافتگی، همترازی گراف دانش و فرصت‌های FAQ."
-              : "Enterprise-grade suite designed to measure page answerability, semantic structures, entity coverage, and Knowledge Graph alignments."}
+              ? "پلتفرم پیشرفته تحلیل و ارزیابی آمادگی محتوای وب‌سایت برای هوش مصنوعی. بررسی قابلیت پاسخ‌دهی، جفت‌سازی سوالات، ساختاریافتگی، همترازی گراف دانش و فرصت‌های FAQ." :"Enterprise-grade suite designed to measure page answerability, semantic structures, entity coverage, and Knowledge Graph alignments."}
           </p>
         </div>
 
@@ -214,8 +195,7 @@ export default function AeoContentIntelligenceDashboard() {
 
                   <div className="text-center max-w-xs text-[11px] text-[var(--text-secondary)] leading-relaxed">
                     {isRtl
-                      ? "این نمره بیانگر انطباق همه‌جانبه ساختارهای محتوایی با مدل‌های تحلیل هوش مصنوعی است."
-                      : "Aggregated using deterministic rules for answerability, entities, semantic concepts, and citations."}
+                      ? "این نمره بیانگر انطباق همه‌جانبه ساختارهای محتوایی با مدل‌های تحلیل هوش مصنوعی است." :"Aggregated using deterministic rules for answerability, entities, semantic concepts, and citations."}
                   </div>
                 </CardContent>
               </Card>
@@ -376,8 +356,7 @@ export default function AeoContentIntelligenceDashboard() {
                               <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
                                 ent.status === "covered" ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-500" :
                                 ent.status === "partially_covered" ? "bg-blue-50 dark:bg-blue-950/20 text-blue-500" :
-                                ent.status === "mentioned_only" ? "bg-amber-50 dark:bg-amber-950/20 text-amber-500" :
-                                "bg-red-50 dark:bg-red-950/20 text-red-500"
+                                ent.status === "mentioned_only"? "bg-amber-50 dark:bg-amber-950/20 text-amber-500" : "bg-red-50 dark:bg-red-950/20 text-red-500"
                               }`}>
                                 {ent.status.replace("_", " ")}
                               </span>

@@ -27,8 +27,7 @@ export default function CompetitivePage() {
           </h1>
           <p className="text-xs text-[var(--text-secondary)] mt-1">
             {isRtl
-              ? "پایش سهم صدای مدل‌های زبانی بزرگ، مقایسه شاخص‌های کلیدی محتوا و بهینه‌سازی فنی شما با ۵ رقیب اصلی."
-              : "Compare brand metrics, content strategies, and SEO indicators directly with up to 5 competitors."}
+              ? "پایش سهم صدای مدل‌های زبانی بزرگ، مقایسه شاخص‌های کلیدی محتوا و بهینه‌سازی فنی شما با ۵ رقیب اصلی." :"Compare brand metrics, content strategies, and SEO indicators directly with up to 5 competitors."}
           </p>
         </div>
 

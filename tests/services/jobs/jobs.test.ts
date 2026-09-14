@@ -6,7 +6,7 @@ import { User } from "../../../src/types/auth";
 import { JobService } from "../../../src/services/jobs/service";
 import { InMemoryJobRepository } from "../../../src/services/jobs/repository";
 import { ExponentialBackoffRetryPolicy } from "../../../src/services/jobs/retry";
-import { InMemoryJobQueue, IJobExecutor } from "../../../src/services/jobs/queue";
+import { InMemoryJobQueue } from "../../../src/services/jobs/queue";
 import { JobExecutionManager } from "../../../src/services/jobs/executor";
 import { Job, JobSchedule } from "../../../src/services/jobs/types";
 import { CrawlJobMetadata, AiAnalysisJobMetadata } from "../../../src/services/jobs/contracts";

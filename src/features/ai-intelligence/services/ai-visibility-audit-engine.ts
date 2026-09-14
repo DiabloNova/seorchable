@@ -1,13 +1,4 @@
-import {
-  AIVisibilityAudit,
-  AIVisibilityAuditStatus,
-  AIVisibilityAuditMetrics,
-  AuditPrompt,
-  AuditPromptStatus,
-  AuditPromptAnalysis,
-  Brand,
-  AuditMetadata
-} from "../domain/types";
+import { AIVisibilityAudit, AIVisibilityAuditMetrics, AuditPrompt, AuditPromptAnalysis, Brand, AuditMetadata } from "../domain/types";
 import { BrandRepository, AIVisibilityAuditRepository } from "../repositories";
 import { AIVisibilityProviderRegistry } from "../../../services/ai/ai-visibility-provider";
 

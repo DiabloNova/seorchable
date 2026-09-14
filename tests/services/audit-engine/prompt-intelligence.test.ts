@@ -1,6 +1,6 @@
-import { PromptIntelligenceService, SUPPORTED_MODELS } from "../../../src/features/ai-intelligence/services/prompt-intelligence-service";
+import { PromptIntelligenceService } from "../../../src/features/ai-intelligence/services/prompt-intelligence-service";
 import { BrandRepository, PromptIntelligenceRepository } from "../../../src/features/ai-intelligence/repositories";
-import { Brand, PromptDefinition } from "../../../src/features/ai-intelligence/domain/types";
+import { Brand } from "../../../src/features/ai-intelligence/domain/types";
 import { TenantContextManager } from "../../../src/core/database/tenant-context";
 import * as assert from "assert";
 

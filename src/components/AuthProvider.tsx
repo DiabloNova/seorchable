@@ -1,13 +1,13 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { User, Session, UserRole } from "@/types/auth";
+import { Session, UserRole } from "@/types/auth";
 import { loginAction, logoutAction, getServerSessionAction, registerAction } from "@/app/actions/auth";
 
 interface AuthContextType {
   session: Session;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, workspaceName?: string) => Promise<void>;
   logout: () => Promise<void>;
   hasPermission: (requiredRole: UserRole) => boolean;
 }
@@ -62,11 +62,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (name: string, email: string, password: string, workspaceName?: string) => {
     setSession((prev) => ({ ...prev, status: "loading" }));
 
     // Secure server-side registration strictly on the server to prevent client-controlled spoofing
-    const user = await registerAction(name, email, password);
+    const user = await registerAction(name, email, password, workspaceName);
 
     setSession({
       user,

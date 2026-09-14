@@ -8,24 +8,7 @@ import { useTheme } from "@/components/ThemeProvider";
 import { useAuth } from "@/components/AuthProvider";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import { LlmAnalyticsResponse } from "@/app/api/v1/analytics/llm/route";
-import {
-  Sparkles,
-  Search,
-  CheckCircle2,
-  AlertCircle,
-  HelpCircle,
-  TrendingUp,
-  BrainCircuit,
-  MessageSquare,
-  ShieldCheck,
-  ChevronLeft,
-  Flame,
-  ArrowRight,
-  Plus,
-  X,
-  PieChartIcon,
-  CircleDot
-} from "lucide-react";
+import { Sparkles, AlertCircle, HelpCircle, TrendingUp, BrainCircuit, MessageSquare, ShieldCheck, Flame, Plus, X, PieChartIcon, CircleDot } from "lucide-react";
 
 export const LlmAnalyticsPanel: React.FC = () => {
   const { language, direction } = useTheme();
@@ -100,7 +83,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
       const duration = 1000;
       const increment = end / (duration / 16);
 
-      const interval = setInterval(() => {
+      let interval = setInterval(() => {
         start += increment;
         if (start >= end) {
           clearInterval(interval);
@@ -355,8 +338,7 @@ export const LlmAnalyticsPanel: React.FC = () => {
                         onClick={() => toggleTemplate(tpl)}
                         className={`w-full text-start p-2.5 text-[10px] rounded-xl border transition-all duration-300 flex items-start gap-2 ${
                           isSelected
-                            ? "border-sky-500/30 bg-sky-500/10 text-sky-400 font-bold"
-                            : "border-[var(--border)] bg-[var(--muted-surface)]/20 text-[var(--text-secondary)] hover:bg-[var(--muted-surface)]"
+                            ? "border-sky-500/30 bg-sky-500/10 text-sky-400 font-bold" :"border-[var(--border)] bg-[var(--muted-surface)]/20 text-[var(--text-secondary)] hover:bg-[var(--muted-surface)]"
                         }`}
                         disabled={isPending}
                       >

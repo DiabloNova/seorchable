@@ -1,15 +1,5 @@
 import { randomUUID } from "crypto";
-import {
-  Competitor,
-  CompetitiveSeoFinding,
-  CompetitiveFindingType,
-  CompetitivePositionType,
-  DifferenceDirectionType,
-  Website,
-  Page,
-  Keyword,
-  Topic
-} from "../domain/types";
+import { Competitor, CompetitiveSeoFinding, CompetitivePositionType, DifferenceDirectionType, Page, Keyword, Topic } from "../domain/types";
 import {
   ICompetitorRepository,
   IWebsiteRepository,
@@ -20,14 +10,28 @@ import {
 } from "../repositories/interfaces";
 
 export class CompetitiveSeoService {
+  private competitorRepo: ICompetitorRepository;
+  private websiteRepo: IWebsiteRepository;
+  private pageRepo: IPageRepository;
+  private keywordRepo: IKeywordRepository;
+  private topicRepo: ITopicRepository;
+  private findingRepo: ICompetitiveSeoFindingRepository;
+
   constructor(
-    private readonly competitorRepo: ICompetitorRepository,
-    private readonly websiteRepo: IWebsiteRepository,
-    private readonly pageRepo: IPageRepository,
-    private readonly keywordRepo: IKeywordRepository,
-    private readonly topicRepo: ITopicRepository,
-    private readonly findingRepo: ICompetitiveSeoFindingRepository
-  ) {}
+    competitorRepo: ICompetitorRepository,
+    websiteRepo: IWebsiteRepository,
+    pageRepo: IPageRepository,
+    keywordRepo: IKeywordRepository,
+    topicRepo: ITopicRepository,
+    findingRepo: ICompetitiveSeoFindingRepository
+  ) {
+    this.competitorRepo = competitorRepo;
+    this.websiteRepo = websiteRepo;
+    this.pageRepo = pageRepo;
+    this.keywordRepo = keywordRepo;
+    this.topicRepo = topicRepo;
+    this.findingRepo = findingRepo;
+  }
 
   /**
    * Helper to compute average word count from Page array.
@@ -99,14 +103,12 @@ export class CompetitiveSeoService {
       const metadataPosition: CompetitivePositionType = metadataDiff > 0.05
         ? "advantage"
         : metadataDiff < -0.05
-          ? "disadvantage"
-          : "neutral";
+          ? "disadvantage" :"neutral";
 
       const metadataDirection: DifferenceDirectionType = metadataDiff > 0.01
         ? "positive"
         : metadataDiff < -0.01
-          ? "negative"
-          : "none";
+          ? "negative" :"none";
 
       const techFinding: CompetitiveSeoFinding = {
         id: randomUUID(),
@@ -149,14 +151,12 @@ export class CompetitiveSeoService {
       const contentPosition: CompetitivePositionType = wordDiff > 50
         ? "advantage"
         : wordDiff < -50
-          ? "disadvantage"
-          : "neutral";
+          ? "disadvantage" :"neutral";
 
       const contentDirection: DifferenceDirectionType = wordDiff > 10
         ? "positive"
         : wordDiff < -10
-          ? "negative"
-          : "none";
+          ? "negative" :"none";
 
       const contentFinding: CompetitiveSeoFinding = {
         id: randomUUID(),

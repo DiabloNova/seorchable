@@ -2,8 +2,8 @@ import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { POST } from "../../src/app/api/v1/crawler/start/route";
 import { NextRequest } from "next/server";
-import * as auth from "../../src/services/auth/authorization";
-import { AuthorizationError } from "../../src/services/auth/authorization";
+
+
 
 describe("POST /api/v1/crawler/start", () => {
   const createRequest = (body: any, headers: Record<string, string> = {}) => {

@@ -21,8 +21,7 @@ export default function EntitiesGraphPage() {
         </h1>
         <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-2xl">
           {isRtl
-            ? "ترسیم زنده ارتباط معنایی برند شما، تحلیل موجودیت‌های کلیدی در گراف دانش، و میزان قرابت موضوعی با رقبا."
-            : "Visualize your semantic knowledge map, brand authority entity coordinates, and relationships."}
+            ? "ترسیم زنده ارتباط معنایی برند شما، تحلیل موجودیت‌های کلیدی در گراف دانش، و میزان قرابت موضوعی با رقبا." :"Visualize your semantic knowledge map, brand authority entity coordinates, and relationships."}
         </p>
       </div>
 
@@ -34,15 +33,13 @@ export default function EntitiesGraphPage() {
           </CardTitle>
           <CardDescription className="text-xs">
             {isRtl
-              ? "پوسته یکپارچه داشبورد با موفقیت بر روی این مسیر بارگذاری شده است."
-              : "The unified Dashboard Shell is actively rendering this route context with proper navigation parameters."}
+              ? "پوسته یکپارچه داشبورد با موفقیت بر روی این مسیر بارگذاری شده است." :"The unified Dashboard Shell is actively rendering this route context with proper navigation parameters."}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-xs text-[var(--text-secondary)] leading-relaxed space-y-2">
           <p>
             {isRtl
-              ? "مسیر فعال سایدبار: ابزارهای دانش و موجودیت‌ها > نمودار زنده دانش"
-              : "Active Sidebar Navigation State: Knowledge & Entity Tools > Live Knowledge Graph"}
+              ? "مسیر فعال سایدبار: ابزارهای دانش و موجودیت‌ها > نمودار زنده دانش" :"Active Sidebar Navigation State: Knowledge & Entity Tools > Live Knowledge Graph"}
           </p>
           <p className="text-[10px] text-[var(--text-muted)] font-mono">
             Route: /dashboard/entities/graph

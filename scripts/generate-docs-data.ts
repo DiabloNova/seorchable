@@ -78,7 +78,7 @@ function getAllDocs(basePath = "docs"): DocMeta[] {
 }
 
 function generate() {
-  const docs = getAllDocs("docs");
+  let docs = getAllDocs("docs");
 
   let indexOutput = `// Auto-generated metadata index for navigation and search
 export interface DocMeta {
@@ -93,8 +93,8 @@ export interface DocMeta {
 export const DOCS_INDEX: DocMeta[] = [\n`;
 
   for (const doc of docs) {
-    const title = doc.title.replace(/"/g, '\\"');
-    const snippet = doc.contentSnippet.replace(/"/g, '\\"').replace(/\\/g, '\\\\').replace(/`/g, '\\`');
+    let title = doc.title.replace(/"/g, '\"');
+    const snippet = doc.contentSnippet.replace(/"/g, '\"').replace(/\\/g, '\\\\').replace(/`/g, '\\`');
     indexOutput += `  {
     slug: "${doc.slug}",
     titleEn: "${title}",

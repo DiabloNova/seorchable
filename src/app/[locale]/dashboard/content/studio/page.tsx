@@ -21,8 +21,7 @@ export default function ContentStudioPage() {
         </h1>
         <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-2xl">
           {isRtl
-            ? "ویرایشگر هوشمند معنایی، بهینه‌سازی خوانایی متون، تحلیل چگالی اصطلاحات کلیدی و امتیازدهی رویت‌پذیری."
-            : "Optimize conversational flow structures, evaluate semantic layout parameters, and score visibility metrics."}
+            ? "ویرایشگر هوشمند معنایی، بهینه‌سازی خوانایی متون، تحلیل چگالی اصطلاحات کلیدی و امتیازدهی رویت‌پذیری." :"Optimize conversational flow structures, evaluate semantic layout parameters, and score visibility metrics."}
         </p>
       </div>
 
@@ -34,15 +33,13 @@ export default function ContentStudioPage() {
           </CardTitle>
           <CardDescription className="text-xs">
             {isRtl
-              ? "پوسته یکپارچه داشبورد با موفقیت بر روی این مسیر بارگذاری شده است."
-              : "The unified Dashboard Shell is actively rendering this route context with proper navigation parameters."}
+              ? "پوسته یکپارچه داشبورد با موفقیت بر روی این مسیر بارگذاری شده است." :"The unified Dashboard Shell is actively rendering this route context with proper navigation parameters."}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-xs text-[var(--text-secondary)] leading-relaxed space-y-2">
           <p>
             {isRtl
-              ? "مسیر فعال سایدبار: ابزارهای محتوایی > استودیوی محتوا"
-              : "Active Sidebar Navigation State: Content Tools > Content Studio"}
+              ? "مسیر فعال سایدبار: ابزارهای محتوایی > استودیوی محتوا" :"Active Sidebar Navigation State: Content Tools > Content Studio"}
           </p>
           <p className="text-[10px] text-[var(--text-muted)] font-mono">
             Route: /dashboard/content/studio

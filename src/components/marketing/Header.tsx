@@ -86,10 +86,10 @@ export function Header() {
                   <ChevronDown size={14} />
                 </button>
               }
-              items={platformItems.map((item) => ({
-                label: item.label,
-                value: item.value,
-                onClick: () => { window.location.href = item.href; }
+              items={platformItems?.map((item) => ({
+                label: item?.label,
+                value: item?.value,
+                onClick: () => { window.location.href = item?.href; }
               }))}
             />
 
@@ -101,10 +101,10 @@ export function Header() {
                   <ChevronDown size={14} />
                 </button>
               }
-              items={solutionsItems.map((item) => ({
-                label: item.label,
-                value: item.value,
-                onClick: () => { window.location.href = item.href; }
+              items={solutionsItems?.map((item) => ({
+                label: item?.label,
+                value: item?.value,
+                onClick: () => { window.location.href = item?.href; }
               }))}
             />
 

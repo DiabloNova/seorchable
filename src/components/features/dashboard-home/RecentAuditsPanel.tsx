@@ -1,9 +1,9 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
 import { useTheme } from "@/components/ThemeProvider";
-import { FileText, ArrowRight, ArrowLeft, Calendar, Globe, Award } from "lucide-react";
+import { FileText, ArrowRight, ArrowLeft, Calendar, Globe } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/Button";
+
 
 interface RecentAudit {
   id: string;
@@ -71,8 +71,7 @@ export const RecentAuditsPanel: React.FC<RecentAuditsPanelProps> = ({
         </CardTitle>
         <CardDescription className="text-xs text-[var(--text-secondary)]">
           {isRtl
-            ? "مرور آخرین ارزیابی‌های فنی و گزارش‌های خزش معنایی انجام شده در محیط کاربری."
-            : "Review technical and entity analysis logs captured from your historical crawl triggers."}
+            ? "مرور آخرین ارزیابی‌های فنی و گزارش‌های خزش معنایی انجام شده در محیط کاربری." :"Review technical and entity analysis logs captured from your historical crawl triggers."}
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-2 flex-1 flex flex-col justify-center">
@@ -87,8 +86,7 @@ export const RecentAuditsPanel: React.FC<RecentAuditsPanelProps> = ({
               </p>
               <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed">
                 {isRtl
-                  ? "وب‌سایتی برای تحلیل ثبت نگردیده است. پایش اول را برای استخراج آمار سئو آغاز کنید."
-                  : "No crawl logs exist for this workspace. Run an audit to generate structural summaries."}
+                  ? "وب‌سایتی برای تحلیل ثبت نگردیده است. پایش اول را برای استخراج آمار سئو آغاز کنید." :"No crawl logs exist for this workspace. Run an audit to generate structural summaries."}
               </p>
             </div>
           </div>

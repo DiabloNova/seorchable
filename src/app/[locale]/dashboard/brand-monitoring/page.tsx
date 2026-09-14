@@ -3,25 +3,7 @@
 import React, { useState, useEffect, useTransition } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
-import {
-  Sparkles,
-  TrendingUp,
-  Award,
-  AlertTriangle,
-  CheckCircle,
-  HelpCircle,
-  ShieldCheck,
-  Percent,
-  Layers,
-  Tag,
-  Clock,
-  Compass,
-  Link2,
-  ArrowUpRight,
-  BookOpen,
-  Eye,
-  CheckSquare
-} from "lucide-react";
+import { Sparkles, Award, AlertTriangle, CheckCircle, ShieldCheck, Layers, ArrowUpRight } from "lucide-react";
 import { getBrandIntelligenceOverviewAction } from "@/app/actions/brand-intelligence";
 import { Brand, BrandAssociation } from "@/features/ai-intelligence/domain/types";
 
@@ -94,8 +76,7 @@ export default function BrandMonitoringPage() {
           </h1>
           <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-2xl leading-relaxed">
             {isRtl
-              ? "پلتفرم سنجش و ارزیابی عمیق نحوه معرفی هویت برند، ردیابی پایداری شناخت در موتورهای پاسخ‌گو، پایش میزان رضایت و شناخت مفاهیم مرتبط."
-              : "Enterprise brand intelligence suite designed to monitor, track, and score brand reputation, semantic associations, and endorsement rates."}
+              ? "پلتفرم سنجش و ارزیابی عمیق نحوه معرفی هویت برند، ردیابی پایداری شناخت در موتورهای پاسخ‌گو، پایش میزان رضایت و شناخت مفاهیم مرتبط." :"Enterprise brand intelligence suite designed to monitor, track, and score brand reputation, semantic associations, and endorsement rates."}
           </p>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { SeoSignals, StructuredDataBlock, LinkItem } from "@/types/seo-signals";
+import { SeoSignals } from "@/types/seo-signals";
 import { DiagnosticFinding, AuditMetadata, DiagnosticCategory } from "@/features/ai-intelligence/domain/types";
 import { TenantContextManager } from "@/core/database/tenant-context";
 

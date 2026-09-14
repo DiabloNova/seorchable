@@ -66,33 +66,10 @@ export interface Tenant {
  * Hierarchical Admin Roles
  */
 export type UserRole =
-  | "Super Admin"
-  | "Platform Admin"
-  | "Operations"
-  | "Support"
-  | "Finance"
-  | "Security Auditor"
-  | "Read-Only Observer";
+  | "Super Admin" |"Platform Admin" |"Operations" |"Support" |"Finance" |"Security Auditor" |"Read-Only Observer";
 
 export type Permission =
-  | "tenant:create"
-  | "tenant:write"
-  | "tenant:read"
-  | "tenant:suspend"
-  | "tenant:activate"
-  | "tenant:archive"
-  | "admin:write"
-  | "admin:read"
-  | "config:write"
-  | "config:read"
-  | "ai:manage"
-  | "ai:read"
-  | "audit:read"
-  | "billing:write"
-  | "billing:read"
-  | "prompt:manage"
-  | "crawler:manage"
-  | "system:monitor";
+  | "tenant:create" |"tenant:write" |"tenant:read" |"tenant:suspend" |"tenant:activate" |"tenant:archive" |"admin:write" |"admin:read" |"config:write" |"config:read" |"ai:manage" |"ai:read" |"audit:read" |"billing:write" |"billing:read" |"prompt:manage" |"crawler:manage" |"system:monitor";
 
 export interface AccessPolicy {
   id: string;

@@ -77,8 +77,7 @@ export default function InvoicePaymentPage({ params }: { params: Promise<{ local
                 </h1>
                 <p className="text-xs text-[var(--text-muted)] mb-6 leading-relaxed">
                   {isFa
-                    ? "لطفاً روش پرداخت ترجیحی خود را انتخاب کرده و مراحل پرداخت امن را تکمیل کنید."
-                    : "Please choose your preferred method and fulfill your platform invoice subscription."}
+                    ? "لطفاً روش پرداخت ترجیحی خود را انتخاب کرده و مراحل پرداخت امن را تکمیل کنید." :"Please choose your preferred method and fulfill your platform invoice subscription."}
                 </p>
 
                 {/* Payment Methods Tabs */}
@@ -179,8 +178,7 @@ export default function InvoicePaymentPage({ params }: { params: Promise<{ local
                       </div>
                       <p className="text-[10px] text-slate-500">
                         {isFa
-                          ? "پس از واریز، شناسه رهگیری را ثبت کنید تا اشتراک شما حداکثر ظرف ۱ ساعت فعال شود."
-                          : "Upload or specify transaction ID below for manual confirmation."}
+                          ? "پس از واریز، شناسه رهگیری را ثبت کنید تا اشتراک شما حداکثر ظرف ۱ ساعت فعال شود." :"Upload or specify transaction ID below for manual confirmation."}
                       </p>
                       <input
                         type="text"
@@ -236,8 +234,7 @@ export default function InvoicePaymentPage({ params }: { params: Promise<{ local
                 <ShieldCheck size={14} className="text-emerald-500" />
                 <span>
                   {isFa
-                    ? "تمام تراکنش‌ها تحت پروتکل SSL ۲۵۶ بیتی به طور کامل رمزنگاری می‌شوند."
-                    : "Transactions secured with AES-256 bit corporate-grade encryption."}
+                    ? "تمام تراکنش‌ها تحت پروتکل SSL ۲۵۶ بیتی به طور کامل رمزنگاری می‌شوند." :"Transactions secured with AES-256 bit corporate-grade encryption."}
                 </span>
               </div>
             </div>
@@ -277,8 +274,7 @@ export default function InvoicePaymentPage({ params }: { params: Promise<{ local
                       <p className="text-xs font-bold text-white">{invoiceData.plan}</p>
                       <p className="text-[10px] text-slate-400">
                         {isFa
-                          ? "دسترسی نامحدود سالانه به ابزارهای تحلیل AEO، GEO و رصد رقابتی"
-                          : "Annual unlimited license to AEO tools, entity graphs, and competitor radar."}
+                          ? "دسترسی نامحدود سالانه به ابزارهای تحلیل AEO، GEO و رصد رقابتی" :"Annual unlimited license to AEO tools, entity graphs, and competitor radar."}
                       </p>
                     </div>
                   </div>
@@ -310,8 +306,7 @@ export default function InvoicePaymentPage({ params }: { params: Promise<{ local
 
               <div className="mt-8 text-[9px] text-slate-500 text-center leading-normal">
                 {isFa
-                  ? "پرداخت‌های سالانه شامل گارانتی ۱۰۰٪ بازگشت وجه به مدت ۱۴ روز در صورت انصراف می‌باشد."
-                  : "Annual corporate subscriptions include a 14-day hassle-free full money-back guarantee."}
+                  ? "پرداخت‌های سالانه شامل گارانتی ۱۰۰٪ بازگشت وجه به مدت ۱۴ روز در صورت انصراف می‌باشد." :"Annual corporate subscriptions include a 14-day hassle-free full money-back guarantee."}
               </div>
             </div>
           </div>
@@ -327,8 +322,7 @@ export default function InvoicePaymentPage({ params }: { params: Promise<{ local
             </h1>
             <p className="text-xs text-slate-300 leading-relaxed max-w-md mx-auto">
               {isFa
-                ? "تراکنش مالی شما تأیید شد و صورتحساب با موفقیت پرداخت گردید. لایسنس کاربری شما به مدت ۱ سال تمدید شد."
-                : "Your transaction has been approved. The system successfully updated your platform subscription status."}
+                ? "تراکنش مالی شما تأیید شد و صورتحساب با موفقیت پرداخت گردید. لایسنس کاربری شما به مدت ۱ سال تمدید شد." :"Your transaction has been approved. The system successfully updated your platform subscription status."}
             </p>
 
             {/* Invoice Details Sheet */}

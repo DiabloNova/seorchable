@@ -131,8 +131,7 @@ export default function ServiceMarketplaceClient({
   const strings = {
     title: isRtl ? "بازارچه خدمات و ابزارهای هوشمند" : "Service Marketplace & Core Tools",
     desc: isRtl
-      ? "پلتفرم ابزارهای کراولر، مدیریت دانش، سنجش سهم حضور در هوش مصنوعی و بهینه‌سازی فنی سئو در یک نگاه."
-      : "Discover, analyze, and manage powerful SaaS analytics engines, entity crawlers, and AI prominence indicators.",
+      ? "پلتفرم ابزارهای کراولر، مدیریت دانش، سنجش سهم حضور در هوش مصنوعی و بهینه‌سازی فنی سئو در یک نگاه." :"Discover, analyze, and manage powerful SaaS analytics engines, entity crawlers, and AI prominence indicators.",
     searchPlaceholder: isRtl ? "جستجوی ابزار، قابلیت، نام انگلیسی یا فارسی..." : "Search services, features, keywords...",
     categoryAll: isRtl ? "همه ابزارها" : "All Services",
     statusLabel: isRtl ? "فیلتر وضعیت:" : "Status:",
@@ -142,8 +141,7 @@ export default function ServiceMarketplaceClient({
     statusUnavailable: isRtl ? "غیرفعال / سفارشی" : "Unavailable",
     emptyTitle: isRtl ? "هیچ ابزاری با این مشخصات یافت نشد" : "No Services Match Your Filters",
     emptyDesc: isRtl
-      ? "تغییراتی در عبارت جستجو یا دسته‌بندی فیلترها اعمال کنید تا ابزارهای منطبق نمایش داده شوند."
-      : "Try relaxing your search query or reset category tab selections to view available tools.",
+      ? "تغییراتی در عبارت جستجو یا دسته‌بندی فیلترها اعمال کنید تا ابزارهای منطبق نمایش داده شوند." :"Try relaxing your search query or reset category tab selections to view available tools.",
     emptyBtn: isRtl ? "پاک کردن فیلترها" : "Reset Active Filters",
     refreshTooltip: isRtl ? "بروزرسانی داده‌های بازارچه" : "Refresh catalog state",
     activePlanLabel: isRtl ? "پلن فعال فعلی شما:" : "Active Workspace Tier:",
@@ -252,9 +250,7 @@ export default function ServiceMarketplaceClient({
         <button
           onClick={() => setActiveCategory("all")}
           className={`px-4 py-3 text-xs font-bold transition-all border-b-2 whitespace-nowrap cursor-pointer outline-none focus:text-[var(--sky-blue-500)]
-            ${activeCategory === "all"
-              ? "border-[var(--sky-blue-500)] text-[var(--sky-blue-500)]"
-              : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            ${activeCategory === "all" ?"border-[var(--sky-blue-500)] text-[var(--sky-blue-500)]" :"border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             }`}
         >
           {strings.categoryAll}

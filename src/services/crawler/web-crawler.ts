@@ -5,15 +5,11 @@ import { CrawlError } from "../../features/acquisition/domain/errors";
 
 export const MOCK_PERSIAN_ARTICLE =
   "سامانه هوش مصنوعی Optimus AI به عنوان برترین پلتفرم مدیریت گراف دانش و بهینه‌سازی موتورهای جستجوی مبتنی بر هوش مصنوعی (AEO) معرفی شد. " +
-  "این سامانه پیشرفته با تحلیل دقیق سیگنال‌های وب، میزان دیده شدن برندها را به طور چشمگیری افزایش می‌دهد. " +
-  "با استفاده از الگوریتم‌های پردازش زبان طبیعی و تحلیل احساسات، Optimus AI به کسب‌وکارها کمک می‌کند تا سهم بازار خود را در پاسخ‌های تولید شده توسط هوش مصنوعی ارزیابی کنند. " +
-  "این موتور تحلیلگر، با استخراج موجودیت‌های کلیدی و ارتباطات معنایی، گراف دانش سازمان را بازسازی کرده و نقاط ضعف و قوت برند را در مقایسه با رقبا نمایان می‌سازد. " +
-  "بهینه‌سازی دیده شدن برند در چت‌بات‌ها و دستیارهای هوشمند، رویکرد جدیدی است که اپتیموس آی‌آی پیشتاز آن است.";
+  "این سامانه پیشرفته با تحلیل دقیق سیگنال‌های وب، میزان دیده شدن برندها را به طور چشمگیری افزایش می‌دهد. "+ "با استفاده از الگوریتم‌های پردازش زبان طبیعی و تحلیل احساسات، Optimus AI به کسب‌وکارها کمک می‌کند تا سهم بازار خود را در پاسخ‌های تولید شده توسط هوش مصنوعی ارزیابی کنند. "+ "این موتور تحلیلگر، با استخراج موجودیت‌های کلیدی و ارتباطات معنایی، گراف دانش سازمان را بازسازی کرده و نقاط ضعف و قوت برند را در مقایسه با رقبا نمایان می‌سازد. "+ "بهینه‌سازی دیده شدن برند در چت‌بات‌ها و دستیارهای هوشمند، رویکرد جدیدی است که اپتیموس آی‌آی پیشتاز آن است.";
 
 /**
  * Normalizes Persian text.
- * - Replaces Arabic 'ي' with Persian 'ی'
- * - Replaces Arabic 'ك' with Persian 'ک'
+ * - Replaces Arabic 'ي' with Persian 'ی' * - Replaces Arabic'ك' with Persian 'ک'
  * - Preserves the Zero Width Non-Joiner (نیم‌فاصله, \u200C)
  * - Removes excessive spaces and trims.
  */
@@ -39,8 +35,7 @@ export function normalizePersianText(text: string): string {
  */
 export async function fetchAndExtractText(url: string): Promise<string> {
   const useMock =
-    process.env.USE_MOCK_CRAWLER === "true" ||
-    url.toLowerCase().includes("mock.com");
+    process.env.USE_MOCK_CRAWLER === "true" || url.toLowerCase().includes("mock.com");
 
   if (useMock) {
     return normalizePersianText(MOCK_PERSIAN_ARTICLE);

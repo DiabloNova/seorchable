@@ -1,13 +1,5 @@
 import { randomUUID } from "crypto";
-import {
-  Competitor,
-  CompetitiveSeoFinding,
-  AIVisibilityAudit,
-  CitationSource,
-  PositionObservation,
-  BrandAssociation,
-  RecommendationObservation
-} from "../domain/types";
+import { Competitor, CompetitiveSeoFinding, AIVisibilityAudit } from "../domain/types";
 import {
   ICompetitorRepository,
   IAIVisibilityAuditRepository,
@@ -18,14 +10,28 @@ import {
 } from "../repositories/interfaces";
 
 export class CompetitiveAiService {
+  private readonly competitorRepo: ICompetitorRepository;
+  private readonly auditRepo: IAIVisibilityAuditRepository;
+  private readonly citationRepo: ICitationIntelligenceRepository;
+  private readonly promptRepo: IPromptIntelligenceRepository;
+  private readonly brandRepo: IBrandIntelligenceRepository;
+  private readonly findingRepo: ICompetitiveSeoFindingRepository;
+
   constructor(
-    private readonly competitorRepo: ICompetitorRepository,
-    private readonly auditRepo: IAIVisibilityAuditRepository,
-    private readonly citationRepo: ICitationIntelligenceRepository,
-    private readonly promptRepo: IPromptIntelligenceRepository,
-    private readonly brandRepo: IBrandIntelligenceRepository,
-    private readonly findingRepo: ICompetitiveSeoFindingRepository
-  ) {}
+    competitorRepo: ICompetitorRepository,
+    auditRepo: IAIVisibilityAuditRepository,
+    citationRepo: ICitationIntelligenceRepository,
+    promptRepo: IPromptIntelligenceRepository,
+    brandRepo: IBrandIntelligenceRepository,
+    findingRepo: ICompetitiveSeoFindingRepository
+  ) {
+    this.competitorRepo = competitorRepo;
+    this.auditRepo = auditRepo;
+    this.citationRepo = citationRepo;
+    this.promptRepo = promptRepo;
+    this.brandRepo = brandRepo;
+    this.findingRepo = findingRepo;
+  }
 
   /**
    * Compares AI Visibility, Citations, Prompts, Brand Mentions, and Observed Recommendations.

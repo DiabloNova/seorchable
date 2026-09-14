@@ -19,7 +19,7 @@ export default function FeaturesPage({ params }: { params: Promise<{ locale: str
       titleFa: "موتور سنجش دیده‌شدن در هوش مصنوعی",
       titleEn: "AI Visibility Engine",
       descFa: "پایش سهم صدای برند و حضور سازمان در خروجی مدل‌های زبانی مانند ChatGPT و Claude.",
-      descEn: "Track your brand's share of voice and presence across major LLMs like ChatGPT and Claude."
+      descEn: "Track your brand\'s share of voice and presence across major LLMs like ChatGPT and Claude."
     },
     {
       id: "seo-intelligence",
@@ -92,8 +92,7 @@ export default function FeaturesPage({ params }: { params: Promise<{ locale: str
             </h1>
             <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
               {isFa
-                ? "مجموعه‌ای کامل از ابزارهای تحلیلی بدون توهم و اثبات‌پذیر برای تسلط بر جستجوی مدرن."
-                : "A deterministic, evidence-backed suite of intelligence tools designed to master modern AI search."}
+                ? "مجموعه‌ای کامل از ابزارهای تحلیلی بدون توهم و اثبات‌پذیر برای تسلط بر جستجوی مدرن." :"A deterministic, evidence-backed suite of intelligence tools designed to master modern AI search."}
             </p>
           </div>
 

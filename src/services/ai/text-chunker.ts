@@ -1,9 +1,7 @@
 /**
  * Persian Text Chunking Utility
  * Optimised specifically for Persian syntax rules:
- * - Sentence boundaries: '.', '؟', '؛', '!', '\n', '\r'
- * - Persian quotes: '«', '»'
- * - Zero-width non-joiner (نیم‌فاصله): '\u200C' (Do NOT break words at this character)
+ * - Sentence boundaries: '.', '؟', '؛', '!', '\n', '\r' * - Persian quotes:'«', '»' * - Zero-width non-joiner (نیم‌فاصله):'\u200C' (Do NOT break words at this character)
  * - Sentence boundary preservation & overlap for RAG
  */
 

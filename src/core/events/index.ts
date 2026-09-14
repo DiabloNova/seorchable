@@ -1,3 +1,5 @@
+import { IEventHandler } from '@/core/events/index';
+
 /**
  * Phase 7C.5 — Enterprise Core Event Infrastructure
  * Standardizes domain event schemas, publishers, and subscribers.

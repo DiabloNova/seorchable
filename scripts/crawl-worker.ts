@@ -22,8 +22,10 @@ export class CrawlWorker {
   private readonly pollMs: number;
   private stopping = false;
   private readonly active = new Set<AbortController>();
+  private readonly options: CrawlWorkerOptions;
 
-  public constructor(private readonly options: CrawlWorkerOptions) {
+  public constructor(options: CrawlWorkerOptions) {
+    this.options = options;
     this.workerId = options.workerId ?? randomUUID();
     this.batchSize = options.batchSize ?? 4;
     this.leaseMs = options.leaseMs ?? 60_000;

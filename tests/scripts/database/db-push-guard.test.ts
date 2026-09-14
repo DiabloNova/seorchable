@@ -1,4 +1,4 @@
-import { validateDbPushGuard, sanitizeErrorMessage } from "../../../scripts/database/db-push-guard";
+import { validateDbPushGuard } from "../../../scripts/database/db-push-guard";
 
 async function runTests() {
   console.log("=========================================================================");

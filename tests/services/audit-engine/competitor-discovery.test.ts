@@ -13,7 +13,7 @@ import {
 } from "../../../src/features/ai-intelligence/services/competitor-discovery-service";
 import { CompetitorClassificationService } from "../../../src/features/ai-intelligence/services/competitor-classification-service";
 import { CompetitorMonitoringService } from "../../../src/features/ai-intelligence/services/competitor-monitoring-service";
-import { Competitor, CompetitorStatusType, AuditMetadata } from "../../../src/features/ai-intelligence/domain/types";
+import { Competitor, AuditMetadata } from "../../../src/features/ai-intelligence/domain/types";
 import * as assert from "assert";
 
 function createAudit(createdBy = "test-system", version = 1): AuditMetadata {

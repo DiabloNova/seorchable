@@ -146,8 +146,7 @@ export function Hero() {
                   </h2>
                   <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                     {isFa
-                      ? "ایمیل سازمانی خود را برای مشاهده‌ی نسخه‌ی نمایشی وارد کنید."
-                      : "Enter your business email to open the live sandbox demo."}
+                      ? "ایمیل سازمانی خود را برای مشاهده‌ی نسخه‌ی نمایشی وارد کنید." :"Enter your business email to open the live sandbox demo."}
                   </p>
                 </div>
                 <Input
@@ -167,17 +166,14 @@ export function Hero() {
                 >
                   {isLoading
                     ? isFa
-                      ? "در حال اعتبارسنجی..."
-                      : "Validating secure session..."
+                      ? "در حال اعتبارسنجی..." :"Validating secure session..."
                     : isFa
-                      ? "ورود به نسخه‌ی دمو"
-                      : "Access live sandbox demo"}
+                      ? "ورود به نسخه‌ی دمو" :"Access live sandbox demo"}
                   {!isLoading && <ArrowRight size={18} className="rtl:-scale-x-100" />}
                 </Button>
                 <p className="text-[11px] text-[var(--text-muted)] text-center pt-1">
                   {isFa
-                    ? "بدون نیاز به کارت اعتباری — محیط آزمایشی امن"
-                    : "No credit card required — secure sandbox environment"}
+                    ? "بدون نیاز به کارت اعتباری — محیط آزمایشی امن" :"No credit card required — secure sandbox environment"}
                 </p>
               </form>
             )}

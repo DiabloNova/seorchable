@@ -7,7 +7,7 @@ import { ApiService } from "@/features/public-api/services/api-service";
 const apiService = new ApiService();
 
 export class AuthorizationError extends Error {
-  constructor(public statusCode: number, message: string) {
+  constructor(public readonly statusCode: number, message: string) {
     super(message);
     this.name = "AuthorizationError";
   }
@@ -137,3 +137,11 @@ export async function authorizeApiRequest(req: NextRequest): Promise<{ userId: s
     tenantId: apiKey.organizationId
   };
 }
+
+function auth(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: auth is not implemented yet.', args);
+  return null;
+}
+
+export default auth;

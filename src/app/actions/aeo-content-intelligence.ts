@@ -1,6 +1,6 @@
 "use server";
 
-import { z } from "zod";
+
 import { TenantContextManager } from "@/core/database/tenant-context";
 import { requireSession } from "@/services/auth/session";
 import { requireWorkspaceMembership } from "@/services/auth/authorization";
@@ -161,7 +161,7 @@ export async function runAeoAnalysisForPageAction(pageId: string) {
 
     return await TenantContextManager.runWithTenantContext(tenantId, userId, requestId, async () => {
       const service = new AeoContentIntelligenceService();
-      const analysis = await service.executeAnalysis(tenantId, pageId);
+      let analysis = await service.executeAnalysis(tenantId, pageId);
       return { success: true, result: analysis };
     });
   } catch (err: unknown) {

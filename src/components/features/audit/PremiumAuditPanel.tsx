@@ -7,26 +7,7 @@ import { Badge } from "@/components/Badge";
 import { useTheme } from "@/components/ThemeProvider";
 import { useAuth } from "@/components/AuthProvider";
 import { PremiumAuditResponse } from "@/app/api/v1/audit/premium/route";
-import {
-  Sparkles,
-  Search,
-  CheckCircle2,
-  XCircle,
-  Lock,
-  Globe,
-  AlertCircle,
-  Flame,
-  Check,
-  Shield,
-  Layers,
-  FileCode,
-  Gauge,
-  Workflow,
-  Sparkle,
-  FileDown,
-  ArrowLeft,
-  CircleDot
-} from "lucide-react";
+import { Sparkles, Search, Globe, AlertCircle, Layers, Gauge, Workflow, Sparkle, FileDown, CircleDot } from "lucide-react";
 
 export const PremiumAuditPanel: React.FC = () => {
   const { language, direction } = useTheme();
@@ -83,7 +64,7 @@ export const PremiumAuditPanel: React.FC = () => {
       const duration = 1200;
       const increment = end / (duration / 16);
 
-      const interval = setInterval(() => {
+      let interval = setInterval(() => {
         start += increment;
         if (start >= end) {
           clearInterval(interval);
@@ -109,8 +90,7 @@ export const PremiumAuditPanel: React.FC = () => {
   const strings = {
     title: isRtl ? "تحلیل عمیق و ارزیابی معنایی پریمیوم" : "Premium Deep Semantic SEO Audit",
     desc: isRtl
-      ? "پایش کامل تا سقف ۵۰ صفحه وب‌سایت با موتور خزنده‌ی هوشمند Firecrawl، استخراج خلاءهای معنایی با هوش مصنوعی و بهینه‌سازی گراف دانش"
-      : "Complete crawl of up to 50 pages, semantic gap identification via LLM, and structured Knowledge Graph optimization.",
+      ? "پایش کامل تا سقف ۵۰ صفحه وب‌سایت با موتور خزنده‌ی هوشمند Firecrawl، استخراج خلاءهای معنایی با هوش مصنوعی و بهینه‌سازی گراف دانش" :"Complete crawl of up to 50 pages, semantic gap identification via LLM, and structured Knowledge Graph optimization.",
     placeholder: isRtl ? "آدرس کامل وب‌سایت (مثال: https://example.com)" : "Root website URL (e.g. https://example.com)",
     depthLabel: isRtl ? "تعداد صفحات مورد پایش:" : "Crawl Depth Limit:",
     btnAnalyze: isRtl ? "شروع تحلیل عمیق پریمیوم" : "Start Premium Audit",

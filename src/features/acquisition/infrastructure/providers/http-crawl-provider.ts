@@ -153,8 +153,7 @@ export class HttpCrawlProvider implements CrawlProvider {
       let release!: () => void;
       const current = new Promise<void>(resolve => {
         release = resolve;
-      }
-      );
+      });
       hostLocks.set(host, current);
       await previous;
       try {

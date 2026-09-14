@@ -86,3 +86,11 @@ function isSafeIp(ip: string): boolean {
   }
   return true;
 }
+
+function isSafeUrl(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: isSafeUrl is not implemented yet.', args);
+  return null;
+}
+
+export { isSafeUrl };

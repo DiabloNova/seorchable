@@ -2,52 +2,12 @@
 
 import React, { useState, use, useRef } from "react";
 import Link from "next/link";
-import {
-  Sparkles,
-  ArrowRight,
-  Globe,
-  Database,
-  Check,
-  FileText,
-  Activity,
-  MessageSquare,
-  Network,
-  Zap,
-  Brain,
-  Search,
-  CheckCircle,
-  TrendingUp,
-  ShieldCheck,
-  Eye,
-  Radar,
-  Lock,
-  Compass,
-  DollarSign,
-  Workflow,
-  BarChart3,
-  Terminal,
-  FileCode,
-  HeartHandshake,
-  AlertTriangle,
-  Layers,
-  HelpCircle,
-  PlayCircle,
-  FileSpreadsheet,
-  CheckSquare,
-  BookOpen,
-  MessagesSquare,
-  Newspaper,
-  BookMarked,
-  Award,
-  ArrowDown,
-  Receipt,
-  ExternalLink
-} from "lucide-react";
+import { Sparkles, ArrowRight, Globe, Database, Check, FileText, Activity, Network, Zap, Brain, Search, ShieldCheck, Eye, Radar, Lock, Compass, Workflow, Terminal, FileCode, Layers, FileSpreadsheet, BookOpen, MessagesSquare, Newspaper, BookMarked, Award, Receipt, ExternalLink } from "lucide-react";
 import { Header } from "@/components/marketing/Header";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
 import { Hero } from "@/components/marketing/Hero";
 import { FreeAuditPanel } from "@/components/features/audit/FreeAuditPanel";
-import { RadialPolarGraph } from "@/components/features/graph/RadialPolarGraph";
+
 import { LiveKnowledgeGraph } from "@/components/features/graph/LiveKnowledgeGraph";
 
 /**
@@ -78,7 +38,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
       id: "ai-visibility",
       icon: Eye,
       name: isFa ? "پایش میزان دیده‌شدن برند" : "AI Visibility Monitoring",
-      desc: isFa ? "ردیابی زنده سهم استناد و حضور برند شما در پاسخ‌های ChatGPT، Claude و موتورهای نوظهور." : "Real-time auditing of your brand's citation frequency and share of voice inside LLM responses."
+      desc: isFa ? "ردیابی زنده سهم استناد و حضور برند شما در پاسخ‌های ChatGPT، Claude و موتورهای نوظهور." : "Real-time auditing of your brand\'s citation frequency and share of voice inside LLM responses."
     },
     {
       id: "brand-intelligence",
@@ -168,8 +128,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </h2>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">
               {isFa
-                ? "کافی است آدرس وب‌سایت خود را برای اجرای تحلیل خودکار مبتنی بر Firecrawl و جمنی وارد کنید."
-                : "Submit your domain target to deploy active crawlers, map semantic triples, and check your AI discovery health."}
+                ? "کافی است آدرس وب‌سایت خود را برای اجرای تحلیل خودکار مبتنی بر Firecrawl و جمنی وارد کنید." :"Submit your domain target to deploy active crawlers, map semantic triples, and check your AI discovery health."}
             </p>
           </div>
 
@@ -190,8 +149,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
-                ? "به جای نقاشی‌های دکوری، صفحات واقعی پنل کاربری را مشاهده کنید تا با ساختار عمیق نرم‌افزار آشنا شوید."
-                : "Explore rich, interactive visual mockups of the platform's actual modules. No backend required."}
+                ? "به جای نقاشی‌های دکوری، صفحات واقعی پنل کاربری را مشاهده کنید تا با ساختار عمیق نرم‌افزار آشنا شوید." :"Explore rich, interactive visual mockups of the platform's actual modules. No backend required."}
             </p>
           </div>
 
@@ -262,8 +220,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
                     <p className="text-xs sm:text-sm md:text-xs font-bold text-white">{isFa ? "تحلیل سیگنال‌ها و ارجاع" : "Recommendation Strategy"}</p>
                     <p className="text-[11px] sm:text-xs md:text-[11px] text-slate-300 leading-relaxed md:leading-normal">
                       {isFa
-                        ? "سیگنال‌های ارجاعی در چت‌بات‌ها مثبت است، اما نرخ استناد به مستندات فنی ضعیف عمل می‌کند. کاتالوگ محصولات را با تگ‌های معنایی ساختاردهی کنید."
-                        : "Your organic citations remain high, but documentation citation has fallen by 2% due to crawl blocking. Rectify robots.txt tags immediately."}
+                        ? "سیگنال‌های ارجاعی در چت‌بات‌ها مثبت است، اما نرخ استناد به مستندات فنی ضعیف عمل می‌کند. کاتالوگ محصولات را با تگ‌های معنایی ساختاردهی کنید." :"Your organic citations remain high, but documentation citation has fallen by 2% due to crawl blocking. Rectify robots.txt tags immediately."}
                     </p>
                   </div>
                 </div>
@@ -296,8 +253,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
 
                   <div className="p-4 rounded-xl border border-dashed border-white/10 text-xs text-slate-400">
                     {isFa
-                      ? "پیشنهاد: افزودن آمار مشتریان به تگ‌های معنایی، خطاها و ریسک استناد اشتباه را در کلود ۲.۱٪ کاهش می‌دهد."
-                      : "Add customer statistics to structural markup. This typically scales up citation authority by 15% across conversational queries."}
+                      ? "پیشنهاد: افزودن آمار مشتریان به تگ‌های معنایی، خطاها و ریسک استناد اشتباه را در کلود ۲.۱٪ کاهش می‌دهد." :"Add customer statistics to structural markup. This typically scales up citation authority by 15% across conversational queries."}
                   </div>
                 </div>
               )}
@@ -393,8 +349,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
 
                   <p className="text-[11px] text-slate-400 text-center leading-relaxed">
                     {isFa
-                      ? "گراف بالا ارتباطات معنایی را در پایگاه‌های دانش هوش مصنوعی تثبیت کرده و کیفیت استناد به برند را تضمین می‌کند."
-                      : "Semantic graph models secure entity relationships inside LLM indexes to establish brand context."}
+                      ? "گراف بالا ارتباطات معنایی را در پایگاه‌های دانش هوش مصنوعی تثبیت کرده و کیفیت استناد به برند را تضمین می‌کند." :"Semantic graph models secure entity relationships inside LLM indexes to establish brand context."}
                   </p>
                 </div>
               )}
@@ -463,8 +418,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
-                ? "از لحظه ثبت آدرس سایت تا پایش دائمی و تثبیت استنادها در چت‌بات‌ها؛ گام به گام در کنار شما هستیم."
-                : "Step-by-step lifecycle flow from website ingestion to continuous AI citation monitoring."}
+                ? "از لحظه ثبت آدرس سایت تا پایش دائمی و تثبیت استنادها در چت‌بات‌ها؛ گام به گام در کنار شما هستیم." :"Step-by-step lifecycle flow from website ingestion to continuous AI citation monitoring."}
             </p>
           </div>
 
@@ -506,8 +460,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
-                ? "پلتفرم اپتیموس بر روی پیشرفته‌ترین ساختارهای ابری سوار شده و تمام گواهینامه‌های امنیتی را پوشش می‌دهد."
-                : "Optimus AI operates on military-grade secure infrastructure with robust SLAs and compliance frameworks."}
+                ? "پلتفرم اپتیموس بر روی پیشرفته‌ترین ساختارهای ابری سوار شده و تمام گواهینامه‌های امنیتی را پوشش می‌دهد." :"Optimus AI operates on military-grade secure infrastructure with robust SLAs and compliance frameworks."}
             </p>
           </div>
 
@@ -550,8 +503,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
-                ? "ببینید این پلتفرم فراتر از ممیزی ساده، چه گستره عظیمی از ابزارها را برای مدیریت موجودیت‌های شما فراهم می‌کند."
-                : "No single-tool setup. We host a complete software ecosystem to scale your brand authority."}
+                ? "ببینید این پلتفرم فراتر از ممیزی ساده، چه گستره عظیمی از ابزارها را برای مدیریت موجودیت‌های شما فراهم می‌کند." :"No single-tool setup. We host a complete software ecosystem to scale your brand authority."}
             </p>
           </div>
 
@@ -591,8 +543,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </h2>
             <p className="text-sm md:text-base text-[var(--text-secondary)] leading-relaxed md:leading-normal">
               {isFa
-                ? "پلتفرم ما یک ابزار تک افتاده نیست. تمام محصولات در قالب یک اکوسیستم متصل با هم تعامل دارند."
-                : "Understand how website audit flows into semantic mapping, citation mining, and continuous alerts."}
+                ? "پلتفرم ما یک ابزار تک افتاده نیست. تمام محصولات در قالب یک اکوسیستم متصل با هم تعامل دارند." :"Understand how website audit flows into semantic mapping, citation mining, and continuous alerts."}
             </p>
           </div>
 
@@ -630,8 +581,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
-                ? "دنیای جستجو تغییر کرده است. چرا روش‌های قدیمی رتبه‌بندی کلمات کلیدی، برای پاسخ‌های چت‌بات‌ها بی‌استفاده است؟"
-                : "Understand how conversational discovery diverges from static web page search indexing."}
+                ? "دنیای جستجو تغییر کرده است. چرا روش‌های قدیمی رتبه‌بندی کلمات کلیدی، برای پاسخ‌های چت‌بات‌ها بی‌استفاده است؟" :"Understand how conversational discovery diverges from static web page search indexing."}
             </p>
           </div>
 
@@ -734,8 +684,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
-                ? "دسترسی به آخرین نتایج پژوهشی ما، بنچ‌مارک‌های بازار، بیانیه‌ها و نقشه راه پلتفرم."
-                : "Explore rich whitepapers, case studies, benchmarks, and product roadmap updates."}
+                ? "دسترسی به آخرین نتایج پژوهشی ما، بنچ‌مارک‌های بازار، بیانیه‌ها و نقشه راه پلتفرم." :"Explore rich whitepapers, case studies, benchmarks, and product roadmap updates."}
             </p>
           </div>
 
@@ -777,8 +726,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
             </h2>
             <p className="text-[var(--text-secondary)]">
               {isFa
-                ? "بر اساس تعداد دامنه‌ها، حجم کلمات کلیدی پایش شده و تعداد خزش‌های روزانه پلن کاربری خود را انتخاب نمایید."
-                : "Select a plan tailored exactly to your brand footprint size and desired citation tracking scope."}
+                ? "بر اساس تعداد دامنه‌ها، حجم کلمات کلیدی پایش شده و تعداد خزش‌های روزانه پلن کاربری خود را انتخاب نمایید." :"Select a plan tailored exactly to your brand footprint size and desired citation tracking scope."}
             </p>
           </div>
 
@@ -918,8 +866,7 @@ export default function MarketingLandingPage({ params }: { params: Promise<{ loc
           </h2>
           <p className="text-base md:text-lg text-[var(--text-secondary)] font-medium leading-relaxed max-w-2xl mx-auto">
             {isFa
-              ? "آدرس دامنه خود را بلافاصله آنالیز کنید تا تگ‌های متادیتا و سلامت ساختار آن در خزش Firecrawl سنجش گردد."
-              : "Analyze your website structure right now to check meta elements, H1 tags, and crawler indexability status."}
+              ? "آدرس دامنه خود را بلافاصله آنالیز کنید تا تگ‌های متادیتا و سلامت ساختار آن در خزش Firecrawl سنجش گردد." :"Analyze your website structure right now to check meta elements, H1 tags, and crawler indexability status."}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

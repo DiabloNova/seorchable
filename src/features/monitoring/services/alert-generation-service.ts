@@ -1,6 +1,6 @@
 import { RegressionResult } from "../domain/types/regression-result";
 import { MonitoringAlert } from "../domain/entities/monitoring-alert";
-import { CrawlSnapshot } from "../domain/entities/crawl-snapshot";
+
 import { createHash } from "crypto";
 
 export class AlertGenerationService {

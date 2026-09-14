@@ -3,30 +3,11 @@
 import React, { useState, useTransition, useEffect, useRef } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
 import { Button } from "@/components/Button";
-import { Badge } from "@/components/Badge";
+
 import { useTheme } from "@/components/ThemeProvider";
 import { useAuth } from "@/components/AuthProvider";
 import { ContentStudioResponse } from "@/app/api/v1/content/studio/route";
-import {
-  Sparkles,
-  Search,
-  CheckCircle2,
-  XCircle,
-  Sparkle,
-  PenTool,
-  Bookmark,
-  TrendingUp,
-  X,
-  Plus,
-  RefreshCw,
-  Copy,
-  ChevronLeft,
-  Check,
-  Languages,
-  Activity,
-  Smile,
-  AlertCircle
-} from "lucide-react";
+import { Sparkles, Search, Sparkle, PenTool, Bookmark, X, Copy, ChevronLeft, Check, Languages, Activity, Smile, AlertCircle } from "lucide-react";
 
 export const ContentStudio: React.FC = () => {
   const { language, direction } = useTheme();
@@ -91,7 +72,7 @@ export const ContentStudio: React.FC = () => {
       const duration = 1000;
       const increment = end / (duration / 16);
 
-      const interval = setInterval(() => {
+      let interval = setInterval(() => {
         start += increment;
         if (start >= end) {
           clearInterval(interval);
@@ -117,8 +98,7 @@ export const ContentStudio: React.FC = () => {
   const strings = {
     title: isRtl ? "استودیو خلاق تولید و بهینه‌سازی محتوا" : "AI Content Studio & Semantic Optimizer",
     desc: isRtl
-      ? "لحن و واژگان سایت خود را تحلیل کرده، اصطلاحات خشن یا منفی را پاکسازی کنید، و پیش‌نویس‌های بهینه تولید نمایید."
-      : "Audit brand terminology, optimize harsh expressions into positive/premium copy, and generate highly indexable AEO drafts.",
+      ? "لحن و واژگان سایت خود را تحلیل کرده، اصطلاحات خشن یا منفی را پاکسازی کنید، و پیش‌نویس‌های بهینه تولید نمایید." :"Audit brand terminology, optimize harsh expressions into positive/premium copy, and generate highly indexable AEO drafts.",
     urlLabel: isRtl ? "آدرس وب‌سایت هدف (اختیاری):" : "Target Website URL (Optional):",
     placeholderUrl: isRtl ? "آدرس صفحه وب‌سایت خود را وارد کنید..." : "e.g. https://example.com/product",
     voiceLabel: isRtl ? "لحن برند:" : "Brand Voice:",
@@ -430,8 +410,7 @@ export const ContentStudio: React.FC = () => {
                       size="sm"
                       className={`gap-1.5 text-[10px] font-bold px-3 py-1.5 rounded-lg border transition-all ${
                         isApplied
-                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
-                          : "border-[var(--border)] hover:bg-[var(--muted-surface)]"
+                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500" :"border-[var(--border)] hover:bg-[var(--muted-surface)]"
                       }`}
                     >
                       {isApplied ? (
@@ -486,8 +465,7 @@ export const ContentStudio: React.FC = () => {
                       onClick={() => handleCopy(draftText, idx)}
                       className={`w-full mt-3 gap-1.5 text-[10px] font-bold py-2 rounded-lg border transition-all ${
                         isCopied
-                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
-                          : "border-[var(--border)] bg-[var(--muted-surface)] hover:bg-[var(--background-subtle)] text-[var(--text-primary)]"
+                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500" :"border-[var(--border)] bg-[var(--muted-surface)] hover:bg-[var(--background-subtle)] text-[var(--text-primary)]"
                       }`}
                     >
                       {isCopied ? (

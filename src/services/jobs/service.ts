@@ -5,7 +5,11 @@ import { requireSession } from "../auth/session";
 import { requireWorkspaceMembership } from "../auth/authorization";
 
 export class JobService {
-  constructor(private repository: IJobRepository) {}
+  private repository: IJobRepository;
+
+  constructor(repository: IJobRepository) {
+    this.repository = repository;
+  }
 
   /**
    * Creates a new background job under the authenticated user's tenant context.
