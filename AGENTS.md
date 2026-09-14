@@ -82,8 +82,13 @@ Before completion, verify: the requested objective was addressed; no unrelated o
 Every task report must include: Alignment Record, objective and outcome, changed files, boundary impact, verification and unexecuted checks, divergences, final scope-alignment check, discovered-but-unaddressed issues, and residual risk.
 
 ## 22. Final Rules
-When uncertain: inspect first. When code and documentation conflict: trust the code. When a security boundary is involved: preserve it and fail closed. When another task is discovered: report it. When validation was not performed: say so explicitly.
-23. Execution Alignment & Self-Monitoring
+- When uncertain: inspect first.
+- When code and documentation conflict: trust the code.
+- When a security boundary is involved: preserve it and fail closed.
+- When another task is discovered: report it.
+- When validation was not performed: say so explicitly.
+  
+# 23. Execution Alignment & Self-Monitoring
 Mandatory for Jules and every coding agent operating in this repository.
 
 ## 23.1 Purpose and precedence
@@ -124,7 +129,6 @@ Before declaring completion, answer F1 to F8 explicitly in your report against t
 F1. Requested objective addressed?
 F2. No unrelated objective introduced?
 F3. No out-of-scope file changed?
-
 F4. No security guarantee weakened?
 F5. No tech debt knowingly introduced?
 F6. Tests correspond to the actual change?
