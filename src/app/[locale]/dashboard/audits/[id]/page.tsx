@@ -87,7 +87,7 @@ export default function AuditDetailPage() {
     title: isRtl ? `گزارش تحلیل دیده‌شدن برند: ${id}` : `AI Visibility Audit Report: ${id}`,
     targetUrl: isRtl ? "آدرس اسکن شده" : "AUDITED TARGET DOMAIN",
     overallScore: isRtl ? "شاخص دیده‌شدن برند" : "AI Visibility Score",
-    overallScoreDesc: isRtl ? "سهم صدای برند شما در پاسخ مدل‌های زبانی" : "Your brand's share of voice inside LLM databases",
+    overallScoreDesc: isRtl ? "سهم صدای برند شما در پاسخ مدل‌های زبانی" : "Your brand\'s share of voice inside LLM databases",
     presenceTitle: isRtl ? "امتیاز حضور برند" : "Brand Presence Score",
     mentionTitle: isRtl ? "فرکانس استناد" : "Mention Frequency Score",
     authorityTitle: isRtl ? "اعتبار معنایی محتوا" : "Content Authority Score",

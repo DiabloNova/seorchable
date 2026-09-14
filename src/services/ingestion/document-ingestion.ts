@@ -41,10 +41,16 @@ export interface IngestionResult {
 // ==========================================
 
 export class DocumentIngestionService {
+  private vectorStore: VectorStoreService;
+  private graphStore: GraphStoreService;
+
   constructor(
-    private vectorStore: VectorStoreService = new VectorStoreService(),
-    private graphStore: GraphStoreService = new GraphStoreService()
-  ) {}
+    vectorStore: VectorStoreService = new VectorStoreService(),
+    graphStore: GraphStoreService = new GraphStoreService()
+  ) {
+    this.vectorStore = vectorStore;
+    this.graphStore = graphStore;
+  }
 
   /**
    * Central Ingestion Pipeline for raw documents/texts.

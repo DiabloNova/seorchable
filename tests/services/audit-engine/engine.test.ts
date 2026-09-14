@@ -5,7 +5,7 @@
  */
 
 import { normalizeUrl, isSafeUrl } from "../../../src/lib/audit-engine/url-validator";
-import { calculateScores } from "../../../src/lib/audit-engine/scorer";
+
 import { normalizeFeatures } from "../../../src/lib/audit-engine/normalizer";
 import { executeAudit } from "../../../src/lib/audit-engine/builder";
 import { AuditLogger } from "../../../src/lib/audit-engine/logger";

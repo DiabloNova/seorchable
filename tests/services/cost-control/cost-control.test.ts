@@ -1,8 +1,8 @@
 import { BudgetService } from "../../../src/services/cost-control/budget";
 import { CostCalculator, pricingCatalog } from "../../../src/services/cost-control/pricing";
 import { UsageRecord, RequestBudget } from "../../../src/services/cost-control/types";
-import { createSession, setCookiesMock } from "../../../src/services/auth/session";
-import { User } from "../../../src/types/auth";
+import { setCookiesMock } from "../../../src/services/auth/session";
+
 
 // Mock cookie store for session resolution during cost/budget tests
 const mockCookieStore = {

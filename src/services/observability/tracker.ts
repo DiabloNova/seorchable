@@ -1,4 +1,4 @@
-import { ObservabilityContext, TraceEvent } from "./types";
+import { TraceEvent } from "./types";
 import { ObservabilityContextManager } from "./context";
 
 export class ObservabilityTracker {

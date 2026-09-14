@@ -3,24 +3,7 @@
 import React, { useState, useEffect, useTransition } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
-import {
-  Sparkles,
-  RefreshCw,
-  TrendingUp,
-  Award,
-  Link2,
-  Tag,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Compass,
-  FileText,
-  ChevronDown,
-  ChevronUp,
-  Bookmark,
-  Receipt,
-  HelpCircle
-} from "lucide-react";
+import { Sparkles, RefreshCw, TrendingUp, Award, Link2, AlertTriangle, CheckCircle, Clock, Compass, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import {
   createAndRunAuditAction,
   getAuditDetailsAction,
@@ -200,8 +183,7 @@ export default function AeoAuditsPage() {
           </h3>
           <p className="text-xs text-[var(--text-secondary)] mt-1.5 leading-relaxed">
             {isRtl
-              ? "هیچ سابقه سنجش رویت‌پذیری هوش مصنوعی برای این برند وجود ندارد. پایش هوشمند را برای شروع استخراج مراجع اجرا کنید."
-              : "Perform your first comprehensive AI visibility evaluation to construct semantic entity metrics and trace response citations."}
+              ? "هیچ سابقه سنجش رویت‌پذیری هوش مصنوعی برای این برند وجود ندارد. پایش هوشمند را برای شروع استخراج مراجع اجرا کنید." :"Perform your first comprehensive AI visibility evaluation to construct semantic entity metrics and trace response citations."}
           </p>
           <button
             onClick={triggerNewAudit}
@@ -222,8 +204,7 @@ export default function AeoAuditsPage() {
           </h3>
           <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-md mx-auto leading-relaxed">
             {isRtl
-              ? "موتور در حال ارسال ۷ پرسش کنترل شده به مدل‌ها، شبیه‌سازی مراجع استنادی، تحلیل داده‌های خروجی و وزن‌دهی به نتایج است. لطفاً منتظر بمانید..."
-              : "Submitting prompt vectors, simulating conversational responses, analyzing brand mentions, and evaluating link authorities. Please wait..."}
+              ? "موتور در حال ارسال ۷ پرسش کنترل شده به مدل‌ها، شبیه‌سازی مراجع استنادی، تحلیل داده‌های خروجی و وزن‌دهی به نتایج است. لطفاً منتظر بمانید..." :"Submitting prompt vectors, simulating conversational responses, analyzing brand mentions, and evaluating link authorities. Please wait..."}
           </p>
         </Card>
       )}
@@ -265,8 +246,7 @@ export default function AeoAuditsPage() {
                 <div className="text-center max-w-xs px-2 pt-2">
                   <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                     {isRtl
-                      ? "این نمره نشان‌دهنده درصد کلی دیده شدن و انطباق برند شما در مدل‌های پاسخ‌دهی بر اساس استنادها و موجودیت‌ها است."
-                      : "This metric indicates the overall visibility, recognition clarity, and index inclusion level resolved by conversational engine networks."}
+                      ? "این نمره نشان‌دهنده درصد کلی دیده شدن و انطباق برند شما در مدل‌های پاسخ‌دهی بر اساس استنادها و موجودیت‌ها است." :"This metric indicates the overall visibility, recognition clarity, and index inclusion level resolved by conversational engine networks."}
                   </p>
                 </div>
               </CardContent>

@@ -230,8 +230,7 @@ export const KnowledgeGraphExplorer: React.FC = () => {
           </CardTitle>
           <CardDescription>
             {isRtl
-              ? "موجودیت‌های استخراج‌شده و ارتباطات معنایی ۱-هاپ آن‌ها در شبکه روابط برند."
-              : "Explore semantic entities and their mapped 1-hop relationships in our visual network."}
+              ? "موجودیت‌های استخراج‌شده و ارتباطات معنایی ۱-هاپ آن‌ها در شبکه روابط برند." :"Explore semantic entities and their mapped 1-hop relationships in our visual network."}
           </CardDescription>
         </div>
 
@@ -300,8 +299,7 @@ export const KnowledgeGraphExplorer: React.FC = () => {
             </p>
             <p className="text-xs text-[var(--text-muted)] max-w-sm">
               {isRtl
-                ? "ابتدا فایلی در سیستم بارگذاری کنید یا واژه جستجو را به گزینه‌ای دیگر تغییر دهید."
-                : "Try uploading documents first or query a different entity to explore semantic links."}
+                ? "ابتدا فایلی در سیستم بارگذاری کنید یا واژه جستجو را به گزینه‌ای دیگر تغییر دهید." :"Try uploading documents first or query a different entity to explore semantic links."}
             </p>
           </div>
         ) : null}

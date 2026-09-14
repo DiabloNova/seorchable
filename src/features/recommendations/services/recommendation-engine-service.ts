@@ -1,7 +1,7 @@
 import { AutomatedRecommendationRepository } from "../repositories/automated-recommendation-repository";
 import { TenantContextManager } from "../../../core/database/tenant-context";
 import { MonitoringAlertRepository } from "../../monitoring/repositories/monitoring-alert-repository";
-import { MonitoringAlert } from "../../monitoring/domain/entities/monitoring-alert";
+
 import { createHash } from "crypto";
 
 export class RecommendationEngineService {

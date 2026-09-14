@@ -55,8 +55,7 @@ export const CriticalIssuesPanel: React.FC<CriticalIssuesPanelProps> = ({
         </CardTitle>
         <CardDescription className="text-xs text-[var(--text-secondary)]">
           {isRtl
-            ? "لیستی از مغایرت‌های فنی و معنایی با اولویت بالا که سهم حضور برند شما را تهدید می‌کنند."
-            : "Prioritized high-impact technical or entity anomalies requiring immediate resolution."}
+            ? "لیستی از مغایرت‌های فنی و معنایی با اولویت بالا که سهم حضور برند شما را تهدید می‌کنند." :"Prioritized high-impact technical or entity anomalies requiring immediate resolution."}
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-2 flex-1 flex flex-col justify-center">
@@ -71,8 +70,7 @@ export const CriticalIssuesPanel: React.FC<CriticalIssuesPanelProps> = ({
               </p>
               <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed">
                 {isRtl
-                  ? "سلامت وب‌سایت شما در شرایط مطلوبی قرار دارد یا پایش جدیدی اجرا نشده است."
-                  : "No critical search retrieval issues detected. Run audits to scan your pages."}
+                  ? "سلامت وب‌سایت شما در شرایط مطلوبی قرار دارد یا پایش جدیدی اجرا نشده است." :"No critical search retrieval issues detected. Run audits to scan your pages."}
               </p>
             </div>
           </div>

@@ -25,9 +25,7 @@ export default function AnalyticsPage() {
             {language === "fa" ? "آنالیتیکس پیشرفته" : "Advanced Analytics"}
           </h1>
           <p className="text-sm text-[var(--text-secondary)] mt-1">
-            {language === "fa"
-              ? "تحلیل روندهای آماری بلندمدت و ارزیابی عمیق بر روی الگوهای پاسخ‌دهی موتورهای تولید محتوا."
-              : "Deep-dive statistical trend analysis and validation metrics on generative retrieval frequencies."}
+            {language === "fa" ?"تحلیل روندهای آماری بلندمدت و ارزیابی عمیق بر روی الگوهای پاسخ‌دهی موتورهای تولید محتوا." :"Deep-dive statistical trend analysis and validation metrics on generative retrieval frequencies."}
           </p>
         </div>
 
@@ -35,9 +33,7 @@ export default function AnalyticsPage() {
           <CardHeader>
             <CardTitle>{language === "fa" ? "گزارش‌های جامع عملکرد بلندمدت" : "Long-term Performance Telemetry"}</CardTitle>
             <CardDescription>
-              {language === "fa"
-                ? "داده‌های سری زمانی پایداری حضور برند در خروجی پاسخ‌دهی مدلهای زبانی بزرگ."
-                : "Time-series data monitoring brand visibility persistence indexes."}
+              {language === "fa" ?"داده‌های سری زمانی پایداری حضور برند در خروجی پاسخ‌دهی مدلهای زبانی بزرگ." :"Time-series data monitoring brand visibility persistence indexes."}
             </CardDescription>
           </CardHeader>
           <CardContent className="h-64 flex items-center justify-center border border-dashed border-[var(--border)] rounded-[var(--radius-md)] bg-[var(--background)]">

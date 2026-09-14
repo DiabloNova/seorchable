@@ -4,7 +4,10 @@ import { Tenant, TenantQuota, AdminUser, UserRole, Permission, FeatureFlag } fro
  * Tenant Domain Operations (Aggregate Root)
  */
 export class TenantAggregate {
-  constructor(private tenant: Tenant) {}
+  private tenant: Tenant;
+  constructor(tenant: Tenant) {
+    this.tenant = tenant;
+  }
 
   public getTenant(): Tenant {
     return this.tenant;
@@ -65,7 +68,10 @@ export class TenantAggregate {
  * Admin User Operations
  */
 export class AdminUserAggregate {
-  constructor(private user: AdminUser) {}
+  private user: AdminUser;
+  constructor(user: AdminUser) {
+    this.user = user;
+  }
 
   public getUser(): AdminUser {
     return this.user;
@@ -105,7 +111,10 @@ export class AdminUserAggregate {
  * Feature Flag Operations
  */
 export class FeatureFlagAggregate {
-  constructor(private flag: FeatureFlag) {}
+  private flag: FeatureFlag;
+  constructor(flag: FeatureFlag) {
+    this.flag = flag;
+  }
 
   public getFlag(): FeatureFlag {
     return this.flag;

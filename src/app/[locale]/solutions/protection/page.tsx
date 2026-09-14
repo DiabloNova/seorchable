@@ -32,8 +32,7 @@ export default function ProtectionSolutionPage({ params }: { params: Promise<{ l
             </h1>
             <p className="text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto">
               {isFa
-                ? "پایش مستمر مدل‌های هوش زبانی برای جلوگیری از تخریب برند، رفع توهم‌ها و اصلاح اطلاعات سوگیرانه."
-                : "Continuous monitoring of LLM outputs to preempt brand defamation, resolve hallucinations, and correct biased outputs."}
+                ? "پایش مستمر مدل‌های هوش زبانی برای جلوگیری از تخریب برند، رفع توهم‌ها و اصلاح اطلاعات سوگیرانه." :"Continuous monitoring of LLM outputs to preempt brand defamation, resolve hallucinations, and correct biased outputs."}
             </p>
           </div>
 
@@ -44,8 +43,7 @@ export default function ProtectionSolutionPage({ params }: { params: Promise<{ l
             </h3>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
               {isFa
-                ? "مدل‌های زبانی بزرگ ممکن است با ارائه‌ی پاسخ‌های توهم‌آمیز، اطلاعات نادرستی در مورد موجودیت، آدرس، تماس یا دستاوردهای کسب‌وکار شما ارائه دهند. سئورچبل این انحرافات را پایش کرده و برطرف می‌کند."
-                : "LLMs frequently generate false claims regarding corporate assets, services, and locations. Our semantic agent scans query models daily to flag and fix deflection risks."}
+                ? "مدل‌های زبانی بزرگ ممکن است با ارائه‌ی پاسخ‌های توهم‌آمیز، اطلاعات نادرستی در مورد موجودیت، آدرس، تماس یا دستاوردهای کسب‌وکار شما ارائه دهند. سئورچبل این انحرافات را پایش کرده و برطرف می‌کند." :"LLMs frequently generate false claims regarding corporate assets, services, and locations. Our semantic agent scans query models daily to flag and fix deflection risks."}
             </p>
 
             <h3 className="text-xl font-bold font-display flex items-center gap-2">
@@ -54,8 +52,7 @@ export default function ProtectionSolutionPage({ params }: { params: Promise<{ l
             </h3>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
               {isFa
-                ? "جلوگیری از انحراف مشتریان شما به سمت رقبا در اثر سوگیری‌ها یا اشتباهات متنی چت‌بات‌ها به وسیله ارائه‌ی مراجع معنایی غنی و متصل."
-                : "Ensure conversational search users are not redirected to competitors due to model attribution errors. We construct highly interconnected, canonical schemas that direct traffic to your true brand endpoints."}
+                ? "جلوگیری از انحراف مشتریان شما به سمت رقبا در اثر سوگیری‌ها یا اشتباهات متنی چت‌بات‌ها به وسیله ارائه‌ی مراجع معنایی غنی و متصل." :"Ensure conversational search users are not redirected to competitors due to model attribution errors. We construct highly interconnected, canonical schemas that direct traffic to your true brand endpoints."}
             </p>
 
             <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 space-y-2">

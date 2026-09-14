@@ -1,4 +1,4 @@
-import { getLLMClient, GeminiLLMClient } from "./llm-client";
+import { GeminiLLMClient } from "./llm-client";
 
 export interface AIVisibilityProviderResult {
   provider: string;

@@ -5,7 +5,7 @@ import { TenantContextManager } from "@/core/database/tenant-context";
 import { requireSession } from "@/services/auth/session";
 import { requireWorkspaceMembership } from "@/services/auth/authorization";
 import { AIVisibilityAuditEngine } from "@/features/ai-intelligence/services/ai-visibility-audit-engine";
-import { AIVisibilityAuditRepository, BrandRepository, db } from "@/features/ai-intelligence/repositories";
+import { AIVisibilityAuditRepository, BrandRepository } from "@/features/ai-intelligence/repositories";
 import { Brand } from "@/features/ai-intelligence/domain/types";
 
 const runAuditSchema = z.object({

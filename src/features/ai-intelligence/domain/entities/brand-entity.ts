@@ -2,7 +2,11 @@ import { Brand, AuditMetadata } from "../types";
 import { brandSchema } from "../schemas";
 
 export class BrandEntity {
-  private constructor(public readonly props: Brand) {}
+  public readonly props: Brand;
+
+  private constructor(props: Brand) {
+    this.props = props;
+  }
 
   /**
    * Factory method to create a valid BrandEntity from raw data

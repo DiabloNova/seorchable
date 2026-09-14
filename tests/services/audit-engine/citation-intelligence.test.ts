@@ -1,6 +1,6 @@
 import { CitationIntelligenceService } from "../../../src/features/ai-intelligence/services/citation-intelligence-service";
 import { BrandRepository, CompetitorRepository, CitationIntelligenceRepository } from "../../../src/features/ai-intelligence/repositories";
-import { Brand, Competitor, CitationSource, CitationOccurrence } from "../../../src/features/ai-intelligence/domain/types";
+import { Brand, Competitor } from "../../../src/features/ai-intelligence/domain/types";
 import { TenantContextManager } from "../../../src/core/database/tenant-context";
 import * as assert from "assert";
 

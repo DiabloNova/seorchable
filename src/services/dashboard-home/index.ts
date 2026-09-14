@@ -156,8 +156,7 @@ export const dashboardHomeService = {
             criticalIssues.push({
               id,
               issue: issueObj.description || (isRtl ? "نیاز به بررسی ساختار بهینه‌سازی" : "Optimization structure review needed"),
-              impact: severity === "critical"
-                ? (isRtl ? "کاهش بحرانی رتبه درPerplexity" : "Critical drop in Perplexity search visibility")
+              impact: severity === "critical" ? (isRtl ?"کاهش بحرانی رتبه درPerplexity" : "Critical drop in Perplexity search visibility")
                 : (isRtl ? "تاثیر متوسط در کشف برند" : "Medium impact on brand discoverability"),
               resolvedByRoute,
               priority: severity === "critical" ? "high" : "medium"

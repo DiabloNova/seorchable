@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { Competitor, CompetitorStatusType, AuditMetadata, CitationSourceClassification } from "../domain/types";
+import { Competitor } from "../domain/types";
 import { ICompetitorRepository } from "../repositories/interfaces";
 
 export interface DiscoveryEvidenceRecord {
@@ -24,7 +24,7 @@ export interface DiscoveryResult {
  */
 export function isValidHostname(host: string): boolean {
   if (!host) return false;
-  const cleaned = host.trim().toLowerCase();
+  let cleaned = host.trim().toLowerCase();
   if (cleaned.includes(" ") || cleaned.includes("/") || cleaned.includes(":") || cleaned.includes("@")) {
     return false;
   }
@@ -58,7 +58,11 @@ export function normalizeDomain(input: string): string {
  * Consumes existing discovery/intelligence signals and maintains competitor candidates.
  */
 export class CompetitorDiscoveryService {
-  constructor(private readonly competitorRepo: ICompetitorRepository) {}
+  private readonly competitorRepo: ICompetitorRepository;
+
+  constructor(competitorRepo: ICompetitorRepository) {
+    this.competitorRepo = competitorRepo;
+  }
 
   /**
    * Evaluates a candidate domain.

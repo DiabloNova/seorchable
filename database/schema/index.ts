@@ -1235,3 +1235,33 @@ export const monitoringAlerts = pgTable("monitoring_alerts", {
     ...tenantPolicy("organization_id")
   ];
 });
+
+function audits(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: audits is not implemented yet.', args);
+  return null;
+}
+
+export { audits };
+function users(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: users is not implemented yet.', args);
+  return null;
+}
+
+export { users };
+export { organizations };
+function organizationMembers(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: organizationMembers is not implemented yet.', args);
+  return null;
+}
+
+export { organizationMembers };
+function organizationInvitations(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: organizationInvitations is not implemented yet.', args);
+  return null;
+}
+
+export { organizationInvitations };

@@ -76,8 +76,7 @@ export default function IndustriesPage({ params }: { params: Promise<{ locale: s
             </h1>
             <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
               {isFa
-                ? "هر صنعتی با چالش‌های منحصر به فردی در مدل‌های زبانی روبروست. ما ساختارهای اثبات‌پذیر را برای بخش‌های مختلف پیاده‌سازی کرده‌ایم."
-                : "Every industry faces unique risks with LLM hallucinations. We deliver structured, evidence-backed observability tailored for major sectors."}
+                ? "هر صنعتی با چالش‌های منحصر به فردی در مدل‌های زبانی روبروست. ما ساختارهای اثبات‌پذیر را برای بخش‌های مختلف پیاده‌سازی کرده‌ایم." :"Every industry faces unique risks with LLM hallucinations. We deliver structured, evidence-backed observability tailored for major sectors."}
             </p>
           </div>
 
@@ -97,8 +96,7 @@ export default function IndustriesPage({ params }: { params: Promise<{ locale: s
             <h3 className="text-2xl font-bold font-display">{isFa ? "صنعت شما در لیست نیست؟" : "Don't see your industry?"}</h3>
             <p className="text-[var(--text-secondary)] max-w-2xl mx-auto">
               {isFa
-                ? "فناوری هسته‌ی ما انعطاف‌پذیر است. گراف‌های دانش اختصاصی و پایش مبتنی بر مستندات، برای تمامی سازمان‌های بزرگ قابل اجراست."
-                : "Our core technology is agnostic. Private knowledge graphs and strict tenant isolation make the platform adaptable to any enterprise requirement."}
+                ? "فناوری هسته‌ی ما انعطاف‌پذیر است. گراف‌های دانش اختصاصی و پایش مبتنی بر مستندات، برای تمامی سازمان‌های بزرگ قابل اجراست." :"Our core technology is agnostic. Private knowledge graphs and strict tenant isolation make the platform adaptable to any enterprise requirement."}
             </p>
             <div className="flex justify-center pt-2">
               <Link href={`/${locale}/contact`}>

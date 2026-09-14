@@ -6,9 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
-import {
-  Settings, Key, Shield, Building, Sparkles, CheckCircle2, AlertCircle
-} from "lucide-react";
+import { Settings, Key, Shield, Building, CheckCircle2 } from "lucide-react";
 
 export default function SettingsPage() {
   const { language, direction } = useTheme();
@@ -35,8 +33,7 @@ export default function SettingsPage() {
   const strings = {
     title: isRtl ? "تنظیمات فضای کاری و سازمان" : "Workspace & API Settings",
     desc: isRtl
-      ? "پیکربندی هویت سازمان، مدیریت دامنه‌های تحت پایش، کلیدهای دسترسی API و تنظیمات عمومی پلتفرم."
-      : "Manage corporate workspace profiles, fetch programmatical API Keys, configure authorization rules and crawler targets.",
+      ? "پیکربندی هویت سازمان، مدیریت دامنه‌های تحت پایش، کلیدهای دسترسی API و تنظیمات عمومی پلتفرم." :"Manage corporate workspace profiles, fetch programmatical API Keys, configure authorization rules and crawler targets.",
     companyLabel: isRtl ? "نام رسمی سازمان" : "Official Organization Name",
     domainLabel: isRtl ? "دامنه اختصاصی فضا" : "Primary Audited Root Domain",
     apiKeyLabel: isRtl ? "کلید دسترسی معتبر (API Token)" : "Secret Integration API Key",
@@ -135,8 +132,7 @@ export default function SettingsPage() {
               <Shield size={14} className="text-amber-400 shrink-0 mt-0.5" />
               <span>
                 {isRtl
-                  ? "کلید دسترسی خود را هرگز در کلاینت‌های عمومی به اشتراک نگذارید. خزش‌های برنامه‌ریزی‌شده مجهز به این توکن مستقیماً روی پلن فعال محاسبه خواهند شد."
-                  : "Keep this secret secure. All REST calls and MCP queries performed via this token are charged directly on your active billing workspace balance."}
+                  ? "کلید دسترسی خود را هرگز در کلاینت‌های عمومی به اشتراک نگذارید. خزش‌های برنامه‌ریزی‌شده مجهز به این توکن مستقیماً روی پلن فعال محاسبه خواهند شد." :"Keep this secret secure. All REST calls and MCP queries performed via this token are charged directly on your active billing workspace balance."}
               </span>
             </div>
           </CardContent>

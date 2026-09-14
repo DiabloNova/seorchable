@@ -18,7 +18,11 @@ interface CandidateRow extends QueryResultRow {
  * cross-tenant surface; callers must establish tenant context before work.
  */
 export class CrawlDispatcherRepository {
-  public constructor(private readonly pool: Pool) {}
+  private readonly pool: Pool;
+
+  public constructor(pool: Pool) {
+    this.pool = pool;
+  }
 
   public async claim(
     workerId: string,

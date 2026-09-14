@@ -19,8 +19,7 @@ export default function SettingsPage() {
         </h1>
         <p className="text-sm text-[var(--text-secondary)] mt-1.5 max-w-3xl leading-relaxed">
           {isRtl
-            ? "پیکربندی هویت برند، مدیریت حریم خصوصی، و دسترسی به کلیدهای API."
-            : "Configure brand settings, integrate crawl sources, and manage developer tokens."}
+            ? "پیکربندی هویت برند، مدیریت حریم خصوصی، و دسترسی به کلیدهای API." :"Configure brand settings, integrate crawl sources, and manage developer tokens."}
         </p>
       </div>
 
@@ -31,8 +30,7 @@ export default function SettingsPage() {
         </h3>
         <p className="text-xs text-[var(--text-muted)] max-w-md">
           {isRtl
-            ? "پیکربندی‌های امنیتی و مراجع خزش در به‌روزرسانی‌های بعدی در دسترس خواهد بود."
-            : "Security parameters and vector partition controls will be live in upcoming version releases."}
+            ? "پیکربندی‌های امنیتی و مراجع خزش در به‌روزرسانی‌های بعدی در دسترس خواهد بود." :"Security parameters and vector partition controls will be live in upcoming version releases."}
         </p>
       </GlassCard>
     </div>

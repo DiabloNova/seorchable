@@ -1,25 +1,4 @@
-import {
-  AeoAnalysis,
-  FaqOpportunity,
-  KgAlignment,
-  Page,
-  Brand,
-  Entity,
-  AnswerabilityLevel,
-  EntityCoverageStatus,
-  QuestionCoverageStatus,
-  CitationReadinessLevel,
-  KgAlignmentStatus,
-  AnswerabilityAnalysis,
-  EntityCoverageItem,
-  SemanticCoverageAnalysis,
-  QuestionCoverageAnalysis,
-  CitationReadinessAnalysis,
-  StructuredAnswerQualityAnalysis,
-  KgAlignmentAnalysis,
-  PriorityLevel,
-  KgAlignmentItem
-} from "../domain/types";
+import { AeoAnalysis, FaqOpportunity, KgAlignment, Page, Brand, Entity, AnswerabilityLevel, EntityCoverageStatus, QuestionCoverageStatus, CitationReadinessLevel, AnswerabilityAnalysis, EntityCoverageItem, SemanticCoverageAnalysis, QuestionCoverageAnalysis, CitationReadinessAnalysis, StructuredAnswerQualityAnalysis, KgAlignmentAnalysis, KgAlignmentItem } from "../domain/types";
 import {
   AeoContentIntelligenceRepository,
   PageRepository,

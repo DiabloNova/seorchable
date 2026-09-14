@@ -188,7 +188,7 @@ export async function requestPasswordResetAction(email: string): Promise<void> {
     }
 
     const { rows: userRows } = await client.query("SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL", [email]);
-    const userRecord = userRows[0];
+    let userRecord = userRows[0];
 
     // Mock reset token generation
     const resetToken = randomUUID();
@@ -208,7 +208,7 @@ export async function requestPasswordResetAction(email: string): Promise<void> {
 /**
  * Registers user and resolves identity/workspace strictly on the server.
  */
-export async function registerAction(name: string, email: string, password: string): Promise<User> {
+export async function registerAction(name: string, email: string, password: string, workspaceName?: string): Promise<User> {
   const normalizedEmail = email.trim().toLowerCase();
   if (!password) {
     throw new Error("Password is required");
@@ -231,14 +231,17 @@ export async function registerAction(name: string, email: string, password: stri
     const userId = randomUUID();
 
     // Create User
-    await client.query("INSERT INTO users (id, name, email, password_hash, is_active, email_verified, email_verified_at) VALUES ($1, $2, $3, $4, true, false, null)", [userId, name, normalizedEmail, hashedPassword]);
+    await client.query(
+      "INSERT INTO users (id, name, email, password_hash, is_active, email_verified, email_verified_at) VALUES ($1, $2, $3, $4, true, false, null)",
+      [userId, name, normalizedEmail, hashedPassword]
+    );
 
-    // Create Organization (Workspace)
+    // Create Organization (Workspace) — use provided workspaceName or derive from user name
     const orgId = randomUUID();
-    const orgSlug = `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${randomUUID().slice(0,4)}`;
-    const orgName = `${name}'s Workspace`;
+    const resolvedOrgName = workspaceName?.trim() || `${name}'s Workspace`;
+    const orgSlug = `${resolvedOrgName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${randomUUID().slice(0,4)}`;
 
-    await client.query("INSERT INTO organizations (id, name, slug) VALUES ($1, $2, $3)", [orgId, orgName, orgSlug]);
+    await client.query("INSERT INTO organizations (id, name, slug) VALUES ($1, $2, $3)", [orgId, resolvedOrgName, orgSlug]);
 
     // Create Membership
     await client.query("INSERT INTO organization_members (organization_id, user_id, role) VALUES ($1, $2, $3)", [orgId, userId, "viewer"]);

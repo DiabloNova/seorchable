@@ -20,8 +20,7 @@ export default function LlmAnalyticsPage() {
         </h1>
         <p className="text-sm text-[var(--text-secondary)] mt-1.5 max-w-3xl leading-relaxed">
           {isRtl
-            ? "پایش الگوها، شاخص‌های معنایی، و تحلیل جهت‌گیری پاسخ‌ها در مدل‌های زبانی پیشرو."
-            : "Monitor response biases, token representation indexes, and query metrics across conversational models."}
+            ? "پایش الگوها، شاخص‌های معنایی، و تحلیل جهت‌گیری پاسخ‌ها در مدل‌های زبانی پیشرو." :"Monitor response biases, token representation indexes, and query metrics across conversational models."}
         </p>
       </div>
 

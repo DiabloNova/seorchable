@@ -4,7 +4,7 @@ import React, { use } from "react";
 import { Header } from "@/components/marketing/Header";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
 import AppSidebar from "@/components/navigation/AppSidebar";
-import { Sparkles, BookOpen, FileText, Video, Code, ArrowRight } from "lucide-react";
+import { Sparkles, BookOpen, FileText, Video, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function ResourcesPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -63,8 +63,7 @@ export default function ResourcesPage({ params }: { params: Promise<{ locale: st
             </h1>
             <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
               {isFa
-                ? "هر آنچه برای شروع بهینه‌سازی موتورهای پاسخگو، آموزش تیم‌ها، و درک عمیق‌تر از سیستم‌های ما نیاز دارید."
-                : "Everything you need to master Generative Engine Optimization, train your team, and understand our architecture."}
+                ? "هر آنچه برای شروع بهینه‌سازی موتورهای پاسخگو، آموزش تیم‌ها، و درک عمیق‌تر از سیستم‌های ما نیاز دارید." :"Everything you need to master Generative Engine Optimization, train your team, and understand our architecture."}
             </p>
           </div>
 

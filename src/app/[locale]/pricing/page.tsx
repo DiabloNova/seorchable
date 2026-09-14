@@ -8,7 +8,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Dialog } from "@/components/Dialog";
-import { Check, Shield, Award, Sparkles, Building, ChevronRight, AlertCircle } from "lucide-react";
+import { Check, Sparkles, ChevronRight, AlertCircle } from "lucide-react";
 
 export default function PricingPage() {
   const router = useRouter();
@@ -102,8 +102,7 @@ export default function PricingPage() {
   const strings = {
     title: isRtl ? "طرح‌های اشتراک و تعرفه‌ها" : "Enterprise Grade Pricing",
     subtitle: isRtl
-      ? "پیکربندی هوشمند و ممیزی دیده‌شدن برند خود در مدل‌های زبانی با پلن‌های متناسب با مقیاس کسب‌وکار شما."
-      : "Start measuring and optimizing your LLM footprint. Choose the subscription matching your scale.",
+      ? "پیکربندی هوشمند و ممیزی دیده‌شدن برند خود در مدل‌های زبانی با پلن‌های متناسب با مقیاس کسب‌وکار شما." :"Start measuring and optimizing your LLM footprint. Choose the subscription matching your scale.",
 
     // Plans Copy
     freeTitle: isRtl ? "پلن رایگان (Free)" : "Free",
@@ -135,14 +134,12 @@ export default function PricingPage() {
     // Modals
     registerTitle: isRtl ? "🔐 ثبت‌نام و فعال‌سازی اشتراک" : "🔐 Register to Activate Plan",
     registerDesc: isRtl
-      ? "لطفاً ابتدا حساب کاربری سازمانی خود را برای اعمال تغییرات لایسنس فعال فرمایید."
-      : "Please create your corporate account first to activate your selected billing license.",
+      ? "لطفاً ابتدا حساب کاربری سازمانی خود را برای اعمال تغییرات لایسنس فعال فرمایید." :"Please create your corporate account first to activate your selected billing license.",
     registerBtn: isRtl ? "ثبت‌نام و ادامه خرید" : "Create Account & Continue",
 
     workspaceTitle: isRtl ? "⚡ راه‌اندازی فوری فضای کاری جدید" : "⚡ Setup Your Premium Workspace",
     workspaceDesc: isRtl
-      ? "مشخصات و دامنه وب‌سایت اصلی سازمان خود را برای شروع پایش دائم سیستم وارد کنید."
-      : "Input your primary audited domain and brand name to launch your dedicated monitoring space.",
+      ? "مشخصات و دامنه وب‌سایت اصلی سازمان خود را برای شروع پایش دائم سیستم وارد کنید." :"Input your primary audited domain and brand name to launch your dedicated monitoring space.",
     workspaceNameLabel: isRtl ? "نام تجاری فضای کاری" : "Workspace / Brand Name",
     targetDomainLabel: isRtl ? "آدرس وب‌سایت سازمان (دامنه)" : "Target Web Domain URL",
     workspaceBtn: isRtl ? "ایجاد فضا و ورود به داشبورد" : "Provision Workspace & Enter Dashboard"

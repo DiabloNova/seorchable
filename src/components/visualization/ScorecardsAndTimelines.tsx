@@ -170,8 +170,7 @@ export const ScorecardPrimitive: React.FC<ScorecardProps> = ({ metric }) => {
   const trendColorClass = isUp
     ? "text-emerald-500 bg-emerald-500/10"
     : isDown
-    ? "text-red-500 bg-red-500/10"
-    : "text-[var(--text-muted)] bg-[var(--border)]";
+    ? "text-red-500 bg-red-500/10" :"text-[var(--text-muted)] bg-[var(--border)]";
 
   // Parse sparkline format data point array
   const sparklineData = metric.sparklineData?.map((val, i) => ({ val, i })) || [];

@@ -15,10 +15,16 @@ export const defaultTTLPolicy: CacheTTLPolicy = {
 };
 
 export class CacheService {
+  private store: ICacheStore;
+  private ttlPolicy: CacheTTLPolicy;
+
   constructor(
-    private store: ICacheStore,
-    private ttlPolicy: CacheTTLPolicy = defaultTTLPolicy
-  ) {}
+    store: ICacheStore,
+    ttlPolicy: CacheTTLPolicy = defaultTTLPolicy
+  ) {
+    this.store = store;
+    this.ttlPolicy = ttlPolicy;
+  }
 
   /**
    * Internal defense-in-depth verification check.

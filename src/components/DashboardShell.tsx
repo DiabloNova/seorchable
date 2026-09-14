@@ -9,26 +9,7 @@ import { useTheme } from "@/components/ThemeProvider";
 import { useAuth } from "@/components/AuthProvider";
 import { Dropdown } from "@/components/Dropdown";
 import { Button } from "@/components/Button";
-import {
-  LayoutDashboard,
-  BrainCircuit,
-  Network,
-  Compass,
-  BarChart3,
-  Menu,
-  X,
-  Sun,
-  Moon,
-  Search,
-  Database,
-  Building2,
-  ChevronDown,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Languages,
-  Receipt,
-  LogOut,
-} from "lucide-react";
+import { LayoutDashboard, Network, Compass, BarChart3, Menu, X, Sun, Moon, Search, Database, Building2, ChevronDown, PanelLeftClose, PanelLeftOpen, Languages, Receipt,  } from "lucide-react";
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -151,25 +132,19 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
         },
         {
           name:
-            language === "fa"
-              ? "موتور ورود و پایش اسناد"
-              : "Data Ingestion Engine",
+            language === "fa" ?"موتور ورود و پایش اسناد" :"Data Ingestion Engine",
           href: "/dashboard/content/ingestion",
           icon: Database,
         },
         {
           name:
-            language === "fa"
-              ? "جستجوی پیشرفته معنایی RAG"
-              : "AI Semantic Discovery",
+            language === "fa" ?"جستجوی پیشرفته معنایی RAG" :"AI Semantic Discovery",
           href: "/dashboard/query",
           icon: Search,
         },
         {
           name:
-            language === "fa"
-              ? "گراف دانش سازمانی"
-              : "Enterprise Knowledge Graph",
+            language === "fa" ?"گراف دانش سازمانی" :"Enterprise Knowledge Graph",
           href: "/dashboard/entities",
           icon: Network,
         },
@@ -177,23 +152,17 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
     },
     {
       title:
-        language === "fa"
-          ? "هوشمندی و تحلیل‌های ژرف"
-          : "Intelligence & Deep Analysis",
+        language === "fa" ?"هوشمندی و تحلیل‌های ژرف" :"Intelligence & Deep Analysis",
       items: [
         {
           name:
-            language === "fa"
-              ? "رادار تحلیل رقابتی برند"
-              : "Competitive Intelligence Radar",
+            language === "fa" ?"رادار تحلیل رقابتی برند" :"Competitive Intelligence Radar",
           href: "/dashboard/competitors",
           icon: Compass,
         },
         {
           name:
-            language === "fa"
-              ? "تحلیل پاسخ‌های مدل‌های زبانی"
-              : "Language Model Analytics",
+            language === "fa" ?"تحلیل پاسخ‌های مدل‌های زبانی" :"Language Model Analytics",
           href: "/dashboard/analytics",
           icon: BarChart3,
         },
@@ -336,9 +305,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
               />
             </div>
             <span className="mt-2 block text-[10px] text-[var(--text-muted)]">
-              {language === "fa"
-                ? "۷,۲۰۰ از ۱۰,۰۰۰"
-                : "7,200 of 10,000 queries"}
+              {language === "fa" ?"۷,۲۰۰ از ۱۰,۰۰۰" :"7,200 of 10,000 queries"}
             </span>
           </div>
         )}
@@ -352,12 +319,8 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
             className={`w-full ${sidebarOpen ? "justify-start" : "justify-center"}`}
             aria-label={
               sidebarOpen
-                ? language === "fa"
-                  ? "جمع کردن منو"
-                  : "Collapse menu"
-                : language === "fa"
-                  ? "باز کردن منو"
-                  : "Expand menu"
+                ? language === "fa" ?"جمع کردن منو" :"Collapse menu"
+                : language === "fa" ?"باز کردن منو" :"Expand menu"
             }
           >
             <span className="rtl:-scale-x-100 inline-flex">
@@ -462,9 +425,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
               <input
                 type="search"
                 placeholder={
-                  language === "fa"
-                    ? "جستجو در اسناد..."
-                    : "Search documents..."
+                  language === "fa" ?"جستجو در اسناد..." :"Search documents..."
                 }
                 className="w-full ps-9 pe-16 py-2 text-sm rounded-xl bg-white/[0.03] border border-[var(--glass-border)] focus:border-[var(--sky-blue-500)]/40 focus:bg-white/[0.05] outline-none text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-colors"
               />
@@ -562,16 +523,12 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)]" />
               <span>
-                {language === "fa"
-                  ? "همه سیستم‌ها عملیاتی"
-                  : "All systems operational"}
+                {language === "fa" ?"همه سیستم‌ها عملیاتی" :"All systems operational"}
               </span>
             </div>
             <div className="hidden sm:flex items-center gap-4">
               <span>
-                {language === "fa"
-                  ? "همگام‌سازی: ۱ دقیقه پیش"
-                  : "Synced 1m ago"}
+                {language === "fa" ?"همگام‌سازی: ۱ دقیقه پیش" :"Synced 1m ago"}
               </span>
               <span>v2.4.0</span>
             </div>

@@ -128,8 +128,7 @@ export const VisualizationContainer: React.FC<VisualizationContainerProps> = ({
               onClick={toggleFullscreen}
               aria-label={
                 isFullscreen
-                  ? isRtl ? "خروج از تمام‌صفحه" : "Exit Fullscreen"
-                  : isRtl ? "نمایش تمام‌صفحه" : "View Fullscreen"
+                  ? isRtl ? "خروج از تمام‌صفحه" : "Exit Fullscreen" : isRtl ?"نمایش تمام‌صفحه" : "View Fullscreen"
               }
               className="h-8 w-8 p-0 flex items-center justify-center text-[var(--text-primary)] border-[var(--border)] hover:bg-[var(--background)]"
             >

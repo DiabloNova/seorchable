@@ -6,18 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/Button";
 import { Badge } from "@/components/Badge";
 import { queryKnowledgeGraphAction } from "@/app/actions/query";
-import {
-  Search,
-  BookOpen,
-  Cpu,
-  History,
-  Trash2,
-  AlertCircle,
-  RefreshCw,
-  MessageSquare,
-  Sparkles,
-  ArrowRightLeft
-} from "lucide-react";
+import { Search, BookOpen, Cpu, History, Trash2, AlertCircle, RefreshCw, MessageSquare, Sparkles } from "lucide-react";
 
 interface RetrievedSource {
   id: string;
@@ -81,8 +70,7 @@ export default function RAGQueryPage() {
   const strings = {
     title: isRtl ? "جستجوی معنایی و عیب‌یابی RAG" : "Semantic Search & RAG Diagnostics",
     description: isRtl
-      ? "در گراف دانش و بانک برداری مستأجر خود به صورت همزمان جستجو کنید، قطعات متنی مرجع را بازیابی کرده و پاسخ‌های غنی‌شده را بررسی نمایید."
-      : "Query your isolated tenant vector store. Retrieve matching semantic context chunks and inspect synthesized RAG diagnostics.",
+      ? "در گراف دانش و بانک برداری مستأجر خود به صورت همزمان جستجو کنید، قطعات متنی مرجع را بازیابی کرده و پاسخ‌های غنی‌شده را بررسی نمایید." :"Query your isolated tenant vector store. Retrieve matching semantic context chunks and inspect synthesized RAG diagnostics.",
     inputPlaceholder: isRtl
       ? "سوال برندی یا رقابتی خود را وارد کنید (مثال: رقبای ما در بازار مشهد چه کسانی هستند؟)..."
       : "Ask a brand or competitive question (e.g., 'What are the main criticisms of our pricing?')...",
@@ -93,19 +81,16 @@ export default function RAGQueryPage() {
     noHistory: isRtl ? "تاریخچه‌ای وجود ندارد" : "No recent queries found",
     leftColTitle: isRtl ? "محتوا و مراجع استخراج‌شده" : "Retrieved Context Chunks",
     leftColDesc: isRtl
-      ? "چانک‌های متنی بازیابی‌شده از پایگاه داده برداری به ترتیب میزان همبستگی معنایی:"
-      : "Relevant text fragments retrieved from PostgreSQL vector store sorted by cosine similarity:",
+      ? "چانک‌های متنی بازیابی‌شده از پایگاه داده برداری به ترتیب میزان همبستگی معنایی:" :"Relevant text fragments retrieved from PostgreSQL vector store sorted by cosine similarity:",
     rightColTitle: isRtl ? "پاسخ همبسته هوش مصنوعی" : "AI Synthesized Response",
     rightColDesc: isRtl
-      ? "پاسخ مبتنی بر فکت‌ها و بدون توهم مدل با تحلیل منحصربه‌فرد مراجع:"
-      : "Fact-aligned model output constructed purely on retrieved context to block hallucinations:",
+      ? "پاسخ مبتنی بر فکت‌ها و بدون توهم مدل با تحلیل منحصربه‌فرد مراجع:" :"Fact-aligned model output constructed purely on retrieved context to block hallucinations:",
     alignment: isRtl ? "میزان انطباق معنایی" : "RAG Alignment Score",
     similarity: isRtl ? "شباهت" : "Similarity",
     sourceChunk: isRtl ? "چانک مرجع" : "Source Chunk",
     emptyStateTitle: isRtl ? "درگاه آزمایش و تشخیص RAG" : "RAG Diagnostic Sandbox",
     emptyStateDesc: isRtl
-      ? "برای شروع بازیابی معنایی و ارزیابی فرآیند سنتز، پرسش خود را در کادر بالا بنویسید."
-      : "Enter a question in the search bar above to trigger multi-tenant semantic retrieval and examine the RAG pipeline output.",
+      ? "برای شروع بازیابی معنایی و ارزیابی فرآیند سنتز، پرسش خود را در کادر بالا بنویسید." :"Enter a question in the search bar above to trigger multi-tenant semantic retrieval and examine the RAG pipeline output.",
     errorTitle: isRtl ? "خطا در پرس‌وجوی معنایی" : "Query Pipeline Execution Failure",
     validationError: isRtl ? "لطفاً سوال خود را بنویسید." : "Please enter a valid query string before executing.",
     id: isRtl ? "شناسه" : "ID",

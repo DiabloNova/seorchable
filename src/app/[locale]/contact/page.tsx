@@ -44,8 +44,7 @@ export default function ContactPage({ params }: { params: Promise<{ locale: stri
             </h1>
             <p className="text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto">
               {isFa
-                ? "برای دریافت مشاوره‌ی تخصصی درباره‌ی نحوه‌ی ارتقای رتبه و سهم صدای برند خود در هوش مصنوعی، با ما در تماس باشید."
-                : "Questions about Answer Engine Optimization? Reach out to our specialist team for customized support."}
+                ? "برای دریافت مشاوره‌ی تخصصی درباره‌ی نحوه‌ی ارتقای رتبه و سهم صدای برند خود در هوش مصنوعی، با ما در تماس باشید." :"Questions about Answer Engine Optimization? Reach out to our specialist team for customized support."}
             </p>
           </div>
 

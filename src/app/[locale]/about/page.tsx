@@ -4,7 +4,7 @@ import React, { use } from "react";
 import { Header } from "@/components/marketing/Header";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
 import AppSidebar from "@/components/navigation/AppSidebar";
-import { Sparkles, Users, Award, ShieldCheck, Milestone } from "lucide-react";
+import { Sparkles, Users, Award, Milestone } from "lucide-react";
 
 export default function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
   const resolvedParams = use(params);
@@ -46,8 +46,7 @@ export default function AboutPage({ params }: { params: Promise<{ locale: string
               <h3 className="text-lg font-bold font-display">{isFa ? "ماموریت ما" : "Our Mission"}</h3>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed font-medium">
                 {isFa
-                  ? "ما به برندها کمک می‌کنیم تا ساختارهای متاداده و محتواهای خود را به گونه‌ای ارتقا دهند که هوش مصنوعی بتواند آن‌ها را به راحتی درک کرده و بدون بروز توهم استناد دهد."
-                  : "We empower enterprise brands to refine their entity schemas, enabling models to index and recommend them accurately without hallucinating."}
+                  ? "ما به برندها کمک می‌کنیم تا ساختارهای متاداده و محتواهای خود را به گونه‌ای ارتقا دهند که هوش مصنوعی بتواند آن‌ها را به راحتی درک کرده و بدون بروز توهم استناد دهد." :"We empower enterprise brands to refine their entity schemas, enabling models to index and recommend them accurately without hallucinating."}
               </p>
             </div>
 
@@ -58,8 +57,7 @@ export default function AboutPage({ params }: { params: Promise<{ locale: string
               <h3 className="text-lg font-bold font-display">{isFa ? "تکنولوژی پیشرو" : "Advanced Tech"}</h3>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed font-medium">
                 {isFa
-                  ? "بهره‌گیری از معماری پایش چندمدلی به همراه تحلیل‌های عمیق معنایی، گراف‌های دانش محلی و شاخص دیده‌شدن برخط برند."
-                  : "Leveraging multi-model agent execution pipelines alongside deep semantic analyzers, knowledge graphs, and real-time visibility metrics."}
+                  ? "بهره‌گیری از معماری پایش چندمدلی به همراه تحلیل‌های عمیق معنایی، گراف‌های دانش محلی و شاخص دیده‌شدن برخط برند." :"Leveraging multi-model agent execution pipelines alongside deep semantic analyzers, knowledge graphs, and real-time visibility metrics."}
               </p>
             </div>
           </div>
@@ -71,8 +69,7 @@ export default function AboutPage({ params }: { params: Promise<{ locale: string
             </h2>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">
               {isFa
-                ? "سئورچبل با تمرکز روی وب‌فارسی و بین‌المللی درصدد است تا خلاء بزرگ بازاریابی نوین در عصر چت‌بات‌ها را با ابزار سنجش پیشرفته و راهکارهای تولید محتوای بهینه‌شده حل کند. با پیوستن به ما، گامی بلند به سوی بهینه‌سازی حضور خود در نتایج پاسخ‌های موتورهای پاسخگو بردارید."
-                : "seorchable.ir bridges the critical gap in modern digital presence optimization. By standardizing crawl pipelines and resolving hallucinations, we establish semantic authority for top corporate teams."}
+                ? "سئورچبل با تمرکز روی وب‌فارسی و بین‌المللی درصدد است تا خلاء بزرگ بازاریابی نوین در عصر چت‌بات‌ها را با ابزار سنجش پیشرفته و راهکارهای تولید محتوای بهینه‌شده حل کند. با پیوستن به ما، گامی بلند به سوی بهینه‌سازی حضور خود در نتایج پاسخ‌های موتورهای پاسخگو بردارید." :"seorchable.ir bridges the critical gap in modern digital presence optimization. By standardizing crawl pipelines and resolving hallucinations, we establish semantic authority for top corporate teams."}
             </p>
           </div>
         </div>

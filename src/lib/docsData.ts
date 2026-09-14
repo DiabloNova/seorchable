@@ -1874,7 +1874,21 @@ To implement production SQL persistence, follow these steps to link the database
    Example \`database/schema/brand.ts\`:
    \`\`\`typescript
    import { pgTable, uuid, text, timestamp, integer } from "drizzle-orm/pg-core";
-   import { organizationsTable } from "./organization";
+   import { organizationsTable } from "../../database/schema/organization";
+import { DashboardShell } from '@/components/DashboardShell';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { ITenantRepository } from '@/features/admin/domain/repositories/index';
+import { AdminAPIClient } from '@/features/admin/api/v1/admin/index';
+import { EntityGraph } from '@/features/ai-intelligence/knowledge-graph/index';
+import DashboardSidebar from '@/components/navigation/DashboardSidebar';
+import DashboardTopbar from '@/components/navigation/DashboardTopbar';
+
+
+
+
+
+
+
 
    export const brandsTable = pgTable("brands", {
      id: uuid("id").primaryKey().defaultRandom(),

@@ -50,9 +50,7 @@ export const IngestionForm: React.FC = () => {
       // Simulate successful ingestion with extracted sentiment and 768-dimensional metadata preparation
       setResult({
         status: "success",
-        message: language === "fa"
-          ? "سند با موفقیت پردازش شد. فرآیند پاک‌سازی، توکنایزیشن و جاسازی برداری ۷۶۸ بُعدی خاتمه یافت."
-          : "Document ingested successfully. Cleaning, tokenization, and 768-dimensional embedding generation completed.",
+        message: language === "fa" ?"سند با موفقیت پردازش شد. فرآیند پاک‌سازی، توکنایزیشن و جاسازی برداری ۷۶۸ بُعدی خاتمه یافت." :"Document ingested successfully. Cleaning, tokenization, and 768-dimensional embedding generation completed.",
         chunksCount: mode === "text" ? Math.max(1, Math.ceil(text.length / 350)) : 4,
         extractedSentiment: {
           score: mode === "text" && text.includes("بد") ? -0.75 : 0.85,
@@ -83,9 +81,7 @@ export const IngestionForm: React.FC = () => {
               {language === "fa" ? "ورود و اینجکشن داده‌های هوشمندی برند" : "Brand Intelligence Ingestion"}
             </CardTitle>
             <CardDescription>
-              {language === "fa"
-                ? "اسناد متنی یا نشانی‌های وب رقیبان را بارگذاری کنید تا گراف دانش برند و لایه RAG غنی‌سازی شوند."
-                : "Inject text documents or target competitor URLs to enrich the semantic Knowledge Graph and RAG index."}
+              {language === "fa" ?"اسناد متنی یا نشانی‌های وب رقیبان را بارگذاری کنید تا گراف دانش برند و لایه RAG غنی‌سازی شوند." :"Inject text documents or target competitor URLs to enrich the semantic Knowledge Graph and RAG index."}
             </CardDescription>
           </div>
         </div>
@@ -126,9 +122,7 @@ export const IngestionForm: React.FC = () => {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder={
-                  language === "fa"
-                    ? "محتوای گزارش، کامنت خریداران، یا متن مصاحبه پیرامون برند..."
-                    : "Paste brand report, customer reviews, or market interviews..."
+                  language === "fa" ?"محتوای گزارش، کامنت خریداران، یا متن مصاحبه پیرامون برند..." :"Paste brand report, customer reviews, or market interviews..."
                 }
                 rows={4}
                 className="

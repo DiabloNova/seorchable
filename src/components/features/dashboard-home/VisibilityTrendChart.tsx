@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from "recharts";
 import { useTheme } from "@/components/ThemeProvider";
-import { Sparkles, TrendingUp, HelpCircle } from "lucide-react";
+import { Sparkles, TrendingUp } from "lucide-react";
 import { Button } from "@/components/Button";
 import { useRouter } from "next/navigation";
 
@@ -97,8 +97,7 @@ export const VisibilityTrendChart: React.FC<VisibilityTrendChartProps> = ({
           </h3>
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             {isRtl
-              ? "هنوز هیچ گزارش ممیزی یا اسکن دامنه‌ای ثبت نشده است. برای ترسیم نمودارهای تحلیلی و مقایسه‌ای بین سئو فنی و سهم دیده‌شدن هوش مصنوعی، اولین پایش را همین امروز اجرا کنید."
-              : "No historical audit metrics found for your workspace. Initiate a technical crawl on your website to begin tracking multi-model search trends."}
+              ? "هنوز هیچ گزارش ممیزی یا اسکن دامنه‌ای ثبت نشده است. برای ترسیم نمودارهای تحلیلی و مقایسه‌ای بین سئو فنی و سهم دیده‌شدن هوش مصنوعی، اولین پایش را همین امروز اجرا کنید." :"No historical audit metrics found for your workspace. Initiate a technical crawl on your website to begin tracking multi-model search trends."}
           </p>
         </div>
         <Button

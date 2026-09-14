@@ -10,20 +10,10 @@ import {
 } from "lucide-react";
 
 export type ServiceCategory =
-  | "seo"
-  | "aeo"
-  | "content"
-  | "competitors"
-  | "brand"
-  | "entities"
-  | "analytics";
+  | "seo" |"aeo" |"content" |"competitors" |"brand" |"entities" |"analytics";
 
 export type ServiceAvailability =
-  | "AVAILABLE"
-  | "PREMIUM"
-  | "LOCKED"
-  | "COMING_SOON"
-  | "UNAVAILABLE";
+  | "AVAILABLE" |"PREMIUM" |"LOCKED" |"COMING_SOON" |"UNAVAILABLE";
 
 export interface ServiceFeature {
   id: string;

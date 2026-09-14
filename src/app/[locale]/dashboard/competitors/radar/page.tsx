@@ -21,8 +21,7 @@ export default function CompetitorsRadarPage() {
         </h1>
         <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-2xl">
           {isRtl
-            ? "پایش و مقایسه شاخص‌های کلیدی برند شما در کنار ۵ رقیب برتر بازار به صورت زنده."
-            : "Review multi-competitor visibility scores, sentiment differentials, and entity alignment factors."}
+            ? "پایش و مقایسه شاخص‌های کلیدی برند شما در کنار ۵ رقیب برتر بازار به صورت زنده." :"Review multi-competitor visibility scores, sentiment differentials, and entity alignment factors."}
         </p>
       </div>
 
@@ -34,15 +33,13 @@ export default function CompetitorsRadarPage() {
           </CardTitle>
           <CardDescription className="text-xs">
             {isRtl
-              ? "پوسته یکپارچه داشبورد با موفقیت بر روی این مسیر بارگذاری شده است."
-              : "The unified Dashboard Shell is actively rendering this route context with proper navigation parameters."}
+              ? "پوسته یکپارچه داشبورد با موفقیت بر روی این مسیر بارگذاری شده است." :"The unified Dashboard Shell is actively rendering this route context with proper navigation parameters."}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-xs text-[var(--text-secondary)] leading-relaxed space-y-2">
           <p>
             {isRtl
-              ? "مسیر فعال سایدبار: ابزارهای رقابتی > رادار رقیبان"
-              : "Active Sidebar Navigation State: Competitive Tools > Competitor Radar"}
+              ? "مسیر فعال سایدبار: ابزارهای رقابتی > رادار رقیبان" :"Active Sidebar Navigation State: Competitive Tools > Competitor Radar"}
           </p>
           <p className="text-[10px] text-[var(--text-muted)] font-mono">
             Route: /dashboard/competitors/radar

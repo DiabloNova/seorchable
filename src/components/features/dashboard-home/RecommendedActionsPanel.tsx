@@ -55,8 +55,7 @@ export const RecommendedActionsPanel: React.FC<RecommendedActionsPanelProps> = (
         </CardTitle>
         <CardDescription className="text-xs text-[var(--text-secondary)]">
           {isRtl
-            ? "توصیه‌های هوشمند با اثرگذاری بالا که حضور برند شما را در هسته‌های معنایی بهبود می‌دهند."
-            : "Actionable recommendations formulated to elevate your brand content for retrieval engines."}
+            ? "توصیه‌های هوشمند با اثرگذاری بالا که حضور برند شما را در هسته‌های معنایی بهبود می‌دهند." :"Actionable recommendations formulated to elevate your brand content for retrieval engines."}
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-2 flex-1 flex flex-col justify-center">
@@ -71,8 +70,7 @@ export const RecommendedActionsPanel: React.FC<RecommendedActionsPanelProps> = (
               </p>
               <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed">
                 {isRtl
-                  ? "هیچ اقدام اولویت‌داری برای بهبود هم‌بستگی رتبه وب‌سایت در این مستأجر شناسایی نشده است."
-                  : "Excellent coverage! Register new target keywords to discover more opportunities."}
+                  ? "هیچ اقدام اولویت‌داری برای بهبود هم‌بستگی رتبه وب‌سایت در این مستأجر شناسایی نشده است." :"Excellent coverage! Register new target keywords to discover more opportunities."}
               </p>
             </div>
           </div>

@@ -274,12 +274,7 @@ export interface SiteArchitectureInput {
 }
 
 export type SiteArchitectureCategory =
-  | "site-structure"
-  | "crawl-depth"
-  | "internal-linking"
-  | "orphan-page"
-  | "content-hierarchy"
-  | "architecture";
+  | "site-structure" |"crawl-depth" |"internal-linking" |"orphan-page" |"content-hierarchy" |"architecture";
 
 export interface CrawlDepthResult {
   url: string;
@@ -517,12 +512,7 @@ export interface LLMAnalyticsComparisonResult {
  * Competitive Radar (Task 6.3) Type Definitions
  */
 export type DataAvailabilityStatus =
-  | "available"
-  | "partial"
-  | "missing"
-  | "unavailable"
-  | "not_applicable"
-  | "incompatible";
+  | "available" |"partial" |"missing" |"unavailable" |"not_applicable" |"incompatible";
 
 export interface RadarDimension {
   name: string;
@@ -565,17 +555,7 @@ export interface CompetitiveInsight {
 }
 
 export type CompetitiveFindingType =
-  | "technical_gap"
-  | "content_gap"
-  | "keyword_gap"
-  | "topic_gap"
-  | "structural_difference"
-  | "ai_visibility_gap"
-  | "citation_gap"
-  | "prompt_gap"
-  | "brand_mention_gap"
-  | "ai_recommendation_gap"
-  | "citation_overlap";
+  | "technical_gap" |"content_gap" |"keyword_gap" |"topic_gap" |"structural_difference" |"ai_visibility_gap" |"citation_gap" |"prompt_gap" |"brand_mention_gap" |"ai_recommendation_gap" |"citation_overlap";
 export type CompetitivePositionType = "advantage" | "disadvantage" | "neutral";
 export type DifferenceDirectionType = "positive" | "negative" | "none";
 
@@ -607,42 +587,19 @@ export interface CompetitiveSeoFinding {
  * AEO Content Intelligence Types (Task 5.4)
  */
 export type AnswerabilityLevel =
-  | "directly_answerable"
-  | "partially_answerable"
-  | "indirectly_answerable"
-  | "not_answerable"
-  | "insufficient_evidence";
+  | "directly_answerable" |"partially_answerable" |"indirectly_answerable" |"not_answerable" |"insufficient_evidence";
 
 export type EntityCoverageStatus =
-  | "covered"
-  | "partially_covered"
-  | "mentioned_only"
-  | "not_covered"
-  | "unresolved"
-  | "ambiguous";
+  | "covered" |"partially_covered" |"mentioned_only" |"not_covered" |"unresolved" |"ambiguous";
 
 export type QuestionCoverageStatus =
-  | "answered"
-  | "partially_answered"
-  | "indirectly_answered"
-  | "unanswered"
-  | "not_applicable"
-  | "insufficient_evidence";
+  | "answered" |"partially_answered" |"indirectly_answered" |"unanswered" |"not_applicable" |"insufficient_evidence";
 
 export type CitationReadinessLevel =
-  | "high"
-  | "medium"
-  | "low"
-  | "insufficient_evidence";
+  | "high" |"medium" |"low" |"insufficient_evidence";
 
 export type KgAlignmentStatus =
-  | "aligned"
-  | "missing_entity"
-  | "missing_relationship"
-  | "unresolved_entity"
-  | "ambiguous_entity"
-  | "potential_contradiction"
-  | "conflicting_evidence";
+  | "aligned" |"missing_entity" |"missing_relationship" |"unresolved_entity" |"ambiguous_entity" |"potential_contradiction" |"conflicting_evidence";
 
 export interface AnswerabilityAnalysis {
   level: AnswerabilityLevel;
@@ -890,17 +847,7 @@ export interface AuditPrompt {
  * AI Prompt Intelligence Types (Task 5.1)
  */
 export type PromptCategory =
-  | "Brand Discovery"
-  | "Product/Service Discovery"
-  | "Category"
-  | "Recommendation"
-  | "Comparison"
-  | "Problem/Solution"
-  | "Local/Geographic"
-  | "Entity"
-  | "Informational"
-  | "Transactional"
-  | "Navigational";
+  | "Brand Discovery" |"Product/Service Discovery" |"Category" |"Recommendation" |"Comparison" |"Problem/Solution" |"Local/Geographic" |"Entity" |"Informational" |"Transactional" |"Navigational";
 
 export type PromptIntentType = "Discovery" | "Comparison" | "Recommendation" | "Purchase" | "Research" | "Authority" | "Informational" | "Transactional" | "Navigational";
 
@@ -989,20 +936,7 @@ export interface PositionObservation {
  * AI Citation Intelligence Types (Task 5.2)
  */
 export type CitationSourceClassification =
-  | "owned"
-  | "competitor"
-  | "third_party"
-  | "publisher_media"
-  | "government"
-  | "academic_research"
-  | "directory"
-  | "marketplace"
-  | "social"
-  | "forum_community"
-  | "documentation"
-  | "reference_encyclopedia"
-  | "other"
-  | "unknown";
+  | "owned" |"competitor" |"third_party" |"publisher_media" |"government" |"academic_research" |"directory" |"marketplace" |"social" |"forum_community" |"documentation" |"reference_encyclopedia" |"other" |"unknown";
 
 export interface CitationSource {
   id: string;
@@ -1039,11 +973,7 @@ export interface CitationOccurrence {
  * AI Brand Intelligence Types (Task 5.3)
  */
 export type RecommendationStatusType =
-  | "mention"
-  | "consideration"
-  | "recommendation"
-  | "strong_recommendation"
-  | "negative_recommendation";
+  | "mention" |"consideration" |"recommendation" |"strong_recommendation" |"negative_recommendation";
 
 export interface BrandAssociation {
   id: string;

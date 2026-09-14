@@ -247,7 +247,7 @@ export class PostgresTenantRepository implements ITenantRepository {
   public static seed(tenants: Tenant[]) {
     this.store.clear();
 
-    for (const tenant of tenants) {
+    for (let tenant of tenants) {
       this.store.set(tenant.id, { ...tenant });
     }
   }
@@ -276,9 +276,7 @@ export class PostgresTenantRepository implements ITenantRepository {
         name: row.name as string,
         slug: row.slug as string,
         status: (row.status || "active") as
-          | "active"
-          | "suspended"
-          | "archived",
+          | "active" |"suspended" |"archived",
         configuration:
           typeof row.configuration === "string"
             ? JSON.parse(row.configuration)
@@ -302,7 +300,7 @@ export class PostgresTenantRepository implements ITenantRepository {
       };
     }
 
-    const tenant = PostgresTenantRepository.store.get(id);
+    let tenant = PostgresTenantRepository.store.get(id);
 
     if (!tenant || tenant.audit.deletedAt) {
       return null;
@@ -329,9 +327,7 @@ export class PostgresTenantRepository implements ITenantRepository {
         name: row.name as string,
         slug: row.slug as string,
         status: (row.status || "active") as
-          | "active"
-          | "suspended"
-          | "archived",
+          | "active" |"suspended" |"archived",
         configuration:
           typeof row.configuration === "string"
             ? JSON.parse(row.configuration)
@@ -355,7 +351,7 @@ export class PostgresTenantRepository implements ITenantRepository {
       };
     }
 
-    for (const tenant of PostgresTenantRepository.store.values()) {
+    for (let tenant of PostgresTenantRepository.store.values()) {
       if (tenant.slug === slug && !tenant.audit.deletedAt) {
         return {
           ...tenant,
@@ -382,9 +378,7 @@ export class PostgresTenantRepository implements ITenantRepository {
         name: row.name as string,
         slug: row.slug as string,
         status: (row.status || "active") as
-          | "active"
-          | "suspended"
-          | "archived",
+          | "active" |"suspended" |"archived",
         configuration:
           typeof row.configuration === "string"
             ? JSON.parse(row.configuration)
@@ -460,9 +454,7 @@ export class PostgresTenantRepository implements ITenantRepository {
           name: row.name as string,
           slug: row.slug as string,
           status: (row.status || "active") as
-            | "active"
-            | "suspended"
-            | "archived",
+            | "active" |"suspended" |"archived",
           configuration:
             typeof row.configuration === "string"
               ? JSON.parse(row.configuration)
@@ -603,9 +595,7 @@ export class PostgresTenantRepository implements ITenantRepository {
           name: row.name as string,
           slug: row.slug as string,
           status: (row.status || "active") as
-            | "active"
-            | "suspended"
-            | "archived",
+            | "active" |"suspended" |"archived",
           configuration:
             typeof row.configuration === "string"
               ? JSON.parse(row.configuration)
@@ -748,7 +738,7 @@ export class PostgresAdminUserRepository
 
   public async save(entity: AdminUser): Promise<AdminUser> {
     const execute = async () => {
-      const existing =
+      let existing =
         PostgresAdminUserRepository.store.get(entity.id);
 
       if (existing) {
@@ -937,7 +927,7 @@ export class PostgresFeatureFlagRepository
 
   public async save(entity: FeatureFlag): Promise<FeatureFlag> {
     const execute = async () => {
-      const existing =
+      let existing =
         PostgresFeatureFlagRepository.store.get(entity.key);
 
       if (existing) {
@@ -1258,7 +1248,7 @@ export class PostgresAIProviderConfigurationRepository
     entity: AIProviderConfiguration
   ): Promise<AIProviderConfiguration> {
     const execute = async () => {
-      const existing =
+      let existing =
         PostgresAIProviderConfigurationRepository.store.get(
           entity.id
         );

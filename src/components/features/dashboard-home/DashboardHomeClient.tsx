@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/Button";
@@ -144,8 +144,7 @@ export default function DashboardHomeClient({
           err instanceof Error
             ? err.message
             : isRtl
-              ? "ارتباط با لایه تحلیل با خطا مواجه شد."
-              : "Error communicating with crawling layer.",
+              ? "ارتباط با لایه تحلیل با خطا مواجه شد." :"Error communicating with crawling layer.",
         );
       }
     });
@@ -165,8 +164,7 @@ export default function DashboardHomeClient({
           </h1>
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             {isRtl
-              ? "پایش یکپارچه سهم حضور برند شما در موتورهای پاسخ‌گویی هوش مصنوعی، کیفیت ارجاعات و سلامت فنی دامنه‌ها."
-              : "Consolidated intelligence workspace to protect your prominence inside generative retrieval models."}
+              ? "پایش یکپارچه سهم حضور برند شما در موتورهای پاسخ‌گویی هوش مصنوعی، کیفیت ارجاعات و سلامت فنی دامنه‌ها." :"Consolidated intelligence workspace to protect your prominence inside generative retrieval models."}
           </p>
         </div>
 
@@ -229,8 +227,7 @@ export default function DashboardHomeClient({
         <div className="space-y-3">
           <h2 className="text-xs font-black uppercase text-[var(--text-muted)] tracking-wider">
             {isRtl
-              ? "مشکلات بحرانی و با اولویت بالا"
-              : "Action Layer — Critical Issues"}
+              ? "مشکلات بحرانی و با اولویت بالا" :"Action Layer — Critical Issues"}
           </h2>
           <CriticalIssuesPanel
             issues={data.criticalIssues}
@@ -241,8 +238,7 @@ export default function DashboardHomeClient({
         <div className="space-y-3">
           <h2 className="text-xs font-black uppercase text-[var(--text-muted)] tracking-wider">
             {isRtl
-              ? "اقدامات و اولویت‌های بهبود استراتژیک"
-              : "Action Layer — Recommended Actions"}
+              ? "اقدامات و اولویت‌های بهبود استراتژیک" :"Action Layer — Recommended Actions"}
           </h2>
           <RecommendedActionsPanel
             actions={data.recommendedActions}
@@ -256,8 +252,7 @@ export default function DashboardHomeClient({
         <div className="space-y-3">
           <h2 className="text-xs font-black uppercase text-[var(--text-muted)] tracking-wider">
             {isRtl
-              ? "آخرین پایش‌های ثبت شده دامنه‌ها"
-              : "Activity Layer — Recent Audits"}
+              ? "آخرین پایش‌های ثبت شده دامنه‌ها" :"Activity Layer — Recent Audits"}
           </h2>
           <RecentAuditsPanel
             audits={data.recentAudits}
@@ -268,8 +263,7 @@ export default function DashboardHomeClient({
         <div className="space-y-3">
           <h2 className="text-xs font-black uppercase text-[var(--text-muted)] tracking-wider">
             {isRtl
-              ? "جریان بلادرنگ فعالیت‌های فضای کاربری"
-              : "Activity Layer — Recent Activities"}
+              ? "جریان بلادرنگ فعالیت‌های فضای کاربری" :"Activity Layer — Recent Activities"}
           </h2>
           <RecentActivityPanel
             activities={data.recentActivity}
@@ -284,22 +278,19 @@ export default function DashboardHomeClient({
         onClose={() => setIsNewAuditOpen(false)}
         title={
           isRtl
-            ? "اجرای پایش و تحلیل کامل معنایی"
-            : "Crawl & Run New Brand Audit"
+            ? "اجرای پایش و تحلیل کامل معنایی" :"Crawl & Run New Brand Audit"
         }
       >
         <form onSubmit={handleStartAudit} className="space-y-4 text-start">
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             {isRtl
-              ? "آدرس وب‌سایت اصلی یا صفحه لندینگ برند خود را وارد کنید. سیستم به صورت خودکار فرآیند خزش عمیق، استخراج تگ‌های اسکیما و سنجش کیفیت محتوا را آغاز می‌کند."
-              : "Enter your primary root website or landing page. Conversational crawlers will crawl, index, and score model discoverability."}
+              ? "آدرس وب‌سایت اصلی یا صفحه لندینگ برند خود را وارد کنید. سیستم به صورت خودکار فرآیند خزش عمیق، استخراج تگ‌های اسکیما و سنجش کیفیت محتوا را آغاز می‌کند." :"Enter your primary root website or landing page. Conversational crawlers will crawl, index, and score model discoverability."}
           </p>
 
           <Input
             label={
               isRtl
-                ? "آدرس کامل وب‌سایت همراه با پروتکل"
-                : "Target Website Address with Protocol"
+                ? "آدرس کامل وب‌سایت همراه با پروتکل" :"Target Website Address with Protocol"
             }
             placeholder="https://company.ir"
             value={newUrl}
@@ -337,8 +328,7 @@ export default function DashboardHomeClient({
                   <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-1.5" />
                   <span>
                     {isRtl
-                      ? "در حال اجرای فرآیند خزش..."
-                      : "Executing Scrape..."}
+                      ? "در حال اجرای فرآیند خزش..." :"Executing Scrape..."}
                   </span>
                 </>
               ) : (

@@ -8,7 +8,7 @@ import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
 import { SeorchableLogo } from "@/components/marketing/SeorchableLogo";
-import { AlertCircle, ArrowLeft, ArrowRight, LogIn, Mail, ShieldAlert } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, LogIn } from "lucide-react";
 
 export default function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
   const resolvedParams = use(params);

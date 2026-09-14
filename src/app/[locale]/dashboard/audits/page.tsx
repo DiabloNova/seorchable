@@ -160,8 +160,7 @@ export default function AuditsPage() {
           </h1>
           <p className="text-xs text-[var(--text-secondary)] mt-1">
             {isRtl
-              ? "لیست گزارش‌های گذشته و نتایج خزش هوشمند وب‌سایت‌ها توسط کراولرهای پیشرفته."
-              : "Overview of your generated audit files, crawlers performance logs, and AI footprint metrics."}
+              ? "لیست گزارش‌های گذشته و نتایج خزش هوشمند وب‌سایت‌ها توسط کراولرهای پیشرفته." :"Overview of your generated audit files, crawlers performance logs, and AI footprint metrics."}
           </p>
         </div>
 
@@ -204,8 +203,7 @@ export default function AuditsPage() {
             </h3>
             <p className="text-xs text-[var(--text-secondary)]">
               {isRtl
-                ? "وب‌سایتی با این مشخصات یافت نشد یا هنوز پایش جدیدی ثبت نکرده‌اید."
-                : "No historical crawls match your query. Try registering a new brand domain."}
+                ? "وب‌سایتی با این مشخصات یافت نشد یا هنوز پایش جدیدی ثبت نکرده‌اید." :"No historical crawls match your query. Try registering a new brand domain."}
             </p>
           </div>
         </Card>
@@ -267,8 +265,7 @@ export default function AuditsPage() {
         <form onSubmit={handleStartAudit} className="space-y-4">
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             {isRtl
-              ? "آدرس وب‌سایت اصلی یا صفحه لندینگ خود را وارد کنید. سیستم به صورت خودکار شروع به خزش، استخراج موجودیت‌ها و بررسی رتبه‌بندی در چت‌بات‌ها می‌کند."
-              : "Register your product or domain URL below. Our crawling agents will scrape, extract semantic tags, and score your LLM footprint."}
+              ? "آدرس وب‌سایت اصلی یا صفحه لندینگ خود را وارد کنید. سیستم به صورت خودکار شروع به خزش، استخراج موجودیت‌ها و بررسی رتبه‌بندی در چت‌بات‌ها می‌کند." :"Register your product or domain URL below. Our crawling agents will scrape, extract semantic tags, and score your LLM footprint."}
           </p>
 
           <Input

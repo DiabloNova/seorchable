@@ -1,6 +1,7 @@
 import { PostgresClient } from "../../../features/admin/infrastructure/persistence/postgres";
 import { TenantContextManager } from "../../../core/database/tenant-context";
-import { InMemoryCacheStore } from "../../../services/cache/store"; // Using existing store infra for rate limiting
+import { InMemoryCacheStore } from "../../../services/cache/store"
+; // Using existing store infra for rate limiting
 
 // Realistically this would be Redis, but we use the provided CacheStore interface implementation
 const rateLimitStore = new InMemoryCacheStore();

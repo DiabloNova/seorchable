@@ -32,8 +32,7 @@ export default function GeoSolutionPage({ params }: { params: Promise<{ locale: 
             </h1>
             <p className="text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto">
               {isFa
-                ? "ارتقای رتبه، سهم دیده‌شدن و میزان استناد به برند شما در خروجی موتورهای نسل جدید چت‌بات‌ها مانند Perplexity و SearchGPT."
-                : "Boost your brand's presence, authority, and citations across generative engines such as SearchGPT, Gemini, and Perplexity."}
+                ? "ارتقای رتبه، سهم دیده‌شدن و میزان استناد به برند شما در خروجی موتورهای نسل جدید چت‌بات‌ها مانند Perplexity و SearchGPT." :"Boost your brand's presence, authority, and citations across generative engines such as SearchGPT, Gemini, and Perplexity."}
             </p>
           </div>
 
@@ -44,8 +43,7 @@ export default function GeoSolutionPage({ params }: { params: Promise<{ locale: 
             </h3>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
               {isFa
-                ? "موتورهای جستجوی متکی بر هوش مصنوعی برخلاف موتورهای کلاسیک، اطلاعات را به صورت خلاصه و همراه با ارجاع دقیق به مراجع ارائه می‌دهند. بهینه‌سازی GEO به شما کمک می‌کند تا به عنوان منبع اصلی این پاسخ‌ها انتخاب شوید."
-                : "Unlike static search indexes, generative engines synthesize answers dynamically while citing relevant resources. Our GEO framework ensures your content structures are prioritized as primary source citations."}
+                ? "موتورهای جستجوی متکی بر هوش مصنوعی برخلاف موتورهای کلاسیک، اطلاعات را به صورت خلاصه و همراه با ارجاع دقیق به مراجع ارائه می‌دهند. بهینه‌سازی GEO به شما کمک می‌کند تا به عنوان منبع اصلی این پاسخ‌ها انتخاب شوید." :"Unlike static search indexes, generative engines synthesize answers dynamically while citing relevant resources. Our GEO framework ensures your content structures are prioritized as primary source citations."}
             </p>
 
             <h3 className="text-xl font-bold font-display flex items-center gap-2">
@@ -54,8 +52,7 @@ export default function GeoSolutionPage({ params }: { params: Promise<{ locale: 
             </h3>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
               {isFa
-                ? "تولید تگ‌های ساختاریافته‌ی کلمات کلیدی، بهینه‌سازی بردارهای محتوایی و هماهنگی کامل معنایی وب‌سایت با نیازهای مدل‌های زبانی کلان."
-                : "Aligning text vector metrics, fine-tuning schema declarations, and optimizing structural catalogs to meet semantic ingestion requirements of top LLMs."}
+                ? "تولید تگ‌های ساختاریافته‌ی کلمات کلیدی، بهینه‌سازی بردارهای محتوایی و هماهنگی کامل معنایی وب‌سایت با نیازهای مدل‌های زبانی کلان." :"Aligning text vector metrics, fine-tuning schema declarations, and optimizing structural catalogs to meet semantic ingestion requirements of top LLMs."}
             </p>
 
             <div className="p-4 rounded-xl border border-sky-500/20 bg-sky-500/5 space-y-2">

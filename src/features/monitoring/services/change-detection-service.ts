@@ -1,5 +1,5 @@
 import { CrawlSnapshot, SnapshotPage } from "../domain/entities/crawl-snapshot";
-import { SnapshotChangeResult, TechnicalChange, SeoChange, ContentChange } from "../domain/types/snapshot-change-result";
+import { SnapshotChangeResult } from "../domain/types/snapshot-change-result";
 import { createHash } from "crypto";
 
 export class ChangeDetectionService {

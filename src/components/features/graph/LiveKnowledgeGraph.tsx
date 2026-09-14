@@ -3,19 +3,7 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/components/ThemeProvider";
-import {
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  Sparkles,
-  Clock,
-  ArrowUpRight,
-  Info,
-  Shield,
-  Zap,
-  Globe,
-  Radio
-} from "lucide-react";
+import { TrendingUp, Activity, Clock, Shield, Zap, Globe, Radio } from "lucide-react";
 
 interface MetricConfig {
   id: string;
@@ -410,8 +398,7 @@ export function LiveKnowledgeGraph() {
         </h2>
         <p className="text-slate-400 leading-relaxed text-sm md:text-base font-medium max-w-2xl mx-auto">
           {isFa
-            ? "پایش تعاملی و مانیتورینگ زنده ارتباط برند «راشا گستر» با منابع مرجع، نهادهای بازار و مدل‌های هوش مصنوعی بزرگ به موازات استنادات ورودی."
-            : "Enterprise-grade real-time analytics visualization tracking brand citations and context coverage across leading AI engines."}
+            ? "پایش تعاملی و مانیتورینگ زنده ارتباط برند «راشا گستر» با منابع مرجع، نهادهای بازار و مدل‌های هوش مصنوعی بزرگ به موازات استنادات ورودی." :"Enterprise-grade real-time analytics visualization tracking brand citations and context coverage across leading AI engines."}
         </p>
       </div>
 

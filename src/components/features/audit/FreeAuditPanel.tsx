@@ -8,26 +8,7 @@ import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { AuditJob, AuditStatus } from "@/types/audit";
 import { auditService } from "@/services/auditService";
-import {
-  Sparkles,
-  Globe,
-  AlertCircle,
-  CheckCircle2,
-  Terminal,
-  FileCode,
-  Shield,
-  Layers,
-  Brain,
-  Compass,
-  ArrowRight,
-  ArrowLeft,
-  XCircle,
-  Activity,
-  Award,
-  Lock,
-  LogIn,
-  UserPlus
-} from "lucide-react";
+import { Sparkles, Globe, AlertCircle, Terminal, FileCode, Shield, Layers, Brain, Compass, ArrowRight, ArrowLeft, XCircle, Activity, Award, Lock, LogIn, UserPlus } from "lucide-react";
 
 interface FreeAuditPanelProps {
   onUpgradeClick?: () => void;
@@ -83,8 +64,7 @@ export const FreeAuditPanel: React.FC<FreeAuditPanelProps> = ({ onUpgradeClick }
   const strings = {
     title: isRtl ? "موتور بهینه‌سازی و تحلیل رایگان برند" : "Free AI Visibility Ingestion Funnel",
     desc: isRtl
-      ? "پایش حضور برند در چت‌بات‌ها و مدل‌های زبانی به کمک خزش Firecrawl و تحلیل زبانی گوگل جمنی."
-      : "Verify your brand footprint in ChatGPT, Claude and Gemini with active web crawler ingestion.",
+      ? "پایش حضور برند در چت‌بات‌ها و مدل‌های زبانی به کمک خزش Firecrawl و تحلیل زبانی گوگل جمنی." :"Verify your brand footprint in ChatGPT, Claude and Gemini with active web crawler ingestion.",
     placeholder: isRtl ? "آدرس وب‌سایت خود را وارد کنید (مثلاً: example.com)" : "Enter website URL (e.g. company.com)",
     btnAnalyze: isRtl ? "شروع تحلیل هوشمند" : "Analyze Brand Visibility",
     invalidUrl: isRtl ? "لطفاً یک آدرس وب‌سایت معتبر (مانند example.com) وارد کنید." : "Please enter a valid domain address (e.g. company.com).",
@@ -92,8 +72,7 @@ export const FreeAuditPanel: React.FC<FreeAuditPanelProps> = ({ onUpgradeClick }
     // Auth Required Strings
     authRequiredTitle: isRtl ? "🔒 تایید هویت سازمانی الزامی است" : "🔒 Identity Verification Required",
     authRequiredDesc: isRtl
-      ? "برای پایش و خزش کامل صفحات توسط Firecrawl و تولید گزارش جمنی، لطفاً یک حساب کاربری موقت ایجاد کنید یا وارد شوید."
-      : "To run active crawling instances and generate structured AI report sheets, please authenticate.",
+      ? "برای پایش و خزش کامل صفحات توسط Firecrawl و تولید گزارش جمنی، لطفاً یک حساب کاربری موقت ایجاد کنید یا وارد شوید." :"To run active crawling instances and generate structured AI report sheets, please authenticate.",
     loginTab: isRtl ? "ورود کاربران" : "Sign In",
     registerTab: isRtl ? "ایجاد حساب کاربری جدید" : "Register Workspace",
     authNameLabel: isRtl ? "نام و نام خانوادگی" : "Full Name",
@@ -112,7 +91,7 @@ export const FreeAuditPanel: React.FC<FreeAuditPanelProps> = ({ onUpgradeClick }
     engineTab: isRtl ? "تحلیل موتورهای پاسخگو" : "LLM Crawl & Engine Logs",
     recommendationsTab: isRtl ? "راهکارهای بهبود و GEO" : "GEO Copy Recommendations",
     scoreTitle: isRtl ? "شاخص دیده‌شدن برند" : "AI Visibility Score",
-    scoreDesc: isRtl ? "سهم صدای برند شما در پاسخ مدل‌های زبانی" : "Your brand's share of voice inside LLM databases",
+    scoreDesc: isRtl ? "سهم صدای برند شما در پاسخ مدل‌های زبانی" : "Your brand\'s share of voice inside LLM databases",
     presenceTitle: isRtl ? "امتیاز حضور برند" : "Brand Presence Score",
     mentionTitle: isRtl ? "فرکانس استناد" : "Mention Frequency Score",
     authorityTitle: isRtl ? "اعتبار معنایی محتوا" : "Content Authority Score",

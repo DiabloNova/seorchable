@@ -145,8 +145,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
                 isExhausted
                   ? "bg-rose-500"
                   : isNearLimit
-                  ? "bg-amber-500"
-                  : "bg-gradient-to-r from-[var(--sky-blue-500)] to-[var(--sky-blue-400)]"
+                  ? "bg-amber-500" :"bg-gradient-to-r from-[var(--sky-blue-500)] to-[var(--sky-blue-400)]"
               }`}
               style={{ width: `${Math.min(usage.percentage, 100)}%` }}
             />

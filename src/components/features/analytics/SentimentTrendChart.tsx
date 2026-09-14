@@ -91,8 +91,7 @@ export const SentimentTrendChart: React.FC<SentimentTrendChartProps> = ({
         </CardTitle>
         <CardDescription>
           {isRtl
-            ? "تحلیل روند کیفی بازخوردهای ثبت شده در هفت روز گذشته."
-            : "Analytical time-series trend of tracked sentiment over the past 7 days."}
+            ? "تحلیل روند کیفی بازخوردهای ثبت شده در هفت روز گذشته." :"Analytical time-series trend of tracked sentiment over the past 7 days."}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 mt-4">

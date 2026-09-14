@@ -122,8 +122,7 @@ export default function TechnicalSeoPage() {
           </h1>
           <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-2xl">
             {isRtl
-              ? "پایش قطعی، تحلیل داده‌های ساختاریافته، قابلیت خزش، ایندکس‌پذیری، نقشه سایت، کانونیکال و سرعت اولیه سرور بر پایه سیگنال‌های کانونی."
-              : "Deterministic audit layer evaluating Structured Data, Crawlability, Indexability, Internal Links, Sitemap, Canonical, Robots, and CWV performance."}
+              ? "پایش قطعی، تحلیل داده‌های ساختاریافته، قابلیت خزش، ایندکس‌پذیری، نقشه سایت، کانونیکال و سرعت اولیه سرور بر پایه سیگنال‌های کانونی." :"Deterministic audit layer evaluating Structured Data, Crawlability, Indexability, Internal Links, Sitemap, Canonical, Robots, and CWV performance."}
           </p>
         </div>
 
@@ -234,8 +233,7 @@ export default function TechnicalSeoPage() {
               </p>
               <p className="text-[11px] max-w-md mx-auto">
                 {isRtl
-                  ? "تمام سیگنال‌های کانونی ارزیابی‌شده در وضعیت مطلوب و سالم قرار دارند."
-                  : "All evaluated canonical signals passed validation cleanly with zero errors."}
+                  ? "تمام سیگنال‌های کانونی ارزیابی‌شده در وضعیت مطلوب و سالم قرار دارند." :"All evaluated canonical signals passed validation cleanly with zero errors."}
               </p>
             </CardContent>
           </Card>
@@ -245,13 +243,9 @@ export default function TechnicalSeoPage() {
             const recData = isRtl ? rec?.fa : rec?.en;
 
             const severityBadge =
-              finding.severity === "critical"
-                ? "bg-red-500/10 text-red-500 border-red-500/20"
-                : finding.severity === "high"
-                ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
-                : finding.severity === "medium"
-                ? "bg-blue-500/10 text-blue-500 border-blue-500/20"
-                : "bg-slate-500/10 text-slate-400 border-slate-500/20";
+              finding.severity === "critical" ?"bg-red-500/10 text-red-500 border-red-500/20"
+                : finding.severity === "high" ?"bg-amber-500/10 text-amber-500 border-amber-500/20"
+                : finding.severity === "medium" ?"bg-blue-500/10 text-blue-500 border-blue-500/20" :"bg-slate-500/10 text-slate-400 border-slate-500/20";
 
             return (
               <Card key={finding.id} className="border border-[var(--border)] bg-[var(--card)] hover:border-[var(--sky-blue-500)]/40 transition-colors">

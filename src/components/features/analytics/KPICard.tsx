@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "@/components/Card";
 import { Badge } from "@/components/Badge";
-import { ArrowUpRight, ArrowDownRight, LucideIcon } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, type LucideIcon } from "lucide-react";
 
 interface KPICardProps {
   title: string;

@@ -437,7 +437,7 @@ export class OrganizationRepository implements IOrganizationRepository {
 
   public async findById(id: string): Promise<Organization | null> {
     enforceTenantContext(id);
-    const sql = `
+    let sql = `
       SELECT id, name, slug, plan, created_at, updated_at, created_by, updated_by, deleted_at, version
       FROM organizations
       WHERE id = $1 AND deleted_at IS NULL
@@ -524,7 +524,7 @@ export class OrganizationRepository implements IOrganizationRepository {
 
   public async deleteSoft(id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(id);
-    const sql = `
+    let sql = `
       UPDATE organizations
       SET deleted_at = $1, updated_by = $2, updated_at = $3
       WHERE id = $4 AND deleted_at IS NULL;
@@ -636,7 +636,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async findAnalysisById(organizationId: string, id: string): Promise<AeoAnalysis | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM aeo_analyses WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
+      let sql = `SELECT * FROM aeo_analyses WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToAnalysis(res.rows[0]);
@@ -652,7 +652,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async findAnalysisByPageId(organizationId: string, pageId: string): Promise<AeoAnalysis | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM aeo_analyses WHERE page_id = $1 AND organization_id = $2 ORDER BY created_at DESC LIMIT 1;`;
+      let sql = `SELECT * FROM aeo_analyses WHERE page_id = $1 AND organization_id = $2 ORDER BY created_at DESC LIMIT 1;`;
       const res = await this.pg.query(sql, [pageId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToAnalysis(res.rows[0]);
@@ -671,7 +671,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async findAnalysesByPageId(organizationId: string, pageId: string, params?: QueryParams): Promise<PaginatedResult<AeoAnalysis>> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM aeo_analyses WHERE page_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM aeo_analyses WHERE page_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [pageId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         const mapped = res.rows.map(row => this.mapRowToAnalysis(row));
@@ -689,7 +689,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async saveAnalysis(analysis: AeoAnalysis): Promise<AeoAnalysis> {
     enforceTenantContext(analysis.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO aeo_analyses (id, organization_id, page_id, overall_score, answerability, entity_coverage, semantic_coverage, question_coverage, citation_readiness, structured_answer_quality, kg_alignment, scoring_version, analyzer_version, provenance, created_at, updated_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
         ON CONFLICT (page_id, analyzer_version, scoring_version) DO UPDATE SET
@@ -732,7 +732,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async deleteAnalysisSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `DELETE FROM aeo_analyses WHERE id = $1 AND organization_id = $2;`;
+      let sql = `DELETE FROM aeo_analyses WHERE id = $1 AND organization_id = $2;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         db.aeoAnalyses.delete(id);
@@ -755,7 +755,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async findFaqOpportunityById(organizationId: string, id: string): Promise<FaqOpportunity | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM faq_opportunities WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
+      let sql = `SELECT * FROM faq_opportunities WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToFaqOpportunity(res.rows[0]);
@@ -771,7 +771,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async findFaqOpportunitiesByPageId(organizationId: string, pageId: string): Promise<FaqOpportunity[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM faq_opportunities WHERE page_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM faq_opportunities WHERE page_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [pageId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToFaqOpportunity(row));
@@ -787,7 +787,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async findAllFaqOpportunities(organizationId: string): Promise<FaqOpportunity[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM faq_opportunities WHERE organization_id = $1 ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM faq_opportunities WHERE organization_id = $1 ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToFaqOpportunity(row));
@@ -803,7 +803,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async saveFaqOpportunity(opportunity: FaqOpportunity): Promise<FaqOpportunity> {
     enforceTenantContext(opportunity.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO faq_opportunities (id, organization_id, page_id, question, source_type, evidence_source_id, priority, impact_score, status, created_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         ON CONFLICT (page_id, question) DO UPDATE SET
@@ -843,7 +843,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async findKgAlignmentById(organizationId: string, id: string): Promise<KgAlignment | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM kg_alignments WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
+      let sql = `SELECT * FROM kg_alignments WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToKgAlignment(res.rows[0]);
@@ -859,7 +859,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async findKgAlignmentsByPageId(organizationId: string, pageId: string): Promise<KgAlignment[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM kg_alignments WHERE page_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM kg_alignments WHERE page_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [pageId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToKgAlignment(row));
@@ -875,7 +875,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async findAllKgAlignments(organizationId: string): Promise<KgAlignment[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM kg_alignments WHERE organization_id = $1 ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM kg_alignments WHERE organization_id = $1 ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToKgAlignment(row));
@@ -891,7 +891,7 @@ export class AeoContentIntelligenceRepository implements IAeoContentIntelligence
   public async saveKgAlignment(alignment: KgAlignment): Promise<KgAlignment> {
     enforceTenantContext(alignment.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO kg_alignments (id, organization_id, page_id, alignment_type, entity_name, property_name, expected_value, actual_value, status, created_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         ON CONFLICT (page_id, alignment_type, entity_name, COALESCE(property_name, '')) DO UPDATE SET
@@ -992,7 +992,7 @@ export class AIVisibilityAuditRepository implements IAIVisibilityAuditRepository
   public async findById(organizationId: string, id: string): Promise<AIVisibilityAudit | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM ai_visibility_audits WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      let sql = `SELECT * FROM ai_visibility_audits WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToAudit(res.rows[0]);
@@ -1008,7 +1008,7 @@ export class AIVisibilityAuditRepository implements IAIVisibilityAuditRepository
   public async findByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<AIVisibilityAudit>> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM ai_visibility_audits WHERE brand_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM ai_visibility_audits WHERE brand_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [brandId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         const mapped = res.rows.map(row => this.mapRowToAudit(row));
@@ -1026,7 +1026,7 @@ export class AIVisibilityAuditRepository implements IAIVisibilityAuditRepository
   public async save(audit: AIVisibilityAudit): Promise<AIVisibilityAudit> {
     enforceTenantContext(audit.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO ai_visibility_audits (id, organization_id, brand_id, status, overall_score, metrics, prompts_coverage, evidence_summary, scoring_version, analyzer_version, created_at, updated_at, created_by, updated_by, version)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
         ON CONFLICT (id) DO UPDATE SET
@@ -1066,7 +1066,7 @@ export class AIVisibilityAuditRepository implements IAIVisibilityAuditRepository
   public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `UPDATE ai_visibility_audits SET deleted_at = NOW(), updated_by = $1, updated_at = NOW() WHERE id = $2 AND organization_id = $3;`;
+      let sql = `UPDATE ai_visibility_audits SET deleted_at = NOW(), updated_by = $1, updated_at = NOW() WHERE id = $2 AND organization_id = $3;`;
       const res = await this.pg.query(sql, [deletedBy, id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return true;
@@ -1085,7 +1085,7 @@ export class AIVisibilityAuditRepository implements IAIVisibilityAuditRepository
   public async findPromptsByAuditId(organizationId: string, auditId: string): Promise<AuditPrompt[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM audit_prompts WHERE audit_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at ASC;`;
+      let sql = `SELECT * FROM audit_prompts WHERE audit_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at ASC;`;
       const res = await this.pg.query(sql, [auditId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToPrompt(row));
@@ -1101,7 +1101,7 @@ export class AIVisibilityAuditRepository implements IAIVisibilityAuditRepository
   public async findPromptById(organizationId: string, id: string): Promise<AuditPrompt | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM audit_prompts WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      let sql = `SELECT * FROM audit_prompts WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToPrompt(res.rows[0]);
@@ -1117,7 +1117,7 @@ export class AIVisibilityAuditRepository implements IAIVisibilityAuditRepository
   public async savePrompt(prompt: AuditPrompt): Promise<AuditPrompt> {
     enforceTenantContext(prompt.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO audit_prompts (id, organization_id, audit_id, prompt_text, category, target_entity, locale, status, error_message, latency_ms, executed_at, response_text, analysis, created_at, updated_at, created_by, updated_by, version)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
         ON CONFLICT (id) DO UPDATE SET
@@ -1254,7 +1254,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async findDefinitionById(organizationId: string, id: string): Promise<PromptDefinition | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM prompt_definitions WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      let sql = `SELECT * FROM prompt_definitions WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToDefinition(res.rows[0]);
@@ -1270,7 +1270,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async findDefinitionsByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<PromptDefinition>> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM prompt_definitions WHERE brand_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM prompt_definitions WHERE brand_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [brandId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         const mapped = res.rows.map(row => this.mapRowToDefinition(row));
@@ -1288,7 +1288,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async saveDefinition(definition: PromptDefinition): Promise<PromptDefinition> {
     enforceTenantContext(definition.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO prompt_definitions (id, organization_id, brand_id, name, prompt_template, category, intent, locale, is_active, variables, competitors, tags, notes, version, created_at, updated_at, created_by, updated_by, opt_version)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
         ON CONFLICT (id) DO UPDATE SET
@@ -1338,7 +1338,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async deleteDefinitionSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `UPDATE prompt_definitions SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+      let sql = `UPDATE prompt_definitions SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
       const res = await this.pg.query(sql, [deletedBy, id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return true;
@@ -1358,7 +1358,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async findScheduleByPromptId(organizationId: string, promptId: string): Promise<PromptSchedule | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM prompt_schedules WHERE prompt_id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      let sql = `SELECT * FROM prompt_schedules WHERE prompt_id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
       const res = await this.pg.query(sql, [promptId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToSchedule(res.rows[0]);
@@ -1377,7 +1377,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async findScheduleById(organizationId: string, id: string): Promise<PromptSchedule | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM prompt_schedules WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      let sql = `SELECT * FROM prompt_schedules WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToSchedule(res.rows[0]);
@@ -1392,7 +1392,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
 
   public async findActiveSchedules(): Promise<PromptSchedule[]> {
     try {
-      const sql = `SELECT * FROM prompt_schedules WHERE enabled = true;`;
+      let sql = `SELECT * FROM prompt_schedules WHERE enabled = true;`;
       const res = await this.pg.query(sql, []);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToSchedule(row));
@@ -1406,7 +1406,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async findAllSchedules(organizationId: string): Promise<PromptSchedule[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM prompt_schedules WHERE organization_id = $1 AND deleted_at IS NULL;`;
+      let sql = `SELECT * FROM prompt_schedules WHERE organization_id = $1 AND deleted_at IS NULL;`;
       const res = await this.pg.query(sql, [organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToSchedule(row));
@@ -1422,7 +1422,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async saveSchedule(schedule: PromptSchedule): Promise<PromptSchedule> {
     enforceTenantContext(schedule.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO prompt_schedules (id, organization_id, prompt_id, enabled, cron_expression, timezone, next_execution_at, last_execution_at, status, failure_reason, schedule_version, created_at, updated_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
         ON CONFLICT (id) DO UPDATE SET
@@ -1462,7 +1462,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async findExecutionById(organizationId: string, id: string): Promise<PromptExecution | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM prompt_executions WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      let sql = `SELECT * FROM prompt_executions WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToExecution(res.rows[0]);
@@ -1478,7 +1478,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async findExecutionsByPromptId(organizationId: string, promptId: string, params?: QueryParams): Promise<PaginatedResult<PromptExecution>> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM prompt_executions WHERE prompt_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM prompt_executions WHERE prompt_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [promptId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         const mapped = res.rows.map(row => this.mapRowToExecution(row));
@@ -1496,7 +1496,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async saveExecution(execution: PromptExecution): Promise<PromptExecution> {
     enforceTenantContext(execution.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO prompt_executions (id, organization_id, prompt_id, prompt_version, resolved_prompt_text, variables_values, status, provider, model, model_version, response_text, latency_ms, error_message, attempts, max_attempts, scheduled_for, executed_at, created_at, updated_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
         ON CONFLICT (id) DO UPDATE SET
@@ -1540,7 +1540,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async findPositionsByExecutionId(organizationId: string, executionId: string): Promise<PositionObservation[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM position_observations WHERE source_execution_id = $1 AND organization_id = $2;`;
+      let sql = `SELECT * FROM position_observations WHERE source_execution_id = $1 AND organization_id = $2;`;
       const res = await this.pg.query(sql, [executionId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToPosition(row));
@@ -1556,7 +1556,7 @@ export class PromptIntelligenceRepository implements IPromptIntelligenceReposito
   public async savePosition(position: PositionObservation): Promise<PositionObservation> {
     enforceTenantContext(position.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO position_observations (id, organization_id, source_execution_id, subject_entity_id, presence, numeric_position, evidence_excerpt, evidence_structure, confidence, analyzer_version, created_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         ON CONFLICT (id) DO NOTHING;
@@ -1626,7 +1626,7 @@ export class CitationIntelligenceRepository implements ICitationIntelligenceRepo
   public async findSourceById(organizationId: string, id: string): Promise<CitationSource | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM citation_sources WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
+      let sql = `SELECT * FROM citation_sources WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToSource(res.rows[0]);
@@ -1642,7 +1642,7 @@ export class CitationIntelligenceRepository implements ICitationIntelligenceRepo
   public async findSourceByDomain(organizationId: string, domain: string): Promise<CitationSource | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM citation_sources WHERE LOWER(domain) = LOWER($1) AND organization_id = $2 LIMIT 1;`;
+      let sql = `SELECT * FROM citation_sources WHERE LOWER(domain) = LOWER($1) AND organization_id = $2 LIMIT 1;`;
       const res = await this.pg.query(sql, [domain, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToSource(res.rows[0]);
@@ -1661,7 +1661,7 @@ export class CitationIntelligenceRepository implements ICitationIntelligenceRepo
   public async findSources(organizationId: string, params?: QueryParams): Promise<PaginatedResult<CitationSource>> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM citation_sources WHERE organization_id = $1 ORDER BY occurrence_count DESC;`;
+      let sql = `SELECT * FROM citation_sources WHERE organization_id = $1 ORDER BY occurrence_count DESC;`;
       const res = await this.pg.query(sql, [organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         const mapped = res.rows.map(row => this.mapRowToSource(row));
@@ -1679,7 +1679,7 @@ export class CitationIntelligenceRepository implements ICitationIntelligenceRepo
   public async saveSource(source: CitationSource): Promise<CitationSource> {
     enforceTenantContext(source.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO citation_sources (id, organization_id, domain, canonical_url, classification, quality_score, authority_score, first_seen_at, last_seen_at, occurrence_count, created_at, updated_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
         ON CONFLICT (organization_id, domain) DO UPDATE SET
@@ -1715,7 +1715,7 @@ export class CitationIntelligenceRepository implements ICitationIntelligenceRepo
   public async findOccurrencesBySourceId(organizationId: string, sourceId: string): Promise<CitationOccurrence[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM citation_occurrences WHERE source_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM citation_occurrences WHERE source_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [sourceId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToOccurrence(row));
@@ -1731,7 +1731,7 @@ export class CitationIntelligenceRepository implements ICitationIntelligenceRepo
   public async findOccurrencesByAuditId(organizationId: string, auditId: string): Promise<CitationOccurrence[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM citation_occurrences WHERE audit_id = $1 AND organization_id = $2;`;
+      let sql = `SELECT * FROM citation_occurrences WHERE audit_id = $1 AND organization_id = $2;`;
       const res = await this.pg.query(sql, [auditId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToOccurrence(row));
@@ -1747,7 +1747,7 @@ export class CitationIntelligenceRepository implements ICitationIntelligenceRepo
   public async findOccurrencesByExecutionId(organizationId: string, executionId: string): Promise<CitationOccurrence[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM citation_occurrences WHERE execution_id = $1 AND organization_id = $2;`;
+      let sql = `SELECT * FROM citation_occurrences WHERE execution_id = $1 AND organization_id = $2;`;
       const res = await this.pg.query(sql, [executionId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToOccurrence(row));
@@ -1763,7 +1763,7 @@ export class CitationIntelligenceRepository implements ICitationIntelligenceRepo
   public async findAllOccurrences(organizationId: string): Promise<CitationOccurrence[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM citation_occurrences WHERE organization_id = $1 ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM citation_occurrences WHERE organization_id = $1 ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToOccurrence(row));
@@ -1779,7 +1779,7 @@ export class CitationIntelligenceRepository implements ICitationIntelligenceRepo
   public async saveOccurrence(occurrence: CitationOccurrence): Promise<CitationOccurrence> {
     enforceTenantContext(occurrence.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO citation_occurrences (id, organization_id, source_id, audit_id, execution_id, prompt_id, observation_id, url, title, snippet, position, confidence, created_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
         ON CONFLICT (organization_id, source_id, observation_id, url) DO NOTHING;
@@ -1856,7 +1856,7 @@ export class BrandIntelligenceRepository implements IBrandIntelligenceRepository
   public async findAssociationById(organizationId: string, id: string): Promise<BrandAssociation | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM brand_associations WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
+      let sql = `SELECT * FROM brand_associations WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToAssociation(res.rows[0]);
@@ -1872,7 +1872,7 @@ export class BrandIntelligenceRepository implements IBrandIntelligenceRepository
   public async findAssociationByEntity(organizationId: string, brandId: string, entityName: string, relType: string): Promise<BrandAssociation | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM brand_associations WHERE LOWER(entity_name) = LOWER($1) AND relationship_type = $2 AND brand_id = $3 AND organization_id = $4 LIMIT 1;`;
+      let sql = `SELECT * FROM brand_associations WHERE LOWER(entity_name) = LOWER($1) AND relationship_type = $2 AND brand_id = $3 AND organization_id = $4 LIMIT 1;`;
       const res = await this.pg.query(sql, [entityName, relType, brandId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToAssociation(res.rows[0]);
@@ -1896,7 +1896,7 @@ export class BrandIntelligenceRepository implements IBrandIntelligenceRepository
   public async findAssociationsByBrandId(organizationId: string, brandId: string): Promise<BrandAssociation[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM brand_associations WHERE brand_id = $1 AND organization_id = $2 ORDER BY occurrence_count DESC;`;
+      let sql = `SELECT * FROM brand_associations WHERE brand_id = $1 AND organization_id = $2 ORDER BY occurrence_count DESC;`;
       const res = await this.pg.query(sql, [brandId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToAssociation(row));
@@ -1912,7 +1912,7 @@ export class BrandIntelligenceRepository implements IBrandIntelligenceRepository
   public async saveAssociation(association: BrandAssociation): Promise<BrandAssociation> {
     enforceTenantContext(association.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO brand_associations (id, organization_id, brand_id, entity_name, relationship_type, occurrence_count, first_seen_at, last_seen_at, supporting_context, confidence, created_at, updated_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
         ON CONFLICT (organization_id, brand_id, entity_name, relationship_type) DO UPDATE SET
@@ -1947,7 +1947,7 @@ export class BrandIntelligenceRepository implements IBrandIntelligenceRepository
   public async findRecommendationByObservationId(organizationId: string, brandId: string, observationId: string): Promise<RecommendationObservation | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM recommendation_observations WHERE observation_id = $1 AND brand_id = $2 AND organization_id = $3 LIMIT 1;`;
+      let sql = `SELECT * FROM recommendation_observations WHERE observation_id = $1 AND brand_id = $2 AND organization_id = $3 LIMIT 1;`;
       const res = await this.pg.query(sql, [observationId, brandId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToRecommendation(res.rows[0]);
@@ -1966,7 +1966,7 @@ export class BrandIntelligenceRepository implements IBrandIntelligenceRepository
   public async findRecommendationsByBrandId(organizationId: string, brandId: string): Promise<RecommendationObservation[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM recommendation_observations WHERE brand_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM recommendation_observations WHERE brand_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [brandId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToRecommendation(row));
@@ -1982,7 +1982,7 @@ export class BrandIntelligenceRepository implements IBrandIntelligenceRepository
   public async saveRecommendationObservation(rec: RecommendationObservation): Promise<RecommendationObservation> {
     enforceTenantContext(rec.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO recommendation_observations (id, organization_id, brand_id, execution_id, prompt_id, observation_id, recommendation_status, position, evidence_excerpt, created_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         ON CONFLICT (organization_id, brand_id, observation_id) DO UPDATE SET
@@ -2018,7 +2018,7 @@ export class WebsiteRepository implements IWebsiteRepository {
 
   public async findById(organizationId: string, id: string): Promise<Website | null> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM websites WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    let sql = `SELECT * FROM websites WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
     await this.pg.query(sql, [id, organizationId]);
 
     const item = db.websites.get(id);
@@ -2028,7 +2028,7 @@ export class WebsiteRepository implements IWebsiteRepository {
 
   public async findByDomain(organizationId: string, domain: string): Promise<Website | null> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM websites WHERE domain = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    let sql = `SELECT * FROM websites WHERE domain = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
     await this.pg.query(sql, [domain, organizationId]);
 
     for (const item of db.websites.values()) {
@@ -2041,7 +2041,7 @@ export class WebsiteRepository implements IWebsiteRepository {
 
   public async save(website: Website): Promise<Website> {
     enforceTenantContext(website.organizationId);
-    const sql = `
+    let sql = `
       INSERT INTO websites (id, organization_id, domain, normalized_url, status, last_crawled_at, last_analyzed_at, created_at, updated_at, created_by, updated_by, version)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       ON CONFLICT (organization_id, domain) DO UPDATE SET
@@ -2074,7 +2074,7 @@ export class WebsiteRepository implements IWebsiteRepository {
 
   public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
-    const sql = `UPDATE websites SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+    let sql = `UPDATE websites SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
     await this.pg.query(sql, [deletedBy, id, organizationId]);
 
     const item = db.websites.get(id);
@@ -2094,7 +2094,7 @@ export class PageRepository implements IPageRepository {
 
   public async findById(organizationId: string, id: string): Promise<Page | null> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM pages WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    let sql = `SELECT * FROM pages WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
     await this.pg.query(sql, [id, organizationId]);
 
     const item = db.pages.get(id);
@@ -2104,7 +2104,7 @@ export class PageRepository implements IPageRepository {
 
   public async findByWebsiteId(organizationId: string, websiteId: string, params?: QueryParams): Promise<PaginatedResult<Page>> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM pages WHERE website_id = $1 AND organization_id = $2 AND deleted_at IS NULL;`;
+    let sql = `SELECT * FROM pages WHERE website_id = $1 AND organization_id = $2 AND deleted_at IS NULL;`;
     await this.pg.query(sql, [websiteId, organizationId]);
 
     const list = Array.from(db.pages.values()).filter(
@@ -2115,7 +2115,7 @@ export class PageRepository implements IPageRepository {
 
   public async findByNormalizedUrl(organizationId: string, websiteId: string, normalizedUrl: string): Promise<Page | null> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM pages WHERE website_id = $1 AND normalized_url = $2 AND organization_id = $3 AND deleted_at IS NULL LIMIT 1;`;
+    let sql = `SELECT * FROM pages WHERE website_id = $1 AND normalized_url = $2 AND organization_id = $3 AND deleted_at IS NULL LIMIT 1;`;
     await this.pg.query(sql, [websiteId, normalizedUrl, organizationId]);
 
     for (const item of db.pages.values()) {
@@ -2128,7 +2128,7 @@ export class PageRepository implements IPageRepository {
 
   public async save(page: Page): Promise<Page> {
     enforceTenantContext(page.organizationId);
-    const sql = `
+    let sql = `
       INSERT INTO pages (id, organization_id, website_id, url, normalized_url, path, status_code, indexability, title, description, created_at, updated_at, created_by, updated_by, version)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       ON CONFLICT (website_id, normalized_url) DO UPDATE SET
@@ -2166,7 +2166,7 @@ export class PageRepository implements IPageRepository {
 
   public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
-    const sql = `UPDATE pages SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+    let sql = `UPDATE pages SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
     await this.pg.query(sql, [deletedBy, id, organizationId]);
 
     const item = db.pages.get(id);
@@ -2180,7 +2180,7 @@ export class PageRepository implements IPageRepository {
   // Many-to-many associations
   public async linkKeyword(organizationId: string, pageId: string, keywordId: string): Promise<void> {
     enforceTenantContext(organizationId);
-    const sql = `INSERT INTO pages_keywords (organization_id, page_id, keyword_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
+    let sql = `INSERT INTO pages_keywords (organization_id, page_id, keyword_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
     await this.pg.query(sql, [organizationId, pageId, keywordId]);
 
     const exists = db.pagesKeywords.some(link => link.pageId === pageId && link.keywordId === keywordId);
@@ -2191,7 +2191,7 @@ export class PageRepository implements IPageRepository {
 
   public async linkTopic(organizationId: string, pageId: string, topicId: string): Promise<void> {
     enforceTenantContext(organizationId);
-    const sql = `INSERT INTO pages_topics (organization_id, page_id, topic_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
+    let sql = `INSERT INTO pages_topics (organization_id, page_id, topic_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
     await this.pg.query(sql, [organizationId, pageId, topicId]);
 
     const exists = db.pagesTopics.some(link => link.pageId === pageId && link.topicId === topicId);
@@ -2202,7 +2202,7 @@ export class PageRepository implements IPageRepository {
 
   public async linkEntity(organizationId: string, pageId: string, entityId: string): Promise<void> {
     enforceTenantContext(organizationId);
-    const sql = `INSERT INTO pages_entities (organization_id, page_id, entity_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
+    let sql = `INSERT INTO pages_entities (organization_id, page_id, entity_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
     await this.pg.query(sql, [organizationId, pageId, entityId]);
 
     const exists = db.pagesEntities.some(link => link.pageId === pageId && link.entityId === entityId);
@@ -2213,7 +2213,7 @@ export class PageRepository implements IPageRepository {
 
   public async getLinkedKeywords(organizationId: string, pageId: string): Promise<Keyword[]> {
     enforceTenantContext(organizationId);
-    const sql = `
+    let sql = `
       SELECT k.* FROM keywords k
       INNER JOIN pages_keywords pk ON k.id = pk.keyword_id
       WHERE pk.page_id = $1 AND pk.organization_id = $2 AND k.deleted_at IS NULL;
@@ -2226,7 +2226,7 @@ export class PageRepository implements IPageRepository {
 
   public async getLinkedTopics(organizationId: string, pageId: string): Promise<Topic[]> {
     enforceTenantContext(organizationId);
-    const sql = `
+    let sql = `
       SELECT t.* FROM topics t
       INNER JOIN pages_topics pt ON t.id = pt.topic_id
       WHERE pt.page_id = $1 AND pt.organization_id = $2 AND t.deleted_at IS NULL;
@@ -2239,7 +2239,7 @@ export class PageRepository implements IPageRepository {
 
   public async getLinkedEntities(organizationId: string, pageId: string): Promise<Entity[]> {
     enforceTenantContext(organizationId);
-    const sql = `
+    let sql = `
       SELECT e.* FROM entities e
       INNER JOIN pages_entities pe ON e.id = pe.entity_id
       WHERE pe.page_id = $1 AND pe.organization_id = $2 AND e.deleted_at IS NULL;
@@ -2259,7 +2259,7 @@ export class KeywordRepository implements IKeywordRepository {
 
   public async findById(organizationId: string, id: string): Promise<Keyword | null> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM keywords WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    let sql = `SELECT * FROM keywords WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
     await this.pg.query(sql, [id, organizationId]);
 
     const item = db.keywords.get(id);
@@ -2269,7 +2269,7 @@ export class KeywordRepository implements IKeywordRepository {
 
   public async findByName(organizationId: string, name: string): Promise<Keyword | null> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM keywords WHERE name = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    let sql = `SELECT * FROM keywords WHERE name = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
     await this.pg.query(sql, [name, organizationId]);
 
     for (const item of db.keywords.values()) {
@@ -2282,7 +2282,7 @@ export class KeywordRepository implements IKeywordRepository {
 
   public async save(keyword: Keyword): Promise<Keyword> {
     enforceTenantContext(keyword.organizationId);
-    const sql = `
+    let sql = `
       INSERT INTO keywords (id, organization_id, name, display_name, language, intent, created_at, updated_at, created_by, updated_by, version)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       ON CONFLICT (organization_id, name) DO UPDATE SET
@@ -2312,7 +2312,7 @@ export class KeywordRepository implements IKeywordRepository {
 
   public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
-    const sql = `UPDATE keywords SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+    let sql = `UPDATE keywords SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
     await this.pg.query(sql, [deletedBy, id, organizationId]);
 
     const item = db.keywords.get(id);
@@ -2325,7 +2325,7 @@ export class KeywordRepository implements IKeywordRepository {
 
   public async linkTopic(organizationId: string, keywordId: string, topicId: string): Promise<void> {
     enforceTenantContext(organizationId);
-    const sql = `INSERT INTO keywords_topics (organization_id, keyword_id, topic_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
+    let sql = `INSERT INTO keywords_topics (organization_id, keyword_id, topic_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
     await this.pg.query(sql, [organizationId, keywordId, topicId]);
 
     const exists = db.keywordsTopics.some(link => link.keywordId === keywordId && link.topicId === topicId);
@@ -2336,7 +2336,7 @@ export class KeywordRepository implements IKeywordRepository {
 
   public async getLinkedTopics(organizationId: string, keywordId: string): Promise<Topic[]> {
     enforceTenantContext(organizationId);
-    const sql = `
+    let sql = `
       SELECT t.* FROM topics t
       INNER JOIN keywords_topics kt ON t.id = kt.topic_id
       WHERE kt.keyword_id = $1 AND kt.organization_id = $2 AND t.deleted_at IS NULL;
@@ -2356,7 +2356,7 @@ export class TopicRepository implements ITopicRepository {
 
   public async findById(organizationId: string, id: string): Promise<Topic | null> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM topics WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    let sql = `SELECT * FROM topics WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
     await this.pg.query(sql, [id, organizationId]);
 
     const item = db.topics.get(id);
@@ -2366,7 +2366,7 @@ export class TopicRepository implements ITopicRepository {
 
   public async findByName(organizationId: string, name: string): Promise<Topic | null> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM topics WHERE name = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    let sql = `SELECT * FROM topics WHERE name = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
     await this.pg.query(sql, [name, organizationId]);
 
     for (const item of db.topics.values()) {
@@ -2379,7 +2379,7 @@ export class TopicRepository implements ITopicRepository {
 
   public async save(topic: Topic): Promise<Topic> {
     enforceTenantContext(topic.organizationId);
-    const sql = `
+    let sql = `
       INSERT INTO topics (id, organization_id, name, description, language, parent_topic_id, created_at, updated_at, created_by, updated_by, version)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       ON CONFLICT (organization_id, name) DO UPDATE SET
@@ -2409,7 +2409,7 @@ export class TopicRepository implements ITopicRepository {
 
   public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
-    const sql = `UPDATE topics SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+    let sql = `UPDATE topics SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
     await this.pg.query(sql, [deletedBy, id, organizationId]);
 
     const item = db.topics.get(id);
@@ -2422,7 +2422,7 @@ export class TopicRepository implements ITopicRepository {
 
   public async linkEntity(organizationId: string, topicId: string, entityId: string): Promise<void> {
     enforceTenantContext(organizationId);
-    const sql = `INSERT INTO topics_entities (organization_id, topic_id, entity_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
+    let sql = `INSERT INTO topics_entities (organization_id, topic_id, entity_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`;
     await this.pg.query(sql, [organizationId, topicId, entityId]);
 
     const exists = db.topicsEntities.some(link => link.topicId === topicId && link.entityId === entityId);
@@ -2433,7 +2433,7 @@ export class TopicRepository implements ITopicRepository {
 
   public async getLinkedEntities(organizationId: string, topicId: string): Promise<Entity[]> {
     enforceTenantContext(organizationId);
-    const sql = `
+    let sql = `
       SELECT e.* FROM entities e
       INNER JOIN topics_entities te ON e.id = te.entity_id
       WHERE te.topic_id = $1 AND te.organization_id = $2 AND e.deleted_at IS NULL;
@@ -2496,7 +2496,7 @@ export class CompetitorRepository implements ICompetitorRepository {
   public async findById(organizationId: string, id: string): Promise<Competitor | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM competitors WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      let sql = `SELECT * FROM competitors WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToCompetitor(res.rows[0]);
@@ -2513,7 +2513,7 @@ export class CompetitorRepository implements ICompetitorRepository {
   public async findByOrganizationId(organizationId: string, params?: QueryParams): Promise<PaginatedResult<Competitor>> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM competitors WHERE organization_id = $1 AND deleted_at IS NULL;`;
+      let sql = `SELECT * FROM competitors WHERE organization_id = $1 AND deleted_at IS NULL;`;
       const res = await this.pg.query(sql, [organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         const mapped = res.rows.map(row => this.mapRowToCompetitor(row));
@@ -2532,7 +2532,7 @@ export class CompetitorRepository implements ICompetitorRepository {
   public async findByDomain(organizationId: string, domain: string): Promise<Competitor | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM competitors WHERE LOWER(domain) = LOWER($1) AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      let sql = `SELECT * FROM competitors WHERE LOWER(domain) = LOWER($1) AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
       const res = await this.pg.query(sql, [domain, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToCompetitor(res.rows[0]);
@@ -2552,7 +2552,7 @@ export class CompetitorRepository implements ICompetitorRepository {
   public async save(competitor: Competitor): Promise<Competitor> {
     enforceTenantContext(competitor.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO competitors (
           id, organization_id, name, domain, status, brand_name, classification,
           discovery_source, discovery_evidence, confidence, first_discovered_at,
@@ -2608,7 +2608,7 @@ export class CompetitorRepository implements ICompetitorRepository {
   public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `UPDATE competitors SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+      let sql = `UPDATE competitors SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
       await this.pg.query(sql, [deletedBy, id, organizationId]);
     } catch (err) {
       console.warn("[CompetitorRepository.deleteSoft Error]: fallback to memory", err);
@@ -2625,7 +2625,7 @@ export class CompetitorRepository implements ICompetitorRepository {
   public async saveChange(change: CompetitorChange): Promise<CompetitorChange> {
     enforceTenantContext(change.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO competitor_changes (
           id, organization_id, competitor_id, changed_field, previous_value, new_value, change_type, observed_at, created_at
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
@@ -2652,7 +2652,7 @@ export class CompetitorRepository implements ICompetitorRepository {
   public async findChangesByCompetitorId(organizationId: string, competitorId: string): Promise<CompetitorChange[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM competitor_changes WHERE competitor_id = $1 AND organization_id = $2 ORDER BY observed_at DESC;`;
+      let sql = `SELECT * FROM competitor_changes WHERE competitor_id = $1 AND organization_id = $2 ORDER BY observed_at DESC;`;
       const res = await this.pg.query(sql, [competitorId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToCompetitorChange(row));
@@ -2698,7 +2698,7 @@ export class CompetitiveSeoFindingRepository implements ICompetitiveSeoFindingRe
   public async findById(organizationId: string, id: string): Promise<CompetitiveSeoFinding | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM competitive_seo_findings WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
+      let sql = `SELECT * FROM competitive_seo_findings WHERE id = $1 AND organization_id = $2 LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToFinding(res.rows[0]);
@@ -2715,7 +2715,7 @@ export class CompetitiveSeoFindingRepository implements ICompetitiveSeoFindingRe
   public async findByCompetitorId(organizationId: string, competitorId: string): Promise<CompetitiveSeoFinding[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM competitive_seo_findings WHERE competitor_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM competitive_seo_findings WHERE competitor_id = $1 AND organization_id = $2 ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [competitorId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToFinding(row));
@@ -2732,7 +2732,7 @@ export class CompetitiveSeoFindingRepository implements ICompetitiveSeoFindingRe
   public async findByOrganizationId(organizationId: string, params?: QueryParams): Promise<PaginatedResult<CompetitiveSeoFinding>> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM competitive_seo_findings WHERE organization_id = $1 ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM competitive_seo_findings WHERE organization_id = $1 ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         const mapped = res.rows.map(row => this.mapRowToFinding(row));
@@ -2751,7 +2751,7 @@ export class CompetitiveSeoFindingRepository implements ICompetitiveSeoFindingRe
   public async save(finding: CompetitiveSeoFinding): Promise<CompetitiveSeoFinding> {
     enforceTenantContext(finding.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO competitive_seo_findings (
           id, organization_id, competitor_id, finding_type, comparison_scope, competitive_position,
           tenant_value, competitor_value, difference, difference_direction, severity,
@@ -2802,7 +2802,7 @@ export class CompetitiveSeoFindingRepository implements ICompetitiveSeoFindingRe
   public async deleteSoft(organizationId: string, id: string): Promise<boolean> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `DELETE FROM competitive_seo_findings WHERE id = $1 AND organization_id = $2;`;
+      let sql = `DELETE FROM competitive_seo_findings WHERE id = $1 AND organization_id = $2;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         db.competitiveSeoFindings.delete(id);
@@ -2831,7 +2831,7 @@ export class HistoricalMetricRepository implements IHistoricalMetricRepository {
 
   public async save(metric: HistoricalMetric): Promise<HistoricalMetric> {
     enforceTenantContext(metric.organizationId);
-    const sql = `
+    let sql = `
       INSERT INTO historical_metrics (id, organization_id, target_type, target_id, metric_name, metric_value, dimensions, timestamp, created_at, created_by, version)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
     `;
@@ -2901,7 +2901,7 @@ export class PostgresDiagnosticFindingRepository implements IDiagnosticFindingRe
 
   public async findById(organizationId: string, id: string): Promise<DiagnosticFinding | null> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM diagnostic_findings WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+    let sql = `SELECT * FROM diagnostic_findings WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
     await this.pg.query(sql, [id, organizationId]);
 
     const item = db.diagnosticFindings.get(id);
@@ -2911,7 +2911,7 @@ export class PostgresDiagnosticFindingRepository implements IDiagnosticFindingRe
 
   public async findByWebsiteId(organizationId: string, websiteId: string, params?: QueryParams): Promise<PaginatedResult<DiagnosticFinding>> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM diagnostic_findings WHERE website_id = $1 AND organization_id = $2 AND deleted_at IS NULL;`;
+    let sql = `SELECT * FROM diagnostic_findings WHERE website_id = $1 AND organization_id = $2 AND deleted_at IS NULL;`;
     await this.pg.query(sql, [websiteId, organizationId]);
 
     const list = Array.from(db.diagnosticFindings.values()).filter(
@@ -2922,7 +2922,7 @@ export class PostgresDiagnosticFindingRepository implements IDiagnosticFindingRe
 
   public async findByCodeAndResource(organizationId: string, websiteId: string, code: string, affectedResource: string): Promise<DiagnosticFinding | null> {
     enforceTenantContext(organizationId);
-    const sql = `SELECT * FROM diagnostic_findings WHERE website_id = $1 AND code = $2 AND affected_resource = $3 AND organization_id = $4 AND deleted_at IS NULL LIMIT 1;`;
+    let sql = `SELECT * FROM diagnostic_findings WHERE website_id = $1 AND code = $2 AND affected_resource = $3 AND organization_id = $4 AND deleted_at IS NULL LIMIT 1;`;
     await this.pg.query(sql, [websiteId, code, affectedResource, organizationId]);
 
     for (const item of db.diagnosticFindings.values()) {
@@ -2935,7 +2935,7 @@ export class PostgresDiagnosticFindingRepository implements IDiagnosticFindingRe
 
   public async save(finding: DiagnosticFinding): Promise<DiagnosticFinding> {
     enforceTenantContext(finding.organizationId);
-    const sql = `
+    let sql = `
       INSERT INTO diagnostic_findings (id, organization_id, website_id, category, code, title, explanation, severity, confidence, status, affected_resource, evidence, created_at, updated_at, created_by, updated_by, version)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       ON CONFLICT (organization_id, website_id, code, affected_resource) DO UPDATE SET
@@ -2987,7 +2987,7 @@ export class PostgresDiagnosticFindingRepository implements IDiagnosticFindingRe
 
   public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
-    const sql = `UPDATE diagnostic_findings SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
+    let sql = `UPDATE diagnostic_findings SET deleted_at = NOW(), updated_by = $1 WHERE id = $2 AND organization_id = $3;`;
     await this.pg.query(sql, [deletedBy, id, organizationId]);
 
     const item = db.diagnosticFindings.get(id);
@@ -3000,7 +3000,7 @@ export class PostgresDiagnosticFindingRepository implements IDiagnosticFindingRe
 
   public async linkFindings(organizationId: string, sourceId: string, targetId: string, type: FindingRelationshipType): Promise<void> {
     enforceTenantContext(organizationId);
-    const sql = `
+    let sql = `
       INSERT INTO diagnostic_finding_relationships (organization_id, source_finding_id, target_finding_id, relationship_type, created_at, updated_at, created_by, updated_by, version)
       VALUES ($1, $2, $3, $4, NOW(), NOW(), 'system', 'system', 1)
       ON CONFLICT DO NOTHING;
@@ -3029,7 +3029,7 @@ export class PostgresDiagnosticFindingRepository implements IDiagnosticFindingRe
 
   public async getLinkedFindings(organizationId: string, findingId: string): Promise<DiagnosticFindingRelationship[]> {
     enforceTenantContext(organizationId);
-    const sql = `
+    let sql = `
       SELECT * FROM diagnostic_finding_relationships
       WHERE (source_finding_id = $1 OR target_finding_id = $1) AND organization_id = $2 AND deleted_at IS NULL;
     `;
@@ -3105,7 +3105,7 @@ export class EntityRepository implements IEntityRepository {
   public async findById(organizationId: string, id: string): Promise<Entity | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM entities WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      let sql = `SELECT * FROM entities WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
       const res = await this.pg.query(sql, [id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToEntity(res.rows[0]);
@@ -3124,7 +3124,7 @@ export class EntityRepository implements IEntityRepository {
   public async findByName(organizationId: string, name: string): Promise<Entity | null> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM entities WHERE LOWER(name) = LOWER($1) AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
+      let sql = `SELECT * FROM entities WHERE LOWER(name) = LOWER($1) AND organization_id = $2 AND deleted_at IS NULL LIMIT 1;`;
       const res = await this.pg.query(sql, [name.trim(), organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return this.mapRowToEntity(res.rows[0]);
@@ -3148,7 +3148,7 @@ export class EntityRepository implements IEntityRepository {
   public async findByBrandId(organizationId: string, brandId: string, params?: QueryParams): Promise<PaginatedResult<Entity>> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM entities WHERE brand_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at DESC;`;
+      let sql = `SELECT * FROM entities WHERE brand_id = $1 AND organization_id = $2 AND deleted_at IS NULL ORDER BY created_at DESC;`;
       const res = await this.pg.query(sql, [brandId, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         const mapped = res.rows.map(row => this.mapRowToEntity(row));
@@ -3167,7 +3167,7 @@ export class EntityRepository implements IEntityRepository {
   public async save(entity: Entity): Promise<Entity> {
     enforceTenantContext(entity.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO entities (
           id, organization_id, brand_id, name, type, wikidata_id, wikipedia_url,
           aliases, description, provenance, authority_score, completeness_score, status,
@@ -3227,7 +3227,7 @@ export class EntityRepository implements IEntityRepository {
   public async deleteSoft(organizationId: string, id: string, deletedBy: string): Promise<boolean> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `UPDATE entities SET deleted_at = NOW(), updated_by = $1, updated_at = NOW() WHERE id = $2 AND organization_id = $3;`;
+      let sql = `UPDATE entities SET deleted_at = NOW(), updated_by = $1, updated_at = NOW() WHERE id = $2 AND organization_id = $3;`;
       const res = await this.pg.query(sql, [deletedBy, id, organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         const item = db.entities.get(id);
@@ -3253,7 +3253,7 @@ export class EntityRepository implements IEntityRepository {
   public async getRelationships(organizationId: string): Promise<EntityRelationship[]> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `SELECT * FROM entity_relationships WHERE organization_id = $1 AND deleted_at IS NULL;`;
+      let sql = `SELECT * FROM entity_relationships WHERE organization_id = $1 AND deleted_at IS NULL;`;
       const res = await this.pg.query(sql, [organizationId]);
       if (res.rowCount && res.rowCount > 0) {
         return res.rows.map(row => this.mapRowToRelationship(row));
@@ -3270,7 +3270,7 @@ export class EntityRepository implements IEntityRepository {
   public async saveRelationship(relationship: EntityRelationship): Promise<EntityRelationship> {
     enforceTenantContext(relationship.organizationId);
     try {
-      const sql = `
+      let sql = `
         INSERT INTO entity_relationships (
           organization_id, source_entity_id, target_entity_id, relationship_type,
           direction, provenance, metadata, confidence_score, confidence_rating,
@@ -3326,7 +3326,7 @@ export class EntityRepository implements IEntityRepository {
   public async deleteRelationship(organizationId: string, sourceId: string, targetId: string, type: RelationshipType): Promise<boolean> {
     enforceTenantContext(organizationId);
     try {
-      const sql = `DELETE FROM entity_relationships WHERE organization_id = $1 AND source_entity_id = $2 AND target_entity_id = $3 AND relationship_type = $4;`;
+      let sql = `DELETE FROM entity_relationships WHERE organization_id = $1 AND source_entity_id = $2 AND target_entity_id = $3 AND relationship_type = $4;`;
       const res = await this.pg.query(sql, [organizationId, sourceId, targetId, type]);
       if (res.rowCount && res.rowCount > 0) {
         db.relationships = db.relationships.filter(

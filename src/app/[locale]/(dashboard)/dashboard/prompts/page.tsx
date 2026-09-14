@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useTransition } from "react";
 import { useTheme } from "@/components/ThemeProvider";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
+import { Card } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Dialog } from "@/components/Dialog";
@@ -135,8 +135,7 @@ export default function PromptsPage() {
           </h1>
           <p className="text-xs text-[var(--text-secondary)] mt-1">
             {isRtl
-              ? "پرامپت‌های هدف خود را اضافه و پایش کنید تا رویت‌پذیری برند در موتورهای هوش مصنوعی اندازه‌گیری شود."
-              : "Manage, track, and organize target queries to measure brand visibility across AI response engines."}
+              ? "پرامپت‌های هدف خود را اضافه و پایش کنید تا رویت‌پذیری برند در موتورهای هوش مصنوعی اندازه‌گیری شود." :"Manage, track, and organize target queries to measure brand visibility across AI response engines."}
           </p>
         </div>
 
@@ -179,8 +178,7 @@ export default function PromptsPage() {
             </h3>
             <p className="text-xs text-[var(--text-secondary)]">
               {isRtl
-                ? "پرامپتی با این مشخصات یافت نشد یا هنوز پرامپتی ثبت نکرده‌اید."
-                : "No historical prompts match your query. Try adding a new target prompt."}
+                ? "پرامپتی با این مشخصات یافت نشد یا هنوز پرامپتی ثبت نکرده‌اید." :"No historical prompts match your query. Try adding a new target prompt."}
             </p>
           </div>
         </Card>
@@ -235,8 +233,7 @@ export default function PromptsPage() {
         <form onSubmit={handleAddPrompt} className="space-y-4">
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             {isRtl
-              ? "کوئری جستجوی کاربران را وارد کنید. سئورچبل به صورت مداوم جایگاه برند شما را در نتایج تولید شده توسط مدل‌های زبانی هوش مصنوعی رصد خواهد کرد."
-              : "Enter the user query/prompt you want to track. Seorchable will continually measure your brand presence inside generative AI responses."}
+              ? "کوئری جستجوی کاربران را وارد کنید. سئورچبل به صورت مداوم جایگاه برند شما را در نتایج تولید شده توسط مدل‌های زبانی هوش مصنوعی رصد خواهد کرد." :"Enter the user query/prompt you want to track. Seorchable will continually measure your brand presence inside generative AI responses."}
           </p>
 
           <Input

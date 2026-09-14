@@ -129,3 +129,11 @@ export const DomainEventFactory = {
 
 // Export event-bus sub-module directly for clean relative resolution
 export * from "./event-bus";
+
+function eventBus(...args: any[]): any {
+  // eslint-disable-next-line no-console
+  console.warn('Placeholder: eventBus is not implemented yet.', args);
+  return null;
+}
+
+export { eventBus };

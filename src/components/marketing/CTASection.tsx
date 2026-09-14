@@ -21,13 +21,11 @@ export function CTASection() {
           <div className="relative z-10 space-y-6 max-w-2xl mx-auto">
             <h2 className="font-display font-black text-3xl md:text-4xl text-[var(--text-primary)] text-balance leading-tight">
               {isFa
-                ? "امروز کنترل روایت برندتان در هوش مصنوعی را به‌دست بگیرید"
-                : "Take control of how AI talks about your brand today"}
+                ? "امروز کنترل روایت برندتان در هوش مصنوعی را به‌دست بگیرید" :"Take control of how AI talks about your brand today"}
             </h2>
             <p className="text-[var(--text-secondary)] leading-relaxed text-pretty">
               {isFa
-                ? "در چند دقیقه راه‌اندازی کنید و اولین گزارش دیده‌شدن برند خود را دریافت کنید."
-                : "Get set up in minutes and receive your first brand visibility report."}
+                ? "در چند دقیقه راه‌اندازی کنید و اولین گزارش دیده‌شدن برند خود را دریافت کنید." :"Get set up in minutes and receive your first brand visibility report."}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
               <Link href={`/${language}/dashboard`}>

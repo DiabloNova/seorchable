@@ -3,38 +3,8 @@
 import React, { useState, useEffect, useTransition } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/Card";
-import {
-  Sparkles,
-  RefreshCw,
-  Award,
-  Link2,
-  Tag,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Compass,
-  FileText,
-  ChevronDown,
-  ChevronUp,
-  Bookmark,
-  Plus,
-  Play,
-  Settings,
-  Calendar,
-  Layers,
-  ChevronRight,
-  TrendingUp
-} from "lucide-react";
-import {
-  createPromptDefinitionAction,
-  updatePromptDefinitionAction,
-  getPromptDefinitionsAction,
-  getPromptDetailsAction,
-  executePromptAction,
-  executeModelComparisonAction,
-  schedulePromptAction,
-  unschedulePromptAction
-} from "@/app/actions/prompt-intelligence";
+import { Tag, AlertTriangle, CheckCircle, Clock, Compass, FileText, Plus, Play, Settings, Calendar, Layers, ChevronRight, TrendingUp } from "lucide-react";
+import { createPromptDefinitionAction, getPromptDefinitionsAction, getPromptDetailsAction, executeModelComparisonAction, schedulePromptAction, unschedulePromptAction } from "@/app/actions/prompt-intelligence";
 import { getBrandsAction } from "@/app/actions/ai-visibility-audit";
 import {
   Brand,
@@ -321,8 +291,7 @@ export default function AeoPlaygroundPage() {
           </h1>
           <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-2xl leading-relaxed">
             {isRtl
-              ? "ابزار پیشرفته مدیریت، قالب‌سازی متغیرها، مقایسه همزمان پاسخ مدل‌های هوشمند و ردیابی رتبه‌بندی کلامی برند شما در برابر رقبا."
-              : "Enterprise prompt laboratory to parameterize templates, compare semantic models, schedule cron audits, and trace brand-vs-competitor ranks."}
+              ? "ابزار پیشرفته مدیریت، قالب‌سازی متغیرها، مقایسه همزمان پاسخ مدل‌های هوشمند و ردیابی رتبه‌بندی کلامی برند شما در برابر رقبا." :"Enterprise prompt laboratory to parameterize templates, compare semantic models, schedule cron audits, and trace brand-vs-competitor ranks."}
           </p>
         </div>
 

@@ -1,19 +1,10 @@
-import { UserRole } from "@/types/auth";
+
 
 export type JobStatus =
-  | "queued"
-  | "running"
-  | "retrying"
-  | "completed"
-  | "failed"
-  | "cancelled";
+  | "queued" |"running" |"retrying" |"completed" |"failed" |"cancelled";
 
 export type JobType =
-  | "crawl"
-  | "seo_audit"
-  | "ai_analysis"
-  | "document_ingestion"
-  | "scheduled";
+  | "crawl" |"seo_audit" |"ai_analysis" |"document_ingestion" |"scheduled";
 
 export interface JobError {
   code: string;

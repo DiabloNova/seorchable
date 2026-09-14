@@ -33,10 +33,10 @@ export default function GlobalNavigationControls() {
 
   const handleBack = () => {
     // Attempt to go back, otherwise fall back to home page
-    if (window.history.length > 1) {
-      router.back();
+    if (window.history?.length > 1) {
+      router?.back();
     } else {
-      router.push(`/${language}`);
+      router?.push(`/${language}`);
     }
   };
 

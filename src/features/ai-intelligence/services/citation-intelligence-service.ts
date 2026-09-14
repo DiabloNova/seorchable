@@ -1,12 +1,4 @@
-import {
-  CitationSource,
-  CitationOccurrence,
-  CitationSourceClassification,
-  Brand,
-  Competitor,
-  AuditMetadata,
-  AIVisibilityAudit
-} from "../domain/types";
+import { CitationOccurrence, CitationSourceClassification, Brand, Competitor } from "../domain/types";
 import {
   CitationIntelligenceRepository,
   BrandRepository,

@@ -76,13 +76,25 @@ function event(
 }
 
 export class CrawlOrchestrator {
+  private readonly jobs: CrawlJobRepository;
+  private readonly cache: CrawlCacheRepository;
+  private readonly results: CrawlResultRepository;
+  private readonly router: ProviderRouter;
+  private readonly validateHost: typeof resolveAndValidateHost;
+
   public constructor(
-    private readonly jobs = new CrawlJobRepository(),
-    private readonly cache = new CrawlCacheRepository(),
-    private readonly results = new CrawlResultRepository(),
-    private readonly router = defaultRouter(),
-    private readonly validateHost: typeof resolveAndValidateHost = resolveAndValidateHost
-  ) {}
+    jobs?: CrawlJobRepository,
+    cache?: CrawlCacheRepository,
+    results?: CrawlResultRepository,
+    router?: ProviderRouter,
+    validateHost?: typeof resolveAndValidateHost
+  ) {
+    this.jobs = jobs ?? new CrawlJobRepository();
+    this.cache = cache ?? new CrawlCacheRepository();
+    this.results = results ?? new CrawlResultRepository();
+    this.router = router ?? defaultRouter();
+    this.validateHost = validateHost ?? resolveAndValidateHost;
+  }
 
   public async submit(
     tenantId: string,

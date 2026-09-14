@@ -5,7 +5,7 @@ import { Header } from "@/components/marketing/Header";
 import { LandingFooter } from "@/components/marketing/LandingFooter";
 import AppSidebar from "@/components/navigation/AppSidebar";
 import { Sparkles, ArrowRight, Calendar, User, Clock } from "lucide-react";
-import Link from "next/link";
+
 
 export default function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
   const resolvedParams = use(params);
@@ -58,8 +58,7 @@ export default function BlogPage({ params }: { params: Promise<{ locale: string 
             </h1>
             <p className="text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto">
               {isFa
-                ? "به‌روزترین مقالات فنی در حوزه‌ی موتورهای پاسخگو، تولید محتوای بهینه‌شده AEO و بازاریابی مبتنی بر مدل‌های هوش مصنوعی."
-                : "Stay ahead with technical tutorials on Generative Engine Optimization, brand factuality, and LLM visibility trends."}
+                ? "به‌روزترین مقالات فنی در حوزه‌ی موتورهای پاسخگو، تولید محتوای بهینه‌شده AEO و بازاریابی مبتنی بر مدل‌های هوش مصنوعی." :"Stay ahead with technical tutorials on Generative Engine Optimization, brand factuality, and LLM visibility trends."}
             </p>
           </div>
 

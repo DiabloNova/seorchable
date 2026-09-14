@@ -4,21 +4,7 @@
  * root-cause analysis, severity/confidence separation, and historical regression checks.
  */
 
-import {
-  DiagnosticFinding,
-  DiagnosticFindingRelationship,
-  DiagnosticCategory,
-  FindingSeverity,
-  FindingConfidence,
-  FindingStatus,
-  Website,
-  Page,
-  Keyword,
-  Topic,
-  Competitor,
-  HistoricalMetric,
-  AIObservation
-} from "../../features/ai-intelligence/domain/types";
+import { DiagnosticFinding, DiagnosticFindingRelationship, DiagnosticCategory, FindingSeverity, FindingConfidence, Website, Competitor, HistoricalMetric, AIObservation } from "../../features/ai-intelligence/domain/types";
 import { SeoSignals } from "../../types/seo-signals";
 
 export interface DiagnosticInputs {

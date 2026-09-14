@@ -27,6 +27,7 @@ export class InMemoryJobQueue implements IJobQueue {
         this.queuedJobs.splice(idx, 1);
         // Execute the job via the executor
         // In real BullMQ/SQS this runs on separate worker threads/machines
+        await this.executor.execute({ id: jobId } as Job);
       }
     }, 0);
   }

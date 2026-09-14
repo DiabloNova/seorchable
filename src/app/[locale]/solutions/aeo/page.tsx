@@ -32,8 +32,7 @@ export default function AeoSolutionPage({ params }: { params: Promise<{ locale: 
             </h1>
             <p className="text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto">
               {isFa
-                ? "قالب‌بندی و بهینه‌سازی محتوای سایت برای حضور موثر و مستمر در کادر پاسخ‌های مستقیم چت‌بات‌های بزرگ هوش مصنوعی."
-                : "Structure and tune your web content to win organic, direct answers within LLMs and intelligent chat dialogues."}
+                ? "قالب‌بندی و بهینه‌سازی محتوای سایت برای حضور موثر و مستمر در کادر پاسخ‌های مستقیم چت‌بات‌های بزرگ هوش مصنوعی." :"Structure and tune your web content to win organic, direct answers within LLMs and intelligent chat dialogues."}
             </p>
           </div>
 
@@ -54,8 +53,7 @@ export default function AeoSolutionPage({ params }: { params: Promise<{ locale: 
             </h3>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
               {isFa
-                ? "ابزار بهینه‌سازی فنی سئورچبل کدهای قالب محتوای شما را به صورت بلادرنگ اسکن کرده و توصیه‌های دقیقی را جهت ارتقای امتیاز و برتری بر رقبا ارائه می‌دهد."
-                : "Our platform scans your web layout in real-time, delivering tactical, on-page optimization steps to outpace competitor recommendations in conversational search."}
+                ? "ابزار بهینه‌سازی فنی سئورچبل کدهای قالب محتوای شما را به صورت بلادرنگ اسکن کرده و توصیه‌های دقیقی را جهت ارتقای امتیاز و برتری بر رقبا ارائه می‌دهد." :"Our platform scans your web layout in real-time, delivering tactical, on-page optimization steps to outpace competitor recommendations in conversational search."}
             </p>
 
             <div className="p-4 rounded-xl border border-orange-500/20 bg-orange-500/5 space-y-2">

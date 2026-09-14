@@ -5,15 +5,7 @@
  */
 
 import { TenantContextManager } from "../../../core/database/tenant-context";
-import {
-  SiteArchitectureInput,
-  CrawlDepthResult,
-  SiteArchitectureFinding,
-  SiteArchitectureAnalysisResult,
-  SiteArchitectureCategory,
-  FindingSeverity,
-  Page
-} from "../domain/types";
+import { SiteArchitectureInput, CrawlDepthResult, SiteArchitectureFinding, SiteArchitectureAnalysisResult, FindingSeverity, Page } from "../domain/types";
 
 /**
  * Normalizes URL paths and URLs for exact graph node matching.
@@ -171,7 +163,7 @@ export class SiteArchitectureAnalyzerService {
     for (const [norm, pg] of nodeMap.entries()) {
       const isReachable = depthMap.has(norm);
       const depth = isReachable ? depthMap.get(norm)! : -1;
-      const path = isReachable ? pathMap.get(norm)! : [];
+      let path = isReachable ? pathMap.get(norm)! : [];
 
       crawlDepths.push({
         url: pg.url,

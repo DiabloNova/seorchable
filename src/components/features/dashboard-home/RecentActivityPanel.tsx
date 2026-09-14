@@ -47,8 +47,7 @@ export const RecentActivityPanel: React.FC<RecentActivityPanelProps> = ({
         </CardTitle>
         <CardDescription className="text-xs text-[var(--text-secondary)]">
           {isRtl
-            ? "جریان بلادرنگ رویدادها، تغییرات امنیتی و کوئری‌های اجرا شده در لایه استناد."
-            : "Real-time feed of background crawl tasks, API runs, and diagnostic actions."}
+            ? "جریان بلادرنگ رویدادها، تغییرات امنیتی و کوئری‌های اجرا شده در لایه استناد." :"Real-time feed of background crawl tasks, API runs, and diagnostic actions."}
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-2 flex-1 flex flex-col justify-center">
@@ -63,8 +62,7 @@ export const RecentActivityPanel: React.FC<RecentActivityPanelProps> = ({
               </p>
               <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed">
                 {isRtl
-                  ? "فعالیت اخیری در ارتباط با این مستأجر شناسایی نگردید. با اجرای کوئری یا اسکن، رویدادها در این بخش ظاهر می‌شوند."
-                  : "No platform activities tracked for this organization. Activities appear as you audit pages."}
+                  ? "فعالیت اخیری در ارتباط با این مستأجر شناسایی نگردید. با اجرای کوئری یا اسکن، رویدادها در این بخش ظاهر می‌شوند." :"No platform activities tracked for this organization. Activities appear as you audit pages."}
               </p>
             </div>
           </div>

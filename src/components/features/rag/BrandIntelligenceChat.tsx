@@ -139,9 +139,7 @@ export const BrandIntelligenceChat: React.FC = () => {
         {messages.map((msg) => {
           // Dynamic text content localization without setState triggers inside effects
           const content = msg.id === "msg-greet"
-            ? (language === "fa"
-              ? "درود بر شما. من دستیار هوشمندی برند Optimus AI هستم. بر مبنای اسناد و تحلیل‌های استخراج‌شده، هر سوالی در رابطه با وضعیت سهم صدای برند خود، رتبه‌بندی رقیبان، یا احساسات کاربران دارید بپرسید."
-              : "Hello. I am your Optimus AI Brand Assistant. Ask me anything about your brand's presence, comparative rankings, or user sentiment metrics across AI model queries.")
+            ? (language === "fa" ?"درود بر شما. من دستیار هوشمندی برند Optimus AI هستم. بر مبنای اسناد و تحلیل‌های استخراج‌شده، هر سوالی در رابطه با وضعیت سهم صدای برند خود، رتبه‌بندی رقیبان، یا احساسات کاربران دارید بپرسید." :"Hello. I am your Optimus AI Brand Assistant. Ask me anything about your brand's presence, comparative rankings, or user sentiment metrics across AI model queries.")
             : msg.content;
 
           return (
@@ -156,9 +154,7 @@ export const BrandIntelligenceChat: React.FC = () => {
                 className={`
                   px-4 py-3 rounded-2xl text-xs leading-relaxed transition-all duration-300
                   ${
-                    msg.role === "user"
-                      ? "bg-gradient-to-br from-[var(--color-primary-600)] to-[var(--color-primary-700)] text-white rounded-br-none shadow-[0_6px_20px_-4px_color-mix(in_srgb,var(--color-primary-600)_45%,transparent)]"
-                      : "glass-panel text-[var(--text-primary)] rounded-bl-none"
+                    msg.role === "user" ?"bg-gradient-to-br from-[var(--color-primary-600)] to-[var(--color-primary-700)] text-white rounded-br-none shadow-[0_6px_20px_-4px_color-mix(in_srgb,var(--color-primary-600)_45%,transparent)]" :"glass-panel text-[var(--text-primary)] rounded-bl-none"
                   }
                 `}
               >
@@ -267,9 +263,7 @@ export const BrandIntelligenceChat: React.FC = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={
-            language === "fa"
-              ? "سوال خود را بنویسید (مثال: رتبه برند در Claude چطور است؟)..."
-              : "Type your brand visibility question..."
+            language === "fa" ?"سوال خود را بنویسید (مثال: رتبه برند در Claude چطور است؟)..." :"Type your brand visibility question..."
           }
           className="
             flex-1 px-4 py-2.5 text-xs rounded-[var(--radius-md)] outline-none transition-all duration-300
