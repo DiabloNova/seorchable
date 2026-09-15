@@ -72,29 +72,39 @@ export default function VerifyEmailPage({ params }: { params: Promise<{ locale: 
 
     setIsLoading(true);
     try {
-      // Simulate backend API code check
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const { verifyEmailAction } = await import("@/app/actions/auth");
+      await verifyEmailAction(code);
 
       setIsSuccess(true);
+      // Do not redirect directly to dashboard as session is not established.
+      // Send them to login to enter credentials.
       setTimeout(() => {
-        router.push(`/${locale}/dashboard`);
+        router.push(`/${locale}/login`);
       }, 1500);
     } catch (err: unknown) {
-      setSubmitError(isFa ? "کد تایید نامعتبر یا منقضی شده است." : "The verification code is invalid or has expired.");
+      const errMsg = err instanceof Error ? err.message : String(err);
+      setSubmitError(errMsg);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     if (resendCooldown > 0) return;
+    if (!emailParam) return;
 
-    // Simulate backend sending a new code
-    setResendCooldown(60);
-    alert(isFa
-      ? "کد تایید جدید مجدداً ارسال شد."
-      : "A new confirmation code has been dispatched."
-    );
+    try {
+      const { resendVerificationAction } = await import("@/app/actions/auth");
+      await resendVerificationAction(emailParam);
+
+      setResendCooldown(60);
+      alert(isFa
+        ? "کد تایید جدید مجدداً ارسال شد."
+        : "A new confirmation code has been dispatched."
+      );
+    } catch (err) {
+      setSubmitError(isFa ? "خطا در ارسال مجدد کد." : "Error resending code.");
+    }
   };
 
   return (

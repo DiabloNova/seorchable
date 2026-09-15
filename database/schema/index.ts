@@ -1235,3 +1235,5 @@ export const monitoringAlerts = pgTable("monitoring_alerts", {
     ...tenantPolicy("organization_id")
   ];
 });
+export * from './verification-token';
+export * from './password-reset-token';

@@ -1,6 +1,7 @@
 import { cookies as nextCookies } from "next/headers";
 import crypto from "crypto";
 import { User, Session } from "@/types/auth";
+import { TenantContextManager } from "@/core/database/tenant-context";
 
 let cookiesFn = nextCookies;
 
@@ -107,6 +108,27 @@ export async function getSession(): Promise<Session | null> {
 
     if (new Date(payload.expiresAt) < new Date()) {
       return null; // Expired
+    }
+
+    // Verify session_version against database for global invalidation support
+    let isValidVersion = false;
+    try {
+      await TenantContextManager.runWithSystemContext(null, "sys-verify-session", async () => {
+        const client = TenantContextManager.getDbClient();
+        if (client) {
+          const { rows } = await client.query("SELECT session_version FROM users WHERE id = $1 AND deleted_at IS NULL", [payload.user.id]);
+          if (rows[0] && rows[0].session_version === payload.user.sessionVersion) {
+            isValidVersion = true;
+          }
+        }
+      });
+    } catch (dbErr) {
+      // If DB fails, fail closed securely
+      return null;
+    }
+
+    if (!isValidVersion) {
+      return null; // Session version mismatch
     }
 
     return {

@@ -7,7 +7,7 @@ import { loginAction, logoutAction, getServerSessionAction, registerAction } fro
 interface AuthContextType {
   session: Session;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, workspaceName: string) => Promise<void>;
   logout: () => Promise<void>;
   hasPermission: (requiredRole: UserRole) => boolean;
 }
@@ -62,16 +62,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (name: string, email: string, password: string, workspaceName: string) => {
     setSession((prev) => ({ ...prev, status: "loading" }));
 
     // Secure server-side registration strictly on the server to prevent client-controlled spoofing
-    const user = await registerAction(name, email, password);
+    await registerAction(name, email, password, workspaceName);
 
+    // Registration does not authenticate the user; email verification is required.
     setSession({
-      user,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      status: "authenticated",
+      user: null,
+      expiresAt: null,
+      status: "unauthenticated",
     });
   };
 

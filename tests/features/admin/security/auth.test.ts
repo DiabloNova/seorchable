@@ -89,14 +89,14 @@ async function setupDatabase() {
   const hash = await argon2.hash("validpassword", { type: argon2.argon2id, memoryCost: 19456, timeCost: 2 } as any);
 
   dbUsers = [
-    { id: 'usr-test-1', name: 'Valid User', email: 'valid@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: ['127.0.0.1'] },
-    { id: 'usr-test-2', name: 'Locked User', email: 'locked@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 6, challenge_required: 1, trusted_ips: null },
-    { id: 'usr-test-3', name: 'Delay User 1', email: 'delay1@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 3, challenge_required: 0, trusted_ips: null },
-    { id: 'usr-test-8', name: 'Delay User 4', email: 'delay_test4@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 4, challenge_required: 0, trusted_ips: null },
-    { id: 'usr-test-4', name: 'Delay User 2', email: 'delay2@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 5, challenge_required: 0, trusted_ips: null },
-    { id: 'usr-test-5', name: 'Untrusted User', email: 'untrusted@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: ['192.168.1.1'] },
-    { id: 'usr-test-7', name: 'Unverified User', email: 'unverified@test.com', password_hash: hash, is_active: 1, email_verified: 0, failed_login_attempts: 0, challenge_required: 0, trusted_ips: null },
-    { id: 'usr-test-6', name: 'Concurrent User', email: 'concurrent@test.com', password_hash: hash, is_active: 1, email_verified: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: null }
+    { id: 'usr-test-1', name: 'Valid User', email: 'valid@test.com', password_hash: hash, is_active: 1, email_verified: 1, session_version: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: ['127.0.0.1'] },
+    { id: 'usr-test-2', name: 'Locked User', email: 'locked@test.com', password_hash: hash, is_active: 1, email_verified: 1, session_version: 1, failed_login_attempts: 6, challenge_required: 1, trusted_ips: null },
+    { id: 'usr-test-3', name: 'Delay User 1', email: 'delay1@test.com', password_hash: hash, is_active: 1, email_verified: 1, session_version: 1, failed_login_attempts: 3, challenge_required: 0, trusted_ips: null },
+    { id: 'usr-test-8', name: 'Delay User 4', email: 'delay_test4@test.com', password_hash: hash, is_active: 1, email_verified: 1, session_version: 1, failed_login_attempts: 4, challenge_required: 0, trusted_ips: null },
+    { id: 'usr-test-4', name: 'Delay User 2', email: 'delay2@test.com', password_hash: hash, is_active: 1, email_verified: 1, session_version: 1, failed_login_attempts: 5, challenge_required: 0, trusted_ips: null },
+    { id: 'usr-test-5', name: 'Untrusted User', email: 'untrusted@test.com', password_hash: hash, is_active: 1, email_verified: 1, session_version: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: ['192.168.1.1'] },
+    { id: 'usr-test-7', name: 'Unverified User', email: 'unverified@test.com', password_hash: hash, is_active: 1, email_verified: 0, session_version: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: null },
+    { id: 'usr-test-6', name: 'Concurrent User', email: 'concurrent@test.com', password_hash: hash, is_active: 1, email_verified: 1, session_version: 1, failed_login_attempts: 0, challenge_required: 0, trusted_ips: null }
   ];
 
   dbOrgs = [{ id: 'org-test-1', name: 'Test Org', slug: 'test-org' }];
@@ -213,9 +213,9 @@ export async function runAuthTests() {
 
   // Test 9: Successful Registration
   try {
-    const newUser = await import("../../../../src/app/actions/auth").then(m => m.registerAction("New User", "new@test.com", "newpassword123"));
-    assert.equal(newUser.role, "viewer", "Default role must be viewer");
-    assert.ok(newUser.id.length > 30, "User ID generated as UUID");
+    const res = await import("../../../../src/app/actions/auth").then(m => m.registerAction("New User", "new@test.com", "newpassword123", "New Workspace"));
+    assert.equal(res.success, true, "Registration must succeed");
+    assert.equal(res.email, "new@test.com", "Registration must return email");
 
     // Attempt to login should fail since they are unverified
     try {
