@@ -72,8 +72,11 @@ export default function VerifyEmailPage({ params }: { params: Promise<{ locale: 
 
     setIsLoading(true);
     try {
-      // Simulate backend API code check
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Real backend API code check
+      const { verifyEmailAction } = await import("@/app/actions/auth");
+      const success = await verifyEmailAction(emailParam || "", code);
+      if (!success) throw new Error("Invalid code");
+
 
       setIsSuccess(true);
       setTimeout(() => {
