@@ -16,86 +16,52 @@ export default function VerifyEmailPage({ params }: { params: Promise<{ locale: 
   const isFa = locale === "fa";
   const router = useRouter();
   const searchParams = useSearchParams();
-  const emailParam = searchParams?.get("email") || "";
+  const tokenParam = searchParams?.get("token") || "";
 
-  const [code, setCode] = useState("");
-  const [codeError, setCodeError] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(60);
-
-  // Resend code countdown timer
-  useEffect(() => {
-    if (resendCooldown <= 0) return;
-    const timer = setTimeout(() => {
-      setResendCooldown((prev) => prev - 1);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [resendCooldown]);
+  const [hasAttempted, setHasAttempted] = useState(false);
 
   const strings = {
     title: isFa ? "تایید ایمیل سازمانی" : "Verify Your Email Address",
     desc: isFa
-      ? `یک کد تایید ۶ رقمی به آدرس ${emailParam || "ایمیل شما"} ارسال گردید. لطفاً آن را وارد نمایید.`
-      : `We sent a 6-digit confirmation code to ${emailParam || "your email"}. Enter it to continue.`,
-    codeLabel: isFa ? "کد تایید ۶ رقمی" : "6-Digit Verification Code",
-    codePlaceholder: isFa ? "مثلاً: ۱۲۳۴۵۶" : "e.g. 123456",
+      ? "در حال تایید آدرس ایمیل شما، لطفاً شکیبا باشید..."
+      : "Verifying your email address, please wait...",
     submitBtn: isFa ? "تایید نهایی و فعال‌سازی" : "Verify & Activate Workspace",
-    loading: isFa ? "در حال اعتبارسنجی کد..." : "Validating code...",
-    resendBtn: isFa ? "ارسال مجدد کد تایید" : "Resend Verification Code",
-    resendWait: isFa
-      ? `ارسال مجدد تا ${resendCooldown} ثانیه دیگر`
-      : `Resend code in ${resendCooldown}s`,
+    loading: isFa ? "در حال اعتبارسنجی توکن..." : "Validating token...",
     successTitle: isFa ? "فعال‌سازی با موفقیت انجام شد!" : "Verification Complete!",
     successDesc: isFa
-      ? "ایمیل سازمانی شما تایید گردید. در حال انتقال به پیشخوان کاربری..."
-      : "Your workspace has been successfully verified. Entering the dashboard...",
+      ? "ایمیل سازمانی شما تایید گردید. در حال انتقال به صفحه ورود..."
+      : "Your workspace has been successfully verified. Redirecting to login...",
     backToHome: isFa ? "بازگشت به صفحه اصلی" : "Back to landing page",
-    validationCodeRequired: isFa ? "وارد کردن کد تایید الزامی است." : "Verification code is required.",
-    validationCodeLength: isFa ? "کد تایید باید ۶ رقمی باشد." : "Code must be exactly 6 digits.",
+    missingToken: isFa ? "لینک تایید نامعتبر است. لطفاً از طریق ایمیل ارسال شده اقدام کنید." : "Invalid verification link. Please use the link sent to your email.",
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitError("");
-    setCodeError("");
+  useEffect(() => {
+    if (!tokenParam || hasAttempted) return;
+    setHasAttempted(true);
 
-    if (!code.trim()) {
-      setCodeError(strings.validationCodeRequired);
-      return;
-    }
-    if (code.trim().length !== 6) {
-      setCodeError(strings.validationCodeLength);
-      return;
-    }
+    const verifyToken = async () => {
+      setIsLoading(true);
+      try {
+        const { verifyEmailAction } = await import("@/app/actions/auth");
+        await verifyEmailAction(tokenParam);
 
-    setIsLoading(true);
-    try {
-      // Simulate backend API code check
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+        setIsSuccess(true);
+        setTimeout(() => {
+          router.push(`/${locale}/login`);
+        }, 2000);
+      } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        setSubmitError(errMsg);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-      setIsSuccess(true);
-      setTimeout(() => {
-        router.push(`/${locale}/dashboard`);
-      }, 1500);
-    } catch (err: unknown) {
-      setSubmitError(isFa ? "کد تایید نامعتبر یا منقضی شده است." : "The verification code is invalid or has expired.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleResend = () => {
-    if (resendCooldown > 0) return;
-
-    // Simulate backend sending a new code
-    setResendCooldown(60);
-    alert(isFa
-      ? "کد تایید جدید مجدداً ارسال شد."
-      : "A new confirmation code has been dispatched."
-    );
-  };
+    verifyToken();
+  }, [tokenParam, hasAttempted, locale, router]);
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center p-4 bg-[var(--background)] relative overflow-hidden" style={{ direction: isFa ? "rtl" : "ltr" }}>
@@ -123,7 +89,7 @@ export default function VerifyEmailPage({ params }: { params: Promise<{ locale: 
               {isSuccess ? strings.successTitle : strings.title}
             </CardTitle>
             <CardDescription className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed mt-1">
-              {isSuccess ? strings.successDesc : strings.desc}
+              {isSuccess ? strings.successDesc : (tokenParam ? strings.desc : strings.missingToken)}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -132,64 +98,23 @@ export default function VerifyEmailPage({ params }: { params: Promise<{ locale: 
                 <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
                   <CheckCircle2 size={36} className="animate-pulse" />
                 </div>
-                <div className="text-sm font-semibold text-[var(--text-primary)]">{isFa ? "درحال ورود به محیط داشبورد..." : "Loading Workspace Dashboard..."}</div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="flex flex-col items-center justify-center space-y-4">
                 {submitError && (
-                  <div className="p-3.5 rounded-xl border border-[var(--color-error)]/25 bg-[var(--color-error)]/10 text-[var(--color-error)] text-xs flex items-start gap-2 animate-shake">
+                  <div className="w-full p-3.5 rounded-xl border border-[var(--color-error)]/25 bg-[var(--color-error)]/10 text-[var(--color-error)] text-xs flex items-start gap-2 animate-shake">
                     <AlertCircle size={15} className="shrink-0 mt-0.5" />
                     <p className="font-bold">{submitError}</p>
                   </div>
                 )}
 
-                {/* Verification Code Input */}
-                <Input
-                  type="text"
-                  maxLength={6}
-                  label={strings.codeLabel}
-                  placeholder={strings.codePlaceholder}
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                  error={codeError}
-                  disabled={isLoading}
-                  required
-                  className="text-center text-lg font-mono tracking-[0.5em] focus:tracking-[0.5em]"
-                />
-
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  variant="primary"
-                  disabled={isLoading}
-                  className="w-full py-3 mt-2 rounded-xl text-xs font-black flex items-center justify-center gap-2"
-                >
-                  {isLoading ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                      <span>{strings.loading}</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 size={15} />
-                      <span>{strings.submitBtn}</span>
-                    </>
-                  )}
-                </Button>
-
-                {/* Resend Code controls */}
-                <div className="pt-4 border-t border-[var(--border)] text-center flex flex-col items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleResend}
-                    disabled={resendCooldown > 0 || isLoading}
-                    className="text-xs text-[var(--sky-blue-500)] hover:text-[var(--orange-500)] transition-colors font-bold disabled:opacity-50 disabled:pointer-events-none flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <RotateCw size={13} className={isLoading ? "animate-spin" : ""} />
-                    <span>{resendCooldown > 0 ? strings.resendWait : strings.resendBtn}</span>
-                  </button>
-                </div>
-              </form>
+                {isLoading && (
+                  <div className="flex flex-col items-center py-6 gap-3">
+                    <span className="w-8 h-8 border-4 border-[var(--sky-blue-500)]/20 border-t-[var(--sky-blue-500)] rounded-full animate-spin" />
+                    <span className="text-sm font-bold text-[var(--text-secondary)]">{strings.loading}</span>
+                  </div>
+                )}
+              </div>
             )}
           </CardContent>
         </Card>

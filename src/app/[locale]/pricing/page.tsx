@@ -61,7 +61,8 @@ export default function PricingPage() {
         throw new Error(isRtl ? "لطفاً تمام فیلدها را پر کنید." : "Please fill in all details.");
       }
 
-      await register(authName, authEmail, authPassword);
+      const defaultWorkspaceName = `${authName}'s Workspace`;
+      await register(authName, authEmail, authPassword, defaultWorkspaceName);
 
       // Successfully authenticated, close auth modal and open Workspace Creation modal!
       setIsAuthOpen(false);
