@@ -312,7 +312,7 @@ export async function runAuthTests() {
         require("../../../../src/services/auth/session");
       });
     } catch (e: any) {
-      if (e.message && e.message.includes("CRITICAL SECURITY ERROR")) {
+      if (e.message && e.message.includes("SESSION_SECRET is required")) {
         crashed = true;
       }
     }
