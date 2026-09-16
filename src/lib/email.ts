@@ -90,7 +90,8 @@ async function sendEmail({ to, subject, html }: SendEmailParams) {
     console.warn("[Email Utility] RESEND_API_KEY is not configured.");
     console.warn(`[Email Utility] Mocking email send to: ${to}`);
     console.warn(`[Email Utility] Subject: ${subject}`);
-    console.log(`[Email Utility] HTML Content:\n${html}\n`);
+    // Security: Never log the raw HTML because it contains the unhashed verification/reset token.
+    console.log(`[Email Utility] HTML Content: [REDACTED FOR SECURITY]\n`);
     return { success: true, mocked: true };
   }
 
@@ -115,7 +116,7 @@ async function sendEmail({ to, subject, html }: SendEmailParams) {
 }
 
 /**
- * Sends a verification email (link or code).
+ * Sends a verification email containing a secure link.
  */
 export async function sendVerificationEmail(email: string, name: string, verificationLink: string) {
   const subject = "تایید آدرس ایمیل - SEOrchable";

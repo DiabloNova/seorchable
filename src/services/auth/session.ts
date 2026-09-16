@@ -13,10 +13,15 @@ export function setCookiesMock(mockFn: any) {
 }
 
 // Resolve the session secret safely.
-// Generates a cryptographically secure random key if SESSION_SECRET is not configured in the environment.
-// This prevents silent use of any guessable, insecure hard-coded fallback secrets,
-// and ensures Next.js "pnpm run build" can execute page data collection successfully.
-const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex");
+// In production, require SESSION_SECRET to be defined, failing closed if missing.
+// However, allow a fallback strictly during pnpm build (static page generation).
+let SESSION_SECRET = process.env.SESSION_SECRET;
+if (!SESSION_SECRET) {
+  if (process.env.NODE_ENV === "production" && process.env.npm_lifecycle_event !== "build") {
+    throw new Error("CRITICAL SECURITY ERROR: SESSION_SECRET is missing in production environment. Aborting.");
+  }
+  SESSION_SECRET = crypto.randomBytes(32).toString("hex");
+}
 const COOKIE_NAME = "seorchable_session";
 const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -26,7 +31,7 @@ interface SessionPayload {
 }
 
 export function signPayload(payloadStr: string): string {
-  return crypto.createHmac("sha256", SESSION_SECRET).update(payloadStr).digest("hex");
+  return crypto.createHmac("sha256", SESSION_SECRET as string).update(payloadStr).digest("hex");
 }
 
 export function verifyPayload(payloadStr: string, signature: string): boolean {

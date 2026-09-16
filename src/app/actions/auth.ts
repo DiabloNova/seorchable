@@ -87,6 +87,8 @@ export async function loginAction(email: string, password: string): Promise<User
   }
 
   // Check hard locks
+  // Note: These distinct secondary messages are intentional security guardrails after the initial lookup.
+  // They apply to valid users who are locked or challenged, and they do not weaken our anti-enumeration for invalid accounts.
   if (userRecord.locked_until && new Date(userRecord.locked_until) > new Date()) {
     throw new Error("Account is temporarily locked due to too many failed attempts. Please try again later.");
   }
@@ -184,7 +186,7 @@ export async function verifyEmailAction(token: string): Promise<boolean> {
   await checkRateLimit("verify", ip, 5, 60); // 5 attempts per minute
 
   if (!token) {
-    throw new Error("Invalid verification code format.");
+    throw new Error("Invalid verification token format.");
   }
 
   const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
@@ -206,15 +208,15 @@ export async function verifyEmailAction(token: string): Promise<boolean> {
       const tokenRecord = rows[0];
 
       if (!tokenRecord) {
-        throw new Error("Invalid or expired verification code.");
+        throw new Error("Invalid or expired verification token.");
       }
 
       if (tokenRecord.used_at) {
-        throw new Error("This verification code has already been used.");
+        throw new Error("This verification token has already been used.");
       }
 
       if (new Date(tokenRecord.expires_at) < new Date()) {
-        throw new Error("This verification code has expired.");
+        throw new Error("This verification token has expired.");
       }
 
       // Mark token as used
@@ -239,9 +241,9 @@ export async function verifyEmailAction(token: string): Promise<boolean> {
 }
 
 /**
- * Resends the verification code for the given email.
+ * Resends the verification email for the given email.
  */
-export async function resendVerificationAction(email: string): Promise<void> {
+export async function resendVerificationAction(email: string, locale: string = "fa"): Promise<void> {
   const ip = await getClientIp();
   await checkRateLimit("resend", ip, 3, 60); // 3 resends per minute
 
@@ -263,7 +265,7 @@ export async function resendVerificationAction(email: string): Promise<void> {
       return;
     }
 
-    // Generate new code and invalidate old ones or simply create a new one
+    // Generate new token and invalidate old ones or simply create a new one
     const verificationToken = crypto.randomBytes(32).toString('base64url');
     const tokenHash = crypto.createHash('sha256').update(verificationToken).digest('hex');
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -281,7 +283,7 @@ export async function resendVerificationAction(email: string): Promise<void> {
       throw error;
     }
 
-    const verificationLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/fa/verify-email?token=${verificationToken}`;
+    const verificationLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/${locale}/verify-email?token=${verificationToken}`;
     sendVerificationEmail(email, userRecord.name, verificationLink).catch((err) => {
       console.error("Failed to resend verification email:", err);
     });
@@ -291,7 +293,7 @@ export async function resendVerificationAction(email: string): Promise<void> {
 /**
  * Requests a password reset and sends a password reset email to the user.
  */
-export async function requestPasswordResetAction(email: string): Promise<void> {
+export async function requestPasswordResetAction(email: string, locale: string = "fa"): Promise<void> {
   const ip = await getClientIp();
   await checkRateLimit("req-reset", ip, 3, 60); // 3 requests per minute
 
@@ -313,7 +315,7 @@ export async function requestPasswordResetAction(email: string): Promise<void> {
 
       await client.query("INSERT INTO password_reset_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, $3)", [userRecord.id, tokenHash, expiresAt.toISOString()]);
 
-      const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/fa/reset-password?token=${resetToken}`;
+      const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/${locale}/reset-password?token=${resetToken}`;
 
       sendPasswordResetEmail(email, resetLink).catch((err) => {
         console.error("Failed to send password reset email:", err);
@@ -394,7 +396,7 @@ export async function resetPasswordAction(token: string, newPassword: string): P
 /**
  * Registers user and resolves identity/workspace strictly on the server.
  */
-export async function registerAction(name: string, email: string, password: string, workspaceName: string): Promise<{ success: boolean; email: string }> {
+export async function registerAction(name: string, email: string, password: string, workspaceName: string, locale: string = "fa"): Promise<{ success: boolean; email: string }> {
   const ip = await getClientIp();
   await checkRateLimit("register", ip, 5, 60);
 
@@ -455,7 +457,7 @@ export async function registerAction(name: string, email: string, password: stri
 
   if (accountCreated) {
     // Send email
-    const verificationLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/fa/verify-email?token=${verificationToken}`;
+    const verificationLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/${locale}/verify-email?token=${verificationToken}`;
     sendVerificationEmail(email, name, verificationLink).catch((err) => {
       console.error("Failed to send verification email:", err);
     });
@@ -464,7 +466,7 @@ export async function registerAction(name: string, email: string, password: stri
     // Technically, to have identical timing, we would do an Argon2 dummy hash inside the query context if it exists.
     // We will do that right above this in the query execution.
     const { sendAccountExistsEmail } = await import("@/lib/email");
-    const loginLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/fa/login`;
+    const loginLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/${locale}/login`;
     sendAccountExistsEmail(email, loginLink).catch(err => {
       console.error("Failed to send generic account existing email:", err);
     });

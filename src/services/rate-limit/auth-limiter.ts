@@ -1,15 +1,22 @@
 import { headers } from "next/headers";
-import { Redis } from "@upstash/redis";
 
-let redis: Redis | null = null;
+let redis: any = null;
 if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
-  redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  });
+  try {
+    // Dynamically import @upstash/redis so that the process doesn't crash
+    // or fail to build if the package is missing when Redis isn't explicitly configured.
+    const { Redis } = require("@upstash/redis");
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+  } catch (err) {
+    console.error("[RateLimiter] Failed to initialize Upstash Redis despite env vars being present. Falling back to memory store.", err);
+    redis = null;
+  }
 }
 
-// In-memory fallback for local dev or when Redis is not configured
+// In-memory fallback for local dev, missing dependencies, or when Redis is not configured
 const memoryStore = new Map<string, { count: number, resetAt: number }>();
 
 export async function checkRateLimit(action: string, identifier: string, limit: number, windowSecs: number): Promise<void> {
@@ -22,7 +29,7 @@ export async function checkRateLimit(action: string, identifier: string, limit: 
     multi.pttl(key);
     const results = await multi.exec() as [number, number];
     let count = results[0];
-    let pttl = results[1];
+    const pttl = results[1];
 
     if (pttl === -1 || pttl === -2) {
       await redis.expire(key, windowSecs);
