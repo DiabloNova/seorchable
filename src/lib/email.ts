@@ -132,6 +132,20 @@ export async function sendVerificationEmail(email: string, name: string, verific
   return sendEmail({ to: email, subject, html });
 }
 
+export async function sendAccountExistsEmail(email: string, loginLink: string) {
+  const subject = "ایجاد حساب کاربری - SEOrchable";
+  const content = `
+    <p>کاربر گرامی،</p>
+    <p>درخواستی مبنی بر ثبت‌نام با این آدرس ایمیل در سیستم ثبت شده است. اما حسابی با این ایمیل از قبل در سیستم ما وجود دارد.</p>
+    <p>برای ورود به حساب کاربری خود، لطفاً روی دکمه زیر کلیک کنید:</p>
+    <a href="${loginLink}" class="btn">ورود به حساب کاربری</a>
+    <p>اگر شما این درخواست را نداده‌اید، حساب شما امن است و نیاز به انجام کاری نیست.</p>
+  `;
+
+  const html = getBaseTemplate(subject, content);
+  return sendEmail({ to: email, subject, html });
+}
+
 /**
  * Sends a password reset email.
  */

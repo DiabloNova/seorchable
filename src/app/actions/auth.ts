@@ -9,6 +9,7 @@ import * as crypto from "crypto";
 import { sendVerificationEmail, sendPasswordResetEmail } from "@/lib/email";
 import * as argon2 from "argon2";
 import { headers } from "next/headers";
+import { checkRateLimit, getClientIp } from "@/services/rate-limit/auth-limiter";
 
 const ARGON2_OPTIONS: any = {
   type: argon2.argon2id,
@@ -51,10 +52,9 @@ export async function loginAction(email: string, password: string): Promise<User
     throw new Error("Password is required");
   }
 
-  const reqHeaders = await headers();
-  // Using x-forwarded-for for testing.
-  // Trusted IP checks should ideally rely on gateway headers, but we extract a base IP here.
-  const ip = reqHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const ip = await getClientIp();
+  await checkRateLimit("login", ip, 10, 60); // 10 attempts per minute per IP
+  await checkRateLimit("login-email", normalizedEmail, 10, 60);
 
   // Step 1: Pre-auth data fetch. No locks held.
   let userRecord: any = null;
@@ -74,13 +74,13 @@ export async function loginAction(email: string, password: string): Promise<User
     throw new Error("Invalid credentials or user not found.");
   }
 
-  if (userRecord.is_active === 0 || userRecord.is_active === false) {
+  if (userRecord.email_verified === false || userRecord.email_verified === 0) {
     await getDummyHash();
     await argon2.verify(dummyHash!, password);
     throw new Error("Invalid credentials or user not found.");
   }
 
-  if (userRecord.email_verified === 0 || userRecord.email_verified === false) {
+  if (userRecord.is_active === 0 || userRecord.is_active === false) {
     await getDummyHash();
     await argon2.verify(dummyHash!, password);
     throw new Error("Invalid credentials or user not found.");
@@ -179,12 +179,15 @@ export async function loginAction(email: string, password: string): Promise<User
   });
 }
 
-export async function verifyEmailAction(code: string): Promise<boolean> {
-  if (!code || code.length !== 6) {
+export async function verifyEmailAction(token: string): Promise<boolean> {
+  const ip = await getClientIp();
+  await checkRateLimit("verify", ip, 5, 60); // 5 attempts per minute
+
+  if (!token) {
     throw new Error("Invalid verification code format.");
   }
 
-  const tokenHash = crypto.createHash('sha256').update(code).digest('hex');
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
 
   return await TenantContextManager.runWithSystemContext(null, "sys-verify-email", async () => {
     const client = TenantContextManager.getDbClient();
@@ -239,7 +242,11 @@ export async function verifyEmailAction(code: string): Promise<boolean> {
  * Resends the verification code for the given email.
  */
 export async function resendVerificationAction(email: string): Promise<void> {
+  const ip = await getClientIp();
+  await checkRateLimit("resend", ip, 3, 60); // 3 resends per minute
+
   const normalizedEmail = email.trim().toLowerCase();
+  await checkRateLimit("resend-email", normalizedEmail, 3, 60);
 
   await TenantContextManager.runWithSystemContext(null, "sys-resend-verification", async () => {
     const client = TenantContextManager.getDbClient();
@@ -257,15 +264,15 @@ export async function resendVerificationAction(email: string): Promise<void> {
     }
 
     // Generate new code and invalidate old ones or simply create a new one
-    const verificationCode = crypto.randomInt(100000, 1000000).toString();
-    const tokenHash = crypto.createHash('sha256').update(verificationCode).digest('hex');
+    const verificationToken = crypto.randomBytes(32).toString('base64url');
+    const tokenHash = crypto.createHash('sha256').update(verificationToken).digest('hex');
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     try {
       await client.query("BEGIN");
 
-      // Soft 'invalidate' existing pending tokens for this user by marking them used or just creating a new one
-      // We will just let them expire and add a new one.
+      // Soft 'invalidate' existing pending tokens for this user by marking them used
+      await client.query("UPDATE verification_tokens SET used_at = now() WHERE user_id = $1 AND used_at IS NULL", [userRecord.id]);
 
       await client.query("INSERT INTO verification_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, $3)", [userRecord.id, tokenHash, expiresAt.toISOString()]);
       await client.query("COMMIT");
@@ -274,7 +281,8 @@ export async function resendVerificationAction(email: string): Promise<void> {
       throw error;
     }
 
-    sendVerificationEmail(email, userRecord.name, verificationCode).catch((err) => {
+    const verificationLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/fa/verify-email?token=${verificationToken}`;
+    sendVerificationEmail(email, userRecord.name, verificationLink).catch((err) => {
       console.error("Failed to resend verification email:", err);
     });
   });
@@ -284,13 +292,18 @@ export async function resendVerificationAction(email: string): Promise<void> {
  * Requests a password reset and sends a password reset email to the user.
  */
 export async function requestPasswordResetAction(email: string): Promise<void> {
+  const ip = await getClientIp();
+  await checkRateLimit("req-reset", ip, 3, 60); // 3 requests per minute
+
+  const normalizedEmail = email.trim().toLowerCase();
+  await checkRateLimit("req-reset-email", normalizedEmail, 3, 60);
   await TenantContextManager.runWithSystemContext(null, "sys-password-reset", async () => {
     const client = TenantContextManager.getDbClient();
     if (!client) {
         throw new Error("Failed to get DB client in system context");
     }
 
-    const { rows: userRows } = await client.query("SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL", [email]);
+    const { rows: userRows } = await client.query("SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL", [normalizedEmail]);
     const userRecord = userRows[0];
 
     if (userRecord) {
@@ -300,7 +313,7 @@ export async function requestPasswordResetAction(email: string): Promise<void> {
 
       await client.query("INSERT INTO password_reset_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, $3)", [userRecord.id, tokenHash, expiresAt.toISOString()]);
 
-      const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/reset-password?token=${resetToken}`;
+      const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/fa/reset-password?token=${resetToken}`;
 
       sendPasswordResetEmail(email, resetLink).catch((err) => {
         console.error("Failed to send password reset email:", err);
@@ -316,6 +329,9 @@ export async function requestPasswordResetAction(email: string): Promise<void> {
  * Resets the user's password using a valid reset token.
  */
 export async function resetPasswordAction(token: string, newPassword: string): Promise<boolean> {
+  const ip = await getClientIp();
+  await checkRateLimit("reset-pw", ip, 5, 60);
+
   if (!token || !newPassword) {
     throw new Error("Token and new password are required.");
   }
@@ -363,12 +379,7 @@ export async function resetPasswordAction(token: string, newPassword: string): P
         [hashedPassword, tokenRecord.user_id]
       );
 
-      // Note: We don't have a specific persistent session store to invalidate existing sessions
-      // other than the JWT secret which is global. Since Next.js signs cookies statelessly,
-      // changing the secret revokes all sessions. For a single user, we would typically check a
-      // session_version column in the users table during session validation, but that's beyond
-      // the current schema. The instructions say "existing-session invalidation" - we'll implement
-      // what we can here by clearing the current cookie if they are logged in.
+      // Clear the current active session cookie for this device
       await invalidateSession();
 
       await client.query("COMMIT");
@@ -384,6 +395,9 @@ export async function resetPasswordAction(token: string, newPassword: string): P
  * Registers user and resolves identity/workspace strictly on the server.
  */
 export async function registerAction(name: string, email: string, password: string, workspaceName: string): Promise<{ success: boolean; email: string }> {
+  const ip = await getClientIp();
+  await checkRateLimit("register", ip, 5, 60);
+
   const normalizedEmail = email.trim().toLowerCase();
   if (!password) {
     throw new Error("Password is required");
@@ -391,9 +405,9 @@ export async function registerAction(name: string, email: string, password: stri
 
   const hashedPassword = await argon2.hash(password, ARGON2_OPTIONS as any) as unknown as string;
 
-  // Generate a secure random 6-digit verification code
-  const verificationCode = crypto.randomInt(100000, 1000000).toString();
-  const tokenHash = crypto.createHash('sha256').update(verificationCode).digest('hex');
+  // Generate a secure random high-entropy token
+  const verificationToken = crypto.randomBytes(32).toString('base64url');
+  const tokenHash = crypto.createHash('sha256').update(verificationToken).digest('hex');
 
   const accountCreated = await TenantContextManager.runWithSystemContext(null, "sys-register", async () => {
     const client = TenantContextManager.getDbClient();
@@ -404,8 +418,9 @@ export async function registerAction(name: string, email: string, password: stri
     // Check if user exists
     const { rows: existingUser } = await client.query("SELECT id FROM users WHERE email = $1", [normalizedEmail]);
     if (existingUser.length > 0) {
-        // Return success to prevent enumeration, but do not create the account
-        // Typically, we might send an email saying "An account with this email already exists"
+        // Run dummy hash to equalize timing before returning false
+        await getDummyHash();
+        await argon2.verify(dummyHash!, password);
         return false;
     }
 
@@ -440,13 +455,17 @@ export async function registerAction(name: string, email: string, password: stri
 
   if (accountCreated) {
     // Send email
-    sendVerificationEmail(email, name, verificationCode).catch((err) => {
+    const verificationLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/fa/verify-email?token=${verificationToken}`;
+    sendVerificationEmail(email, name, verificationLink).catch((err) => {
       console.error("Failed to send verification email:", err);
     });
   } else {
-    // Optionally send "Account already exists" email to avoid enumeration but still notify
-    const loginLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/login`;
-    sendPasswordResetEmail(email, loginLink).catch(err => {
+    // We already returned a generic success. Let's send an email out of band so we don't leak info through timing.
+    // Technically, to have identical timing, we would do an Argon2 dummy hash inside the query context if it exists.
+    // We will do that right above this in the query execution.
+    const { sendAccountExistsEmail } = await import("@/lib/email");
+    const loginLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.seorchable.com'}/fa/login`;
+    sendAccountExistsEmail(email, loginLink).catch(err => {
       console.error("Failed to send generic account existing email:", err);
     });
   }

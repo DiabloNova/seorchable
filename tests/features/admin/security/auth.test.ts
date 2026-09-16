@@ -112,11 +112,14 @@ async function setupDatabase() {
 }
 
 
+import { resetRateLimitStore } from "../../../../src/services/rate-limit/auth-limiter";
+
 export async function runAuthTests() {
   let advancedTime = 0;
   const originalSetTimeout = global.setTimeout;
   global.setTimeout = ((cb: any, ms: any) => { advancedTime += ms as number; (cb as () => void)(); }) as unknown as typeof global.setTimeout;
   try {
+  resetRateLimitStore();
 
   setCookiesMock(() => ({
   set: () => {},
@@ -236,15 +239,15 @@ export async function runAuthTests() {
   // Test 7: Concurrency
   // If multiple logins are fired at once against the same account, the attempts should still safely increment up to the threshold
   try {
+    // Clear rate limits so we don't trip them
+    resetRateLimitStore();
     const promises = [];
     for (let i = 0; i < 7; i++) {
-       // We use delay1@test.com which already has 3 failures from before (if not reset).
-       // Actually let's test against valid@test.com which should currently have 0 failures.
        promises.push(loginAction("concurrent@test.com", "wrongpassword").catch(e => e));
     }
     await Promise.all(promises);
 
-    // Check final DB state for valid@test.com
+    // Check final DB state for concurrent@test.com
     const userState = dbUsers.find(u => u.email === "concurrent@test.com");
     assert.equal(userState.failed_login_attempts, 7, "DB should atomically increment all 7 failures");
     assert.equal(userState.challenge_required, 1, "Challenge state should be flipped based on atomic returns");
