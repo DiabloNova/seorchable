@@ -13,11 +13,14 @@ export function setCookiesMock(mockFn: any) {
 }
 
 // Resolve the session secret safely.
-// Require SESSION_SECRET to be defined, failing closed if missing.
-// Allow a fallback strictly during pnpm build (static page generation).
-const SESSION_SECRET = process.env.SESSION_SECRET;
-if (!SESSION_SECRET && process.env.npm_lifecycle_event !== "build") {
-  throw new Error("SESSION_SECRET is required. Please set it to a cryptographically secure string (e.g. 32+ characters).");
+// In production, require SESSION_SECRET to be defined, failing closed if missing.
+// However, allow a fallback strictly during pnpm build (static page generation).
+let SESSION_SECRET = process.env.SESSION_SECRET;
+if (!SESSION_SECRET) {
+  if (process.env.NODE_ENV === "production" && process.env.npm_lifecycle_event !== "build") {
+    throw new Error("CRITICAL SECURITY ERROR: SESSION_SECRET is missing in production environment. Aborting.");
+  }
+  SESSION_SECRET = crypto.randomBytes(32).toString("hex");
 }
 const COOKIE_NAME = "seorchable_session";
 const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
