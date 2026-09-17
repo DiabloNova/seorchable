@@ -214,8 +214,7 @@ export const FreeAuditPanel: React.FC<FreeAuditPanelProps> = ({ onUpgradeClick }
         if (!authName.trim() || !authEmail.trim() || !authPassword.trim()) {
           throw new Error(isRtl ? "لطفاً تمام فیلدها را پر کنید." : "Please fill in all registration fields.");
         }
-        const defaultWorkspaceName = `${authName}'s Workspace`;
-        await register(authName, authEmail, authPassword, defaultWorkspaceName);
+        await register(authName, authEmail, authPassword);
       }
       // Success will trigger the useEffect, resuming the audit!
     } catch (err: unknown) {

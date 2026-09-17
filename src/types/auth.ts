@@ -6,7 +6,6 @@ export interface User {
   email: string;
   role: UserRole;
   workspaceId: string;
-  sessionVersion: number;
 }
 
 export interface Session {

@@ -90,8 +90,7 @@ async function sendEmail({ to, subject, html }: SendEmailParams) {
     console.warn("[Email Utility] RESEND_API_KEY is not configured.");
     console.warn(`[Email Utility] Mocking email send to: ${to}`);
     console.warn(`[Email Utility] Subject: ${subject}`);
-    // Security: Never log the raw HTML because it contains the unhashed verification/reset token.
-    console.log(`[Email Utility] HTML Content: [REDACTED FOR SECURITY]\n`);
+    console.log(`[Email Utility] HTML Content:\n${html}\n`);
     return { success: true, mocked: true };
   }
 
@@ -116,7 +115,7 @@ async function sendEmail({ to, subject, html }: SendEmailParams) {
 }
 
 /**
- * Sends a verification email containing a secure link.
+ * Sends a verification email (link or code).
  */
 export async function sendVerificationEmail(email: string, name: string, verificationLink: string) {
   const subject = "تایید آدرس ایمیل - SEOrchable";
@@ -127,20 +126,6 @@ export async function sendVerificationEmail(email: string, name: string, verific
     <p>اگر دکمه بالا کار نمی‌کند، می‌توانید لینک زیر را در مرورگر خود کپی و پیست کنید:</p>
     <p dir="ltr" style="text-align: left; word-break: break-all; color: #3b82f6;">${verificationLink}</p>
     <p>اگر شما این درخواست را نداده‌اید، لطفاً این ایمیل را نادیده بگیرید.</p>
-  `;
-
-  const html = getBaseTemplate(subject, content);
-  return sendEmail({ to: email, subject, html });
-}
-
-export async function sendAccountExistsEmail(email: string, loginLink: string) {
-  const subject = "ایجاد حساب کاربری - SEOrchable";
-  const content = `
-    <p>کاربر گرامی،</p>
-    <p>درخواستی مبنی بر ثبت‌نام با این آدرس ایمیل در سیستم ثبت شده است. اما حسابی با این ایمیل از قبل در سیستم ما وجود دارد.</p>
-    <p>برای ورود به حساب کاربری خود، لطفاً روی دکمه زیر کلیک کنید:</p>
-    <a href="${loginLink}" class="btn">ورود به حساب کاربری</a>
-    <p>اگر شما این درخواست را نداده‌اید، حساب شما امن است و نیاز به انجام کاری نیست.</p>
   `;
 
   const html = getBaseTemplate(subject, content);
