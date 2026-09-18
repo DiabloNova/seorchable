@@ -2,395 +2,441 @@
 
 # Seorchable — System Specification
 
-This document defines the intended technical behavior, architectural invariants, security properties, and product-level system contracts of Seorchable.
+## 0. Document Purpose
 
-It defines **what the system must be**, not the current condition of the repository.
+This document defines the intended behavior and non-negotiable technical invariants of the Seorchable system.
 
-The current repository may violate one or more requirements in this specification. Such a violation is a finding to be investigated and, where authorized by `PLAN.md`, repaired. It must not be silently treated as the intended design.
+It describes the **target state** of the system.
 
----
+It does not describe the current condition of the repository.
 
-## 1. Specification Status
+It does not authorize changes by itself.
 
-This document is the repository's high-level technical contract.
+It does not replace:
 
-It is intentionally different from:
+- `AGENTS.md` — agent instructions and repository-wide behavioral rules.
+- `BLUEPRINT.md` — controlled engineering workflow.
+- `PLAN.md` — currently authorized work.
+- `SKILL.md` — operational procedures.
 
-- `AGENTS.md` — how an AI agent must behave.
-- `BLUEPRINT.md` — how engineering work must be performed.
-- `PLAN.md` — what work is currently authorized.
-- `SKILL.md` — how specific technical operations are performed.
-
-This specification does not itself authorize implementation.
-
-A requirement in this document describes the target system. An agent must not assume that the current implementation already satisfies it.
+When the current implementation differs from this specification, the difference must be treated as a discrepancy to investigate, not as evidence that the specification is automatically wrong.
 
 ---
 
-# 2. Product Identity
+# 1. Source-of-Truth Model
 
-Seorchable is a multi-tenant SaaS platform for brand intelligence, SEO intelligence, AI visibility, AEO/GEO analysis, competitive intelligence, content intelligence, and related AI-assisted workflows.
+The repository must distinguish between four different kinds of truth.
 
-The system is intended to help users understand and improve how their brands, websites, entities, content, and competitive positions are represented across search engines and AI-powered answer systems.
+### 1.1 Current State
 
-The platform is designed for:
+What the repository and runtime currently contain.
 
-- SEO professionals.
-- Marketing teams.
-- Brand teams.
-- Content teams.
-- Technical teams.
-- Organizations managing one or more brands or websites.
+Current state must be established by inspecting the actual repository and, where applicable, the actual database/runtime state.
 
-The product must provide useful intelligence while preserving strict tenant isolation, controlled access, deterministic processing where required, and auditable security boundaries.
+### 1.2 Intended State
 
----
+What this specification requires the system to provide.
 
-# 3. Product Capability Model
+### 1.3 Authorized Change
 
-The platform is composed of cooperating intelligence domains.
+What the active `PLAN.md` permits the agent to change now.
 
-The architecture must preserve clear boundaries between these domains.
+### 1.4 Verified State
 
-Relevant product capabilities include:
+What has actually been demonstrated through inspection, tests, or other appropriate verification.
 
-- AI Visibility Intelligence.
-- AEO/GEO Intelligence.
-- Brand Intelligence.
-- Competitive Intelligence.
-- Citation Intelligence.
-- Knowledge Graph / Entity Intelligence.
-- Content Intelligence.
-- Keyword Intelligence.
-- Technical SEO Intelligence.
-- Site Architecture Intelligence.
-- Document Intelligence.
-- RAG-based intelligence.
-- AI Prompt Intelligence.
-- Content Studio.
-- Content Gap Intelligence.
-- Competitive Radar.
-- Credit and usage management.
+These concepts must never be silently conflated.
 
-A capability described as implemented in product documentation is not automatically proof that its implementation is complete or correct. Runtime behavior and source code remain subject to verification.
+In particular:
+
+> The presence of a requirement in this document does not prove that the repository currently implements it.
 
 ---
 
-# 4. Architectural Principles
+# 2. Product Definition
 
-The system must follow these architectural principles.
+Seorchable is a multi-tenant SaaS platform for analyzing and improving the visibility, discoverability, representation, and competitive position of websites, brands, entities, content, and related digital properties across search engines and AI-powered answer systems.
 
-## 4.1 Multi-Tenancy
+The product combines conventional SEO intelligence with AI visibility, answer-engine optimization, entity intelligence, competitive intelligence, content intelligence, and related analysis workflows.
 
-The platform is fundamentally multi-tenant.
+The system must allow users to transform collected and analyzed data into understandable intelligence and actionable workflows.
 
-Tenant/workspace data must be isolated so that one tenant cannot access another tenant's protected data.
-
-Tenant isolation must be enforced at the server and database boundaries, not merely through UI conventions.
-
-Where PostgreSQL Row-Level Security is used, RLS is a security boundary and must not be treated as optional presentation logic.
+The platform must preserve the security and ownership boundaries of the organizations/workspaces that own that data.
 
 ---
 
-## 4.2 Server-Side Authorization
+# 3. Core Product Model
 
-Authorization must be enforced on trusted server-side boundaries.
+The system conceptually operates through the following lifecycle:
 
-Client-side checks may improve user experience but must never be considered sufficient authorization.
+    USER
+      ↓
+    WORKSPACE
+      ↓
+    DIGITAL ASSETS
+      ↓
+    DATA COLLECTION
+      ↓
+    NORMALIZATION
+      ↓
+    ANALYSIS
+      ↓
+    INTELLIGENCE
+      ↓
+    REPORTING / RECOMMENDATIONS
+      ↓
+    USER ACTION
 
-A request must not gain access to protected resources merely because a client supplies:
+The implementation may use different internal services, queues, tables, or processing stages, but the following properties must remain true:
 
-- a tenant ID;
-- workspace ID;
-- user ID;
-- role;
+1. Data must have an identifiable owner.
+2. Analysis must operate on the correct owner's data.
+3. Results must remain associated with their originating context.
+4. Protected data must not cross workspace boundaries.
+5. AI-generated conclusions must not be represented as verified source data without appropriate evidence.
+
+---
+
+# 4. Multi-Tenant Architecture
+
+Seorchable is a multi-tenant system.
+
+The primary security boundary for tenant-owned resources is the organization/workspace to which the resource belongs.
+
+A user's identity and a workspace's identity are separate concepts.
+
+The relationship is represented through membership.
+
+Conceptually:
+
+    USER
+      │
+      └── MEMBERSHIP ──→ WORKSPACE / ORGANIZATION
+                              │
+                              ├── websites
+                              ├── analyses
+                              ├── documents
+                              ├── projects
+                              ├── credits
+                              └── other tenant resources
+
+A user must not gain access to a workspace merely because they know its identifier.
+
+---
+
+# 5. Tenant Isolation Invariant
+
+Tenant isolation is a mandatory security invariant.
+
+For every tenant-owned resource:
+
+    authenticated identity
+        +
+    verified membership / authorization
+        +
+    correct tenant context
+        +
+    resource ownership
+        =
+    authorized access
+
+The exact combination depends on the operation, but no protected operation may omit the authorization boundary required by its domain.
+
+Changing a client-supplied:
+
+- `workspaceId`;
+- `organizationId`;
+- `tenantId`;
 - resource ID;
-- or another authorization-related identifier.
 
-The server must derive or validate authorization context from trusted authenticated state and database relationships.
-
----
-
-## 4.3 Domain Boundaries
-
-Business logic should remain separated into coherent domain or service boundaries.
-
-Application routes, server actions, UI components, database access, background processing, and external integrations must not become a single undifferentiated layer.
-
-Where a service boundary exists, callers should depend on the service contract rather than duplicating its internal implementation.
+must never be sufficient to cross a tenant boundary.
 
 ---
 
-## 4.4 Deterministic Processing
+# 6. Authentication and Authorization Boundary
 
-Components explicitly defined as deterministic must produce results from their declared inputs without hidden dependence on nondeterministic external behavior.
+Authentication answers:
 
-Examples include:
+> Who is this requester?
 
-- scoring;
-- classification;
-- normalization;
-- chunking;
-- gap detection;
-- structural analysis;
-- content analysis;
-- URL normalization;
-- deterministic SEO analyzers.
+Authorization answers:
 
-A deterministic engine must not silently introduce an external LLM or network call merely because it is convenient.
+> What may this authenticated identity access or modify?
 
----
+Tenant context answers:
 
-## 4.5 AI-Assisted Processing
+> Within which authorized workspace is this operation occurring?
 
-AI-powered functionality must distinguish between:
+These are separate security decisions.
 
-- deterministic computation;
-- retrieved evidence;
-- model-generated output;
-- persisted canonical data;
-- user-authored content.
+The application must not treat authentication as automatic authorization for every workspace.
 
-AI output must not silently be represented as verified factual data when the system does not possess corresponding evidence.
+Likewise, possessing a workspace identifier must not be treated as evidence of membership.
 
-Where a workflow requires grounded generation, insufficient evidence must be representable and must not be replaced by fabricated certainty.
+Client-side routing guards and UI visibility are not authorization mechanisms.
+
+Protected operations must enforce authorization on a trusted server-side boundary.
 
 ---
 
-# 5. Request Processing Model
+# 7. Identity Model
 
-The preferred protected request flow is:
+The system must maintain distinct concepts for:
 
-    User
-      ↓
-    Next.js Server Action / Route Handler
-      ↓
-    Authentication
-      ↓
-    Authorization
-      ↓
-    Tenant / Workspace Context
-      ↓
-    Domain Service
-      ↓
-    Database / External Service
-      ↓
-    Response
-
-Each layer has a distinct responsibility.
-
-### Authentication
-
-Determines whether the requester has a valid authenticated identity.
-
-### Authorization
-
-Determines whether that identity may perform the requested operation.
-
-### Tenant Context
-
-Determines which tenant/workspace boundary applies.
-
-### Domain Service
-
-Executes business rules.
-
-### Persistence / Integration
-
-Performs database or external-system operations under the already-established security context.
-
-A lower layer must not blindly trust identifiers supplied by an untrusted client.
-
----
-
-# 6. Identity Model
-
-The system must maintain a clear distinction between:
-
-- User identity.
-- Organization / workspace / tenant identity.
-- Organization membership.
+- User.
+- Organization/workspace.
+- Membership.
 - Role.
 - Session.
 - Authentication token.
-- Invitation token.
-- Domain resource ownership.
+- Password-reset token.
+- Email-verification token.
+- Tenant-owned resource.
 
-A user and a workspace are not interchangeable concepts.
+The database model must preserve these relationships explicitly.
 
-Membership determines a user's relationship with a workspace.
+A user may have relationships with multiple workspaces where the product model permits it.
 
-A session identifies an authenticated user and must not by itself grant unrestricted access to every tenant.
-
----
-
-# 7. Registration Contract
-
-Registration must establish the initial account and workspace relationship atomically where the data model requires those records to be created together.
-
-The registration lifecycle must support:
-
-1. Validating user-provided registration fields.
-2. Normalizing the email address.
-3. Creating the user in an unverified state.
-4. Creating the requested workspace/organization.
-5. Creating the initial owner membership.
-6. Creating the email-verification token state.
-7. Committing the required database transaction.
-8. Sending the verification message only after the relevant database transaction has committed.
-9. Requiring email verification before authenticated access where specified by the authentication model.
-
-Registration must not create an authenticated session for an unverified account.
-
-The submitted workspace name must be respected when workspace creation is part of registration.
-
-The system must not silently replace the submitted workspace name with an unrelated generated name.
+A workspace must have an explicit membership relationship to each user who is authorized to operate within it.
 
 ---
 
-# 8. Authentication Contract
+# 8. Registration
 
-Authentication must be server-controlled.
+Registration must create the initial account state consistently.
 
-Password authentication must use a password hashing mechanism appropriate for password storage, with Argon2id as the intended password hashing algorithm for password-based authentication.
+Where registration creates both a user and a workspace, the logically dependent database records must be created atomically.
 
-Authentication must not rely on:
+The intended registration sequence is:
 
-- plaintext passwords;
-- client-provided authentication state;
-- plaintext authentication tokens stored as durable database credentials;
-- tenant identifiers supplied by the client as proof of authorization.
+    validate input
+        ↓
+    normalize email
+        ↓
+    create unverified user
+        ↓
+    create workspace / organization
+        ↓
+    create owner membership
+        ↓
+    create verification-token state
+        ↓
+    commit transaction
+        ↓
+    send verification message
 
-Login failures must not expose unnecessary information about account existence.
+The exact implementation may vary, but the following invariants must hold:
 
-Where the authentication contract requires a generic failure response, differences between:
+- Invalid input is rejected.
+- Email addresses are normalized consistently.
+- A newly registered account begins unverified.
+- The initial workspace uses the submitted workspace name when workspace creation is part of registration.
+- The initial membership has the explicitly defined owner-level role.
+- Registration does not create an authenticated session for an account that still requires email verification.
+- Verification messaging must not be treated as successfully delivered merely because the database transaction succeeded.
 
-- nonexistent user;
+---
+
+# 9. Duplicate Registration Behavior
+
+Registration must not unnecessarily disclose whether an email address already belongs to an account.
+
+Where the public registration contract uses a uniform success response for an existing email, the response shape must remain indistinguishable from the normal registration response.
+
+An existing-account path must not create duplicate:
+
+- users;
+- workspaces;
+- memberships;
+- verification tokens;
+- other registration records.
+
+The implementation must not introduce a practical timing or response-shape side channel whose purpose is to reveal account existence.
+
+---
+
+# 10. Password Authentication
+
+Password authentication must use a secure password-hashing algorithm.
+
+For password-based authentication, Argon2id is the intended password hashing mechanism.
+
+The system must never store plaintext passwords.
+
+Authentication failures must not expose unnecessary internal information.
+
+Where the authentication contract requires a generic login error, the public response must not distinguish among:
+
+- nonexistent account;
 - incorrect password;
-- inactive user;
-- unverified user;
+- inactive account;
+- unverified account.
 
-must not create an account-enumeration side channel through public error behavior.
+The internal implementation may distinguish these states when required for correct processing, logging, or control flow, but the public authentication boundary must preserve the required anti-enumeration behavior.
 
 ---
 
-# 9. Email Verification
+# 11. Email Verification
 
-Email verification must use a cryptographically strong, single-use token.
+Email verification must use a cryptographically secure, high-entropy token.
 
-The raw verification token must not be stored as durable plaintext in the database.
+The intended model is:
 
-The intended token properties are:
+    raw token
+        ↓
+    sent to user
+        ↓
+    cryptographic hash stored in database
+        ↓
+    token presented
+        ↓
+    hash / lookup
+        ↓
+    validate purpose
+        ↓
+    validate expiration
+        ↓
+    atomically consume
+        ↓
+    mark account verified
+
+The raw token must not be stored as a durable plaintext database credential.
+
+Verification tokens must be:
+
+- unpredictable;
+- sufficiently high entropy;
+- purpose-specific;
+- time-limited;
+- single-use.
+
+An expired or already-used token must not successfully verify an account.
+
+Issuing a replacement verification token must invalidate or supersede the previous usable token according to the token lifecycle contract.
+
+---
+
+# 12. Password Reset
+
+Password reset must use a security model equivalent in strength to email verification.
+
+Password-reset tokens must be:
 
 - high entropy;
 - unpredictable;
-- single-purpose;
+- purpose-specific;
 - time-limited;
 - single-use;
-- invalidated after successful use;
-- replaced when a new verification token is issued.
+- stored in hashed form rather than as durable raw tokens.
 
-The database should store a cryptographic representation such as a secure token hash rather than the raw token.
+A password-reset token must never be accepted as an email-verification token.
 
-The verification operation must be atomic with respect to token consumption.
+A successful password reset must invalidate previously issued authenticated sessions according to the session invalidation mechanism.
 
-An already-used, expired, invalid, or otherwise invalidated token must not successfully verify an account.
+The public password-reset request must not unnecessarily reveal whether the submitted email belongs to an account.
 
 ---
 
-# 10. Password Reset
+# 13. Authentication Token Model
 
-Password-reset tokens must follow the same core security model as verification tokens.
+Where email verification and password reset share the same lifecycle, the system should represent them through one canonical authentication-token model with an explicit purpose.
 
-They must be:
+The conceptual fields are:
 
-- cryptographically unpredictable;
-- high entropy;
-- time-limited;
-- single-use;
-- stored in hashed form rather than raw form;
-- invalidated after successful use.
+    id
+    user_id
+    token_hash
+    purpose
+    expires_at
+    used_at
+    created_at
 
-A successful password reset must invalidate previously issued authenticated sessions according to the session invalidation model.
-
-A password-reset flow must not disclose whether an arbitrary email address belongs to an account through its public response.
-
----
-
-# 11. Unified Authentication Token Model
-
-Where email verification and password reset tokens share the same lifecycle model, they should use a unified token representation with an explicit purpose.
-
-The conceptual model is:
-
-    auth token
-      ├── user
-      ├── token hash
-      ├── purpose
-      ├── expiration
-      ├── used timestamp
-      └── creation timestamp
-
-The token purpose must be explicit.
-
-At minimum, the model must distinguish:
+The required purposes are:
 
     email_verification
     password_reset
 
-A token created for one purpose must not be accepted for another purpose.
+Purpose is a security boundary.
+
+A token for one purpose must never be accepted for another purpose.
+
+The database must enforce appropriate uniqueness and indexing for secure and efficient token lookup.
 
 ---
 
-# 12. Session Security
+# 14. Token Consumption
 
-Authenticated sessions must be server-controlled and cryptographically protected.
+Token consumption must be atomic.
 
-The session model must support:
+The implementation must prevent two concurrent requests from successfully consuming the same single-use token.
 
-- authenticated user identity;
-- session integrity;
+The token state transition is conceptually:
+
+    unused + valid
+          ↓
+       consumed
+
+and not:
+
+    unused + valid
+          ↓
+    request A reads unused
+    request B reads unused
+          ↓
+    both succeed
+
+Database constraints, transactional locking, or equivalent concurrency controls must enforce the single-use invariant.
+
+---
+
+# 15. Session Model
+
+Authenticated sessions must be cryptographically protected and server-controlled.
+
+A session must represent an authenticated identity rather than arbitrary client-provided authorization state.
+
+The session lifecycle must support:
+
+- creation;
+- validation;
 - expiration;
-- invalidation;
 - logout;
-- protection against stale sessions after security-sensitive account changes.
+- invalidation;
+- security-sensitive revocation.
 
-Session validity must not depend solely on an untrusted client-controlled identifier.
+Where session versioning is part of the design, the authoritative user/session version must be checked so that previously issued sessions can be invalidated centrally.
 
-Where session versioning is used, the version stored in the authenticated session must be checked against the authoritative user state when required by the security model.
-
-Incrementing the authoritative session version must invalidate previously issued sessions.
-
----
-
-# 13. Session Secret
-
-Cryptographic session signing/encryption must use an explicitly configured server secret.
-
-The application must fail closed when the required session secret is missing.
-
-It must not silently generate a random fallback secret at runtime for production authentication.
-
-A missing required authentication secret is a configuration failure, not an invitation to create an ephemeral secret.
+Security-sensitive account changes such as password reset must invalidate sessions according to the defined session-version contract.
 
 ---
 
-# 14. Cookie Security
+# 16. Session Secret
 
-Authentication cookies must contain only the minimum information required by the session design.
+The cryptographic secret required for session security must be explicitly configured.
 
-Sensitive authorization state must not be trusted merely because it appears in a cookie.
+A missing required session secret is a configuration failure.
 
-Plaintext durable cookies containing:
+The application must fail closed rather than silently creating an ephemeral production secret.
 
-- tenant IDs;
+A randomly generated fallback secret must not be used as a substitute for the required persistent configuration.
+
+---
+
+# 17. Authentication Cookies
+
+Authentication cookies must contain only the information required by the session design.
+
+The system must not rely on plaintext client-controlled cookies containing:
+
 - user IDs;
+- tenant IDs;
+- workspace IDs;
 - roles;
-- authorization state;
+- authorization decisions;
 
-must not be treated as authenticated proof of identity or authorization.
+as proof of authentication or authorization.
 
-Cookie properties must follow the application's security requirements for:
+Cookies used for authentication must use appropriate security attributes, including where applicable:
 
 - `HttpOnly`;
 - `Secure`;
@@ -398,105 +444,104 @@ Cookie properties must follow the application's security requirements for:
 - appropriate path;
 - controlled expiration.
 
----
-
-# 15. Logout
-
-Logout must invalidate the authenticated session according to the session model.
-
-Logout must also clear the relevant authentication cookies.
-
-Legacy authentication cookies must not remain as an alternative authentication mechanism after the migration to the authoritative session model.
-
-Logout must not merely redirect the browser while leaving a valid server-side session active.
+The exact values must follow the application's runtime and deployment requirements.
 
 ---
 
-# 16. Authorization and RBAC
+# 18. Logout
 
-Authorization must be based on server-verified membership and role state.
+Logout must invalidate the authenticated session.
 
-The workspace role model includes:
+It must also clear the relevant authentication cookies.
+
+Legacy authentication mechanisms must not remain silently usable after the authoritative authentication mechanism has been established.
+
+A logout operation that only redirects the browser while leaving a valid session active does not satisfy the session contract.
+
+---
+
+# 19. Role-Based Access Control
+
+The workspace authorization model includes:
 
     super_admin
     workspace_admin
     viewer
 
-Role names and their permissions must be treated as explicit contracts rather than inferred from UI visibility.
+Roles represent authorization capabilities, not UI states.
 
-A user interface hiding a control is not an authorization mechanism.
+The system must define permissions explicitly.
 
-Every protected mutation and protected data access must perform the required server-side authorization.
+The following principle is mandatory:
 
----
+> Hiding an interface element does not authorize or deny the underlying operation.
 
-# 17. Tenant Isolation
+Every protected mutation and protected data-access operation must perform the required server-side authorization.
 
-Tenant isolation is a critical security invariant.
-
-A tenant-scoped operation must operate within the authenticated and authorized tenant context.
-
-The application must not trust an arbitrary client-provided tenant ID as proof that the requester belongs to that tenant.
-
-Where PostgreSQL RLS is part of the architecture:
-
-    authenticated request
-        ↓
-    verified tenant context
-        ↓
-    database transaction
-        ↓
-    RLS enforcement
-
-The tenant context must be established safely and must not be left behind on a reused database connection.
+System-level administration must remain distinct from ordinary workspace membership where the domain model requires it.
 
 ---
 
-# 18. Database Context Safety
-
-Tenant context must not leak between requests, transactions, users, or workspaces.
-
-Database connection reuse must not permit one request to inherit another request's tenant context.
-
-Tenant context should be established within the appropriate transaction or connection scope and cleared or isolated according to the database access design.
-
-A missing tenant context for a tenant-scoped operation must fail safely rather than implicitly becoming unrestricted access.
-
----
-
-# 19. Database Schema Contract
+# 20. Database Architecture
 
 PostgreSQL is the primary relational database.
 
-Drizzle ORM is the intended ORM/schema management layer.
+Drizzle ORM is the intended schema and migration tooling layer.
 
-Canonical schema definitions belong under:
+Canonical application schema definitions reside under:
 
     database/schema/
 
-The schema aggregator must expose the intended schema definitions consistently.
+The database schema must have one coherent canonical representation.
 
-Database structure must be represented consistently across:
-
-- schema definitions;
-- migrations;
-- migration metadata;
-- migration journal;
-- runtime database state.
-
-These representations must not be treated as interchangeable.
+Schema aggregation must not accidentally expose obsolete competing definitions.
 
 ---
 
-# 20. Migration Integrity
+# 21. Database Integrity
 
-Migration history is part of the database system and must be treated as historical state.
+The database must preserve:
 
-Historical migrations must not be rewritten merely to make the current schema or migration generator convenient.
+- primary-key integrity;
+- foreign-key integrity;
+- uniqueness constraints;
+- appropriate nullability;
+- correct data types;
+- ownership relationships;
+- tenant boundaries;
+- transaction boundaries.
 
-A migration must represent an intentional transition from one database state to another.
+Security and ownership invariants must not depend exclusively on application-level conventions when the database can enforce the invariant safely.
 
-Generated migration output must be inspected before being accepted.
+Where appropriate, database constraints should provide the final integrity boundary.
+
+---
+
+# 22. Migration Integrity
+
+Migration history is historical state.
+
+Historical migrations must not be rewritten merely to make the current schema generator succeed.
+
+The migration system must preserve a traceable sequence of intentional database transitions.
+
+The relationship is:
+
+    schema definition
+        ↓
+    migration generation
+        ↓
+    migration file
+        ↓
+    migration metadata / snapshot
+        ↓
+    migration journal
+        ↓
+    database state
+
+A disagreement between these layers is a database-integrity issue and must be investigated.
+
+Migration tooling must not be allowed to silently reinterpret an existing schema history.
 
 Unexpected:
 
@@ -504,679 +549,707 @@ Unexpected:
 - column renames;
 - dropped columns;
 - dropped tables;
-- recreated constraints;
-- index changes;
-- foreign-key changes;
+- changed foreign keys;
+- changed indexes;
+- changed constraints;
 
-must be investigated rather than automatically accepted.
-
----
-
-# 21. Migration and Schema Alignment
-
-The intended relationship is:
-
-    Canonical Schema
-          ↓
-    Migration Generation
-          ↓
-    Migration File
-          ↓
-    Migration Metadata / Snapshot
-          ↓
-    Migration Journal
-          ↓
-    Database State
-
-A contradiction between these layers is a repository integrity issue.
-
-It must be investigated before additional migrations are generated on top of an uncertain baseline.
-
-A migration generator must not be used as a substitute for understanding the existing migration history.
+must be explicitly understood before acceptance.
 
 ---
 
-# 22. Data Integrity
+# 23. Database Migration Baseline
 
-Database operations must preserve:
+A migration baseline must be considered trustworthy only when:
 
-- referential integrity;
-- uniqueness constraints;
-- appropriate nullability;
-- correct data types;
-- ownership relationships;
-- tenant boundaries;
-- transactional invariants.
+1. The canonical schema has been inspected.
+2. Existing migration history has been inspected.
+3. The migration journal has been inspected.
+4. Relevant snapshots/metadata have been inspected.
+5. The migration configuration has been inspected.
+6. Conflicting representations have been identified and resolved.
+7. The resulting migration transition is understood.
 
-Operations that modify multiple logically dependent records must use appropriate transactional semantics.
-
-Partial creation of an account/workspace/membership security boundary must not be accepted where atomicity is required by the domain contract.
+A successful migration-generation command alone does not establish baseline correctness.
 
 ---
 
-# 23. Credits and Financially Relevant State
+# 24. Tenant-Aware Database Access
 
-Credit balances and credit transactions must be treated as integrity-sensitive state.
+Tenant-scoped database operations must execute within the correct authenticated and authorized tenant context.
+
+Where PostgreSQL Row-Level Security is used, RLS is a security boundary.
+
+Application code must not treat RLS as merely an optional defense for UI bugs.
+
+Tenant context must be scoped safely to the relevant request/transaction/connection.
+
+A reused database connection must never retain tenant context from a previous request.
+
+A missing tenant context must fail safely for operations that require tenant context.
+
+---
+
+# 25. Row-Level Security
+
+Where RLS is part of the database design:
+
+- policies must reflect the intended ownership model;
+- policies must not accidentally permit unrestricted access;
+- system-level access must be explicit;
+- tenant context must be established safely;
+- policy behavior must be tested for both positive and negative cases.
+
+RLS policies must be reviewed together with the application code that establishes database context.
+
+Neither layer should be assumed correct in isolation.
+
+---
+
+# 26. Transactional Boundaries
+
+Transactions must protect operations whose records form one logical invariant.
+
+Examples include:
+
+- account/workspace creation;
+- membership creation;
+- security-token creation;
+- password-reset state changes;
+- credit application;
+- payment-event processing;
+- other multi-record security or financial state transitions.
+
+A transaction must cover the complete invariant it is intended to protect.
+
+A sequence of independent operations is not equivalent to a transaction merely because the operations are executed sequentially.
+
+---
+
+# 27. Idempotency
+
+Operations that can be retried must define their idempotency behavior.
+
+This includes, where applicable:
+
+- webhook processing;
+- background jobs;
+- payment events;
+- token consumption;
+- external provider callbacks;
+- expensive analysis jobs.
+
+For database-enforced uniqueness, application-level "check then insert" logic must not be treated as sufficient protection against races.
+
+The database constraint must remain authoritative.
+
+---
+
+# 28. Credits and Payment State
+
+Credits represent value-bearing application state and must be treated as integrity-sensitive.
 
 Credit mutations must be:
 
 - attributable;
 - tenant-scoped;
 - transactionally consistent;
-- protected against duplicate application where an external event can be retried.
+- protected against duplicate application.
 
-Payment/webhook processing must not trust client-supplied tenant identifiers when the server can derive ownership from authoritative payment state.
+Payment events must be associated with the correct workspace through authoritative server-side state.
 
-External provider event identifiers should support idempotent processing.
+A client-provided workspace identifier must not be trusted as the ownership source for a payment event when ownership can be derived from the payment/provider state.
 
 ---
 
-# 24. Webhook Security
+# 29. Payment Webhooks
 
-Webhook handlers must verify authenticity before applying state changes.
+Payment webhooks must verify authenticity before changing trusted application state.
 
-Where HMAC signatures are used:
+Where HMAC verification is used:
 
-- verification must use the raw request body;
-- the signed timestamp must be included in the authenticated material when required;
-- stale requests must be rejected;
+- the raw request body must be used;
+- required timestamp material must be authenticated;
+- stale events must be rejected;
 - malformed signatures must be rejected;
-- comparison must use timing-safe comparison where applicable.
+- timing-safe comparison must be used where appropriate.
 
-Webhook processing must be idempotent.
+A valid provider event may be retried.
 
-A duplicate valid provider event must not apply its financial effect more than once.
+The same provider event must therefore not apply its financial effect more than once.
 
----
-
-# 25. External Network Access
-
-Outbound network requests must be treated as security-sensitive.
-
-User-controlled URLs must not automatically be fetched from the server.
-
-Where outbound fetching is permitted, URL validation must protect against SSRF and unsafe network targets.
-
-The crawler/integration layer must maintain an explicit trust boundary between:
-
-- user-controlled input;
-- URL validation;
-- external network access;
-- returned content;
-- persistence.
+A duplicate event should be handled idempotently rather than treated as a new payment.
 
 ---
 
-# 26. Crawling and Website Intelligence
+# 30. External Services
 
-Website crawling is an important product capability.
+External services include AI providers, email providers, crawling infrastructure, payment providers, and other third-party systems.
 
-Crawler operations must:
+External integrations must remain behind explicit boundaries.
 
-- operate within the authorized tenant/workspace;
-- validate outbound URLs;
-- respect applicable security constraints;
-- persist results under the correct tenant;
-- avoid cross-tenant data contamination;
-- provide enough state to distinguish crawl status and freshness.
+Credentials must remain server-side.
 
-Crawled data must remain attributable to the website, workspace, and relevant analysis context.
-
----
-
-# 27. AI and External Provider Boundaries
-
-External AI providers are integration boundaries.
-
-Provider calls must not bypass:
+External-provider failures must not silently bypass:
 
 - authorization;
-- tenant boundaries;
-- rate limits;
+- tenant isolation;
 - credit controls;
-- data-access rules;
-- logging/security requirements.
+- rate limits;
+- transaction boundaries;
+- security logging rules.
 
-Provider configuration and credentials must remain server-side.
-
-Sensitive provider credentials must not be exposed to browser clients.
-
----
-
-# 28. AI Output Integrity
-
-AI-generated results must be distinguishable from deterministic calculations and retrieved evidence.
-
-Where an AI workflow is grounded in retrieved documents or canonical data:
-
-- the retrieved evidence must remain identifiable;
-- insufficient evidence must be representable;
-- the system must not fabricate supporting evidence;
-- generated claims must not automatically become canonical facts without an explicit persistence rule.
-
-AI output should not silently overwrite authoritative data without the appropriate domain operation.
+External services are not authoritative for Seorchable's internal ownership model unless explicitly defined as such.
 
 ---
 
-# 29. Document Intelligence
+# 31. Email Delivery
 
-Document processing must preserve tenant ownership and document identity.
+Email delivery is an external side effect.
 
-Where content hashing is part of the design:
+Where a database transaction creates security state and an email must communicate that state:
 
-- SHA-256 content hashing should provide stable content identity;
-- normalization must be deterministic where specified;
-- chunking must be deterministic where specified;
-- vector dimensionality must match the configured model/storage contract.
+    database transaction
+        ↓
+    COMMIT
+        ↓
+    send email
 
-Document retrieval must remain tenant-safe.
+The application must not send an email that references security state that may subsequently roll back.
 
----
-
-# 30. Knowledge and Entity Model
-
-Canonical entities and relationships form a shared intelligence foundation.
-
-Entity relationships must preserve:
-
-- tenant ownership;
-- source and target entity identity;
-- relationship semantics;
-- referential integrity.
-
-Deterministic scoring systems must document their inputs and calculation rules.
-
-A score must not be represented as an objective fact when it is actually a model-derived metric.
+If email delivery is unavailable, the application must not expose raw security tokens through unsafe logs merely to make development easier.
 
 ---
 
-# 31. Content Intelligence
+# 32. Logging and Secret Handling
 
-Content-related functionality must distinguish:
+The following must never be written to ordinary application logs in raw form:
 
-- source content;
-- canonical intelligence;
-- deterministic analysis;
-- AI-generated suggestions;
-- user edits;
-- persisted final content.
-
-A content brief engine defined as deterministic must not silently generate article prose.
-
-Content recommendations must not be presented as verified facts unless supported by the relevant evidence model.
-
----
-
-# 32. Localization
-
-The application supports localization, including Persian and right-to-left interfaces.
-
-Locale-aware routing must preserve the active locale where appropriate.
-
-Server actions and generated links must not hardcode a single locale when the caller has already established a different valid locale.
-
-Localization behavior must not compromise authentication, authorization, or redirect security.
-
----
-
-# 33. Background Processing
-
-Background processing must preserve the same domain invariants as synchronous requests.
-
-Inngest/background jobs must:
-
-- identify the relevant tenant/workspace context safely;
-- avoid relying on stale client state;
-- remain idempotent where retries are possible;
-- protect external integrations;
-- preserve database consistency;
-- avoid cross-tenant processing.
-
-A background job must not assume that a previously valid authorization state remains valid forever without checking the required persisted state.
-
----
-
-# 34. Caching
-
-Caches must not become an unintended authorization boundary.
-
-Tenant-scoped cached data must include sufficient isolation in its cache identity.
-
-A cache hit must never return another tenant's protected data.
-
-Sensitive authentication state must not be cached in a way that bypasses the authoritative session/security model.
-
----
-
-# 35. Rate Limiting and Abuse Controls
-
-Security-sensitive operations must be protected against abuse.
-
-Relevant operations include:
-
-- Login.
-- Registration.
-- Email verification.
-- Verification resend.
-- Password reset.
-- Password-reset resend.
-- Sensitive API operations.
-- Expensive AI operations.
-- Expensive crawling operations.
-
-Rate limiting must not create an account-enumeration side channel.
-
-Failure handling should preserve the same public security contract regardless of whether an account exists where appropriate.
-
----
-
-# 36. Error Handling
-
-Errors must not expose unnecessary sensitive information.
-
-Public authentication errors should not disclose:
-
-- password correctness;
-- account existence;
-- internal database details;
-- session secrets;
-- token values;
-- provider credentials.
-
-Internal diagnostics may contain more detail only where appropriate and must still protect sensitive information.
-
----
-
-# 37. Logging and Observability
-
-Logs must support debugging without becoming a secret-exfiltration mechanism.
-
-Do not log:
-
-- raw authentication tokens;
-- raw password-reset tokens;
-- raw verification tokens;
 - passwords;
 - session secrets;
 - API credentials;
-- sensitive authorization cookies.
+- raw verification tokens;
+- raw password-reset tokens;
+- sensitive authentication cookies.
 
-When an external email provider is unavailable and a development fallback is used, logs must remain redacted and must not expose raw authentication links or token values.
+Development fallbacks must remain redacted.
 
----
-
-# 38. API Contract
-
-API routes and server actions must:
-
-1. Validate input.
-2. Authenticate where required.
-3. Authorize the requested operation.
-4. Establish the correct tenant context.
-5. Execute the domain operation.
-6. Return an appropriate response.
-
-Client-provided identifiers must not bypass authorization.
-
-An API endpoint must not assume that reaching the endpoint implies permission to perform the operation.
+Logs should provide enough information to diagnose failures without becoming an alternate credential store.
 
 ---
 
-# 39. Validation
+# 33. Rate Limiting
 
-Untrusted input must be validated at the server boundary.
+Security-sensitive and resource-intensive operations must have appropriate abuse protection.
 
-Validation must cover:
+Relevant operations may include:
 
-- type;
+- login;
+- registration;
+- email verification;
+- verification resend;
+- password reset;
+- password-reset resend;
+- expensive AI requests;
+- expensive crawling operations;
+- sensitive APIs.
+
+Rate limiting must not introduce an account-enumeration side channel through materially different public behavior.
+
+Where an external rate-limit service is optional, the application must have an explicitly defined safe behavior when that service is unavailable.
+
+---
+
+# 34. Input Validation
+
+All untrusted input must be validated at the server boundary.
+
+Validation must cover, as applicable:
+
 - required fields;
-- acceptable ranges;
-- string constraints;
+- data types;
+- string lengths;
+- ranges;
 - identifiers;
 - URLs;
-- enum-like values;
+- enum values;
+- structured objects;
 - security-sensitive parameters.
 
-Validation must not replace authorization.
+Validation does not establish authorization.
 
-A valid UUID belonging to another tenant is still unauthorized.
-
----
-
-# 40. Transactional Integrity
-
-Transactions must be used where multiple operations form one logical invariant.
-
-Examples include:
-
-- account/workspace creation;
-- membership creation;
-- token creation tied to account state;
-- password-reset state changes;
-- credit application;
-- payment event processing;
-- security-sensitive state transitions.
-
-A transaction must not be considered correct merely because it exists; the complete set of reads and writes must be evaluated for race conditions and rollback behavior.
+A syntactically valid identifier belonging to another tenant remains unauthorized.
 
 ---
 
-# 41. Concurrency and Idempotency
+# 35. API and Server Action Contract
 
-Operations exposed to retries, duplicate requests, background retries, or external provider events must define their idempotency behavior.
+Protected API routes and server actions should follow this conceptual order:
 
-Where uniqueness is the database-level invariant, application code must not rely exclusively on a preceding existence check.
+    RECEIVE INPUT
+        ↓
+    VALIDATE
+        ↓
+    AUTHENTICATE
+        ↓
+    AUTHORIZE
+        ↓
+    ESTABLISH TENANT CONTEXT
+        ↓
+    EXECUTE DOMAIN OPERATION
+        ↓
+    PERSIST / INTEGRATE
+        ↓
+    RETURN RESULT
 
-Database constraints should protect critical uniqueness invariants.
+The exact order may vary where technically necessary, but no step may be omitted when required by the operation.
 
-Race-prone security operations must use appropriate transactional or locking semantics.
-
----
-
-# 42. Data Ownership
-
-Every tenant-owned resource must have an unambiguous ownership relationship.
-
-Ownership must be enforceable through the data model and server authorization.
-
-A resource must not become accessible merely because a caller knows its identifier.
-
-Direct-object access must still verify:
-
-    authenticated user
-        +
-    authorized membership
-        +
-    authorized tenant
-        +
-    resource ownership
-
-where applicable.
+Client input must not bypass the trusted security context.
 
 ---
 
-# 43. Administrative Access
+# 36. SSRF and Server-Side Fetching
 
-System-level administrative capabilities must remain distinct from ordinary workspace access.
+Any feature that fetches user-influenced URLs must treat the URL as untrusted input.
 
-Administrative roles must not be accidentally granted through workspace membership.
+The application must validate outbound targets before making server-side requests.
 
-Administrative operations must have explicit authorization rules.
+SSRF protections must consider:
 
-Sensitive administrative actions should be auditable.
+- private networks;
+- loopback addresses;
+- internal services;
+- metadata endpoints;
+- DNS resolution behavior;
+- redirects;
+- protocol restrictions;
+- alternate IP representations.
 
----
-
-# 44. Auditability
-
-Security-sensitive and materially consequential operations should be auditable where the application defines an audit trail.
-
-Audit records should identify, as appropriate:
-
-- actor;
-- action;
-- resource;
-- timestamp;
-- outcome;
-- relevant contextual information.
-
-Audit data must itself respect privacy and tenant/security boundaries.
+The crawler/integration layer must not assume that a syntactically valid URL is a safe server-side destination.
 
 ---
 
-# 45. Dependency and Configuration Integrity
+# 37. Crawling
 
-Dependencies must be used according to the project's established package-management configuration.
+Website crawling is a product capability and a security-sensitive network operation.
 
-An agent must not add a dependency merely to avoid understanding or repairing an existing implementation.
+Crawler jobs must:
 
-Required environment variables must fail safely when absent.
+- operate within the correct workspace context;
+- validate outbound destinations;
+- preserve ownership of collected data;
+- distinguish crawl state from analysis state;
+- handle failures explicitly;
+- avoid cross-tenant persistence.
 
-Secrets must remain outside source control.
-
-Configuration changes must be treated as behavioral changes and verified accordingly.
+Crawler retries must not create uncontrolled duplicate records where idempotency is required.
 
 ---
 
-# 46. Build and Runtime Integrity
+# 38. AI Processing
 
-A successful build establishes only that the build succeeded.
+AI processing must preserve the distinction between:
 
-It does not independently prove:
+    source evidence
+    deterministic computation
+    retrieved information
+    model-generated output
+    persisted canonical data
+    user-authored content
 
-- database correctness;
-- authentication correctness;
-- authorization correctness;
+These categories must not be silently collapsed into one another.
+
+AI-generated text or analysis is not automatically authoritative merely because it was generated successfully.
+
+Where a workflow requires grounded output, insufficient evidence must remain representable.
+
+The system must not fabricate citations, evidence, source facts, or verification status.
+
+---
+
+# 39. Deterministic Intelligence
+
+Components designated as deterministic must remain deterministic with respect to their declared inputs.
+
+Examples may include:
+
+- normalization;
+- scoring;
+- structural analysis;
+- chunking;
+- URL processing;
+- gap calculations;
+- deterministic SEO analysis.
+
+A deterministic component must not silently introduce an LLM or external network dependency when doing so would alter its contractual behavior.
+
+If an algorithm depends on external or probabilistic behavior, it must not be described as deterministic.
+
+---
+
+# 40. AI Provider Isolation
+
+AI provider configuration and credentials must remain server-side.
+
+Provider selection must not allow an untrusted client to bypass:
+
+- authorization;
+- tenant boundaries;
+- usage limits;
+- credit controls;
+- provider restrictions;
+- logging/security policies.
+
+Provider-specific behavior must remain behind an explicit integration boundary so that provider implementation details do not leak throughout the application.
+
+---
+
+# 41. Document Intelligence
+
+Documents must remain associated with their owning workspace and appropriate processing context.
+
+Where content hashing is used for identity, the hashing contract must be deterministic.
+
+Where content chunking is defined as deterministic, the same normalized input and configuration must produce the same chunking result.
+
+Vector storage must remain compatible with the embedding model contract, including dimensionality.
+
+Document retrieval must enforce tenant isolation.
+
+---
+
+# 42. Knowledge and Entity Data
+
+Entities and relationships form part of the intelligence layer.
+
+Entity relationships must preserve:
+
+- identity;
+- ownership;
+- relationship semantics;
+- referential integrity;
+- source context where applicable.
+
+Derived scores and classifications must be distinguishable from canonical source facts.
+
+A calculated metric must not be represented as raw factual data merely because it is persisted in a database.
+
+---
+
+# 43. Content Intelligence
+
+Content workflows must distinguish among:
+
+- source material;
+- analyzed content;
+- deterministic findings;
+- AI suggestions;
+- user modifications;
+- final persisted content.
+
+An analysis engine must not silently become a content-generation engine unless the specification for that component explicitly permits generation.
+
+AI suggestions must not overwrite user-authored or canonical content without an explicit operation.
+
+---
+
+# 44. Background Jobs
+
+Background jobs must preserve the same security and ownership invariants as synchronous requests.
+
+A job must establish or recover the correct tenant/workspace context from trusted persisted state.
+
+Jobs that may be retried must define idempotent behavior where duplicate execution could produce incorrect results.
+
+A background job must not assume that client-provided authorization state is trustworthy.
+
+---
+
+# 45. Caching
+
+Caching must preserve tenant isolation.
+
+A tenant-scoped cache key must contain sufficient identity to prevent cross-tenant collisions.
+
+A cache hit must never become an authorization bypass.
+
+Sensitive authentication state must not be cached in a way that bypasses the authoritative session mechanism.
+
+When cached data becomes stale, the application must follow the defined freshness behavior rather than silently treating stale data as current authoritative state.
+
+---
+
+# 46. Localization
+
+The application supports localized user experiences, including Persian and right-to-left interfaces.
+
+Authentication and application routing must preserve valid locale context.
+
+Server-side actions and generated links must not unnecessarily hardcode one locale when the active locale is already known.
+
+Localization must not alter authorization behavior.
+
+Locale handling must not become an input-validation or redirect-security bypass.
+
+---
+
+# 47. Error Semantics
+
+Public errors must contain enough information for the client to respond appropriately without unnecessarily exposing internal state.
+
+Errors must not expose:
+
+- passwords;
+- authentication secrets;
+- raw security tokens;
+- internal credentials;
+- database connection information;
+- unnecessary account-existence information;
+- sensitive tenant data.
+
+Internal errors may contain more diagnostic detail, but logging must still follow the secret-handling contract.
+
+---
+
+# 48. Testing Requirements
+
+Tests must validate behavior and invariants, not merely implementation details.
+
+Critical security-sensitive domains require both positive and negative tests.
+
+At minimum, the relevant test strategy must cover, where implemented:
+
+- registration;
+- login;
+- email verification;
+- password reset;
+- session invalidation;
+- logout;
+- RBAC;
 - tenant isolation;
-- runtime external integrations;
-- migration correctness.
+- token single-use behavior;
+- token expiration;
+- rate limiting;
+- webhook authenticity;
+- webhook idempotency;
+- credit integrity;
+- SSRF defenses;
+- deterministic processing;
+- database constraints;
+- migration behavior.
 
-Each of these requires appropriate verification.
-
----
-
-# 47. Testing Contract
-
-Tests should verify behavior and invariants rather than merely implementation details.
-
-Critical areas require focused coverage, including:
-
-- Authentication.
-- Registration.
-- Email verification.
-- Password reset.
-- Session invalidation.
-- Authorization.
-- Tenant isolation.
-- RBAC.
-- Rate limiting.
-- Database constraints.
-- Migration behavior.
-- Payment idempotency.
-- Webhook authenticity.
-- SSRF protection.
-- Deterministic engines.
-
-Security tests should include negative cases, not only successful flows.
+A successful happy-path test is not sufficient evidence for a security boundary.
 
 ---
 
-# 48. Security Invariants
+# 49. Security Invariants
 
-The following are non-negotiable system invariants:
+The following invariants are mandatory:
 
-1. An unauthenticated requester cannot access protected user/workspace data.
-2. An authenticated user cannot access another tenant's protected data merely by changing an identifier.
-3. Client-controlled tenant identifiers do not establish authorization.
-4. Client-side authorization checks are never the sole security boundary.
-5. Raw authentication tokens are not stored as durable database secrets.
-6. Authentication secrets are not silently generated as production fallbacks.
-7. Passwords are never stored in plaintext.
-8. Security-sensitive token use is single-purpose and single-use.
-9. Expired security tokens cannot be consumed successfully.
-10. Password reset invalidates previously valid sessions according to the session model.
-11. Logout invalidates the relevant session.
-12. Duplicate external financial events cannot apply their effect more than once.
-13. Webhook authenticity is verified before applying trusted state changes.
-14. Tenant context cannot leak between requests.
-15. Protected data cannot cross tenant boundaries through caching.
-16. Security-sensitive operations do not unnecessarily disclose account existence.
-17. Secrets and raw authentication material are not exposed through logs.
-18. Server-side authorization is performed before protected mutations.
-19. Database constraints protect critical uniqueness and referential invariants.
-20. Material database inconsistencies are resolved before building further migration state on top of them.
+1. Unauthenticated users cannot access protected account or workspace data.
 
----
+2. Authentication does not automatically grant access to every workspace.
 
-# 49. Product-to-Architecture Alignment
+3. Client-provided tenant/workspace identifiers do not establish authorization.
 
-The product exists to transform website, brand, content, entity, search, citation, and AI-observation data into actionable intelligence.
+4. Client-side authorization checks are never the sole authorization boundary.
 
-The architecture must therefore preserve this chain:
+5. Passwords are never stored in plaintext.
 
-    Data Collection
-        ↓
-    Normalization
-        ↓
-    Canonical Persistence
-        ↓
-    Deterministic / AI Analysis
-        ↓
-    Intelligence
-        ↓
-    User-Facing Results
-        ↓
-    Actions / Recommendations
+6. Raw authentication tokens are not stored as durable plaintext database credentials.
 
-Security boundaries must apply across the entire chain.
+7. Verification and password-reset tokens are purpose-specific.
 
-Tenant isolation must not disappear when data moves from synchronous requests to:
+8. Expired or consumed security tokens cannot be successfully reused.
 
-- caches;
-- background jobs;
-- AI providers;
-- crawler services;
-- documents;
-- vector retrieval;
-- reports;
-- analytics;
-- persisted intelligence.
+9. Concurrent requests cannot successfully consume the same single-use token more than once.
+
+10. Missing required authentication secrets cause safe failure rather than insecure ephemeral fallback.
+
+11. Logout invalidates the relevant authenticated session.
+
+12. Password reset invalidates previously valid sessions according to the session model.
+
+13. Tenant context cannot leak across requests or database connections.
+
+14. Tenant-scoped cached data cannot cross tenant boundaries.
+
+15. Protected server operations perform the required authorization checks.
+
+16. Duplicate financial provider events cannot apply their financial effect more than once.
+
+17. Webhook authenticity is established before trusted financial state is changed.
+
+18. Security-sensitive credentials and raw tokens are not exposed through ordinary logs.
+
+19. Database constraints protect critical uniqueness and referential-integrity invariants.
+
+20. Migration history is not silently rewritten to conceal or bypass an inconsistent baseline.
+
+21. AI-generated output is not silently treated as verified source evidence.
+
+22. Deterministic components do not silently acquire nondeterministic external dependencies that violate their contract.
 
 ---
 
-# 50. Specification Versus Current Repository
+# 50. Compatibility and Evolution
 
-The agent MUST distinguish between:
+The system must be capable of evolving without silently weakening its invariants.
 
-    SPECIFICATION
-    CURRENT IMPLEMENTATION
-    VERIFIED CONFORMANCE
-    VERIFIED NON-CONFORMANCE
-    UNKNOWN
+Changes to:
 
-The existence of a requirement in this document does not prove that the current code satisfies it.
-
-When an implementation differs from this specification:
-
-1. Verify the implementation.
-2. Record the discrepancy.
-3. Determine whether it is intentional or defective.
-4. Check the active plan.
-5. Modify it only when authorized.
-
-Do not rewrite the specification merely to make the current implementation appear compliant.
-
----
-
-# 51. Change Impact
-
-Any change to a core invariant must be evaluated for downstream impact.
-
-In particular, changes involving:
-
-- users;
-- organizations;
-- memberships;
+- authentication;
 - sessions;
-- authentication tokens;
-- database migrations;
+- users;
+- memberships;
+- workspaces;
 - tenant context;
 - RLS;
+- database migrations;
 - credits;
-- payment events;
+- payments;
 - external integrations;
 
-may affect multiple application layers.
+must be treated as potentially cross-cutting changes.
 
-A local code change must not be assumed to have local consequences.
+A local implementation change must not be assumed to have only local consequences.
 
----
+Backward compatibility requirements must be established explicitly for each migration or API change.
 
-# 52. Canonicality Rules
-
-When a concept has a canonical representation, duplicate competing representations should not be introduced without an explicit architectural reason.
-
-Examples include:
-
-- canonical tenant identity;
-- canonical user identity;
-- canonical token representation;
-- canonical database schema;
-- canonical migration history;
-- canonical entity records;
-- canonical document identity.
-
-Compatibility layers must have an explicit purpose and must not become accidental parallel systems.
+Deprecated behavior must not remain as an accidental second security mechanism.
 
 ---
 
-# 53. Evolution and Migration
+# 51. Specification Conformance
 
-The system is expected to evolve.
+Conformance to this specification must be established through evidence.
 
-Evolution must preserve:
+For any requirement under investigation, the valid states are:
 
-- existing data integrity;
-- tenant isolation;
-- authentication security;
-- authorization boundaries;
-- migration traceability;
-- backward compatibility where required;
-- explicit deprecation behavior.
+    COMPLIANT
+    NON-COMPLIANT
+    PARTIALLY VERIFIED
+    NOT VERIFIED
+    NOT APPLICABLE
 
-A migration must be an intentional state transition, not a tool-generated attempt to reconcile unknown repository state.
+The agent must not use "compliant" merely because:
 
----
+- the code compiles;
+- a test passes;
+- a migration command succeeds;
+- a file contains an expected name;
+- a previous agent claimed completion.
 
-# 54. Definition of Correctness
-
-A feature is technically correct only when:
-
-1. It satisfies the applicable specification.
-2. It integrates correctly with existing architecture.
-3. It preserves security invariants.
-4. It preserves tenant boundaries.
-5. It preserves database integrity.
-6. It handles relevant failure modes.
-7. It has appropriate test coverage or documented verification.
-8. Its implementation is within the authorized scope.
-9. Its resulting repository state has been verified.
-
-"Compiles" is not equivalent to "correct."
-
-"Tests pass" is not equivalent to "secure."
-
-"Migration generated" is not equivalent to "database state is correct."
+Conformance requires inspection and verification appropriate to the requirement.
 
 ---
 
-# 55. Final System Principle
+# 52. Specification Changes
 
-Seorchable must remain a secure, multi-tenant intelligence platform in which:
+This document is itself part of the system's engineering contract.
 
-    USERS
+A change to this specification must:
+
+1. Clearly identify the requirement being changed.
+2. Explain why the change is necessary.
+3. Identify affected invariants.
+4. Identify affected implementation areas where known.
+5. Identify required migration or compatibility consequences.
+6. Avoid changing the specification merely to make an existing implementation appear compliant.
+
+A discovered implementation defect must not be "fixed" by weakening the specification unless the intended product behavior has actually changed.
+
+---
+
+# 53. Relationship to Current Repository
+
+The repository may currently contain:
+
+- incomplete implementations;
+- legacy implementations;
+- inconsistent schema representations;
+- obsolete compatibility code;
+- missing tests;
+- partially migrated functionality;
+- technical debt;
+- behavior that violates this specification.
+
+Those conditions are repository findings.
+
+They are not automatically part of the target architecture.
+
+The agent must therefore maintain the distinction:
+
+    CURRENT REPOSITORY
+            ≠
+    TARGET SPECIFICATION
+
+The purpose of engineering work is to move the authorized portion of the current repository toward the target state while preserving all unrelated existing invariants.
+
+---
+
+# 54. Definition of System Correctness
+
+The system is considered correct for a given capability only when the relevant implementation:
+
+1. Satisfies the applicable requirements in this specification.
+2. Integrates with the existing architecture.
+3. Preserves authentication and authorization boundaries.
+4. Preserves tenant isolation.
+5. Preserves database integrity.
+6. Handles relevant failure and concurrency cases.
+7. Preserves required compatibility.
+8. Has appropriate verification evidence.
+9. Has been changed within the authorized scope.
+
+The following are not, by themselves, definitions of correctness:
+
+    "It compiles."
+
+    "The test passed."
+
+    "The migration generated."
+
+    "The UI works."
+
+    "The agent said it was complete."
+
+Each establishes only the property it actually verifies.
+
+---
+
+# 55. Final System Contract
+
+Seorchable must remain a secure, multi-tenant intelligence platform.
+
+Its fundamental security and data model is:
+
+    USER
       ↓
     AUTHENTICATED IDENTITY
       ↓
-    AUTHORIZED WORKSPACE CONTEXT
+    AUTHORIZED MEMBERSHIP
       ↓
-    TRUSTED DOMAIN OPERATIONS
+    TRUSTED WORKSPACE CONTEXT
+      ↓
+    DOMAIN OPERATION
       ↓
     ISOLATED DATA
       ↓
-    DETERMINISTIC / GROUNDED INTELLIGENCE
+    ANALYSIS / INTELLIGENCE
       ↓
-    AUDITABLE RESULTS
+    VERIFIED OR CLEARLY QUALIFIED RESULT
       ↓
     USER ACTION
 
-Every layer must preserve the invariants established by the layers before it.
+At every transition:
 
-Convenience must not override security.
+- identity must remain trustworthy;
+- authorization must remain enforceable;
+- tenant ownership must remain intact;
+- database state must remain consistent;
+- external side effects must be controlled;
+- generated intelligence must remain distinguishable from source evidence.
 
-Generated artifacts must not override architectural intent.
+The system must prefer explicit, verifiable state over implicit assumptions.
 
-Current implementation must not redefine desired behavior merely because it already exists.
-
-And repository repair must never be performed by hiding contradictions; contradictions must be exposed, understood, and resolved deliberately.
-```0
+The implementation must never redefine the intended system merely because the current repository happens to be inconsistent with it.
