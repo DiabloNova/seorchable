@@ -1,12 +1,14 @@
 ---
-
 name: build-from-plan
 description: 'Execute one explicitly authorized plan step against the actual repository using evidence-first inspection, strict scope control, protected repository state, and verifiable implementation. Designed for controlled iterative development of Seorchable with strong security, database, migration, and verification safeguards.'
 license: MIT
 metadata:
-prompt_slug: task_build_from_plan
-title: Build from Plan
-category: Iterative Development
+  prompt_slug: task_build_from_plan
+  title: Build from Plan
+  category: Iterative Development
+---
+
+# Build from Plan
 
 Build from Plan
 
