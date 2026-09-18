@@ -2,127 +2,219 @@
 
 # Seorchable — Controlled Engineering Blueprint
 
-This document defines the mandatory workflow for AI-assisted engineering work in this repository.
+This document defines the mandatory governance and lifecycle for AI-assisted engineering work in the Seorchable repository, including work performed by autonomous coding agents such as Google Jules.
 
-It is designed for autonomous coding agents, including Google Jules.
+This document defines **how engineering work is controlled and performed**.
 
-This document defines **how work is to be performed**.
+It does not replace the application's technical specification, it does not authorize arbitrary changes, and it does not grant an agent authority to redefine the project.
 
-It does not define the complete technical specification of the application and it does not authorize arbitrary changes.
+The repository, the active user request, `AGENTS.md`, `BLUEPRINT.md`, `SPEC.md`, `PLAN.md`, and applicable `SKILL.md` files have distinct purposes and must be interpreted accordingly.
 
-The repository, the active task, `AGENTS.md`, `SPEC.md`, and `PLAN.md` must be treated as separate sources of control with distinct purposes.
+The governing objective is:
+
+> Make authorized changes correctly, preserve everything outside the authorized scope, verify material claims with appropriate evidence, expose uncertainty and failure, and never guess when the repository does not establish the next safe action.
 
 ---
 
-## 1. Purpose
+# 1. Purpose
 
 Seorchable is treated as a potentially inconsistent brownfield repository.
 
-The agent must therefore operate as an investigator before operating as an implementer.
+An agent must therefore operate as an investigator before operating as an implementer.
 
-The required operating model is:
+The mandatory engineering model is:
 
-    INSPECT
-      ↓
+    UNDERSTAND REQUEST
+          ↓
+    INSPECT LIVE REPOSITORY
+          ↓
+    ESTABLISH BASELINE
+          ↓
     ESTABLISH FACTS
-      ↓
-    IDENTIFY CONFLICTS
-      ↓
-    DEFINE SCOPE
-      ↓
-    ALIGN ON TARGET STATE
-      ↓
+          ↓
+    IDENTIFY CONFLICTS / UNKNOWNS
+          ↓
+    DEFINE AUTHORIZED SCOPE
+          ↓
+    ALIGN CURRENT STATE WITH TARGET STATE
+          ↓
     PLAN
-      ↓
-    HUMAN APPROVAL
-      ↓
+          ↓
+    HUMAN APPROVAL WHEN REQUIRED
+          ↓
     IMPLEMENT
-      ↓
+          ↓
     VERIFY
-      ↓
+          ↓
+    ADVERSARIAL / MUTATION VERIFICATION WHEN WARRANTED
+          ↓
     REVIEW
-      ↓
+          ↓
     REPORT
+          ↓
+    STOP
 
-The agent MUST NOT skip an earlier stage merely because the requested change appears simple.
+An agent MUST NOT skip an earlier control merely because the requested change appears simple.
+
+The depth of investigation and verification may be proportional to the risk and blast radius of the change, but the governing controls themselves remain applicable.
 
 ---
 
 # 2. Governing Principles
 
-The following principles govern every phase.
+## 2.1 Reality Before Intention
 
-### 2.1 Reality Before Intention
+Determine what the repository actually contains before deciding how it should be changed.
 
-Determine what the repository currently contains before deciding how it should be changed.
+Do not infer current state from what the repository appears intended to contain.
 
-### 2.2 Evidence Before Conclusion
+## 2.2 Evidence Before Conclusion
 
-Every material conclusion must be supported by direct evidence.
+Every material conclusion must be supported by evidence appropriate to that conclusion.
 
-### 2.3 Scope Before Implementation
+A plausible explanation is not evidence.
 
-The agent must know what it is authorized to change before modifying files.
+A previous agent's report is not independent evidence.
 
-### 2.4 Specification Before Design
+A passing test is not automatically proof that the test is capable of detecting the relevant defect.
 
-The desired behavior must be understood before implementation decisions are made.
+## 2.3 Scope Before Implementation
 
-### 2.5 Diagnosis Before Repair
+The agent must establish exactly what it is authorized to change before modifying files.
 
-An error must be understood before attempting to fix it.
+A discovered problem does not become authorized merely because it is related.
 
-### 2.6 Verification Before Completion
+## 2.4 Specification Before Design
 
-A change is not complete until its relevant acceptance criteria have been verified.
+Understand the intended behavior before choosing an implementation.
 
-### 2.7 Stop Before Guessing
+Do not redesign a subsystem merely because another design appears preferable.
 
-When material uncertainty cannot be resolved safely from available evidence, stop.
+## 2.5 Diagnosis Before Repair
+
+Understand and, where practical, reproduce a claimed defect before repairing it.
+
+Do not guess at the cause of a failure.
+
+## 2.6 Verification Before Completion
+
+A change is not complete merely because code was written or a command succeeded.
+
+Material acceptance criteria must be verified with appropriate evidence.
+
+## 2.7 Stop Before Guessing
+
+When material uncertainty cannot be resolved safely from available evidence and authorization, stop.
+
+Stopping because the evidence is insufficient is a valid engineering result.
+
+## 2.8 Preserve Existing State
+
+Pre-existing user work, repository history, migration history, and unrelated behavior are protected unless the authorized task explicitly changes them.
+
+## 2.9 Minimality After Completeness
+
+Prefer the smallest correct implementation, but never omit required behavior, compatibility changes, security controls, or verification merely to reduce the diff.
+
+## 2.10 Honest Reporting
+
+The final report must describe what was actually observed, executed, verified, skipped, broken, or left unresolved.
+
+The agent must never report an expected result as an observed result.
 
 ---
 
 # 3. Controlled Document Model
 
-The repository uses these documents as separate layers of control:
+The repository uses separate documents as separate layers of control.
 
-| Document | Purpose |
+| Document | Primary responsibility |
 |---|---|
-| `AGENTS.md` | Mandatory agent operating rules |
-| `BLUEPRINT.md` | Engineering workflow and phase protocol |
-| `SPEC.md` | Desired technical behavior and invariants |
-| `PLAN.md` | Current authorized implementation plan |
-| `SKILL.md` | Detailed operational procedures |
+| `AGENTS.md` | Mandatory agent constraints and repository-wide operating rules |
+| `BLUEPRINT.md` | Engineering lifecycle, governance gates, and control protocol |
+| `SPEC.md` | Intended technical behavior, requirements, and invariants |
+| `PLAN.md` | Currently authorized implementation scope and planned work |
+| `SKILL.md` | Detailed operational procedure for performing an applicable task |
 
 Their responsibilities MUST NOT be merged.
 
-### `AGENTS.md`
+## 3.1 Actual Repository State
 
-Defines mandatory behavioral constraints.
+The actual repository establishes **what currently exists**.
 
-### `BLUEPRINT.md`
+Source files, configuration, Git state, executable behavior, database state, tests, migration metadata, and other direct evidence are used to establish current state.
 
-Defines the lifecycle through which work is performed.
+## 3.2 `AGENTS.md`
 
-### `SPEC.md`
+Defines mandatory agent behavior and restrictions.
 
-Defines what the system is intended to do.
+An agent must obey it.
 
-### `PLAN.md`
+## 3.3 `BLUEPRINT.md`
 
-Defines what work is currently authorized.
+Defines the engineering lifecycle, approval gates, evidence discipline, stop conditions, and completion controls.
 
-### `SKILL.md`
+## 3.4 `SPEC.md`
 
-Defines how specific technical operations should be performed.
+Defines intended system behavior and technical invariants.
 
-A document at a lower level MUST NOT be used to bypass a rule established at a higher level.
+It does not by itself authorize implementation of every requirement it describes.
+
+## 3.5 `PLAN.md`
+
+Defines the currently authorized work.
+
+A plan is an authorization boundary, not a general invitation to improve the repository.
+
+## 3.6 `SKILL.md`
+
+Defines detailed procedures for performing specific classes of work.
+
+A skill cannot authorize work that the active plan does not authorize.
 
 ---
 
-# 4. Standard Task Lifecycle
+# 4. Authority Rules
 
-Every substantial task MUST follow this lifecycle.
+The documents have different types of authority and must not be treated as a simple stack of interchangeable instructions.
+
+Use this model:
+
+    ACTUAL REPOSITORY
+        → establishes current state
+
+    AGENTS.md
+        → establishes mandatory agent constraints
+
+    BLUEPRINT.md
+        → establishes mandatory engineering workflow
+
+    SPEC.md
+        → establishes intended behavior and invariants
+
+    PLAN.md
+        → establishes current implementation authorization
+
+    SKILL.md
+        → establishes operational procedures within that authorization
+
+A lower-level procedure MUST NOT be used to bypass a higher-level constraint.
+
+An implementation plan MUST NOT override a mandatory repository safety rule.
+
+A skill MUST NOT expand the authorized scope.
+
+A specification MUST NOT be treated as implementation authorization unless the applicable plan or explicit user instruction authorizes that work.
+
+If two authoritative sources materially conflict, the agent must enter a contradiction state and resolve the conflict through further evidence or human decision.
+
+The agent must not silently choose whichever interpretation makes implementation easier.
+
+---
+
+# 5. Standard Task Lifecycle
+
+Every task governed by this blueprint follows the lifecycle below.
 
 ## Phase 0 — Task Intake
 
@@ -131,80 +223,204 @@ Determine:
 - What the user explicitly requested.
 - What outcome is expected.
 - What is explicitly not requested.
-- Whether the request is implementation, investigation, audit, repair, refactoring, or planning.
-- Whether the task affects security, database state, migrations, authentication, authorization, payments, infrastructure, or other high-risk areas.
-- Whether additional information is required.
+- Whether the task is implementation, investigation, audit, repair, refactoring, migration, planning, or another activity.
+- Which repository areas may be affected.
+- Whether the task affects security, authentication, authorization, database state, migrations, payments, infrastructure, or other high-risk systems.
+- Whether the request contains ambiguity.
+- Whether additional authorization or information is required.
 
-The agent MUST NOT silently transform a request into a broader objective.
+The agent MUST NOT silently transform a narrow request into a broader objective.
 
----
-
-## Phase 1 — Repository Reconnaissance
-
-This phase is read-only.
+## Phase 1 — Read-Only Repository Reconnaissance
 
 No implementation changes are permitted.
 
-The agent MUST inspect the repository sufficiently to establish the current state relevant to the task.
+Inspect the actual repository sufficiently to establish the state relevant to the task.
 
-Depending on scope, this includes:
+Depending on scope, inspect:
 
-- Git branch.
-- Git commit.
-- Git status.
-- Existing working-tree changes.
-- Repository structure.
-- Relevant source files.
-- Relevant configuration.
-- `package.json`.
-- Package manager.
-- Available scripts.
-- Relevant tests.
-- Database configuration.
-- Schema definitions.
-- Migration files.
-- Migration journal.
-- Migration metadata and snapshots.
-- Relevant documentation.
-- Existing agent instructions.
-- Relevant callers and consumers.
+- branch;
+- commit;
+- working-tree status;
+- existing modifications;
+- repository instructions;
+- relevant source files;
+- configuration;
+- `package.json`;
+- package manager;
+- lockfile;
+- available scripts;
+- relevant tests;
+- relevant callers and consumers;
+- database configuration;
+- schema;
+- migration files;
+- migration journal;
+- migration metadata and snapshots;
+- relevant generated artifacts;
+- relevant documentation.
 
-The agent MUST inspect actual file contents where conclusions depend on them.
+Actual file contents must be inspected whenever conclusions depend on them.
 
-A filename, search result, snapshot, or previous report is not sufficient evidence of implementation behavior.
+A filename, index, snapshot, search result, or previous report is not a substitute for reading the relevant source.
 
-### Phase 1 Exit Criteria
+## Phase 2 — Baseline and Evidence Establishment
 
-The agent must be able to state:
+Establish:
 
     CURRENT REPOSITORY STATE
     RELEVANT FILES
     RELEVANT CONFIGURATION
     RELEVANT DEPENDENCIES
+    RELEVANT CONSUMERS
     RELEVANT TESTS
+    RELEVANT DATABASE STATE
+    PRE-EXISTING CHANGES
+    PRE-EXISTING FAILURES
     KNOWN CONFLICTS
     KNOWN UNKNOWNS
-    PRE-EXISTING CHANGES
 
-If these cannot be established, Phase 1 is incomplete.
+If these cannot be established sufficiently for safe implementation, the phase is incomplete.
+
+## Phase 3 — Scope and Alignment
+
+Determine:
+
+    CURRENT STATE
+    TARGET STATE
+    IN SCOPE
+    OUT OF SCOPE
+    DEPENDENCIES
+    RISKS
+    ACCEPTANCE CRITERIA
+    VERIFICATION
+    STOP CONDITIONS
+
+The target state must come from the applicable specification or explicit authorization.
+
+The agent must not invent material target behavior.
+
+## Phase 4 — Planning
+
+Create or follow an explicit implementation plan.
+
+Each implementation phase should have:
+
+    OBJECTIVE
+    PRECONDITIONS
+    ALLOWED FILES
+    ALLOWED OPERATIONS
+    FORBIDDEN OPERATIONS
+    EXPECTED RESULT
+    VERIFICATION
+    STOP CONDITIONS
+
+The plan must be specific enough that a reviewer can determine whether an individual change belongs to the authorized task.
+
+## Phase 5 — Human Approval
+
+Where human approval is required, implementation must not begin until the applicable plan and scope have been explicitly approved.
+
+An already-approved plan authorizes implementation only within the approved scope.
+
+Approval does not authorize unrelated changes discovered later.
+
+If the repository is materially different from the state on which the approved plan was based, the agent must stop and re-align.
+
+## Phase 6 — Controlled Implementation
+
+Implement one authorized phase at a time.
+
+Before modification:
+
+    WHY IS THIS FILE CHANGING?
+    WHAT EXACT CHANGE IS REQUIRED?
+    IS IT IN SCOPE?
+    WHAT PRE-EXISTING CHANGES EXIST?
+    HOW WILL IT BE VERIFIED?
+
+During modification:
+
+- preserve unrelated behavior;
+- preserve pre-existing work;
+- avoid speculative refactoring;
+- do not expand scope;
+- do not rewrite history;
+- do not conceal failures.
+
+After modification:
+
+- inspect the resulting state;
+- run required verification;
+- record evidence.
+
+## Phase 7 — Verification
+
+Verify the actual acceptance criteria.
+
+Verification depth must be proportional to risk and blast radius.
+
+A small documentation change may need syntax/content validation.
+
+A security-sensitive lifecycle change may require positive, negative, replay, expiry, and authorization testing.
+
+A database migration may require schema, migration, metadata, execution, resulting-state, constraint, and compatibility verification.
+
+## Phase 8 — Adversarial / Mutation Verification
+
+Where a material requirement depends on a verification mechanism being capable of detecting a defect, challenge that mechanism where practical.
+
+Deliberately introduce a minimal relevant defect.
+
+The verification must fail for the intended reason.
+
+Restore the correct implementation.
+
+Re-run verification.
+
+Do not use mutation testing as an excuse for arbitrary repository modification.
+
+## Phase 9 — Final Review
+
+Review:
+
+- implementation;
+- acceptance criteria;
+- security implications;
+- database implications;
+- Git status;
+- final diff;
+- generated artifacts;
+- migration state;
+- scope compliance.
+
+## Phase 10 — Report
+
+Report observed facts, verification results, failures, skipped checks, limitations, and out-of-scope findings.
+
+Do not overstate certainty.
+
+## Phase 11 — Stop
+
+After the authorized step is complete and reported, stop.
+
+Do not automatically begin the next plan step.
 
 ---
 
-# 5. Evidence Discipline
+# 6. Evidence Discipline
 
-The agent must maintain an evidence chain throughout the task.
+The agent must maintain an evidence chain for material findings.
 
-For each material finding, record:
+For important findings, record:
 
     CLAIM
     SOURCE
     OBSERVATION
     INTERPRETATION
-    CONFIDENCE / STATUS
+    STATUS
 
-The source must identify the actual repository artifact or command output from which the finding was established.
-
-The agent must distinguish:
+Distinguish:
 
     FACT
     OBSERVATION
@@ -215,53 +431,160 @@ The agent must distinguish:
 
 An assumption must never silently become a fact.
 
+## 6.1 Evidence States
+
+Use:
+
+### `HOLDS`
+
+The requirement was verified with appropriate evidence.
+
+### `BROKEN`
+
+The requirement was tested or inspected and does not hold.
+
+### `SKIPPED`
+
+The requirement could not be verified.
+
+Every `SKIPPED` result must explain:
+
+- what was not verified;
+- why it could not be verified;
+- what evidence would be required to verify it.
+
+Use:
+
+    BLOCKED — INSUFFICIENT EVIDENCE
+
+when missing evidence prevents safe continuation.
+
+## 6.2 Observed vs Claimed
+
+An observed result comes from direct inspection or execution.
+
+A claimed result comes from another source and has not been independently established.
+
+For example:
+
+    Claimed:
+    "Previous agent reports that the migration is correct."
+
+does not become:
+
+    Observed:
+    "The migration is correct."
+
+until appropriate verification is performed.
+
+## 6.3 Evidence Becomes Stale
+
+Evidence describing repository state becomes stale when the underlying state changes.
+
+After mutation, conclusions based on the pre-mutation state must be revalidated when they materially affect the final result.
+
+Do not assume that because a test, schema, or file was correct before a change, it remains correct afterward.
+
 ---
 
-# 6. Repository Truth Protocol
+# 7. Repository Truth Protocol
 
-When establishing repository state, use the following procedure.
+When establishing a repository fact:
 
-### Step 1 — Locate
+    LOCATE
+       ↓
+    INSPECT ACTUAL CONTENT
+       ↓
+    CROSS-CHECK RELATED SOURCES
+       ↓
+    TRACE IMPORTANT DEPENDENCIES
+       ↓
+    EXECUTE WHEN BEHAVIOR MATTERS
+       ↓
+    RECORD OBSERVATION
+       ↓
+    IDENTIFY REMAINING GAPS
 
-Find the relevant files and configuration.
+The agent must not stop at locating a file when understanding its behavior requires reading it.
 
-### Step 2 — Inspect
-
-Read the actual relevant content.
-
-### Step 3 — Cross-check
-
-Compare related sources where consistency matters.
-
-### Step 4 — Trace
-
-Follow important definitions to their callers, consumers, migrations, tests, or runtime boundaries.
-
-### Step 5 — Record
-
-Record the verified result.
-
-### Step 6 — Identify Gaps
-
-Explicitly record anything that remains unverified.
-
-The agent MUST NOT stop at discovery when the task requires understanding behavior.
+For important behavior, trace definitions to relevant callers and consumers.
 
 ---
 
-# 7. Contradiction Resolution
+# 8. Anti-Lazy Inspection Protocol
 
-When contradictory evidence is discovered, the agent MUST enter a contradiction state.
+The following pattern is prohibited:
 
-A contradiction state requires:
+    SEARCH
+      ↓
+    FIND ONE FILE
+      ↓
+    INFER SYSTEM
+      ↓
+    IMPLEMENT
+
+The required pattern is:
+
+    SEARCH
+      ↓
+    LOCATE
+      ↓
+    READ ACTUAL FILE
+      ↓
+    INSPECT SURROUNDING IMPLEMENTATION
+      ↓
+    TRACE DEPENDENCIES
+      ↓
+    CROSS-CHECK RELATED SOURCES
+      ↓
+    ESTABLISH FACT
+      ↓
+    ACT
+
+For high-risk areas, inspect both definitions and consumers.
+
+Examples:
+
+    DATABASE SCHEMA
+      → MIGRATIONS
+      → METADATA / JOURNAL
+      → APPLICATION CONSUMERS
+      → DATABASE TESTS
+
+    AUTHENTICATION FUNCTION
+      → SESSION HANDLING
+      → CALLERS
+      → FAILURE PATHS
+      → RELEVANT TESTS
+
+    API ROUTE
+      → VALIDATION
+      → AUTHORIZATION
+      → PERSISTENCE
+      → ERROR PATHS
+      → TESTS
+
+    PAYMENT WEBHOOK
+      → RAW REQUEST
+      → SIGNATURE VERIFICATION
+      → IDEMPOTENCY
+      → TRANSACTION
+      → CREDIT EFFECT
+      → TESTS
+
+---
+
+# 9. Contradiction Protocol
+
+When contradictory evidence is discovered, enter:
 
     CONFLICT DETECTED
 
     SOURCE A:
-    <path / artifact>
+    <artifact>
 
     SOURCE B:
-    <path / artifact>
+    <artifact>
 
     EXACT DIFFERENCE:
     <observed difference>
@@ -269,27 +592,360 @@ A contradiction state requires:
     POSSIBLE IMPACT:
     <impact>
 
-    CURRENT STATUS:
+    RESOLUTION:
     <resolved / unresolved>
 
-    AUTHORIZED RESOLUTION:
-    <yes / no>
+    AUTHORIZATION:
+    <authorized / not authorized>
 
-The agent must then determine whether the contradiction can be resolved through further read-only inspection.
+The agent must attempt read-only resolution where appropriate.
 
-If repository evidence resolves the contradiction, document the resolution.
+If repository evidence resolves the contradiction, record the resolution.
 
 If it cannot be resolved safely, STOP.
 
-The agent MUST NOT resolve an ambiguous contradiction by choosing the option that makes the current command succeed.
+The agent MUST NOT:
+
+- choose the easier interpretation;
+- choose the interpretation that makes a command succeed;
+- alter evidence merely to remove the contradiction;
+- silently rewrite the plan.
 
 ---
 
-# 8. Database Investigation Protocol
+# 10. Failure Protocol
+
+When a command or operation fails:
+
+    FAILURE
+      ↓
+    CAPTURE ACTUAL OUTPUT
+      ↓
+    DIAGNOSE
+      ↓
+    IDENTIFY FAILURE SCOPE
+      ↓
+    DETERMINE SAFE RECOVERY
+      ↓
+    CHECK AUTHORIZATION
+      ↓
+    RECOVER OR STOP
+      ↓
+    VERIFY AGAIN
+
+Do not immediately begin speculative recovery.
+
+A later successful command does not erase an earlier failure.
+
+The final report must preserve material failures that affected the task.
+
+---
+
+# 11. Safe Recovery
+
+Recovery is permitted only when:
+
+- the cause is understood sufficiently;
+- the recovery is within scope;
+- the operation is safe;
+- user work will not be discarded;
+- historical state will not be rewritten;
+- the target behavior remains unchanged;
+- the recovery itself can be verified.
+
+If recovery requires:
+
+- destructive Git operations;
+- migration-history rewriting;
+- broad architectural changes;
+- unrelated cleanup;
+- scope expansion;
+- ambiguous database repair;
+
+STOP unless explicitly authorized.
+
+---
+
+# 12. Git and Repository State Protection
+
+The repository's history and unrelated working-tree changes are protected.
+
+Do not use destructive Git operations to manufacture a convenient baseline.
+
+Do not use:
+
+    git reset
+    git reset --hard
+    git checkout
+    git restore
+    git clean
+    git rebase
+    git revert
+
+for the purpose of discarding, hiding, or rewriting repository state, unless an explicitly authorized higher-level procedure requires a particular operation.
+
+Do not:
+
+- discard another agent's work;
+- overwrite pre-existing changes;
+- delete untracked files merely to obtain a clean tree;
+- rewrite history to hide implementation state;
+- amend history merely to conceal mistakes.
+
+An unexpected Git state is a stop condition.
+
+---
+
+# 13. Scope Control
+
+The active plan defines implementation authorization.
+
+The agent must distinguish:
+
+    REQUESTED
+    AUTHORIZED
+    NECESSARY COUPLED CHANGE
+    DISCOVERED
+    OUT OF SCOPE
+
+A discovered issue is not automatically authorized.
+
+If a discovered issue is outside scope:
+
+    RECORD FINDING
+    DO NOT MODIFY IT
+
+If it blocks safe completion:
+
+    STOP
+    REPORT BLOCKER
+
+## 13.1 Scope Expansion
+
+Scope may change only through explicit re-planning and authorization where required.
+
+Do not silently:
+
+- add features;
+- refactor;
+- upgrade dependencies;
+- redesign architecture;
+- change unrelated database structures;
+- rewrite migration history;
+- alter unrelated documentation;
+- fix unrelated bugs.
+
+---
+
+# 14. Ambiguity Protocol
+
+When a material requirement is ambiguous:
+
+1. inspect the specification;
+2. inspect the active plan;
+3. inspect current implementation;
+4. inspect relevant consumers;
+5. inspect relevant tests;
+6. determine whether repository evidence resolves the ambiguity.
+
+If ambiguity remains:
+
+    BLOCKED — AMBIGUOUS REQUIREMENT
+
+Report:
+
+    AMBIGUITY:
+    <exact issue>
+
+    EVIDENCE:
+    <relevant evidence>
+
+    POSSIBLE INTERPRETATIONS:
+    <only if useful>
+
+    REQUIRED DECISION:
+    <what must be decided>
+
+Do not silently choose an interpretation.
+
+---
+
+# 15. Defect Reproduction Protocol
+
+When repairing a claimed defect, establish the failure before repair where practical.
+
+Use:
+
+    INSPECT
+      ↓
+    REPRODUCE
+      ↓
+    OBSERVE FAILURE
+      ↓
+    IMPLEMENT
+      ↓
+    REPRODUCE
+      ↓
+    OBSERVE CORRECTION
+      ↓
+    REGRESSION TEST
+
+If reproduction is impossible:
+
+    REPRODUCTION: SKIPPED
+
+and state why.
+
+Do not claim reproduction from static inspection alone.
+
+Reproduction may be unnecessary when the task independently requires behavior that is not dependent on reproducing an existing defect.
+
+---
+
+# 16. Verification Design
+
+Verification must be designed around acceptance criteria, not around whatever checks happen to be convenient.
+
+For each material requirement, determine:
+
+    REQUIREMENT
+    FAILURE MODE
+    VERIFICATION METHOD
+    EXPECTED RESULT
+    ACTUAL RESULT
+
+Examples:
+
+    SOURCE STRUCTURE
+    → source inspection
+
+    BUILD / TYPE SAFETY
+    → actual build / typecheck
+
+    API BEHAVIOR
+    → executable route / integration test
+
+    AUTHORIZATION
+    → positive and negative authorization tests
+
+    DATABASE CONSTRAINT
+    → database-level constraint test
+
+    MIGRATION
+    → generation / inspection / application / resulting-state verification
+
+    IDEMPOTENCY
+    → repeated-event execution and database-effect verification
+
+A command that merely exits successfully is not necessarily sufficient evidence.
+
+---
+
+# 17. Tests Must Be Effective
+
+A passing test is meaningful only if the test can detect the defect or behavior it claims to verify.
+
+For important tests, use mutation or another adversarial verification technique where practical:
+
+    CORRECT IMPLEMENTATION
+          ↓
+        TEST
+          ↓
+        PASS
+          ↓
+    INTRODUCE MINIMAL DEFECT
+          ↓
+        TEST
+          ↓
+       MUST FAIL
+          ↓
+    RESTORE IMPLEMENTATION
+          ↓
+        TEST
+          ↓
+        PASS
+
+If the test passes against both the correct and deliberately broken implementation, the test has not established meaningful detection capability.
+
+Do not leave deliberate mutations in the repository.
+
+Do not weaken a test to make mutation verification succeed.
+
+---
+
+# 18. No Verification Theater
+
+The agent must not create the appearance of verification without actual evidence.
+
+Prohibited practices include:
+
+- reporting a command as executed when it was not;
+- reporting expected output as observed output;
+- suppressing a failing command;
+- swallowing an exception;
+- deleting a failing test;
+- weakening an assertion to obtain green status;
+- changing expected behavior solely to match incorrect implementation;
+- replacing the behavior under test with an irrelevant mock;
+- hiding migration warnings;
+- treating a skipped test as a passing test;
+- treating lack of access as proof of correctness.
+
+Failures must remain visible.
+
+---
+
+# 19. Security Review
+
+Security-sensitive changes require verification of the complete relevant flow.
+
+Applicable areas include:
+
+    Authentication
+    Authorization
+    Sessions
+    Cookies
+    Password handling
+    Tokens
+    Cryptography
+    Rate limiting
+    Tenant isolation
+    RBAC
+    Secrets
+    Webhooks
+    Payment verification
+    Idempotency
+    Database access control
+    Information disclosure
+
+Inspect:
+
+- producers;
+- consumers;
+- success paths;
+- failure paths;
+- malformed inputs;
+- invalid inputs;
+- expiry;
+- invalidation;
+- replay;
+- race conditions where relevant;
+- privilege boundaries;
+- tenant boundaries;
+- logging;
+- persistence.
+
+The presence of a security mechanism is not proof that the mechanism works.
+
+Verify the mechanism against the failure mode it is intended to prevent.
+
+---
+
+# 20. Database Investigation Protocol
 
 Database work requires cross-layer inspection.
 
-When a task touches the database, the agent must distinguish:
+Treat these as distinct but connected layers:
 
     CURRENT SCHEMA
     MIGRATION HISTORY
@@ -300,52 +956,324 @@ When a task touches the database, the agent must distinguish:
     APPLICATION CONSUMERS
     DATABASE TESTS
 
-The agent must not assume these layers are synchronized.
+Do not assume that these layers are synchronized.
 
-For migration-related work, the minimum investigation is:
+For migration-related work:
 
-1. Inspect the schema definition.
-2. Inspect the relevant historical migrations.
-3. Inspect the migration journal.
-4. Inspect the relevant snapshots.
-5. Inspect migration configuration.
-6. Compare the representations.
-7. Identify conflicts.
-8. Determine whether the intended transition is unambiguous.
-9. Only then consider migration generation or modification.
+1. inspect the current schema;
+2. inspect relevant historical migrations;
+3. inspect the migration journal;
+4. inspect relevant snapshots and metadata;
+5. inspect migration configuration;
+6. compare the representations;
+7. identify conflicts;
+8. establish the intended transition;
+9. only then perform migration generation or modification.
 
-If migration tooling presents an unexpected rename, column mapping, table mapping, foreign-key change, index change, or snapshot conflict, the agent MUST stop the migration operation until the meaning of the change is established.
+If actual database access is unavailable, that limitation must be explicit.
+
+For example:
+
+    DATABASE STATE: SKIPPED
+    Reason: no accessible database connection.
+
+This does not mean:
+
+    DATABASE STATE: HOLDS
+
+Lack of evidence is not evidence of correctness.
 
 ---
 
-# 9. Audit Protocol
+# 21. Migration Integrity
 
-A task described as an audit MUST be treated differently from a normal implementation task.
+A migration is part of a state transition, not merely a SQL file.
 
-The agent must first define the audit surface.
+Verify the relevant chain:
 
-An audit surface may include:
+    SOURCE SCHEMA
+        ↓
+    MIGRATION GENERATION
+        ↓
+    MIGRATION FILE
+        ↓
+    MIGRATION JOURNAL
+        ↓
+    SNAPSHOTS / METADATA
+        ↓
+    ACTUAL DATABASE
+        ↓
+    APPLICATION COMPATIBILITY
+
+A migration is not adequately verified merely because it applies successfully once.
+
+Where applicable, verify:
+
+- generated content;
+- migration ordering;
+- journal consistency;
+- snapshot/metadata consistency;
+- tables;
+- columns;
+- indexes;
+- constraints;
+- foreign keys;
+- enums;
+- custom SQL;
+- RLS/policies;
+- resulting schema;
+- data behavior;
+- locking implications;
+- interruption behavior;
+- old/new application compatibility;
+- rollback behavior where required.
+
+An empty database does not prove safety against an existing database.
+
+Where existing data matters, use representative or production-scale verification as required by the applicable task and environment.
+
+---
+
+# 22. Migration Conflict Stop Rule
+
+If migration tooling presents an unexpected:
+
+- table rename;
+- column rename;
+- column mapping;
+- foreign-key change;
+- index change;
+- constraint change;
+- snapshot conflict;
+- journal conflict;
+- schema drift;
+
+STOP the migration operation until the meaning of the proposed change is established.
+
+The agent MUST NOT accept, reject, or resolve the proposed change merely because doing so makes the migration command complete successfully.
+
+The command succeeding is not evidence that the proposed transition is correct.
+
+---
+
+# 23. Migration History Protection
+
+Migration history is repository state.
+
+Do not:
+
+- delete historical migrations to make generation succeed;
+- renumber migrations;
+- rewrite journal history;
+- modify snapshots blindly;
+- create speculative migrations;
+- manually alter generated metadata without understanding its canonical relationship to schema and migration history.
+
+If migration history is inconsistent:
+
+    MIGRATION STATE: BROKEN
+
+If repair is outside the current authorization:
+
+    BLOCKED — MIGRATION STATE REQUIRES AUTHORIZED REPAIR
+
+Do not hide migration inconsistency by modifying unrelated artifacts.
+
+---
+
+# 24. Generated Artifacts
+
+Generated artifacts are outputs of a process.
+
+Before trusting one:
+
+1. identify its source;
+2. inspect the source;
+3. identify the canonical generation command;
+4. execute the canonical command where appropriate;
+5. inspect the generated diff;
+6. verify that output corresponds to intended source state.
+
+Do not treat generated output as a substitute for inspecting authoritative source.
+
+Do not manually modify generated output merely to obtain a desired result unless the repository explicitly treats that artifact as manually maintained.
+
+---
+
+# 25. Documentation Verification
+
+Documentation is code-adjacent when it makes technical claims.
+
+Checkable claims should be validated against the implementation where practical.
+
+Examples:
+
+    "This command generates migrations."
+    → execute the command where appropriate.
+
+    "This endpoint requires authentication."
+    → inspect and test the endpoint.
+
+    "This constraint prevents duplicates."
+    → verify the database constraint.
+
+Do not claim an audit or implementation is correct merely because documentation describes it correctly.
+
+---
+
+# 26. Dependency Changes
+
+Do not add, remove, replace, upgrade, or downgrade dependencies unless explicitly authorized or strictly necessary for the authorized implementation.
+
+When a dependency change is required:
+
+- establish why;
+- inspect compatibility;
+- use the repository's canonical package manager;
+- update the lockfile appropriately;
+- inspect dependency changes;
+- run relevant verification.
+
+Do not perform opportunistic dependency upgrades.
+
+---
+
+# 27. Re-Planning Protocol
+
+Re-planning is required when new evidence materially changes:
+
+- current-state assumptions;
+- target behavior;
+- scope;
+- architecture;
+- migration strategy;
+- dependencies;
+- risk;
+- acceptance criteria;
+- required verification.
+
+Record:
+
+    ORIGINAL PLAN
+    NEW EVIDENCE
+    REASON FOR CHANGE
+    PROPOSED PLAN
+    NEW RISKS
+    NEW VERIFICATION
+
+Implementation must pause when the changed plan requires renewed authorization.
+
+A discovery that changes only an internal implementation detail without changing scope, target behavior, architecture, risk, or acceptance criteria does not automatically require a new plan.
+
+The agent must still document material deviations.
+
+---
+
+# 28. Phase Discipline
+
+Each implementation phase must have:
+
+    OBJECTIVE
+    PRECONDITIONS
+    ALLOWED FILES
+    ALLOWED OPERATIONS
+    FORBIDDEN OPERATIONS
+    EXPECTED RESULT
+    VERIFICATION
+    STOP CONDITIONS
+
+Before the phase:
+
+    VERIFY PRECONDITIONS
+
+During the phase:
+
+    MODIFY ONLY AUTHORIZED STATE
+
+After the phase:
+
+    INSPECT RESULT
+    RUN VERIFICATION
+    RECORD EVIDENCE
+
+Do not combine unrelated implementation and cleanup into a phase.
+
+---
+
+# 29. Stop Conditions
+
+The agent must stop when any of the following materially affects safe continuation:
+
+- unexpected Git state;
+- unexpected deletion;
+- unexpected migration change;
+- unexpected schema drift;
+- conflicting authoritative instructions;
+- unresolved material ambiguity;
+- unresolved security ambiguity;
+- unresolved database ambiguity;
+- required file is missing;
+- required dependency is unavailable;
+- verification fails unexpectedly;
+- required verification cannot be meaningfully performed;
+- continuing would require destructive operations;
+- continuing would expand scope;
+- continuing would require guessing.
+
+Use:
+
+    STATUS: BLOCKED
+
+    PHASE:
+    <phase>
+
+    EXPECTED:
+    <expected state>
+
+    OBSERVED:
+    <actual state>
+
+    EVIDENCE:
+    <evidence>
+
+    IMPACT:
+    <why continuation is unsafe>
+
+    REQUIRED DECISION:
+    <required decision>
+
+    NO FURTHER MODIFICATION PERFORMED.
+
+---
+
+# 30. Audit Protocol
+
+An audit is different from an implementation task.
+
+Before an audit, define the audit surface.
+
+Possible surfaces include:
 
     Architecture
-    Application code
+    Application Code
     Database
     Authentication
     Authorization
     Security
     APIs
-    Background jobs
+    Background Jobs
     Integrations
     Tests
     Configuration
     Dependencies
-    Build system
+    Build System
     Deployment
     Documentation
     Observability
 
-The agent MUST NOT claim a complete audit if material areas were not inspected.
+An audit must not be called complete if material portions of the declared surface were not inspected.
 
-An audit report must include:
+A complete audit report must identify:
 
     SCOPE INSPECTED
     FILES / SYSTEMS INSPECTED
@@ -356,659 +1284,287 @@ An audit report must include:
     TEST / VERIFICATION STATUS
     AREAS NOT INSPECTED
 
-"360° audit" means comprehensive inspection of the declared surface, not a small sample of representative files.
+"360° audit" means comprehensive inspection of the declared surface, not inspection of a representative sample.
 
 ---
 
-# 10. Anti-Lazy Inspection Protocol
+# 31. Final Diff Review
 
-The agent MUST NOT substitute breadth of search results for depth of inspection.
+The final diff is mandatory evidence.
 
-The following pattern is prohibited:
+Inspect:
 
-    Search → find one relevant file → infer the architecture → implement.
+    git status
+    git diff
+    git diff --stat
 
-The required pattern is:
+Then inspect every changed file directly where relevant.
 
-    Search
-      ↓
-    Locate
-      ↓
-    Read actual file
-      ↓
-    Inspect surrounding implementation
-      ↓
-    Trace dependencies
-      ↓
-    Cross-check related sources
-      ↓
-    Establish fact
-      ↓
-    Act
+Classify changes as:
 
-For high-risk areas, the agent MUST inspect both the definition and the relevant consumers.
+    AUTHORIZED
+    NECESSARY COUPLED CHANGE
+    UNEXPECTED
 
-Examples:
+Investigate every unexpected change.
 
-- Database schema → migrations → consumers.
-- Authentication function → session handling → callers.
-- API route → validation → authorization → persistence.
-- Payment webhook → signature verification → idempotency → transaction.
-- Configuration → actual consuming code → runtime behavior.
+Check for:
+
+- accidental deletions;
+- temporary files;
+- debug artifacts;
+- generated junk;
+- unrelated modifications;
+- unexpected dependency changes;
+- schema drift;
+- migration drift;
+- documentation drift.
+
+A green test suite does not eliminate the requirement to inspect the diff.
 
 ---
 
-# 11. Alignment Gate
+# 32. Final Scope Review
 
-After reconnaissance and before implementation, the agent must establish an explicit alignment record.
-
-The alignment record must answer:
-
-    OBJECTIVE:
-    <what is being accomplished>
-
-    CURRENT STATE:
-    <verified state>
-
-    TARGET STATE:
-    <desired state>
-
-    IN SCOPE:
-    <authorized files / behavior>
-
-    OUT OF SCOPE:
-    <protected areas>
-
-    DEPENDENCIES:
-    <prerequisites>
-
-    RISKS:
-    <known risks>
-
-    ACCEPTANCE CRITERIA:
-    <measurable requirements>
-
-    VERIFICATION:
-    <how success will be established>
-
-    STOP CONDITIONS:
-    <conditions requiring halt>
-
-If the target state is not established by the specification or explicit user instruction, the agent MUST NOT invent one.
-
----
-
-# 12. Planning Gate
-
-Before implementation, the agent must produce or follow an explicit plan.
-
-A plan must decompose the work into independently verifiable phases.
-
-Each phase must specify:
-
-    PHASE OBJECTIVE
-    PRECONDITIONS
-    ALLOWED FILES
-    ALLOWED OPERATIONS
-    FORBIDDEN OPERATIONS
-    EXPECTED RESULT
-    VERIFICATION
-    STOP CONDITIONS
-    EVIDENCE
-
-The plan must be specific enough that a reviewer can determine whether an individual action belongs to the authorized work.
-
----
-
-# 13. Human Approval Gate
-
-For substantial or high-risk changes, implementation must not begin until the applicable plan has been explicitly approved.
-
-Approval must be understood as approval of the defined scope and intended operation.
-
-Approval of a plan does not authorize unrelated changes discovered later.
-
-If implementation reveals a materially different repository state from the one on which the plan was based, the agent must stop and re-align rather than silently modifying the plan.
-
----
-
-# 14. Phase Execution Protocol
-
-During implementation, the agent must operate one phase at a time.
-
-For each phase:
-
-### Before
-
-Verify the preconditions.
-
-### During
-
-Perform only authorized operations.
-
-### After
-
-Inspect the resulting state.
-
-### Then
-
-Run the required verification.
-
-### Finally
-
-Record evidence before moving forward.
-
-The agent MUST NOT combine implementation, unrelated cleanup, and speculative repair into one phase.
-
----
-
-# 15. Modification Boundary
-
-Before every modification, the agent must know:
-
-    WHY THIS FILE IS BEING CHANGED
-    WHAT EXACT CHANGE IS REQUIRED
-    WHETHER THE FILE IS IN SCOPE
-    WHAT PRE-EXISTING CHANGES EXIST
-    WHAT VERIFICATION WILL FOLLOW
-
-If any answer is materially unknown, the agent should not modify the file.
-
----
-
-# 16. Minimal-Change Principle
-
-The preferred implementation is the smallest change that satisfies the complete requirement.
-
-The agent should minimize:
-
-- Files changed.
-- Lines changed.
-- New dependencies.
-- New abstractions.
-- Behavioral changes.
-- Database changes.
-- Migration changes.
-- Risk.
-
-Minimality does not justify incomplete implementation.
-
-A required change must not be omitted merely to keep the diff small.
-
----
-
-# 17. Error and Failure Protocol
-
-When a command fails, the agent MUST NOT immediately begin speculative recovery.
-
-The required sequence is:
-
-    FAILURE
-      ↓
-    CAPTURE OUTPUT
-      ↓
-    DIAGNOSE
-      ↓
-    IDENTIFY SCOPE OF FAILURE
-      ↓
-    DETERMINE SAFE RECOVERY
-      ↓
-    CHECK AUTHORIZATION
-      ↓
-    RECOVER OR STOP
-      ↓
-    VERIFY
-
-The original failure must remain visible in the final report.
-
-A later successful command does not erase an earlier failure.
-
----
-
-# 18. Safe Recovery
-
-Recovery is permitted only when:
-
-- The cause is understood sufficiently.
-- The recovery is within scope.
-- The operation is safe.
-- The operation does not destroy user work or historical state.
-- The recovery does not silently redefine the objective.
-
-If recovery would require:
-
-- destructive operations;
-- migration-history changes;
-- broad refactoring;
-- scope expansion;
-- Git history manipulation;
-- ambiguous database repair;
-
-the agent MUST STOP unless explicitly authorized.
-
----
-
-# 19. Verification Gate
-
-Every implementation phase must end with verification.
-
-Verification must test the actual acceptance criteria.
-
-The agent must select verification proportional to the risk.
-
-Examples:
-
-| Change | Relevant verification |
-|---|---|
-| Source logic | Unit / integration tests |
-| API behavior | Route-level / integration tests |
-| Database schema | Schema inspection + migration verification |
-| Migration | Migration generation/inspection + metadata verification |
-| Authentication | Security-focused lifecycle tests |
-| Authorization | Role / tenancy tests |
-| Configuration | Runtime/config validation |
-| Build-related change | Build/type/lint checks |
-| Repository-wide change | Diff/status + relevant test suite |
-
-A check that was not executed must be reported as:
-
-    NOT RUN
-
-A result that could not be independently established must be reported as:
-
-    NOT VERIFIED
-
----
-
-# 20. Verification Must Not Be Gamed
-
-The agent must not obtain a passing result by weakening the verification itself.
-
-Prohibited examples include:
-
-- Removing a failing assertion.
-- Narrowing a test to exclude the failure.
-- Deleting a failing test.
-- Replacing a real integration with an irrelevant mock.
-- Changing expected behavior merely to match the implementation.
-- Skipping required checks without disclosure.
-- Suppressing errors.
-- Ignoring a migration warning because generation otherwise succeeds.
-
-If a legitimate check fails, diagnose the failure.
-
-If it cannot be safely resolved within scope, STOP and report it.
-
----
-
-# 21. Review Gate
-
-Before declaring a phase or task complete, the agent must review the resulting change against:
-
-1. The original objective.
-2. The active specification.
-3. The active plan.
-4. The allowed file set.
-5. The forbidden file set.
-6. Security requirements.
-7. Database invariants where applicable.
-8. Verification results.
-9. Git diff.
-10. Git status.
-
-The agent must specifically check for unintended changes.
-
----
-
-# 22. Diff Review
-
-The final diff is a required source of evidence.
-
-The agent must inspect:
-
-- Every modified file.
-- Every created file.
-- Every deleted file.
-- Unexpected formatting changes.
-- Unexpected generated files.
-- Unexpected migration changes.
-- Unexpected dependency changes.
-- Changes outside the authorized scope.
-
-A clean test result does not eliminate the requirement to inspect the diff.
-
----
-
-# 23. Git State Review
-
-Before and after implementation, Git state must be compared.
-
-The agent must identify:
-
-    PRE-EXISTING CHANGES
-    AGENT CHANGES
-    UNEXPECTED CHANGES
-
-The agent must preserve pre-existing changes.
-
-Unexpected changes must be investigated before completion.
-
----
-
-# 24. Security Review Gate
-
-For security-sensitive work, the agent must perform an explicit security review before completion.
-
-The review should consider, where applicable:
-
-    Authentication
-    Authorization
-    Session lifecycle
-    Cookie security
-    Password handling
-    Token handling
-    Cryptography
-    Rate limiting
-    Tenant isolation
-    RBAC
-    Secrets
-    Webhook verification
-    Idempotency
-    Database access control
-    Information disclosure
-
-The agent must verify that the implementation did not weaken an existing security property.
-
----
-
-# 25. Database Review Gate
-
-For database work, completion requires reviewing the complete relevant transition:
-
-    SOURCE SCHEMA
-        ↓
-    GENERATED / AUTHORIZED MIGRATION
-        ↓
-    MIGRATION METADATA
-        ↓
-    JOURNAL
-        ↓
-    EXPECTED DATABASE STATE
-        ↓
-    APPLICATION COMPATIBILITY
-
-If any material link in this chain remains ambiguous, the database phase is not complete.
-
----
-
-# 26. Scope Review Gate
-
-Before completion, compare the actual diff against the authorized scope.
-
-The agent must answer:
+Before completion, answer:
 
     Did every changed file belong to the task?
-    Did every change serve the objective?
-    Was any unrelated behavior changed?
-    Were any dependencies changed?
-    Were any migrations changed unexpectedly?
-    Were any generated artifacts changed unexpectedly?
-    Was any user work overwritten?
-    Was any historical state modified?
+    Did every change serve the authorized objective?
+    Was unrelated behavior changed?
+    Were dependencies changed?
+    Were migrations changed unexpectedly?
+    Were generated artifacts changed unexpectedly?
+    Was pre-existing user work preserved?
+    Was historical state preserved?
+    Was any destructive operation used?
+    Was any plan meaning silently changed?
 
-If an unauthorized change exists, the task is not complete until it is resolved safely.
+If an unauthorized change exists, the task is not complete until it is safely resolved or explicitly accepted by the appropriate authority.
 
 ---
 
-# 27. Stop Protocol
+# 33. Completion Standard
 
-The agent must stop immediately when continuing would require guessing or unauthorized action.
+Use only the status justified by evidence.
+
+### `COMPLETE`
+
+Use only when:
+
+- authorized work is implemented;
+- material acceptance criteria hold;
+- required verification was performed;
+- final diff was reviewed;
+- final repository state was reviewed;
+- no material unresolved blocker remains.
+
+### `IMPLEMENTED — PARTIALLY VERIFIED`
+
+Use when implementation is present but material verification remains incomplete.
+
+### `BLOCKED`
+
+Use when safe completion or verification requires an unresolved decision, missing evidence, or authorization.
+
+### `FAILED`
+
+Use when the authorized implementation was attempted but the required result was not achieved.
+
+Do not use:
+
+    "looks good"
+    "should work"
+    "probably correct"
+    "likely safe"
+    "fully verified"
+
+as substitutes for evidence.
+
+---
+
+# 34. Final Report
+
+Every substantial implementation or investigation must end with a factual report.
 
 Use:
 
-    STATUS: BLOCKED
+    IMPLEMENTATION REPORT
 
-    PHASE:
-    <current phase>
+    STATUS:
+    <COMPLETE / IMPLEMENTED — PARTIALLY VERIFIED / BLOCKED / FAILED>
 
-    EXPECTED:
-    <expected state>
+    AUTHORIZED OBJECTIVE:
+    <exact objective>
 
-    OBSERVED:
-    <actual state>
+    BASELINE:
+    - Branch:
+    - Commit:
+    - Initial working-tree state:
 
-    EVIDENCE:
-    <relevant evidence>
+    CURRENT STATE:
+    <relevant verified state>
 
-    IMPACT:
-    <why continuation is unsafe>
+    CHANGES:
+    - <path>: <specific change>
 
-    REQUIRED DECISION:
-    <what must be resolved>
+    FILES CREATED:
+    - <path>
 
-    NO FURTHER MODIFICATION PERFORMED.
+    FILES MODIFIED:
+    - <path>
 
-Stopping is a valid successful behavior when the repository cannot be safely changed with the available evidence.
+    FILES DELETED:
+    - <path>
 
----
+    REPRODUCTION:
+    - Required:
+    - Performed:
+    - Result:
 
-# 28. Re-Planning Protocol
+    VERIFICATION:
+    - <requirement>: HOLDS — <evidence>
+    - <requirement>: BROKEN — <evidence>
+    - <requirement>: SKIPPED — <reason>
 
-Re-planning is required when:
+    ADVERSARIAL / MUTATION VERIFICATION:
+    - Performed:
+    - Defect detected:
+    - Repository restored:
 
-- The repository differs materially from the assumed baseline.
-- A new dependency is discovered.
-- A required file is missing.
-- A migration conflict changes the implementation strategy.
-- The target behavior is ambiguous.
-- The scope must change.
-- The implementation requires a different architectural approach.
-- Verification reveals an unexpected side effect.
+    DATABASE / MIGRATION:
+    - Schema:
+    - Migration:
+    - Journal / metadata:
+    - Resulting database:
+    - Remaining limitations:
 
-The agent must not silently alter the plan.
+    SECURITY:
+    - Relevant checks:
+    - Result:
+    - Remaining limitations:
 
-The revised plan must identify:
+    FINAL GIT STATE:
+    - Status:
+    - Diff reviewed:
+    - Unexpected changes:
 
-    ORIGINAL PLAN
-    NEW EVIDENCE
-    REASON FOR CHANGE
-    PROPOSED NEW PLAN
-    NEW RISKS
-    NEW VERIFICATION
+    OUT-OF-SCOPE FINDINGS:
+    - <finding>
 
-Implementation must pause until the revised scope is authorized when authorization is required.
+    UNRESOLVED ITEMS:
+    - <item>
 
----
+    LIMITATIONS:
+    - <limitation>
 
-# 29. No Phase Skipping
+    NEXT ACTION:
+    - None — awaiting further authorization.
+    OR
+    - Blocked — requires <specific decision>.
 
-The agent must not skip:
-
-- Reconnaissance because the change is small.
-- Alignment because the implementation seems obvious.
-- Planning because the task is familiar.
-- Verification because tests are expected to pass.
-- Diff review because the patch is small.
-- Stop conditions because a tool suggests a convenient workaround.
-
-The only exception is when the active plan explicitly defines a phase as unnecessary for the specific task.
-
----
-
-# 30. No Silent Plan Mutation
-
-The agent must not alter the meaning of the active plan through implementation.
-
-Examples:
-
-- Changing a migration strategy without reporting it.
-- Adding unrelated files because they are convenient.
-- Expanding a database task into application changes.
-- Turning an audit into an implementation task.
-- Turning a repair into a migration-history rewrite.
-- Adding dependencies without authorization.
-
-If the plan is no longer adequate, use the re-planning protocol.
+The final report must not conceal failures, skipped checks, or unresolved items.
 
 ---
 
-# 31. Completion Criteria
+# 35. Agent Self-Check
 
-A task may be reported as complete only when all of the following are true:
-
-- The authorized objective was addressed.
-- The implementation stayed within scope.
-- Required acceptance criteria were satisfied.
-- Required verification was performed.
-- The resulting diff was reviewed.
-- Git state was checked.
-- No material unresolved conflict remains.
-- No required security or database verification remains pending.
-- No unauthorized destructive action occurred.
-- The final report accurately describes what happened.
-
-Otherwise use:
-
-    STATUS: INCOMPLETE
-
-or:
-
-    STATUS: BLOCKED
-
-or:
-
-    STATUS: FAILED
-
-as appropriate.
-
----
-
-# 32. Mandatory Final Report
-
-Every substantial task must end with a factual report containing:
-
-    STATUS
-
-    OBJECTIVE
-
-    CURRENT STATE BEFORE CHANGES
-
-    CHANGES MADE
-
-    FILES CREATED
-
-    FILES MODIFIED
-
-    FILES DELETED
-
-    VERIFICATION PERFORMED
-
-    VERIFICATION RESULTS
-
-    GIT STATUS
-
-    DIFF REVIEW
-
-    CONFLICTS
-
-    OUT-OF-SCOPE FINDINGS
-
-    UNRESOLVED ITEMS
-
-    NEXT AUTHORIZED ACTION
-
-The report must distinguish observed facts from interpretation.
-
-Do not use vague completion language.
-
----
-
-# 33. Evidence-First Reporting
-
-The final report must not merely repeat the plan.
-
-For each important result, provide evidence sufficient for another engineer to reproduce or inspect the conclusion.
-
-Weak:
-
-    "The migration is correct."
-
-Strong:
-
-    "The schema definition was inspected, the generated migration was inspected,
-    the migration metadata was checked, and the resulting Git diff contains only
-    the files authorized by the phase. No unresolved migration conflict remains."
-
-The second form is acceptable only when those checks were actually performed.
-
----
-
-# 34. Agent Self-Check
-
-Before declaring completion, the agent must perform this internal checklist:
+Before reporting completion, verify:
 
     [ ] I inspected the actual relevant source files.
-    [ ] I established the current Git state.
-    [ ] I preserved pre-existing user changes.
-    [ ] I followed the active scope.
-    [ ] I did not silently expand the task.
+    [ ] I established the repository baseline.
+    [ ] I identified pre-existing changes.
+    [ ] I preserved pre-existing user work.
+    [ ] I identified the exact authorized scope.
+    [ ] I did not silently expand scope.
+    [ ] I inspected relevant consumers and dependencies.
     [ ] I investigated material contradictions.
-    [ ] I did not use generated artifacts as a substitute for source inspection.
-    [ ] I did not guess where evidence was required.
-    [ ] I performed the required verification.
+    [ ] I did not treat snapshots or generated artifacts as substitutes for source inspection.
+    [ ] I did not treat another agent's report as independent evidence.
+    [ ] I reproduced the defect where reproduction was required and practical.
+    [ ] I defined verification appropriate to the risk.
+    [ ] I performed required verification.
+    [ ] I challenged important verification mechanisms where warranted.
+    [ ] I restored any deliberate test mutation.
+    [ ] I reviewed security implications where applicable.
+    [ ] I reviewed database and migration implications where applicable.
     [ ] I reviewed the final diff.
-    [ ] I reviewed the final Git status.
-    [ ] I checked relevant security implications.
-    [ ] I checked relevant database implications.
-    [ ] I reported failures and unresolved issues.
+    [ ] I reviewed final Git status.
+    [ ] I reported failures.
+    [ ] I reported skipped verification.
+    [ ] I reported unresolved items.
     [ ] Every completion claim is supported by evidence.
+    [ ] I have not started or implied authorization for the next task.
 
-If any required item is unchecked, the agent must not report the task as complete.
-
----
-
-# 35. Operating Model Summary
-
-The required model is:
-
-    1. UNDERSTAND THE REQUEST
-    2. INSPECT THE LIVE REPOSITORY
-    3. ESTABLISH VERIFIED FACTS
-    4. IDENTIFY CONTRADICTIONS
-    5. DEFINE THE SCOPE
-    6. ALIGN CURRENT STATE WITH TARGET STATE
-    7. CREATE / FOLLOW AN APPROVED PLAN
-    8. EXECUTE ONE PHASE AT A TIME
-    9. VERIFY EACH PHASE
-    10. REVIEW THE DIFF
-    11. REVIEW THE REPOSITORY STATE
-    12. REPORT FACTS, EVIDENCE, AND UNRESOLVED ITEMS
-
-The agent must never invert this order by implementing first and investigating afterward.
+If any required item is not satisfied, do not report the task as fully complete.
 
 ---
 
-# 36. Final Rule
+# 36. Non-Negotiable Rules
 
-The purpose of this blueprint is not to force the agent to perform more work for its own sake.
+The following rules apply throughout the repository:
+
+1. Actual repository state outranks agent reports.
+2. Evidence outranks assumptions.
+3. The active plan defines implementation authorization.
+4. The specification defines intended behavior, not automatic authorization.
+5. Ambiguity must be resolved with evidence or human decision.
+6. Unexpected repository state is a stop condition.
+7. Out-of-scope defects remain findings unless separately authorized.
+8. Pre-existing user work must be preserved.
+9. Repository history must be protected.
+10. Migration history must be protected.
+11. Generated artifacts are not automatically authoritative.
+12. A successful command is not automatically proof of correctness.
+13. A green test is not proof that the test is effective.
+14. Important verification should be challenged against deliberate failure where practical.
+15. Failures must never be hidden.
+16. Missing evidence must never be represented as positive evidence.
+17. Material post-change conclusions must be revalidated against the changed state.
+18. Database changes require cross-layer verification.
+19. Security changes require failure-mode-oriented verification.
+20. The final diff must be reviewed.
+21. The final repository state must be reviewed.
+22. The agent must not silently mutate the approved plan.
+23. The agent must not use destructive operations to manufacture success.
+24. Completion means verified authorized work, not merely changed files.
+25. After the authorized step is complete, the agent must stop.
+
+---
+
+# 37. Final Engineering Principle
+
+The purpose of this blueprint is not to make the agent perform unnecessary work.
 
 The purpose is to prevent unsupported decisions in a repository whose current state may be inconsistent.
 
-Therefore:
+The required standard is:
 
-    NEVER IMPLEMENT FROM A GUESS.
+    INSPECT WHAT EXISTS
+          ↓
+    ESTABLISH WHAT IS TRUE
+          ↓
+    IDENTIFY WHAT IS UNKNOWN
+          ↓
+    DETERMINE WHAT IS AUTHORIZED
+          ↓
+    DEFINE WHAT MUST CHANGE
+          ↓
+    DEFINE HOW IT WILL BE VERIFIED
+          ↓
+    CHANGE ONLY WHAT IS AUTHORIZED
+          ↓
+    VERIFY THE ACTUAL RESULT
+          ↓
+    EXPOSE WHAT COULD NOT BE VERIFIED
+          ↓
+    REVIEW THE FINAL STATE
+          ↓
+    STOP
 
-    NEVER CALL A PARTIAL INSPECTION A COMPLETE AUDIT.
+Never optimize for making the repository appear complete.
 
-    NEVER CALL A GENERATED REPRESENTATION THE SOURCE OF TRUTH WITHOUT VERIFICATION.
+Optimize for making the authorized change correct, preserving everything outside its scope, and leaving behind evidence strong enough for another engineer to independently understand what is actually true.
 
-    NEVER SILENTLY RESOLVE A MATERIAL CONTRADICTION.
-
-    NEVER EXPAND SCOPE BECAUSE AN UNRELATED PROBLEM WAS DISCOVERED.
-
-    NEVER DECLARE SUCCESS WITHOUT RELEVANT EVIDENCE.
-
-    WHEN THE NEXT SAFE ACTION IS NOT ESTABLISHED:
+When the next safe action is not established:
 
     STOP.
-```0
